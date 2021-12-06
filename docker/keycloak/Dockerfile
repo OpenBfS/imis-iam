@@ -14,6 +14,8 @@ RUN tar -xvf keycloak-${KEYCLOAK_VERSION}.tar.gz && mv keycloak-${KEYCLOAK_VERSI
 
 WORKDIR ${KEYCLOAK_HOME}
 
+RUN ${KEYCLOAK_HOME}/bin/add-user-keycloak.sh -u admin -p secret
+
 ADD . ${SRC_DIR}
 
 CMD sh $SRC_DIR/start.sh
