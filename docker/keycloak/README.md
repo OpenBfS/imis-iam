@@ -11,13 +11,13 @@ docker network create imis3
 Build image:
 
 ```bash
-docker build -t imis3/iam_keycloak
+docker build -t imis3/iam_keycloak .
 ```
 
 Run container
 
 ```bash
-docker run --name imis3_iam_keycloak -net imis3 -p 48080:8080 -d imis3/iam_keycloak
+docker run --name imis3_iam_keycloak --network imis3 -p 48080:8080 -d imis3/iam_keycloak
 ```
 
 The Keycloak admin ui can then be reached under localhost:48080. An initial user is created during the setup:
