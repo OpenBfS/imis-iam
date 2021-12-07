@@ -5,7 +5,8 @@
 Build image:
 
 ```bash
-docker build --force-rm=true -t bfs/iam_client .
+cd /path/to/repo
+docker build -f docker/client/Dockerfile --force-rm=true -t bfs/iam_client .
 ```
 
 Run container
