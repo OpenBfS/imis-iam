@@ -29,11 +29,11 @@ WORKDIR /usr/local/iamclient
 RUN yarn install
 
 ADD docker/client/custom-vhosts.conf ./
-ADD docker/client/ /usr/src/docker/
-RUN ln -sf $PWD/custom-vhosts.conf $HTTPD_PREFIX/conf/extra/httpd-vhosts.conf
+ADD docker/client/ /usr/local/iamdocker/
+RUN ln -sf /usr/local/iamdocker/custom-vhosts.conf $HTTPD_PREFIX/conf/extra/httpd-vhosts.conf
 
 # TODO: build iamclient development
 # TODO: link & expose entrypoint
 # TODO: keeping container alive
 
-CMD sh /usr/src/docker/start.sh
+CMD sh /usr/local/iamdocker/start.sh
