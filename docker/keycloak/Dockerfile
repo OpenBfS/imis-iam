@@ -6,7 +6,7 @@ ENV KEYCLOAK_VERSION 15.0.2
 ENV KEYCLOAK_HOME /opt/keycloak
 ENV SRC_DIR /opt/src
 
-RUN apt-get update && apt-get install -y openjdk-11-jdk wget maven
+RUN apt-get update && apt-get install -y openjdk-11-jdk wget maven jq curl
 
 RUN wget -L https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz
 
