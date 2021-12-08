@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-LABEL maintainer="awoestmann@intevation.de"
+LABEL maintainer awoestmann@intevation.de
 
 ENV KEYCLOAK_VERSION 15.0.2
 ENV KEYCLOAK_HOME /opt/keycloak
@@ -16,6 +16,6 @@ WORKDIR ${KEYCLOAK_HOME}
 
 RUN ${KEYCLOAK_HOME}/bin/add-user-keycloak.sh -u admin -p secret
 
-ADD . ${SRC_DIR}
+ADD docker/keycloak ${SRC_DIR}
 
 CMD sh $SRC_DIR/start.sh

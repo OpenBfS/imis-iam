@@ -1,5 +1,5 @@
 FROM httpd:2.4
-MAINTAINER jkrambach@intevation.de
+LABEL maintainer jkrambach@intevation.de
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV OPENSSL_CONF /etc/ssl/
@@ -7,9 +7,8 @@ ENV OPENSSL_CONF /etc/ssl/
 #
 # Install required packages
 #
-
 RUN mkdir -p /usr/share/man/man1/ && apt-get -qq update && apt-get -qq install \
-    curl unzip git npm&& \
+    curl unzip git npm libapache2-mod-shib && \
     apt-get -qq clean && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 80
@@ -28,12 +27,19 @@ WORKDIR /usr/local/iamclient
 
 RUN yarn install
 
-ADD docker/client/custom-vhosts.conf ./
 ADD docker/client/ /usr/local/iamdocker/
 RUN ln -sf /usr/local/iamdocker/custom-vhosts.conf $HTTPD_PREFIX/conf/extra/httpd-vhosts.conf
 
-# TODO: build iamclient development
-# TODO: link & expose entrypoint
-# TODO: keeping container alive
+RUN ln -sf /usr/local/iamdocker/shibboleth/shibboleth2.xml \
+       /etc/shibboleth/shibboleth2.xml && \
+    ln -s /usr/local/iamdocker/shibboleth/partner-metadata.xml \
+          /etc/shibboleth/partner-metadata.xml && \
+    ln -sf /usr/local/iamdocker/shibboleth/attribute-map.xml \
+          /etc/shibboleth/attribute-map.xml && \
+    ln -sf /usr/local/iamdocker/shibboleth/shibd.logger \
+          /etc/shibboleth/shibd.logger
+
+#Shibboleth config
+RUN cp /usr/local/iamdocker/shibboleth/etc/*.pem /etc/shibboleth
 
 CMD sh /usr/local/iamdocker/start.sh

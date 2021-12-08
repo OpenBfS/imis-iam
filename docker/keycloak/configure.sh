@@ -3,6 +3,7 @@
 # - Import a realm for the imis applications
 # - Create an openid client with enabled service accounts to access the admin api without user credentials
 # - Create a saml client for the iam web application
+# - Add an initial user
 
 
 KEYCLOAK_URL=http://localhost:8080/auth
@@ -42,3 +43,12 @@ curl -X POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TKN" \
     -d @iam_client.json
+
+#Add inital user
+KEYCLOAK_IAM_USER=$(jq .username iam_user.json)
+KEYCLOAK_IAM_PW=$(jq '.credentials[0].value' iam_user.json)
+echo "Creating iam user: $IMIS_REALM->$KEYCLOAK_IAM_USER - $KEYCLOAK_IAM_PW"
+curl -X POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TKN" \
+    -d @iam_user.json

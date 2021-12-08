@@ -1,0 +1,14 @@
+{
+    "firstName": "Example",
+    "lastName": "User",
+    "username": "exampleuser",
+    "email": "example@user.example",
+    "enabled": "true",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "secret",
+            "temporary": false
+        }
+    ]
+}
