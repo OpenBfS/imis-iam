@@ -30,7 +30,7 @@ services:
       - ./docker/client:/usr/local/iamdocker
       - ./client:/usr/local/iamclient
     ports:
-      - 48081:8081
+      - 48081:80
 networks:
   imis3:
     name: imis3
