@@ -3,4 +3,4 @@
 #Refresh metadata
 service shibd restart
 apachectl start
-yarn serve
+yarn install && yarn serve

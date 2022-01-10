@@ -25,8 +25,6 @@ ADD client /usr/local/iamclient
 RUN rm -rf /usr/local/apache2/htdocs && ln -s /usr/local/iamclient/ /usr/local/apache2/htdocs
 WORKDIR /usr/local/iamclient
 
-RUN yarn install
-
 ADD docker/client/ /usr/local/iamdocker/
 RUN ln -sf /usr/local/iamdocker/custom-vhosts.conf $HTTPD_PREFIX/conf/extra/httpd-vhosts.conf
 
