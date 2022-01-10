@@ -31,9 +31,7 @@ These credentials can be used to log in into the web interface and further confi
 After starting the container the first time, the configure.sh script can be used to do the initial Keycloak configuration:
 
 ```bash
-docker exec -ti iam_keycloak bash
-cd /opt/src/
-./configure.sh
+docker exec iam_keycloak /opt/src/configure.sh
 ```
 
 This will create a new realm for the imis3 iam application and the neccessary clients.
