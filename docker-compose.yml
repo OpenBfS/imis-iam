@@ -25,7 +25,7 @@ services:
     networks:
       - imis3
     depends_on:
-      - iam_keycloak
+      - keycloak
     volumes:
       - ./docker/client:/usr/local/iamdocker
       - ./client:/usr/local/iamclient
