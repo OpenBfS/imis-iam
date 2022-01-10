@@ -7,6 +7,12 @@
 
 DIR=$(dirname $0)
 
+if [ -z $KEYCLOAK_HOME ]
+then
+    KEYCLOAK_HOME=/opt/keycloak
+fi
+JBOSS_CLI=$KEYCLOAK_HOME/bin/jboss-cli.sh
+
 KEYCLOAK_URL=http://localhost:8080/auth
 KEYCLOAK_REALM=master
 KEYCLOAK_CLIENT_ID=clientId
@@ -14,6 +20,19 @@ KEYCLOAK_CLIENT_SECRET=clientSecret
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PW=secret
 IMIS_REALM=imis3
+
+function wait_for_server() {
+    until $JBOSS_CLI -c "ls /deployment"; do
+        sleep 1
+    done
+}
+
+# Add admin user
+${KEYCLOAK_HOME}/bin/add-user-keycloak.sh -u admin -p secret
+
+# Start server
+${KEYCLOAK_HOME}/bin/standalone.sh &
+wait_for_server
 
 #Get access token
 TKN=$(curl -sX POST "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" \
@@ -53,3 +72,6 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TKN" \
     -d @${DIR}/iam_user.json
+
+# Stop server
+$JBOSS_CLI -c ":shutdown"

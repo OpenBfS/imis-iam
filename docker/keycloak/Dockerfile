@@ -13,8 +13,8 @@ RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_V
 
 WORKDIR ${KEYCLOAK_HOME}
 
-RUN ${KEYCLOAK_HOME}/bin/add-user-keycloak.sh -u admin -p secret
-
 ADD docker/keycloak ${SRC_DIR}
+
+RUN ${SRC_DIR}/configure.sh
 
 CMD sh $SRC_DIR/start.sh
