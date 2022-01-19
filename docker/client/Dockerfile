@@ -30,8 +30,6 @@ RUN ln -sf /usr/local/iamdocker/custom-vhosts.conf $HTTPD_PREFIX/conf/extra/http
 
 RUN ln -sf /usr/local/iamdocker/shibboleth/shibboleth2.xml \
        /etc/shibboleth/shibboleth2.xml && \
-    ln -s /usr/local/iamdocker/shibboleth/partner-metadata.xml \
-          /etc/shibboleth/partner-metadata.xml && \
     ln -sf /usr/local/iamdocker/shibboleth/attribute-map.xml \
           /etc/shibboleth/attribute-map.xml && \
     ln -sf /usr/local/iamdocker/shibboleth/shibd.logger \
