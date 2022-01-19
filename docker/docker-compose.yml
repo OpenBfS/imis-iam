@@ -1,0 +1,31 @@
+version: "3.5"
+services:
+  keycloak:
+    container_name: "iam_keycloak"
+    build:
+      context: ../
+      dockerfile: ./docker/keycloak/Dockerfile
+    image: "iam_keycloak"
+    networks:
+      - imis3
+    volumes:
+      - ./keycloak:/opt/src
+    ports:
+      - 48080:8080
+  client:
+    build:
+      context: ../
+      dockerfile: ./docker/client/Dockerfile
+    image: "iam_client"
+    networks:
+      - imis3
+    depends_on:
+      - keycloak
+    volumes:
+      - ./client:/usr/local/iamdocker
+      - ../client:/usr/local/iamclient
+    ports:
+      - 48081:80
+networks:
+  imis3:
+    name: imis3
