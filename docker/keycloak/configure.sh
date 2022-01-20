@@ -34,8 +34,13 @@ function wait_for_server() {
     done
 }
 
-# Add admin user
-${KEYCLOAK_HOME}/bin/add-user-keycloak.sh -u admin -p secret
+# Add admin users for container and keycloak web application
+${KEYCLOAK_HOME}/bin/add-user.sh --silent $KEYCLOAK_ADMIN_USER $KEYCLOAK_ADMIN_PW
+${KEYCLOAK_HOME}/bin/add-user-keycloak.sh -r master \
+    -u $KEYCLOAK_ADMIN_USER -p $KEYCLOAK_ADMIN_PW
+
+# Configure PostgreSQL JDBC driver and data source
+$JBOSS_CLI --file=${DIR}/commands.cli
 
 # Start server
 ${KEYCLOAK_HOME}/bin/standalone.sh &
