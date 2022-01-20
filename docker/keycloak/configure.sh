@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # Script for the inital keycloak setup:
 # - Import a realm for the imis applications
 # - Create an openid client with enabled service accounts to access the admin api without user credentials
@@ -22,8 +22,15 @@ KEYCLOAK_ADMIN_PW=secret
 IMIS_REALM=imis3
 
 function wait_for_server() {
+    wait=10
+    waited=0
     until $JBOSS_CLI -c "ls /deployment"; do
         sleep 1
+        waited=$(($waited + 1))
+        if [ $waited -gt $wait ]; then
+            echo "Failed starting Keycloak"
+            exit 1
+        fi
     done
 }
 
