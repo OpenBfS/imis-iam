@@ -1,5 +1,12 @@
 version: "3.5"
 services:
+  db:
+    container_name: "iam_db"
+    build:
+      context: ./db
+    image: "iam_db"
+    networks:
+      - imis3
   keycloak:
     container_name: "iam_keycloak"
     build:
@@ -8,6 +15,8 @@ services:
     image: "iam_keycloak"
     networks:
       - imis3
+    depends_on:
+      - db
     volumes:
       - ./keycloak:/opt/src
     ports:
