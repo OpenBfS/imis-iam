@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 
 LABEL maintainer awoestmann@intevation.de
 
-ENV KEYCLOAK_VERSION 15.0.2
+ENV KEYCLOAK_VERSION 16.1.0
 ENV KEYCLOAK_HOME /opt/keycloak
 ENV SRC_DIR /opt/src
 
