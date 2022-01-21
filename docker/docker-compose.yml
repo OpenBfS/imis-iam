@@ -21,6 +21,7 @@ services:
       - ./keycloak:/opt/src
     ports:
       - 48080:8080
+      - 49990:9990
   client:
     build:
       context: ../

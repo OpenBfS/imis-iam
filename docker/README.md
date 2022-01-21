@@ -31,6 +31,10 @@ and further configure the application, but the configure.sh script
 is already run during build to create a new realm for the imis3 IAM application
 and the neccessary clients.
 
+The management console of the Wildfly application server into which Keycloak
+is deployed can be reached unter your-docker-host:49990.
+The credentials are the same as for the keycloak web interface.
+
 
 ## Client application
 
