@@ -29,11 +29,11 @@ An initial user is created during the setup:
 These credentials can be used to log in into the web interface
 and further configure the application, but the configure.sh script
 is already run during build to create a new realm for the imis3 IAM application
-and the neccessary clients.
+and the necessary clients.
 
 The management console of the Wildfly application server into which Keycloak
-is deployed can be reached unter your-docker-host:49990.
-The credentials are the same as for the keycloak web interface.
+is deployed can be reached under docker-host:49990.
+The credentials are the same as for the Keycloak web interface.
 
 
 ## Client application
