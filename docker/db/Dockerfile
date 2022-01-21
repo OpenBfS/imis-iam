@@ -55,17 +55,15 @@ RUN sed -i '/logging_collector/s/on/off/' $PGCONF
 #
 EXPOSE 5432
 
+ADD . /opt/keycloak_db/
+WORKDIR /opt/keycloak_db/
+
 #
 # Create database
 #
 RUN $PGBIN/pg_ctl start -so "-c config_file=$PGCONF" && \
-    $PGBIN/createuser keycloak && \
-    $PGBIN/psql -c "ALTER ROLE keycloak PASSWORD 'secret'" && \
-    $PGBIN/createdb keycloak && \
+    ./setup-db.sh && \
     $PGBIN/pg_ctl stop
-
-ADD . /opt/keycloak_db/
-WORKDIR /opt/keycloak_db/
 
 #
 # Set the default command to run when starting the container
