@@ -7,7 +7,8 @@ ENV KEYCLOAK_HOME /opt/keycloak
 ENV SRC_DIR /opt/src
 
 RUN apt-get update && apt-get install -y \
-            default-jre-headless jq curl libpostgresql-jdbc-java
+            default-jre-headless jq curl libpostgresql-jdbc-java \
+            postgresql-client
 
 RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
     | tar zx && mv keycloak-${KEYCLOAK_VERSION} ${KEYCLOAK_HOME}

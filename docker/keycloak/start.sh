@@ -6,6 +6,20 @@ if [ -z $KEYCLOAK_HOME ]
 then
     KEYCLOAK_HOME=/opt/keycloak
 fi
+export PGPASSWORD=secret
+
+wait_for_db () {
+    wait=10
+    waited=0
+    until psql -h iam_db -U keycloak -wl > /dev/null; do
+        sleep 1
+        waited=$(($waited + 1))
+        if [ $waited -gt $wait ]; then
+            echo "Could not connect to PostgreSQL database"
+            exit 1
+        fi
+    done
+}
 
 wait_for_server () {
     wait=10
@@ -21,6 +35,7 @@ wait_for_server () {
 }
 
 # Start Keycloak
+wait_for_db
 ${KEYCLOAK_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement=0.0.0.0 &
 wait_for_server
 
