@@ -44,4 +44,7 @@ the client application:
 * Username: exampleuser
 * Password: secret
 
+Further, the users provided by the LDAP container can be used to login.
+See ldap/users.ldif for credentials (uid, userPassword).
+
 The client should listen to localhost:48081.

@@ -79,5 +79,12 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
     -H "Authorization: Bearer $TKN" \
     -d @${DIR}/iam_user.json
 
+# Configure and sync LDAP
+echo "Creating LDAP user federation"
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $TKN" \
+     -d @${DIR}/ldap_provider.json
+
 echo "... done"
 wait $!
