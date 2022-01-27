@@ -1,5 +1,5 @@
 FROM debian:bullseye
-MAINTAINER tom.gottfried@intevation.de
+LABEL maintainer tom.gottfried@intevation.de
 
 ENV PG_VERSION 14
 
