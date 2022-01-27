@@ -1,5 +1,12 @@
 version: "3.5"
 services:
+  ldap:
+    container_name: "iam_ldap"
+    build:
+      context: ./ldap
+    image: "iam_ldap"
+    networks:
+      - imis3
   db:
     container_name: "iam_db"
     build:
@@ -17,6 +24,7 @@ services:
       - imis3
     depends_on:
       - db
+      - ldap
     volumes:
       - ./keycloak:/opt/src
     ports:
