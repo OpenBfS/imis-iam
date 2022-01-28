@@ -1,6 +1,6 @@
 # Docker Setup
 
-Use docker-compose to build/start the whole bfs-IAM stack at once, e.g. with
+Use docker-compose to build/start the whole IAM stack at once, e.g. with
 
 ```bash
 cd docker
@@ -27,8 +27,9 @@ An initial user is created during the setup:
 * Password: secret
 
 These credentials can be used to log in into the web interface
-and further configure the application, but the configure.sh script
-is already run during build to create a new realm for the imis3 IAM application
+and further configure the application, but the necessary configuration
+is already run during build respectively startup
+to create a new realm for the IMIS3 IAM application
 and the necessary clients.
 
 The management console of the Wildfly application server into which Keycloak
@@ -47,4 +48,4 @@ the client application:
 Further, the users provided by the LDAP container can be used to login.
 See ldap/users.ldif for credentials (uid, userPassword).
 
-The client should listen to localhost:48081.
+Authenticated access to the client is given under localhost:48081.
