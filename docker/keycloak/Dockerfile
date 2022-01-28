@@ -15,7 +15,7 @@ RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_V
 
 WORKDIR ${KEYCLOAK_HOME}
 
-ADD docker/keycloak ${SRC_DIR}
+ADD . ${SRC_DIR}
 
 ENV POSTGRES_MODULE $KEYCLOAK_HOME/modules/system/layers/keycloak/org/postgresql/main
 RUN mkdir -p $POSTGRES_MODULE
