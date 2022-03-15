@@ -13,9 +13,11 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
     | tar zx && mv keycloak-${KEYCLOAK_VERSION} ${KEYCLOAK_HOME}
 
+ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
+
 WORKDIR ${KEYCLOAK_HOME}
 
-ADD . ${SRC_DIR}
+ADD docker/keycloak ${SRC_DIR}
 
 ENV POSTGRES_MODULE $KEYCLOAK_HOME/modules/system/layers/keycloak/org/postgresql/main
 RUN mkdir -p $POSTGRES_MODULE
