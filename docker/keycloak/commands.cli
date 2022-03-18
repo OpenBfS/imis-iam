@@ -3,4 +3,7 @@ embed-server
 data-source --name=KeycloakDS --connection-url=jdbc:postgresql://iam_db/keycloak --driver-name=postgresql --user-name=keycloak --password=secret
 cd /subsystem=keycloak-server/spi=connectionsJpa/provider=default
 :map-put(name=properties, key=schema, value=keycloak)
+/subsystem=keycloak-server/theme=defaults/:write-attribute(name=cacheThemes,value=false)
+/subsystem=keycloak-server/theme=defaults/:write-attribute(name=cacheTemplates,value=false)
+/subsystem=keycloak-server/theme=defaults/:write-attribute(name=staticMaxAge,value=-1)
 stop-embedded-server
