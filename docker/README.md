@@ -20,7 +20,7 @@ ssh -L 48081:docker-host:48081 -L 48080:docker-host:48080 remote-host
 
 ## Keycloak
 
-The Keycloak admin UI can then be reached under localhost:48080.
+The Keycloak admin UI can then be reached under http://localhost:48080/admin.
 An initial user is created during the setup:
 
 * Username: admin
@@ -31,10 +31,6 @@ and further configure the application, but the necessary configuration
 is already run during build respectively startup
 to create a new realm for the IMIS3 IAM application
 and the necessary clients.
-
-The management console of the Wildfly application server into which Keycloak
-is deployed can be reached under docker-host:49990.
-The credentials are the same as for the Keycloak web interface.
 
 
 ## Client application

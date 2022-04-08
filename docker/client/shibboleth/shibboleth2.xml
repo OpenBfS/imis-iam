@@ -30,8 +30,7 @@
             entityID property and adjust discoveryURL to point to discovery service.
             You can also override entityID on /Login query string, or in RequestMap/htaccess.
             -->
-            <SSO entityID="http://localhost:48080/auth/realms/imis3"
-                 discoveryProtocol="SAMLDS" discoveryURL="https://ds.example.org/DS/WAYF"
+            <SSO entityID="http://localhost:48080/realms/imis3"
                  outgoingBindings="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">
               SAML2
             </SSO>
@@ -72,7 +71,7 @@
         <MetadataProvider
             type="XML"
             validate="true"
-            url="http://iam_keycloak:8080/auth/realms/imis3/protocol/saml/descriptor"
+            url="http://iam-keycloak:8080/realms/imis3/protocol/saml/descriptor"
             maxRefreshDelay="7200"
             minRefreshDelay="1"
             />

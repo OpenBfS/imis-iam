@@ -15,7 +15,7 @@ services:
     networks:
       - imis3
   keycloak:
-    container_name: "iam_keycloak"
+    container_name: "iam-keycloak"
     build:
       context: ../
       dockerfile: ./docker/keycloak/Dockerfile

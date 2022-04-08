@@ -21,37 +21,22 @@ wait_for_db () {
     done
 }
 
-wait_for_server () {
-    wait=10
-    waited=0
-    until ${KEYCLOAK_HOME}/bin/jboss-cli.sh -c "ls /deployment"; do
-        sleep 1
-        waited=$(($waited + 1))
-        if [ $waited -gt $wait ]; then
-            echo "Failed starting Keycloak"
-            exit 1
-        fi
-    done
-}
-
 # Start Keycloak
 wait_for_db
-${KEYCLOAK_HOME}/bin/standalone.sh -b 0.0.0.0 -bmanagement=0.0.0.0 &
-wait_for_server
+${KEYCLOAK_HOME}/bin/kc.sh start &
+wait-for-it localhost:8080 -t 60 || { echo "Failed starting Keycloak"; exit 1; }
 
 echo "Configure realm, SAML client and example account if not existing ..."
-KEYCLOAK_URL=http://localhost:8080/auth
+KEYCLOAK_URL=http://localhost:8080
 KEYCLOAK_REALM=master
-KEYCLOAK_ADMIN_USER=admin
-KEYCLOAK_ADMIN_PW=secret
 IMIS_REALM=imis3
 IMIS_CLIENT=iam-client
 
 # Get access token
 TKN=$(curl -sX POST "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" \
  -H "Content-Type: application/x-www-form-urlencoded" \
- -d "username=${KEYCLOAK_ADMIN_USER}" \
- -d "password=${KEYCLOAK_ADMIN_PW}" \
+ -d "username=${KEYCLOAK_ADMIN}" \
+ -d "password=${KEYCLOAK_ADMIN_PASSWORD}" \
  -d 'grant_type=password' \
  -d 'client_id=admin-cli' | jq -r '.access_token')
 
@@ -71,9 +56,7 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients" \
     -d @${DIR}/iam_client.json
 
 # Add inital user
-KEYCLOAK_IAM_USER=$(jq .username ${DIR}/iam_user.json)
-KEYCLOAK_IAM_PW=$(jq '.credentials[0].value' ${DIR}/iam_user.json)
-echo "Creating iam user: $IMIS_REALM->$KEYCLOAK_IAM_USER - $KEYCLOAK_IAM_PW"
+echo "Creating example user"
 curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TKN" \

@@ -2,13 +2,15 @@ FROM ubuntu:20.04
 
 LABEL maintainer awoestmann@intevation.de
 
-ENV KEYCLOAK_VERSION 16.1.0
+ENV KEYCLOAK_VERSION 17.0.1
 ENV KEYCLOAK_HOME /opt/keycloak
 ENV SRC_DIR /opt/src
+ENV KEYCLOAK_ADMIN admin
+ENV KEYCLOAK_ADMIN_PASSWORD secret
 
 RUN apt-get update && apt-get install -y \
-            default-jre-headless jq curl libpostgresql-jdbc-java \
-            postgresql-client
+            default-jre-headless jq curl \
+            postgresql-client wait-for-it
 
 RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
     | tar zx && mv keycloak-${KEYCLOAK_VERSION} ${KEYCLOAK_HOME}
@@ -19,11 +21,8 @@ WORKDIR ${KEYCLOAK_HOME}
 
 ADD docker/keycloak ${SRC_DIR}
 
-ENV POSTGRES_MODULE $KEYCLOAK_HOME/modules/system/layers/keycloak/org/postgresql/main
-RUN mkdir -p $POSTGRES_MODULE
-RUN ln -s /usr/share/java/postgresql.jar $POSTGRES_MODULE
-RUN ln -s $SRC_DIR/postgresql-module.xml $POSTGRES_MODULE/module.xml
+RUN ln -fs $SRC_DIR/keycloak.conf $KEYCLOAK_HOME/conf/keycloak.conf
 
-RUN ${SRC_DIR}/configure.sh
+RUN ${KEYCLOAK_HOME}/bin/kc.sh build
 
 CMD sh $SRC_DIR/start.sh
