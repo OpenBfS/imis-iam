@@ -28,6 +28,7 @@ services:
     volumes:
       - ./keycloak:/opt/src
       - ../keycloak/iam_theme:/opt/keycloak/themes/iam_theme
+      - ../keycloak/iam_spi:/opt/iam_spi
     ports:
       - 48080:8080
       - 49990:9990

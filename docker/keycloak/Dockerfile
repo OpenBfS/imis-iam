@@ -5,17 +5,24 @@ LABEL maintainer awoestmann@intevation.de
 ENV KEYCLOAK_VERSION 18.0.0
 ENV KEYCLOAK_HOME /opt/keycloak
 ENV SRC_DIR /opt/src
+ENV SPI_SRC /opt/iam_spi
 ENV KEYCLOAK_ADMIN admin
 ENV KEYCLOAK_ADMIN_PASSWORD secret
 
 RUN apt-get update && apt-get install -y \
-            default-jre-headless jq curl \
+            default-jre-headless maven jq curl \
             postgresql-client wait-for-it
 
 RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
     | tar zx && mv keycloak-${KEYCLOAK_VERSION} ${KEYCLOAK_HOME}
 
 ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
+
+# Deploy SPI
+ADD keycloak/iam_spi ${SPI_SRC}
+WORKDIR ${SPI_SRC}
+RUN mvn package
+RUN cp target/iam-api-extension.jar $KEYCLOAK_HOME/providers/
 
 WORKDIR ${KEYCLOAK_HOME}
 
