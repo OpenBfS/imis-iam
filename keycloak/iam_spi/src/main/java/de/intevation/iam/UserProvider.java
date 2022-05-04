@@ -3,14 +3,10 @@ package de.intevation.iam;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
@@ -30,10 +26,8 @@ public class UserProvider implements RealmResourceProvider {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/profile")
-    public Response getProfile(
-            @Context UriInfo info,
-            @Context HttpServletRequest request) {
+    // @Path("/profile")
+    public Response getProfile() {
         UserModel user = auth.getUser();
         return Response.ok(userToJson(user)).build();
     }
@@ -41,7 +35,6 @@ public class UserProvider implements RealmResourceProvider {
     @Override
     public void close() {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
