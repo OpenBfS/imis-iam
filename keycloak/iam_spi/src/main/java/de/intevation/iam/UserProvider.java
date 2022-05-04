@@ -21,6 +21,8 @@ import org.keycloak.userprofile.UserProfile;
 import org.keycloak.userprofile.UserProfileContext;
 import org.keycloak.userprofile.UserProfileProvider;
 
+import de.intevation.iam.model.User;
+
 public class UserProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
@@ -35,11 +37,11 @@ public class UserProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
     public Response getProfile() {
-        UserModel user = auth.getUser();
-        if (user == null) {
+        if (this.auth == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
-        return Response.ok(userToJson(user).toString()).build();
+        UserModel user = auth.getUser();
+        return Response.ok(User.fromUserModel(user)).build();
     }
 
     @PUT
@@ -48,6 +50,9 @@ public class UserProvider implements RealmResourceProvider {
     public Response updateProfile(
         final UserRepresentation rep
     ) {
+        if (this.auth == null) {
+            return Response.status(Status.FORBIDDEN).build();
+        }
         UserModel user = auth.getUser();
         if (!user.getId().equals(rep.getId())) {
             return Response.status(Status.FORBIDDEN).build();
@@ -55,7 +60,7 @@ public class UserProvider implements RealmResourceProvider {
         UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
         UserProfile profile = profileProvider.create(UserProfileContext.USER_API, rep.toAttributes());
         profile.update(false);
-        return Response.ok(userToJson(user).toString()).build();
+        return Response.ok(User.fromUserModel(user)).build();
     }
 
     @Override
@@ -66,14 +71,5 @@ public class UserProvider implements RealmResourceProvider {
     @Override
     public Object getResource() {
         return this;
-    }
-    private JsonObject userToJson(UserModel user) {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("id", user.getId());
-        builder.add("firstname", user.getFirstName());
-        builder.add("lastname", user.getLastName());
-        builder.add("mail", user.getEmail());
-        builder.add("username", user.getUsername());
-        return builder.build();
     }
 }
