@@ -24,34 +24,30 @@
   </v-form>
 </template>
 <script>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
-export default {
+import { computed, defineComponent } from "vue";
+import { useStore } from "vuex";
+export default defineComponent({
   setup() {
     const store = useStore();
-    store.dispatch('loadProfile');
+    store.dispatch("loadProfile");
+    const username = computed(() => {
+      return store.state.username;
+    });
+    const firstname = computed(() => {
+      return store.state.firstname;
+    });
+    const lastname = computed(() => {
+      return store.state.lastname;
+    });
+    const email = computed(() => {
+      return store.state.email;
+    });
+    return {
+      username,
+      firstname,
+      lastname,
+      email,
+    };
   },
-  computed: {
-    username: {
-      get () {
-        return this.$store.state.profile.username;
-      }
-    },
-    firstname: {
-      get () {
-        return this.$store.state.profile.firstname;
-      }
-    },
-    lastname: {
-      get () {
-        return this.$store.state.profile.lastname;
-      }
-    },
-    email: {
-      get () {
-        return this.$store.state.profile.email;
-      }
-    }
-  }
-};
+});
 </script>
