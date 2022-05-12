@@ -1,19 +1,23 @@
 <template>
   <v-form>
     <v-container>
-      <v-text-field v-model="username" label="Username" readonly>
+      <v-text-field v-model="userData.username" label="Username" readonly>
       </v-text-field>
       <v-text-field
-        v-model="firstname"
+        v-model="userData.firstName"
         label="First name"
         required
       ></v-text-field>
       <v-text-field
-        v-model="lastname"
+        v-model="userData.lastName"
         label="Last name"
         required
       ></v-text-field>
-      <v-text-field v-model="email" label="Email" required></v-text-field>
+      <v-text-field
+        v-model="userData.email"
+        label="Email"
+        required
+      ></v-text-field>
       <v-container>
         <v-row>
           <v-btn>Save</v-btn>
@@ -24,30 +28,20 @@
   </v-form>
 </template>
 <script>
-import { computed, defineComponent } from "vue";
+import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
-export default defineComponent({
+export default {
   setup() {
     const store = useStore();
-    store.dispatch("loadProfile");
-    const username = computed(() => {
-      return store.state.username;
+    const userData = computed(() => {
+      return store.state.profile.userData;
     });
-    const firstname = computed(() => {
-      return store.state.firstname;
-    });
-    const lastname = computed(() => {
-      return store.state.lastname;
-    });
-    const email = computed(() => {
-      return store.state.email;
+    onMounted(() => {
+      store.dispatch("profile/loadProfile");
     });
     return {
-      username,
-      firstname,
-      lastname,
-      email,
+      userData,
     };
   },
-});
+};
 </script>
