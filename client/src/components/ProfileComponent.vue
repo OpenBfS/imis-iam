@@ -20,8 +20,8 @@
       ></v-text-field>
       <v-container>
         <v-row>
-          <v-btn>Save</v-btn>
-          <v-btn>Reset</v-btn>
+          <v-btn @click="save">Save</v-btn>
+          <v-btn @click="reset">Reset</v-btn>
         </v-row>
       </v-container>
     </v-container>
@@ -41,7 +41,16 @@ export default {
     });
     return {
       userData,
+      store,
     };
+  },
+  methods: {
+    save() {
+      this.store.dispatch("profile/storeProfile");
+    },
+    reset() {
+      this.store.dispatch("profile/loadProfile");
+    },
   },
 };
 </script>

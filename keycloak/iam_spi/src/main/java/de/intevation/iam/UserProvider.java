@@ -13,7 +13,6 @@ import javax.ws.rs.core.Response.Status;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.representations.account.UserRepresentation;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.userprofile.UserProfile;
 import org.keycloak.userprofile.UserProfileContext;
@@ -47,7 +46,7 @@ public class UserProvider implements RealmResourceProvider {
     @Path("/profile")
     public Response updateProfile(
         @Context HttpHeaders headers,
-        final UserRepresentation rep
+        final User rep
     ) {
         String id = headers.getHeaderString("X-SHIB-user");
         if (id == null) {
@@ -59,8 +58,14 @@ public class UserProvider implements RealmResourceProvider {
         if (!user.getId().equals(rep.getId())) {
             return Response.status(Status.FORBIDDEN).build();
         }
+
+        //Update user
+        user.setFirstName(rep.getFirstName());
+        user.setLastName(rep.getLastName());
+        user.setEmail(rep.getEmail());
+
         UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
-        UserProfile profile = profileProvider.create(UserProfileContext.USER_API, rep.toAttributes());
+        UserProfile profile = profileProvider.create(UserProfileContext.USER_API, user);
         profile.update(false);
         return Response.ok(User.fromUserModel(user)).build();
     }

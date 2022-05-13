@@ -15,5 +15,9 @@ export const profile = {
         commit("setUserData", response.data);
       });
     },
+    storeProfile(context) {
+      console.log(context.state.userData);
+      HTTP.put("/iamuser/profile", context.state.userData);
+    },
   },
 };
