@@ -1,7 +1,9 @@
 <template>
   <v-container>
-    <v-row class="text-center">
-      <v-col cols="12">Work in Progress</v-col>
+    <v-row class="bg-secondary">
+      <v-col cols="12" class="text-h4">
+        Integriertes Mess- und Informationssystem IMIS
+      </v-col>
     </v-row>
   </v-container>
 </template>

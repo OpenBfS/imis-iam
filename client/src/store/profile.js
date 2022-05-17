@@ -12,11 +12,12 @@ export const profile = {
   actions: {
     loadProfile({ commit }) {
       HTTP.get("/iamuser/profile").then((response) => {
-        commit("setUserData", response.data);
+        if (response.status == 200) {
+          commit("setUserData", response.data);
+        }
       });
     },
     storeProfile(context) {
-      console.log(context.state.userData);
       HTTP.put("/iamuser/profile", context.state.userData);
     },
   },

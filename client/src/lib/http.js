@@ -4,4 +4,8 @@ const HTTP = axios.create({
   baseURL: "/backend/realms/imis3",
 });
 
-export { HTTP };
+const ShibHTTP = axios.create({
+  baseURL: "/",
+});
+
+export { HTTP, ShibHTTP };
