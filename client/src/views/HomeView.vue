@@ -9,6 +9,14 @@
         <Applications />
       </v-col>
       <v-col>
+        <v-btn
+          link
+          @click="
+            $route.path == '/institutions' ? '' : $router.push('/institutions')
+          "
+        >
+          Institutions
+        </v-btn>
         <Archive />
       </v-col>
     </v-row>

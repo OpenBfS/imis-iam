@@ -3,14 +3,17 @@
     <v-card-title>Applications</v-card-title>
     <v-container>
       <v-row>
-        <v-btn @click="openInTab(urls.exampleapp1)" class="ma-2 pa-2">
-          <v-icon>mdi-application</v-icon>
-          Example Application 1
-        </v-btn>
-        <v-btn @click="openInTab(urls.exampleapp2)" class="ma-2 pa-2">
-          <v-icon>mdi-application</v-icon>
-          Example Application 2
-        </v-btn>
+        <div v-for="app in applications" :key="app.url">
+          <v-btn
+            :rounded="0"
+            color="accent"
+            @click="openInTab(app.url)"
+            class="ma-2 pa-2"
+          >
+            <v-icon>{{ app.icon }}</v-icon>
+            {{ app.name }}
+          </v-btn>
+        </div>
       </v-row>
     </v-container>
   </v-card>
@@ -21,12 +24,20 @@ export default {
     const openInTab = (url) => {
       window.open(url, "_blank").focus();
     };
-    const urls = {
-      exampleapp1: "https://exampleapp1.test",
-      exampleapp2: "https://exampleapp2.test",
-    };
+    const applications = [
+      {
+        name: "Example Application 1",
+        icon: "mdi-application",
+        url: "https://exampleapp1.test",
+      },
+      {
+        name: "Example Application 2",
+        icon: "mdi-application",
+        url: "https://exampleapp2.test",
+      },
+    ];
     return {
-      urls,
+      applications,
       openInTab,
     };
   },

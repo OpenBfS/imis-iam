@@ -9,7 +9,7 @@
           </li>
         </v-col>
         <v-col align="left" justify="left">
-          <v-btn>Search</v-btn>
+          <v-btn :rounded="0" color="accent">Search</v-btn>
         </v-col>
       </v-row>
     </v-container>

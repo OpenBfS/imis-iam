@@ -1,14 +1,8 @@
 <template>
   <v-form ref="form" v-model="valid" lazy-validation>
     <v-container>
-      <v-col>
-        <v-text-field
-          v-model="userData.username"
-          label="Username"
-          variant="plain"
-          readonly
-        >
-        </v-text-field>
+      <v-col cols="6">
+        <div class="mb-4 text-h6">Username: {{ userData.username }}</div>
         <v-text-field
           v-model="userData.firstName"
           label="First name"
@@ -30,12 +24,10 @@
           :rules="emailRules"
           required
         ></v-text-field>
-        <v-container>
-          <v-row>
-            <v-btn @click="save" class="ma-2 pa-2">Save</v-btn>
-            <v-btn @click="reset" class="ma-2 pa-2">Reset</v-btn>
-          </v-row>
-        </v-container>
+        <v-row>
+          <v-btn @click="save" class="ma-2 pa-2">Save</v-btn>
+          <v-btn @click="reset" class="ma-2 pa-2">Reset</v-btn>
+        </v-row>
       </v-col>
     </v-container>
   </v-form>
