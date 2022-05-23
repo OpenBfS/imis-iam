@@ -6,6 +6,10 @@ export const institution = {
     institutions: [],
     //Institution currently edited
     institution: {},
+    //Institution to be created
+    newInstitution: {
+      name: "",
+    },
   }),
   mutations: {
     setInstitutionList: (state, data) => {
@@ -16,6 +20,13 @@ export const institution = {
     },
   },
   actions: {
+    createInstitution(context, then) {
+      HTTP.post("/institution", context.state.newInstitution).then(() => {
+        if (then) {
+          then();
+        }
+      });
+    },
     /**
      * Load all institutions
      */

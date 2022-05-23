@@ -1,5 +1,38 @@
 <template>
   <div class="ma-2 pa-2">Institutions</div>
+  <div class="ma-2 pa-2">
+    <v-btn color="accent" @click="createVisible = true">
+      <v-icon>mdi-plus </v-icon>
+      Add
+      <v-dialog activator="parent">
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Create new Institution</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    variant="underlined"
+                    label="Name"
+                    v-model="newInstitution.name"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="accent" @click="createInstitution()"> Create </v-btn>
+            <v-btn color="accent" @click="createVisible = false">
+              Cancel
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-btn>
+  </div>
   <v-table class="ma-2 pa-2">
     <thead>
       <th class="text-left">ID</th>
@@ -14,9 +47,12 @@
             (newValue) => dialogVisibilityChanged(item.id, newValue)
           "
         >
-          <v-card>
+          <v-card min-width="500">
             <v-card-title>
-              <span class="text-h5">TEST {{ item.id }}</span>
+              <span class="text-h5">
+                Edit Institution
+                <span class="font-italic">{{ item.name }}</span>
+              </span>
             </v-card-title>
             <v-card-text>
               <v-container>
@@ -55,6 +91,7 @@ import { computed, onMounted } from "vue";
 import institutionStore from "../store";
 export default {
   setup() {
+    var createVisible = false;
     //Load store
     onMounted(() => {
       institutionStore.dispatch("institution/loadInstitutions");
@@ -84,7 +121,18 @@ export default {
       return institutionStore.state.institution.institution;
     });
 
+    const newInstitution = computed(() => {
+      return institutionStore.state.institution.newInstitution;
+    });
+
     //Functions
+    const createInstitution = () => {
+      const then = () => {
+        //Reload list items
+        institutionStore.dispatch("institution/loadInstitutions");
+      };
+      institutionStore.dispatch("institution/createInstitution", then);
+    };
     const dialogVisibilityChanged = (id, newValue) => {
       if (newValue) {
         institutionStore.dispatch("institution/loadInstitutionById", id);
@@ -99,12 +147,14 @@ export default {
       institutionStore.dispatch("institution/storeInstitution", then);
     };
 
-    //Functions
     return {
+      createVisible,
       currentInstitution,
-      dialogVisibilityChanged,
       headers,
       items,
+      newInstitution,
+      createInstitution,
+      dialogVisibilityChanged,
       saveInstitution,
     };
   },
