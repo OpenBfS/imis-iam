@@ -1,9 +1,10 @@
 <template>
-  <div class="ma-2 pa-2">Institutions</div>
+  <div class="ml-4 mr-4 mt-10 pa-2 text-h6 bg-secondary">Institutions</div>
   <div class="ma-2 pa-2">
     <v-btn color="accent" @click="createVisible = true">
       <v-icon>mdi-plus </v-icon>
       Add
+      <!-- Create institution dialog -->
       <v-dialog activator="parent">
         <v-card>
           <v-card-title>
@@ -40,8 +41,10 @@
     </thead>
     <tbody>
       <tr v-for="item in items" :key="item.id">
+        <!-- Edit institution dialog -->
         <v-dialog
           activator="parent"
+          v-model="dialog"
           scrollable
           @update:modelValue="
             (newValue) => dialogVisibilityChanged(item.id, newValue)
@@ -69,6 +72,14 @@
                       label="Name"
                       v-model="currentInstitution.name"
                     ></v-text-field>
+                    <span class="text-h8">Attributes</span>
+                    <v-text-field
+                      class="mt-2 ml-2 mb-0"
+                      v-for="key in Object.keys(currentInstitution.attributes)"
+                      :key="key"
+                      v-model="currentInstitution.attributes[key]"
+                      :label="key"
+                    ></v-text-field>
                   </v-col>
                 </v-row>
               </v-container>
@@ -87,7 +98,7 @@
 </template>
 
 <script>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import institutionStore from "../store";
 export default {
   setup() {
@@ -125,6 +136,8 @@ export default {
       return institutionStore.state.institution.newInstitution;
     });
 
+    const dialog = ref(false);
+
     //Functions
     const createInstitution = () => {
       const then = () => {
@@ -149,6 +162,7 @@ export default {
 
     return {
       createVisible,
+      dialog,
       currentInstitution,
       headers,
       items,
