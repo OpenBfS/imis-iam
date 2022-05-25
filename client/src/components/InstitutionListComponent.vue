@@ -68,18 +68,21 @@
                       v-model="currentInstitution.id"
                     ></v-text-field>
                     <v-text-field
-                      variant="underlined"
+                      variant="plain"
                       label="Name"
                       v-model="currentInstitution.name"
                     ></v-text-field>
                     <span class="text-h8">Attributes</span>
-                    <v-text-field
-                      class="mt-2 ml-2 mb-0"
-                      v-for="key in Object.keys(currentInstitution.attributes)"
-                      :key="key"
-                      v-model="currentInstitution.attributes[key]"
-                      :label="key"
-                    ></v-text-field>
+
+                    <div v-if="instAttributes">
+                      <v-text-field
+                        v-for="attr in Object.keys(instAttributes)"
+                        :label="FormAttribute(attr, instAttributes[attr])"
+                        :key="attr"
+                        clearable
+                        readonly
+                      ></v-text-field>
+                    </div>
                   </v-col>
                 </v-row>
               </v-container>
@@ -99,17 +102,19 @@
 
 <script>
 import { computed, onMounted, ref } from "vue";
-import institutionStore from "../store";
+import { useStore } from "vuex";
+
 export default {
   setup() {
+    const store = useStore();
     var createVisible = false;
     //Load store
     onMounted(() => {
-      institutionStore.dispatch("institution/loadInstitutions");
+      store.dispatch("institution/loadInstitutions");
     });
 
     //Table headers
-    const headers = computed(() => [
+    const headers = ref([
       {
         text: "ID",
         align: "start",
@@ -125,15 +130,15 @@ export default {
     ]);
     //Computed items
     const items = computed(() => {
-      return institutionStore.state.institution.institutions;
+      return store.state.institution.institutions;
     });
 
     const currentInstitution = computed(() => {
-      return institutionStore.state.institution.institution;
+      return store.state.institution.institution;
     });
 
     const newInstitution = computed(() => {
-      return institutionStore.state.institution.newInstitution;
+      return store.state.institution.newInstitution;
     });
 
     const dialog = ref(false);
@@ -142,25 +147,33 @@ export default {
     const createInstitution = () => {
       const then = () => {
         //Reload list items
-        institutionStore.dispatch("institution/loadInstitutions");
+        store.dispatch("institution/loadInstitutions");
       };
-      institutionStore.dispatch("institution/createInstitution", then);
+      store.dispatch("institution/createInstitution", then);
     };
+    //const selectedAttributes = ref([]);
     const dialogVisibilityChanged = (id, newValue) => {
       if (newValue) {
-        institutionStore.dispatch("institution/loadInstitutionById", id);
+        store.dispatch("institution/loadInstitutionById", id).then(() => {
+          instAttributes.value = currentInstitution.value.attributes || [];
+        }); // TODO: Handle HTTP Erorrs
       }
     };
     const saveInstitution = () => {
       const then = () => {
         //Reload list items
-        institutionStore.dispatch("institution/loadInstitutions");
+        store.dispatch("institution/loadInstitutions");
       };
       //Store edited institution
-      institutionStore.dispatch("institution/storeInstitution", then);
+      store.dispatch("institution/storeInstitution", then);
     };
-
+    const instAttributes = ref();
+    const FormAttribute = (key, value) => {
+      return key + ": " + value.map((x) => x).join(", ");
+    };
     return {
+      FormAttribute,
+      instAttributes,
       createVisible,
       dialog,
       currentInstitution,

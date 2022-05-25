@@ -1,3 +1,4 @@
+import { Promise } from "core-js";
 import { HTTP } from "../lib/http";
 export const institution = {
   namespaced: true,
@@ -31,23 +32,24 @@ export const institution = {
      * Load all institutions
      */
     loadInstitutions({ commit }) {
-      HTTP.get("/institution").then((response) => {
-        if (response.status == 200) {
+      HTTP.get("/institution")
+        .then((response) => {
           commit("setInstitutionList", response.data);
-        }
-      });
+        })
+        .catch((error) => console.log(error)); // TODO: Handle http error in component
     },
-    /**
-     * Load institution by id
-     * @param {*} id Id to load
-     */
+
     loadInstitutionById({ commit }, id) {
-      HTTP.get("/institution/" + id).then((response) => {
-        if (response.status == 200) {
-          commit("setInstitution", response.data);
-        }
+      return new Promise((resolve, reject) => {
+        HTTP.get("/institution/" + id)
+          .then((response) => {
+            commit("setInstitution", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error)); // TODO: Handle http error in component
       });
     },
+
     /**
      * Store the institution
      * @param {Function} then Function, called after saving
