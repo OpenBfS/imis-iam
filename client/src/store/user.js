@@ -9,6 +9,7 @@ export const user = {
       firstName: "",
       lastName: "",
       email: "",
+      groups: [],
     },
     users: [],
   }),

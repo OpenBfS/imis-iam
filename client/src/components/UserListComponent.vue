@@ -45,6 +45,18 @@
                 ></v-text-field>
               </v-col>
             </v-row>
+            <v-row>
+              <v-col>
+                <v-combobox
+                  v-model="newUser.groups"
+                  :items="institutions"
+                  label="Institutions"
+                  chips
+                  closable-chips
+                  multiple
+                ></v-combobox>
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -117,58 +129,73 @@
     </v-table>
     <!-- Edit user dialog -->
     <v-dialog v-model="editVisible">
-      <v-card min-width="500">
+      <v-card min-width="700" min-height="800">
         <v-card-title>
           <span class="text-h5">Edit User {{ currentUser.username }}</span>
         </v-card-title>
         <v-card-text>
-          <v-row>
-            <v-col>
-              <v-text-field
-                variant="plain"
-                label="ID"
-                readonly
-                v-model="currentUser.id"
-              ></v-text-field>
-              <v-text-field
-                variant="plain"
-                label="Username"
-                readonly
-                v-model="currentUser.username"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-text-field
-                variant="underlined"
-                label="First Name"
-                v-model="currentUser.firstName"
-              ></v-text-field>
-            </v-col>
-            <v-col>
-              <v-text-field
-                variant="underlined"
-                label="Last Name"
-                v-model="currentUser.lastName"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-text-field
-                variant="underlined"
-                label="Email"
-                v-model="currentUser.email"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+          <v-container>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  variant="plain"
+                  label="ID"
+                  readonly
+                  v-model="currentUser.id"
+                ></v-text-field>
+                <v-text-field
+                  variant="plain"
+                  label="Username"
+                  readonly
+                  v-model="currentUser.username"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  variant="underlined"
+                  label="First Name"
+                  v-model="currentUser.firstName"
+                ></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  variant="underlined"
+                  label="Last Name"
+                  v-model="currentUser.lastName"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  variant="underlined"
+                  label="Email"
+                  v-model="currentUser.email"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col> Institutions </v-col>
+            </v-row>
+            <v-combobox
+              v-model="currentUser.groups"
+              :items="institutions"
+              label="Institutions"
+              chips
+              closable-chips
+              multiple
+            ></v-combobox>
+          </v-container>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="accent" @click="storeUser()"> Save </v-btn>
           <v-btn color="accent" @click="editVisible = false"> Cancel </v-btn>
-          <v-btn color="accent"> Reset </v-btn>
+          <v-btn color="accent" @click="resetUserForm(currentUser.id)">
+            Reset
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -191,9 +218,12 @@ export default {
     const users = computed(() => {
       return store.state.user.users;
     });
-
+    const institutions = computed(() => {
+      return store.state.institution.institutionNames;
+    });
     onMounted(() => {
       store.dispatch("user/loadUsers");
+      store.dispatch("institution/loadInstitutionNames");
     });
 
     const onCopyClicked = (id) => {
@@ -209,6 +239,9 @@ export default {
         store.dispatch("user/loadUsers");
       });
     };
+    const resetUserForm = (id) => {
+      store.dispatch("user/loadUserById", id);
+    };
     const storeUser = () => {
       store.dispatch("user/storeUser").then(() => {
         store.dispatch("user/loadUsers");
@@ -220,8 +253,10 @@ export default {
       editVisible,
       currentUser,
       newUser,
+      institutions,
       users,
       createUser,
+      resetUserForm,
       storeUser,
       onCopyClicked,
       onEditClicked,

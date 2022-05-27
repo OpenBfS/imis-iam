@@ -5,6 +5,7 @@ export const institution = {
   state: () => ({
     //List of institutions
     institutions: [],
+    institutionNames: [],
     //Institution currently edited
     institution: {},
     //Institution to be created
@@ -15,6 +16,13 @@ export const institution = {
   mutations: {
     setInstitutionList: (state, data) => {
       state.institutions = data;
+    },
+    setInstitutionNames: (state, data) => {
+      var names = [];
+      data.forEach((institution) => {
+        names.push(institution.name);
+      });
+      state.institutionNames = names;
     },
     setInstitution: (state, data) => {
       state.institution = data;
@@ -35,6 +43,14 @@ export const institution = {
       HTTP.get("/institution")
         .then((response) => {
           commit("setInstitutionList", response.data);
+        })
+        .catch((error) => console.log(error)); // TODO: Handle http error in component
+    },
+
+    loadInstitutionNames({ commit }) {
+      HTTP.get("/institution")
+        .then((response) => {
+          commit("setInstitutionNames", response.data);
         })
         .catch((error) => console.log(error)); // TODO: Handle http error in component
     },

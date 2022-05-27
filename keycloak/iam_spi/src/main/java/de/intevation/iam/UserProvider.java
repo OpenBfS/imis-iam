@@ -1,7 +1,12 @@
 package de.intevation.iam;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -15,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -113,6 +119,14 @@ public class UserProvider implements RealmResourceProvider {
         newUser.setFirstName(rep.getFirstName());
         newUser.setLastName(rep.getLastName());
         newUser.setEmail(rep.getEmail());
+
+        //Update groups
+        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
+            return rep.getGroups().contains(item.getName());
+        });
+        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getName, Function.identity()));
+        updateGroups(groupMap, newUser);
+
         return Response.ok(User.fromUserModel(newUser)).build();
     }
 
@@ -136,7 +150,30 @@ public class UserProvider implements RealmResourceProvider {
         UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
         UserProfile profile = profileProvider.create(UserProfileContext.USER_API, user);
         profile.update(false);
+
+        //Get new groups list and update
+        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
+            return rep.getGroups().contains(item.getName());
+        });
+        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getName, Function.identity()));
+        updateGroups(groupMap, user);
+
         return Response.ok(User.fromUserModel(user)).build();
+    }
+
+    private void updateGroups(Map<String, GroupModel> newGroups, UserModel user) {
+        //Join new groups
+        newGroups.forEach((name, group) -> {
+            if (!user.isMemberOf(group)) {
+                user.joinGroup(group);
+            }
+        });
+        //Leave groups if necessary
+        user.getGroupsStream().forEach(group -> {
+            if (!newGroups.containsKey(group.getName())) {
+                user.leaveGroup(group);
+            }
+        });
     }
 
     @Override

@@ -107,7 +107,7 @@ import { useStore } from "vuex";
 export default {
   setup() {
     const store = useStore();
-    var createVisible = false;
+    const createVisible = ref(false);
     //Load store
     onMounted(() => {
       store.dispatch("institution/loadInstitutions");
