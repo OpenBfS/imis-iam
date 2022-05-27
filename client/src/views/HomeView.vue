@@ -17,6 +17,12 @@
         >
           Institutions
         </v-btn>
+        <v-btn
+          link
+          @click="$route.path == '/users' ? '' : $router.push('/users')"
+        >
+          Users
+        </v-btn>
         <Archive />
       </v-col>
     </v-row>
