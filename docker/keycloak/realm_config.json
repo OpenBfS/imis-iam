@@ -1468,5 +1468,39 @@
   },
   "clientPolicies": {
     "policies": []
-  }
+  },
+  "groups": [
+    {
+      "id": "afd1d631-8a83-47f7-b74b-1fcac1185ad1",
+      "name": "Institution1",
+      "path": "/Institution1",
+      "attributes": {
+        "Attribute2": [
+          "Value2-1, Value2-2"
+        ],
+        "Attribute1": [
+          "Value1"
+        ]
+      },
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    },
+    {
+      "id": "203a15f9-1de2-4d6b-91c5-33c84e51f17a",
+      "name": "Institution2",
+      "path": "/Institution2",
+      "attributes": {
+        "Attribute2": [
+          "Value2"
+        ],
+        "Attribute1": [
+          "Value1-1, Value1-2"
+        ]
+      },
+      "realmRoles": [],
+      "clientRoles": {},
+      "subGroups": []
+    }
+  ]
 }
