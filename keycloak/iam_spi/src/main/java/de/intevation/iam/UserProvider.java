@@ -1,8 +1,13 @@
 package de.intevation.iam;
 
+import java.util.ArrayList;
+import java.util.stream.Stream;
+
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -54,6 +59,70 @@ public class UserProvider implements RealmResourceProvider {
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
+
+        if (!user.getId().equals(rep.getId())) {
+            return Response.status(Status.FORBIDDEN).build();
+        }
+
+        //Update user
+        user.setFirstName(rep.getFirstName());
+        user.setLastName(rep.getLastName());
+        user.setEmail(rep.getEmail());
+
+        UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
+        UserProfile profile = profileProvider.create(UserProfileContext.USER_API, user);
+        profile.update(false);
+        return Response.ok(User.fromUserModel(user)).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsers() {
+
+        RealmModel realm = session.getContext().getRealm();
+        Stream<UserModel> users = session.users().getUsersStream(realm);
+        ArrayList<User> userList = new ArrayList<User>();
+        users.forEach(user -> {
+            userList.add(User.fromUserModel(user));
+        });
+        return Response.ok(userList).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    public Response getUserById(@PathParam("id") String id) {
+        if (id == null || id.isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+        RealmModel realm = session.getContext().getRealm();
+        UserModel user = session.users().getUserById(realm, id);
+        if (user == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        return Response.ok(User.fromUserModel(user)).build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createUser(final User rep) {
+        if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+        RealmModel realm = session.getContext().getRealm();
+        UserModel newUser = session.users().addUser(realm, rep.getUsername());
+        newUser.setFirstName(rep.getFirstName());
+        newUser.setLastName(rep.getLastName());
+        newUser.setEmail(rep.getEmail());
+        return Response.ok(User.fromUserModel(newUser)).build();
+    }
+
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUser(
+        final User rep
+    ) {
+        RealmModel realm = session.getContext().getRealm();
+        UserModel user = session.users().getUserById(realm, rep.getId());
 
         if (!user.getId().equals(rep.getId())) {
             return Response.status(Status.FORBIDDEN).build();
