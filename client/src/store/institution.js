@@ -14,6 +14,15 @@ export const institution = {
     },
   }),
   mutations: {
+    //Convert current institution attributes to string arrays
+    convertCurrentInstitutionAttributes: (state) => {
+      let attributes = state.institution.attributes;
+      for (let attribute in attributes) {
+        if (typeof attributes[attribute] == "string") {
+          attributes[attribute] = attributes[attribute].split(", ");
+        }
+      }
+    },
     setInstitutionList: (state, data) => {
       state.institutions = data;
     },
@@ -70,11 +79,15 @@ export const institution = {
      * Store the institution
      * @param {Function} then Function, called after saving
      */
-    storeInstitution(context, then) {
-      HTTP.put("/institution", context.state.institution).then(() => {
-        if (then) {
-          then();
-        }
+    storeInstitution({ commit, state }) {
+      commit("convertCurrentInstitutionAttributes");
+      return new Promise((resolve, reject) => {
+        //var instData = context.store.state.institution;
+        HTTP.put("/institution", state.institution)
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((error) => reject(error)); // TODO: Handle http error in component
       });
     },
   },

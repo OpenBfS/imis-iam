@@ -191,7 +191,15 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="accent" @click="storeUser()"> Save </v-btn>
+          <v-btn
+            color="accent"
+            @click="
+              storeUser();
+              editVisible = false;
+            "
+          >
+            Save
+          </v-btn>
           <v-btn color="accent" @click="editVisible = false"> Cancel </v-btn>
           <v-btn color="accent" @click="resetUserForm(currentUser.id)">
             Reset

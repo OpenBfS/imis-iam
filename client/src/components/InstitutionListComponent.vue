@@ -38,66 +38,92 @@
     <thead>
       <th class="text-left">ID</th>
       <th class="text-left">Name</th>
+      <th class="text-left">Actions</th>
     </thead>
     <tbody>
-      <tr v-for="item in items" :key="item.id">
+      <tr v-for="item in institutions" :key="item.id">
         <!-- Edit institution dialog -->
-        <v-dialog
-          activator="parent"
-          v-model="dialog"
-          scrollable
-          @update:modelValue="
-            (newValue) => dialogVisibilityChanged(item.id, newValue)
-          "
-        >
-          <v-card min-width="500">
-            <v-card-title>
-              <span class="text-h5">
-                Edit Institution
-                <span class="font-italic">{{ item.name }}</span>
-              </span>
-            </v-card-title>
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col>
-                    <v-text-field
-                      variant="plain"
-                      label="ID"
-                      readonly
-                      v-model="currentInstitution.id"
-                    ></v-text-field>
-                    <v-text-field
-                      variant="plain"
-                      label="Name"
-                      v-model="currentInstitution.name"
-                    ></v-text-field>
-                    <span class="text-h8">Attributes</span>
-
-                    <div v-if="instAttributes">
-                      <v-text-field
-                        v-for="attr in Object.keys(instAttributes)"
-                        :label="FormAttribute(attr, instAttributes[attr])"
-                        :key="attr"
-                        clearable
-                        readonly
-                      ></v-text-field>
-                    </div>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="accent" @click="saveInstitution()"> Save </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
         <td>{{ item.id }}</td>
         <td>{{ item.name }}</td>
+        <td>
+          <v-tooltip>
+            <template v-slot:activator="{ props }">
+              <v-btn
+                variant="plain"
+                icon="mdi-account-edit-outline"
+                size="small"
+                v-bind="props"
+                @click="
+                  onEditClicked(item.id);
+                  editVisible = true;
+                "
+              ></v-btn>
+            </template>
+            <span>Edit</span>
+          </v-tooltip>
+        </td>
       </tr>
     </tbody>
   </v-table>
+  <v-dialog v-model="editVisible" scrollable>
+    <v-card min-width="500">
+      <v-card-title>
+        <span class="text-h5">
+          Edit Institution
+          <span class="font-italic">{{ currentInstitution.name }}</span>
+        </span>
+      </v-card-title>
+      <v-card-text>
+        <v-container>
+          <v-row>
+            <v-col>
+              <v-text-field
+                variant="plain"
+                label="ID"
+                readonly
+                v-model="currentInstitution.id"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                label="Name"
+                v-model="currentInstitution.name"
+              ></v-text-field>
+              <span class="text-h8">Attributes</span>
+
+              <div v-if="instAttributes">
+                <v-text-field
+                  v-for="attr in Object.keys(instAttributes)"
+                  v-model="instAttributes[attr]"
+                  :label="attr"
+                  :key="attr"
+                  clearable
+                ></v-text-field>
+              </div>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="accent"
+          @click="
+            saveInstitution();
+            editVisible = false;
+          "
+        >
+          Save
+        </v-btn>
+        <v-btn color="accent" @click="editVisible = false"> Cancel </v-btn>
+        <v-btn
+          color="accent"
+          @click="resetInstitutionForm(currentInstitution.id)"
+        >
+          Reset
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -108,6 +134,7 @@ export default {
   setup() {
     const store = useStore();
     const createVisible = ref(false);
+    const editVisible = ref(false);
     //Load store
     onMounted(() => {
       store.dispatch("institution/loadInstitutions");
@@ -129,7 +156,7 @@ export default {
       },
     ]);
     //Computed items
-    const items = computed(() => {
+    const institutions = computed(() => {
       return store.state.institution.institutions;
     });
 
@@ -141,7 +168,11 @@ export default {
       return store.state.institution.newInstitution;
     });
 
-    const dialog = ref(false);
+    const onEditClicked = (id) => {
+      store.dispatch("institution/loadInstitutionById", id).then(() => {
+        instAttributes.value = currentInstitution.value.attributes || [];
+      }); // TODO: Handle HTTP Erorrs
+    };
 
     //Functions
     const createInstitution = () => {
@@ -151,21 +182,16 @@ export default {
       };
       store.dispatch("institution/createInstitution", then);
     };
-    //const selectedAttributes = ref([]);
-    const dialogVisibilityChanged = (id, newValue) => {
-      if (newValue) {
-        store.dispatch("institution/loadInstitutionById", id).then(() => {
-          instAttributes.value = currentInstitution.value.attributes || [];
-        }); // TODO: Handle HTTP Erorrs
-      }
+    const resetInstitutionForm = (id) => {
+      store.dispatch("institution/loadInstitutionById", id).then(() => {
+        instAttributes.value = currentInstitution.value.attributes || [];
+      });
     };
     const saveInstitution = () => {
-      const then = () => {
-        //Reload list items
-        store.dispatch("institution/loadInstitutions");
-      };
       //Store edited institution
-      store.dispatch("institution/storeInstitution", then);
+      store.dispatch("institution/storeInstitution").then(() => {
+        store.dispatch("institution/loadInstitutions");
+      });
     };
     const instAttributes = ref();
     const FormAttribute = (key, value) => {
@@ -175,13 +201,14 @@ export default {
       FormAttribute,
       instAttributes,
       createVisible,
-      dialog,
+      editVisible,
       currentInstitution,
       headers,
-      items,
+      institutions,
       newInstitution,
+      onEditClicked,
       createInstitution,
-      dialogVisibilityChanged,
+      resetInstitutionForm,
       saveInstitution,
     };
   },
