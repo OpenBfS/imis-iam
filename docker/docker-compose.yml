@@ -1,5 +1,12 @@
 version: "3.5"
 services:
+  mailhog:
+    container_name: "iam_mailhog"
+    build:
+      context: ./mailhog
+    image: "iam_mailhog"
+    networks:
+      - imis3
   ldap:
     container_name: "iam_ldap"
     build:
