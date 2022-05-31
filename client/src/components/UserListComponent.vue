@@ -1,81 +1,18 @@
 <template>
   <div class="ml-4 mr-4 mt-10 pa-2 text-h6 bg-secondary">Users</div>
   <div class="ma-2 pa-2">
-    <v-btn color="accent">
-      <v-icon>mdi-plus </v-icon>
+    <v-btn
+      color="accent"
+      @click="
+        resetUser();
+        showCreateDialog = true;
+      "
+    >
+      <v-icon>mdi-plus</v-icon>
       Add
       <!-- Create user dialog -->
-      <v-dialog activator="parent" v-model="createVisible">
-        <v-card min-width="500">
-          <v-card-title>
-            <span class="text-h5">Create new User</span>
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col>
-                <v-text-field
-                  variant="underlined"
-                  label="Username"
-                  v-model="newUser.username"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-text-field
-                  variant="underlined"
-                  label="First Name"
-                  v-model="newUser.firstName"
-                ></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field
-                  variant="underlined"
-                  label="Last Name"
-                  v-model="newUser.lastName"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-text-field
-                  variant="underlined"
-                  label="Email"
-                  v-model="newUser.email"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-combobox
-                  v-model="newUser.groups"
-                  :items="institutions"
-                  label="Institutions"
-                  chips
-                  closable-chips
-                  multiple
-                ></v-combobox>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="accent"
-              @click="
-                createUser();
-                createVisible = false;
-              "
-            >
-              Create
-            </v-btn>
-            <v-btn color="accent" @click="createVisible = false">
-              Cancel
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </v-btn>
+
     <v-table class="ma-2 pa-2">
       <thead>
         <th class="text-left">ID</th>
@@ -102,7 +39,7 @@
                   v-bind="props"
                   @click="
                     onEditClicked(user.id);
-                    editVisible = true;
+                    showEditDialog = true;
                   "
                 ></v-btn>
               </template>
@@ -117,7 +54,7 @@
                   v-bind="props"
                   @click="
                     onCopyClicked(user.id);
-                    createVisible = true;
+                    showCreateDialog = true;
                   "
                 ></v-btn>
               </template>
@@ -128,80 +65,128 @@
       </tbody>
     </v-table>
     <!-- Edit user dialog -->
-    <v-dialog v-model="editVisible">
-      <v-card min-width="700" min-height="800">
+    <v-dialog v-model="showCreateDialog">
+      <v-card min-width="500">
         <v-card-title>
-          <span class="text-h5">Edit User {{ currentUser.username }}</span>
+          <span class="text-h5">Create new User</span>
         </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col>
-                <v-text-field
-                  variant="plain"
-                  label="ID"
-                  readonly
-                  v-model="currentUser.id"
-                ></v-text-field>
-                <v-text-field
-                  variant="plain"
-                  label="Username"
-                  readonly
-                  v-model="currentUser.username"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-text-field
-                  variant="underlined"
-                  label="First Name"
-                  v-model="currentUser.firstName"
-                ></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field
-                  variant="underlined"
-                  label="Last Name"
-                  v-model="currentUser.lastName"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-text-field
-                  variant="underlined"
-                  label="Email"
-                  v-model="currentUser.email"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col> Institutions </v-col>
-            </v-row>
-            <v-combobox
-              v-model="currentUser.groups"
-              :items="institutions"
-              label="Institutions"
-              chips
-              closable-chips
-              multiple
-            ></v-combobox>
-          </v-container>
-        </v-card-text>
+        <v-divider></v-divider>
+        <v-container>
+          <v-row jsutify="start" class="ml-2">
+            <v-col cols="10">
+              <v-text-field
+                variant="underlined"
+                label="Username"
+                v-model="user.username"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                label="First Name"
+                v-model="user.firstName"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                label="Last Name"
+                v-model="user.lastName"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                label="Email"
+                v-model="user.email"
+              ></v-text-field>
+              <v-select
+                dense
+                clearable
+                label="Sub-organisation to:"
+                :items="institutions"
+                item-title="name"
+                item-value="id"
+                hint="The parent of the added organisation"
+                persistent-hint
+              >
+              </v-select>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="accent" @click="createUser()"> Create </v-btn>
+          <v-btn color="accent" @click="showCreateDialog = false">
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="showEditDialog">
+      <v-card min-width="500">
+        <v-card-title>
+          <span class="text-h5">Edit User {{ user.username }}</span>
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-container>
+          <v-row jsutify="start" class="ml-2 pt-2">
+            <v-col cols="10">
+              <v-text-field
+                variant="plain"
+                label="ID"
+                readonly
+                v-model="user.id"
+              ></v-text-field>
+              <v-text-field
+                variant="plain"
+                label="Username"
+                readonly
+                v-model="user.username"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                label="First Name"
+                v-model="user.firstName"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                label="Last Name"
+                v-model="user.lastName"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                label="Email"
+                v-model="user.email"
+              ></v-text-field>
+              <v-combobox
+                v-model="user.groups"
+                :items="institutions"
+                label="Institutions"
+                chips
+                closable-chips
+                multiple
+              ></v-combobox>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
             color="accent"
             @click="
               storeUser();
-              editVisible = false;
+              showEditDialog = false;
             "
           >
             Save
           </v-btn>
-          <v-btn color="accent" @click="editVisible = false"> Cancel </v-btn>
-          <v-btn color="accent" @click="resetUserForm(currentUser.id)">
+          <v-btn color="accent" @click="showEditDialog = false"> Cancel </v-btn>
+          <v-btn
+            color="accent"
+            @click="
+              () => {
+                user = { ...savedUser };
+              }
+            "
+          >
             Reset
           </v-btn>
         </v-card-actions>
@@ -212,14 +197,14 @@
 <script>
 import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
+import { HTTP } from "../lib/http";
+
 export default {
   setup() {
     const store = useStore();
-    const createVisible = ref(false);
-    const editVisible = ref(false);
-    const currentUser = computed(() => {
-      return store.state.user.currentUser;
-    });
+    const showCreateDialog = ref(false);
+    const showEditDialog = ref(false);
+
     const newUser = computed(() => {
       return store.state.user.newUser;
     });
@@ -227,11 +212,12 @@ export default {
       return store.state.user.users;
     });
     const institutions = computed(() => {
-      return store.state.institution.institutionNames;
+      return store.state.institution.institutions;
     });
+
     onMounted(() => {
       store.dispatch("user/loadUsers");
-      store.dispatch("institution/loadInstitutionNames");
+      store.dispatch("institution/loadInstitutions");
     });
 
     const onCopyClicked = (id) => {
@@ -240,26 +226,76 @@ export default {
       });
     };
     const onEditClicked = (id) => {
-      store.dispatch("user/loadUserById", id);
+      hasHttpError.value = false;
+      HTTP.get("/iamuser/" + id)
+        .then((response) => {
+          user.value = response.data;
+          savedUser.value = { ...response.data };
+        })
+        .then(() => {})
+        .catch((error) => {
+          hasHttpError.value = true;
+          httpErrorMsg.value = error;
+        });
     };
+
+    const user = ref({
+      username: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      groups: [],
+    });
+
+    const hasHttpError = ref(false);
+    const httpErrorMsg = ref("");
+
+    const resetUser = () => {
+      user.value.username = "";
+      user.value.firstName = "";
+      user.value.lastName = "";
+      user.value.email = "";
+      user.value.groups = [];
+    };
+
     const createUser = () => {
-      store.dispatch("user/createUser").then(() => {
-        store.dispatch("user/loadUsers");
-      });
+      hasHttpError.value = false;
+      HTTP.post("/iamuser", user.value)
+        .then(() => {
+          resetUser();
+          showCreateDialog.value = false;
+          store.dispatch("user/loadUsers");
+        })
+        .catch((error) => {
+          hasHttpError.value = true;
+          httpErrorMsg.value = error;
+        });
     };
+
+    const savedUser = ref();
     const resetUserForm = (id) => {
       store.dispatch("user/loadUserById", id);
     };
+
     const storeUser = () => {
-      store.dispatch("user/storeUser").then(() => {
-        store.dispatch("user/loadUsers");
-      });
+      HTTP.put("/iamuser", user.value)
+        .then(() => {
+          showEditDialog.value = false;
+          resetUser();
+          store.dispatch("user/loadUsers");
+        })
+        .catch((error) => {
+          hasHttpError.value = true;
+          httpErrorMsg.value = error;
+        });
     };
 
     return {
-      createVisible,
-      editVisible,
-      currentUser,
+      savedUser,
+      user,
+      resetUser,
+      showCreateDialog,
+      showEditDialog,
       newUser,
       institutions,
       users,
