@@ -5,7 +5,7 @@
       <v-icon>mdi-plus </v-icon>
       Add
       <!-- Create institution dialog -->
-      <v-dialog activator="parent">
+      <v-dialog v-model="createVisible">
         <v-card>
           <v-card-title>
             <span class="text-h5">Create new Institution</span>
@@ -25,7 +25,15 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="accent" @click="createInstitution()"> Create </v-btn>
+            <v-btn
+              color="accent"
+              @click="
+                createInstitution();
+                createVisible = false;
+              "
+            >
+              Create
+            </v-btn>
             <v-btn color="accent" @click="createVisible = false">
               Cancel
             </v-btn>
