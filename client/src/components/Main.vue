@@ -17,7 +17,7 @@
         />
       </v-col>
     </v-row>
-    <v-row justify="space-between my-2">
+    <v-row justify="space-between" class="my-2">
       <v-col>
         <Applications />
       </v-col>
