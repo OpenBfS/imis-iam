@@ -5,9 +5,20 @@
         Integriertes Mess- und Informationssystem IMIS
       </v-col>
     </v-row>
+    <v-row class="mt-4" v-if="notifications.length">
+      <v-col
+        v-for="(notification, index) in notifications"
+        cols="8"
+        :key="index"
+      >
+        <NOTIFICATION
+          v-bind:message="notification.text"
+          v-bind:isWarning="notification.type === 'warn'"
+        />
+      </v-col>
+    </v-row>
     <v-row justify="space-between my-2">
       <v-col>
-        <Notifications />
         <Applications />
       </v-col>
       <v-col>
@@ -32,21 +43,36 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
-
 // Components
-import Main from "../components/Main.vue";
 import Applications from "../components/ApplicationComponent.vue";
 import Archive from "../components/ArchiveComponent.vue";
-import Notifications from "../components/NotificationComponent.vue";
-export default defineComponent({
-  name: "HomeView",
-
+import { defineAsyncComponent } from "vue";
+export default {
+  name: "Home",
   components: {
-    Main,
     Applications,
     Archive,
-    Notifications
-  }
-});
+    NOTIFICATION: defineAsyncComponent(() =>
+      import("../components/Notification.vue")
+    ),
+  },
+  setup() {
+    // TODO: Replace following fake data with comming data from HTTP request
+    const notifications = [
+      {
+        type: "warn",
+        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        date: new Date(),
+      },
+      {
+        type: "message",
+        text: "(2)Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        date: new Date("1995-12-17T03:24:00"),
+      },
+    ];
+    return {
+      notifications,
+    };
+  },
+};
 </script>
