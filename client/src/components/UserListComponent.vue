@@ -108,6 +108,11 @@
         </v-container>
         <v-divider></v-divider>
         <v-card-actions>
+          <UIAlert
+            v-if="hasHttpError"
+            v-bind:isSuccessful="!hasHttpError"
+            v-bind:message="httpErrorMsg"
+          />
           <v-spacer></v-spacer>
           <v-btn color="accent" @click="createUser()"> Create </v-btn>
           <v-btn color="accent" @click="showCreateDialog = false">
@@ -165,6 +170,11 @@
         </v-container>
         <v-divider></v-divider>
         <v-card-actions>
+          <UIAlert
+            v-if="hasHttpError"
+            v-bind:isSuccessful="!hasHttpError"
+            v-bind:message="httpErrorMsg"
+          />
           <v-spacer></v-spacer>
           <v-btn
             color="accent"
@@ -192,11 +202,14 @@
   </div>
 </template>
 <script>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, defineAsyncComponent } from "vue";
 import { useStore } from "vuex";
 import { HTTP } from "../lib/http";
 
 export default {
+  components: {
+    UIAlert: defineAsyncComponent(() => import("../components/UI/UIAlert.vue")),
+  },
   setup() {
     const store = useStore();
     const showCreateDialog = ref(false);
@@ -257,7 +270,7 @@ export default {
         })
         .catch((error) => {
           hasHttpError.value = true;
-          httpErrorMsg.value = error;
+          httpErrorMsg.value = error.response.statusText;
         });
     };
 
@@ -275,7 +288,7 @@ export default {
         })
         .catch((error) => {
           hasHttpError.value = true;
-          httpErrorMsg.value = error;
+          httpErrorMsg.value = error.response.statusText;
         });
     };
 
