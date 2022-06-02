@@ -12,7 +12,6 @@
       Add
       <!-- Create user dialog -->
     </v-btn>
-
     <v-table class="ma-2 pa-2">
       <thead>
         <th class="text-left">ID</th>
@@ -97,11 +96,10 @@
               <v-select
                 dense
                 clearable
-                label="Sub-organisation to:"
+                label="institutions"
                 :items="institutions"
                 item-title="name"
                 item-value="id"
-                hint="The parent of the added organisation"
                 persistent-hint
               >
               </v-select>
@@ -109,7 +107,6 @@
           </v-row>
         </v-container>
         <v-divider></v-divider>
-
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="accent" @click="createUser()"> Create </v-btn>
@@ -221,22 +218,14 @@ export default {
     });
 
     const onCopyClicked = (id) => {
-      store.dispatch("user/loadUserById", id).then(() => {
-        store.dispatch("user/copyUser");
-      });
+      savedUser.value = users.value.filter((u) => id === u.id)[0];
+      delete savedUser.value["id"];
+      user.value = { ...savedUser.value };
     };
     const onEditClicked = (id) => {
-      hasHttpError.value = false;
-      HTTP.get("/iamuser/" + id)
-        .then((response) => {
-          user.value = response.data;
-          savedUser.value = { ...response.data };
-        })
-        .then(() => {})
-        .catch((error) => {
-          hasHttpError.value = true;
-          httpErrorMsg.value = error;
-        });
+      savedUser.value = {
+        ...(user.value = users.value.filter((u) => id === u.id)[0]),
+      };
     };
 
     const user = ref({
@@ -294,6 +283,8 @@ export default {
       savedUser,
       user,
       resetUser,
+      hasHttpError,
+      httpErrorMsg,
       showCreateDialog,
       showEditDialog,
       newUser,
