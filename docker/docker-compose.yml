@@ -35,6 +35,7 @@ services:
     depends_on:
       - db
       - ldap
+      - mailhog
     volumes:
       - ./keycloak:/opt/src
       - ../keycloak/iam_theme:/opt/keycloak/themes/iam_theme
