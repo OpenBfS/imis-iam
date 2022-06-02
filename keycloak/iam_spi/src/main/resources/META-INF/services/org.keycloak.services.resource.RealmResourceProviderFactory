@@ -1,2 +1,3 @@
-de.intevation.iam.UserProviderFactory
 de.intevation.iam.InstitutionProviderFactory
+de.intevation.iam.MailProviderFactory
+de.intevation.iam.UserProviderFactory
