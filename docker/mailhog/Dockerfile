@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-LABEL mainter awoestmannn@intevation
+LABEL maintainer awoestmannn@intevation
 
 ENV DEBIAN_FRONTEND noninteractive
 
