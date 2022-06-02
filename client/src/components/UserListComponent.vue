@@ -115,7 +115,13 @@
           />
           <v-spacer></v-spacer>
           <v-btn color="accent" @click="createUser()"> Create </v-btn>
-          <v-btn color="accent" @click="showCreateDialog = false">
+          <v-btn
+            color="accent"
+            @click="
+              showCreateDialog = false;
+              hasHttpError = false;
+            "
+          >
             Cancel
           </v-btn>
         </v-card-actions>
@@ -185,7 +191,15 @@
           >
             Save
           </v-btn>
-          <v-btn color="accent" @click="showEditDialog = false"> Cancel </v-btn>
+          <v-btn
+            color="accent"
+            @click="
+              showEditDialog = false;
+              hasHttpError = false;
+            "
+          >
+            Cancel
+          </v-btn>
           <v-btn
             color="accent"
             @click="
