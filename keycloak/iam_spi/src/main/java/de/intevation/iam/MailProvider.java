@@ -113,7 +113,7 @@ public class MailProvider implements RealmResourceProvider{
         EntityManager em = session.getProvider(JpaConnectionProvider.class).getEntityManager();
         em.persist(list);
         return Response.ok(list).build();
-    } 
+    }
 
     @PUT
     @Produces(MediaType.APPLICATION_JSON)

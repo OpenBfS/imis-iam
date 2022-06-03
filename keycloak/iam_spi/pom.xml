@@ -14,6 +14,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <jpa.version>2.2</jpa.version>
+        <checkstyle.plugin.version>3.1.1</checkstyle.plugin.version>
     </properties>
 
     <parent>
@@ -74,6 +75,33 @@
                             <Dependencies>org.keycloak.keycloak-services</Dependencies>
                         </manifestEntries>
                     </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${checkstyle.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <includeTestSourceDirectory>
+                        true
+                    </includeTestSourceDirectory>
+                    <includeResources>false</includeResources>
+                    <includeTestResources>false</includeTestResources>
+                    <excludes>
+                    </excludes>
+                    <logViolationsToConsole>
+                        true
+                    </logViolationsToConsole>
                 </configuration>
             </plugin>
         </plugins>

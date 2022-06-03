@@ -110,5 +110,5 @@ public class InstitutionProvider implements RealmResourceProvider {
     public Object getResource() {
         return this;
     }
-    
+
 }
