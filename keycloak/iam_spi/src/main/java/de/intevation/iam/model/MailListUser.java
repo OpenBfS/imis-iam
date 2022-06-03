@@ -14,10 +14,10 @@ public class MailListUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "mail_list_id")
+    @Column(name = "mail_list_id", nullable = false)
     private Integer mailListId;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
     public Integer getId() {

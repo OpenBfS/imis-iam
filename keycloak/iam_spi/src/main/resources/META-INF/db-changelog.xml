@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet author="awoestmann@intevation.de" id="v0.1">
+        <!--Create tables-->
+        <createTable tableName="mail_list">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createTable tableName="mail_list_user">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="mail_list_id" type="INT">
+                <constraints foreignKeyName="fk_mail_list_user_list" references="mail_list(id)" />
+            </column>
+            <column name="user_id" type="VARCHAR(36)">
+                <constraints foreignKeyName="fk_mail_list_user_user" references="user_entity(id)" />
+            </column>
+        </createTable>
+        <createTable tableName="mail_type">
+            <column name="id" type="INT">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createTable tableName="mail">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="send_date" type="timestamp with time zone" defaultValue="now()">
+                <constraints nullable="false" />
+            </column>
+            <column name="expiry_date" type="timestamp with time zone">
+            </column>
+            <column name="sender" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="text" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="subject" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="publish" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="INT">
+                <constraints
+                    nullable="false"
+                    foreignKeyName="fk_mail_mail_type"
+                    references="mail_type(id)"
+                />
+            </column>
+            <column name="receipient" type="INT">
+                <constraints
+                    nullable="false"
+                    foreignKeyName="fk_mail_mail_list"
+                    references="mail_list(id)"
+                />
+            </column>
+            <column name="user_id" type="VARCHAR(36)">
+                <constraints
+                    nullable="false"
+                    foreignKeyName="fk_mail_user_entity"
+                    references="user_entity(id)"
+                />
+            </column>
+        </createTable>
+
+        <!--Add Constraints-->
+        <addUniqueConstraint
+            tableName="mail_list_user"
+            columnNames="mail_list_id, user_id"
+            constraintName="mail_list_user_unique"
+        />
+
+        <!--Insert mail type data-->
+        <insert tableName="mail_type">
+            <column name="id" value="1" />
+            <column name="name" value="Einladung" />
+        </insert>
+        <insert tableName="mail_type">
+            <column name="id" value="2" />
+            <column name="name" value="Umfrage" />
+        </insert>
+        <insert tableName="mail_type">
+            <column name="id" value="3" />
+            <column name="name" value="Störung" />
+        </insert>
+        <insert tableName="mail_type">
+            <column name="id" value="4" />
+            <column name="name" value="Wartung" />
+        </insert>
+        <insert tableName="mail_type">
+            <column name="id" value="5" />
+            <column name="name" value="Sprechstunde" />
+        </insert>
+        <insert tableName="mail_type">
+            <column name="id" value="6" />
+            <column name="name" value="Release Note" />
+        </insert>
+        <insert tableName="mail_type">
+            <column name="id" value="7" />
+            <column name="name" value="Soll/Ist-Vergleich" />
+        </insert>
+        <insert tableName="mail_type">
+            <column name="id" value="8" />
+            <column name="name" value="Hinweis" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

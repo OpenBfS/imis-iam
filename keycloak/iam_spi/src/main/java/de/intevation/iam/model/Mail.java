@@ -18,22 +18,28 @@ public class Mail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "send_date")
+    @Column(name = "send_date", nullable = false)
     private Timestamp sendDate;
 
     @Column(name = "expiry_date")
     private Timestamp expiryDate;
 
+    @Column(name = "sender", nullable = false)
     private String sender;
 
+    @Column(name = "text", nullable = false)
     private String text;
 
+    @Column(name ="subject", nullable = false)
     private String subject;
 
+    @Column(name = "publish", nullable = false)
     private Boolean publish;
 
+    @Column(name = "type", nullable = false)
     private Integer type;
 
+    @Column(name = "receipient", nullable = false)
     private Integer receipient;
 
     @JsonIgnore
