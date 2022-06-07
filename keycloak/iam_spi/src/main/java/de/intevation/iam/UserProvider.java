@@ -37,6 +37,11 @@ public class UserProvider implements RealmResourceProvider {
         this.session = session;
     }
 
+    /**
+     * Get profile of the current users.
+     * @param headers Request header
+     * @return User profile as json, 403 if not authorized
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
@@ -50,6 +55,14 @@ public class UserProvider implements RealmResourceProvider {
         return Response.ok(User.fromUserModel(user)).build();
     }
 
+    /**
+     * Update profile of the current user
+     * @param headers Request headers
+     * @param rep User representation
+     * @return Updated profile json if successfull,
+     *         403 if not authorized,
+     *         409 if email address is already used
+     */
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
@@ -84,6 +97,10 @@ public class UserProvider implements RealmResourceProvider {
         return Response.ok(User.fromUserModel(user)).build();
     }
 
+    /**
+     * Gett all users
+     * @return List of user json objects
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsers() {
@@ -97,6 +114,11 @@ public class UserProvider implements RealmResourceProvider {
         return Response.ok(userList).build();
     }
 
+    /**
+     * Get user by id
+     * @param id User id
+     * @return User as json
+     */
     @GET
     @Path("/{id}")
     public Response getUserById(@PathParam("id") String id) {
@@ -111,6 +133,13 @@ public class UserProvider implements RealmResourceProvider {
         return Response.ok(User.fromUserModel(user)).build();
     }
 
+    /**
+     * Create a new user
+     * @param rep User representation
+     * @return New user json if successfull,
+     *         400 if username is empty,
+     *         409 if either username or email are already used
+     */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(final User rep) {
@@ -133,14 +162,21 @@ public class UserProvider implements RealmResourceProvider {
 
         //Update groups
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
-            return rep.getGroups().contains(item.getName());
+            return rep.getGroups().contains(item.getId());
         });
-        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getName, Function.identity()));
+        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, newUser);
 
         return Response.ok(User.fromUserModel(newUser)).build();
     }
 
+    /**
+     * Update the given user
+     * @param rep User representation
+     * @return Updated user json if succesfull,
+     *         403 if not authorized,
+     *         409 if the new email address is already used
+     */
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(
@@ -167,7 +203,7 @@ public class UserProvider implements RealmResourceProvider {
 
         //Get new groups list and update
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
-            return rep.getGroups().contains(item.getName());
+            return rep.getGroups().contains(item.getId());
         });
         Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getName, Function.identity()));
         updateGroups(groupMap, user);
@@ -175,16 +211,21 @@ public class UserProvider implements RealmResourceProvider {
         return Response.ok(User.fromUserModel(user)).build();
     }
 
+    /**
+     * Update groups of the given user
+     * @param newGroups Map of new groups: Map<{id},{Group}>
+     * @param user User to modifiy
+     */
     private void updateGroups(Map<String, GroupModel> newGroups, UserModel user) {
         //Join new groups
-        newGroups.forEach((name, group) -> {
+        newGroups.forEach((id, group) -> {
             if (!user.isMemberOf(group)) {
                 user.joinGroup(group);
             }
         });
         //Leave groups if necessary
         user.getGroupsStream().forEach(group -> {
-            if (!newGroups.containsKey(group.getName())) {
+            if (!newGroups.containsKey(group.getId())) {
                 user.leaveGroup(group);
             }
         });

@@ -21,6 +21,10 @@ wait_for_db () {
     done
 }
 
+#Compile spi
+mvn -f ${SPI_SRC}/pom.xml package
+cp ${SPI_SRC}/target/iam-api-extension.jar $KEYCLOAK_HOME/providers/
+
 # Start Keycloak
 wait_for_db
 ${KEYCLOAK_HOME}/bin/kc.sh build
