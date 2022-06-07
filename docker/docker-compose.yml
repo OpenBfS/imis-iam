@@ -11,7 +11,7 @@ services:
       - 48082:8025
       - 41025:1025
   ldap:
-    container_name: "iam_ldap"
+    container_name: "iam-ldap"
     build:
       context: ./ldap
     image: "iam_ldap"
