@@ -63,9 +63,14 @@ public class UserProvider implements RealmResourceProvider {
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
-
+        rep.setId(id);
         if (!user.getId().equals(rep.getId())) {
             return Response.status(Status.FORBIDDEN).build();
+        }
+
+        if(isEmailAlreadyUsed(realm, rep)) {
+            return Response.status(Status.CONFLICT)
+            .type(MediaType.APPLICATION_JSON).build();
         }
 
         //Update user
@@ -113,7 +118,15 @@ public class UserProvider implements RealmResourceProvider {
             return Response.status(Status.BAD_REQUEST).build();
         }
         RealmModel realm = session.getContext().getRealm();
+
+        if(isEmailAlreadyUsed(realm, rep)
+            || isUsernameAlreadyUsed(realm, rep)) {
+            return Response.status(Status.CONFLICT)
+                .type(MediaType.APPLICATION_JSON).build();
+        }
+
         UserModel newUser = session.users().addUser(realm, rep.getUsername());
+
         newUser.setFirstName(rep.getFirstName());
         newUser.setLastName(rep.getLastName());
         newUser.setEmail(rep.getEmail());
@@ -139,7 +152,10 @@ public class UserProvider implements RealmResourceProvider {
         if (!user.getId().equals(rep.getId())) {
             return Response.status(Status.FORBIDDEN).build();
         }
-
+        if(isEmailAlreadyUsed(realm, rep)) {
+            return Response.status(Status.CONFLICT)
+                .type(MediaType.APPLICATION_JSON).build();
+        }
         //Update user
         user.setFirstName(rep.getFirstName());
         user.setLastName(rep.getLastName());
@@ -182,5 +198,36 @@ public class UserProvider implements RealmResourceProvider {
     @Override
     public Object getResource() {
         return this;
+    }
+
+    /**
+     * Check if the email address of the given user rep is already used.
+     * @param realm Realm
+     * @param user User representation
+     * @return true if already used, else false
+     */
+    private boolean isEmailAlreadyUsed(RealmModel realm, User user) {
+        //Search for user with the given email
+        UserModel u = session.users().getUserByEmail(realm, user.getEmail());
+        if (u == null) {
+            return false;
+        }
+        //If user shall be created
+        if (user.getId() == null || user.getId().isEmpty()) {
+            return true;
+        } else {
+            //else check if the found user equals the user to be modified
+            return !u.getId().equals(user.getId());
+        }
+    }
+
+    /**
+     * Check if username is already used
+     * @param realm Realm
+     * @param user User representation to be created
+     * @return True if username is already used, else false
+     */
+    private boolean isUsernameAlreadyUsed(RealmModel realm, User user) {
+        return session.users().getUserByUsername(realm, user.getUsername()) != null;
     }
 }
