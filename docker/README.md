@@ -45,3 +45,9 @@ Further, the users provided by the LDAP container can be used to login.
 See ldap/users.ldif for credentials (uid, userPassword).
 
 Authenticated access to the client is given under localhost:48081.
+
+
+## Testing E-Mail
+
+E-Mails send by Keycloak (e.g. for password reset) can be viewed in the
+web application "MailHog" at port 48082 on the docker host.
