@@ -256,6 +256,7 @@ export default {
     };
 
     const user = ref({
+      id: "",
       username: "",
       firstName: "",
       lastName: "",
@@ -267,6 +268,7 @@ export default {
     const httpErrorMsg = ref("");
 
     const resetUser = () => {
+      user.value.id = "";
       user.value.username = "";
       user.value.firstName = "";
       user.value.lastName = "";
