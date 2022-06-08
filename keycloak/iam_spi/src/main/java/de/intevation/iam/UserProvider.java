@@ -23,9 +23,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
-import org.keycloak.userprofile.UserProfile;
-import org.keycloak.userprofile.UserProfileContext;
-import org.keycloak.userprofile.UserProfileProvider;
 
 import de.intevation.iam.model.User;
 
@@ -81,19 +78,15 @@ public class UserProvider implements RealmResourceProvider {
             return Response.status(Status.FORBIDDEN).build();
         }
 
-        if(isEmailAlreadyUsed(realm, rep)) {
+        try {
+            user = updateUser(realm, rep, user);
+        } catch (InvalidUserPropertiesException e) {
             return Response.status(Status.CONFLICT)
-            .type(MediaType.APPLICATION_JSON).build();
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(e.getMessage())
+                    .build();
         }
 
-        //Update user
-        user.setFirstName(rep.getFirstName());
-        user.setLastName(rep.getLastName());
-        user.setEmail(rep.getEmail());
-
-        UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
-        UserProfile profile = profileProvider.create(UserProfileContext.USER_API, user);
-        profile.update(false);
         return Response.ok(User.fromUserModel(user)).build();
     }
 
@@ -185,28 +178,14 @@ public class UserProvider implements RealmResourceProvider {
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, rep.getId());
 
-        if (!user.getId().equals(rep.getId())) {
-            return Response.status(Status.FORBIDDEN).build();
-        }
-        if(isEmailAlreadyUsed(realm, rep)) {
+        try {
+            user = updateUser(realm, rep, user);
+        } catch (InvalidUserPropertiesException e) {
             return Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON).build();
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(e.getMessage())
+                    .build();
         }
-        //Update user
-        user.setFirstName(rep.getFirstName());
-        user.setLastName(rep.getLastName());
-        user.setEmail(rep.getEmail());
-
-        UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
-        UserProfile profile = profileProvider.create(UserProfileContext.USER_API, user);
-        profile.update(false);
-
-        //Get new groups list and update
-        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
-            return rep.getGroups().contains(item.getId());
-        });
-        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getId, Function.identity()));
-        updateGroups(groupMap, user);
 
         return Response.ok(User.fromUserModel(user)).build();
     }
@@ -231,14 +210,30 @@ public class UserProvider implements RealmResourceProvider {
         });
     }
 
-    @Override
-    public void close() {
-        // TODO Auto-generated method stub
-    }
+    /**
+     * Update the given Keycloak usermodel with the data from the new one
+     * @param realm Realm
+     * @param newUser User containing new data
+     * @param oldUser Old keycloak user model
+     * @return Updated user
+     * @throws InvalidUserPropertiesException Thrown if new user contains email address already in use
+     */
+    private UserModel updateUser(RealmModel realm, User newUser, UserModel oldUser) throws InvalidUserPropertiesException {
+        if(isEmailAlreadyUsed(realm, newUser)) {
+            throw new InvalidUserPropertiesException("Email already in use");
+        }
+        //Update user
+        oldUser.setFirstName(newUser.getFirstName());
+        oldUser.setLastName(newUser.getLastName());
+        oldUser.setEmail(newUser.getEmail());
 
-    @Override
-    public Object getResource() {
-        return this;
+        //Get new groups list and update
+        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
+            return newUser.getGroups().contains(item.getId());
+        });
+        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getId, Function.identity()));
+        updateGroups(groupMap, oldUser);
+        return oldUser;
     }
 
     /**
@@ -270,5 +265,19 @@ public class UserProvider implements RealmResourceProvider {
      */
     private boolean isUsernameAlreadyUsed(RealmModel realm, User user) {
         return session.users().getUserByUsername(realm, user.getUsername()) != null;
+    }
+
+    private class InvalidUserPropertiesException extends Exception {
+        public InvalidUserPropertiesException(String message) {
+            super(message);
+        }
+    }
+
+    @Override
+    public void close() {}
+
+    @Override
+    public Object getResource() {
+        return this;
     }
 }
