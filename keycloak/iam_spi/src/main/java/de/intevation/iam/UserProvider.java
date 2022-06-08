@@ -205,7 +205,7 @@ public class UserProvider implements RealmResourceProvider {
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
             return rep.getGroups().contains(item.getId());
         });
-        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getName, Function.identity()));
+        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, user);
 
         return Response.ok(User.fromUserModel(user)).build();
