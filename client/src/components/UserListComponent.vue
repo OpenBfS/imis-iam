@@ -94,13 +94,16 @@
                 v-model="user.email"
               ></v-text-field>
               <v-select
+                return-object
                 dense
                 clearable
                 label="institutions"
                 :items="institutions"
+                v-model="user.groups"
                 item-title="name"
                 item-value="id"
                 persistent-hint
+                multiple
               >
               </v-select>
             </v-col>
@@ -163,14 +166,19 @@
                 label="Email"
                 v-model="user.email"
               ></v-text-field>
-              <v-combobox
-                v-model="user.groups"
+              <v-select
+                return-object
+                dense
+                clearable
+                label="institutions"
                 :items="institutions"
-                label="Institutions"
-                chips
-                closable-chips
+                v-model="user.groups"
+                item-title="name"
+                item-value="id"
+                persistent-hint
                 multiple
-              ></v-combobox>
+              >
+              </v-select>
             </v-col>
           </v-row>
         </v-container>
@@ -182,15 +190,7 @@
             v-bind:message="httpErrorMsg"
           />
           <v-spacer></v-spacer>
-          <v-btn
-            color="accent"
-            @click="
-              storeUser();
-              showEditDialog = false;
-            "
-          >
-            Save
-          </v-btn>
+          <v-btn color="accent" @click="storeUser()"> Save </v-btn>
           <v-btn
             color="accent"
             @click="
@@ -246,8 +246,8 @@ export default {
 
     const onCopyClicked = (id) => {
       savedUser.value = users.value.filter((u) => id === u.id)[0];
-      delete savedUser.value["id"];
       user.value = { ...savedUser.value };
+      delete user.value["id"];
     };
     const onEditClicked = (id) => {
       savedUser.value = {
@@ -275,10 +275,16 @@ export default {
       user.value.email = "";
       user.value.groups = [];
     };
-
+    const getInstitutionIds = (institution) => {
+      return institution.map((i) => i.id);
+    };
     const createUser = () => {
       hasHttpError.value = false;
-      HTTP.post("/iamuser", user.value)
+      const payload = { ...user.value };
+      payload["groups"] = user.value.groups.length
+        ? getInstitutionIds(user.value.groups)
+        : [];
+      HTTP.post("/iamuser", payload)
         .then(() => {
           resetUser();
           showCreateDialog.value = false;
@@ -296,11 +302,17 @@ export default {
     };
 
     const storeUser = () => {
-      HTTP.put("/iamuser", user.value)
+      hasHttpError.value = false;
+      const payload = { ...user.value };
+      payload["groups"] = user.value.groups.length
+        ? getInstitutionIds(user.value.groups)
+        : [];
+      HTTP.put("/iamuser", payload)
         .then(() => {
           showEditDialog.value = false;
           resetUser();
           store.dispatch("user/loadUsers");
+          showEditDialog.value = false;
         })
         .catch((error) => {
           hasHttpError.value = true;
