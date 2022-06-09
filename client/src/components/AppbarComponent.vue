@@ -1,13 +1,12 @@
 <template>
   <v-app-bar dark id="theme" app clipped-left>
-    <v-toolbar-title @click="$route.path == '/' ? '' : $router.push('/')"
-      >IAM</v-toolbar-title
-    >
+    <v-toolbar-title @click="$route.path == '/' ? '' : $router.push('/')">
+      {{ $t("appbar.title") }}
+    </v-toolbar-title>
     <v-spacer></v-spacer>
     <div>
-      Login: {{ userData.firstName }} {{ userData.lastName }} ({{
-        userData.username
-      }})
+      {{ $t("appbar.text_login") }} {{ userData.firstName }}
+      {{ userData.lastName }} ({{ userData.username }})
     </div>
     <v-menu right :offset-x="true">
       <template v-slot:activator="{ props }">
@@ -20,9 +19,11 @@
           link
           @click="$route.path == '/profile' ? '' : $router.push('/profile')"
         >
-          Profile
+          {{ $t("appbar.button_profile") }}
         </v-list-item>
-        <v-list-item link @click="logout"> Logout</v-list-item>
+        <v-list-item link @click="logout">
+          {{ $t("appbar.button_logout") }}</v-list-item
+        >
       </v-list>
     </v-menu>
   </v-app-bar>

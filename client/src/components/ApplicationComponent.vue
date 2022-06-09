@@ -1,6 +1,6 @@
 <template>
   <v-card class="ma-2 pa-2">
-    <v-card-title>Applications</v-card-title>
+    <v-card-title>{{ $t("application.title") }}</v-card-title>
     <v-container>
       <v-row>
         <div v-for="app in applications" :key="app.url">

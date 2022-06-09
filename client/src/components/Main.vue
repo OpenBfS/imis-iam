@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="bg-secondary my-2">
       <v-col cols="12" class="text-h4">
-        Integriertes Mess- und Informationssystem IMIS
+        {{ $t("main.title") }}
       </v-col>
     </v-row>
     <v-row class="mt-4" v-if="notifications.length">
@@ -28,13 +28,13 @@
             $route.path == '/institutions' ? '' : $router.push('/institutions')
           "
         >
-          Institutions
+          {{ $t("main.institutions") }}
         </v-btn>
         <v-btn
           link
           @click="$route.path == '/users' ? '' : $router.push('/users')"
         >
-          Users
+          {{ $t("main.users") }}
         </v-btn>
         <Archive />
       </v-col>

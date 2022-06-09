@@ -2,31 +2,35 @@
   <v-form ref="form" v-model="valid" lazy-validation>
     <v-container>
       <v-col cols="6">
-        <div class="mb-4 text-h6">Username: {{ userData.username }}</div>
+        <div class="mb-4 text-h6">
+          {{ $t("label.username") }}: {{ userData.username }}
+        </div>
         <v-text-field
           v-model="userData.firstName"
-          label="First name"
+          :label="$t('label.firstname')"
           variant="underlined"
           :rules="nameRules"
           required
         ></v-text-field>
         <v-text-field
           v-model="userData.lastName"
-          label="Last name"
+          :label="$t('label.lastname')"
           variant="underlined"
           :rules="nameRules"
           required
         ></v-text-field>
         <v-text-field
           v-model="userData.email"
-          label="Email"
+          :label="$t('label.email')"
           variant="underlined"
           :rules="emailRules"
           required
         ></v-text-field>
         <v-row>
-          <v-btn @click="save" class="ma-2 pa-2">Save</v-btn>
-          <v-btn @click="reset" class="ma-2 pa-2">Reset</v-btn>
+          <v-btn @click="save" class="ma-2 pa-2">{{ $t("label.save") }}</v-btn>
+          <v-btn @click="reset" class="ma-2 pa-2">{{
+            $t("label.reset")
+          }}</v-btn>
         </v-row>
       </v-col>
     </v-container>

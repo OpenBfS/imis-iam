@@ -3,13 +3,13 @@
     <v-container>
       <v-row>
         <v-col cols="3">
-          <v-card-title>Archive</v-card-title>
+          <v-card-title>{{ $t("archive.title") }}</v-card-title>
           <li v-for="date in dates" :key="date.year">
             {{ date.year }}
           </li>
         </v-col>
         <v-col align="left" justify="left">
-          <v-btn :rounded="0" color="accent">Search</v-btn>
+          <v-btn :rounded="0" color="accent">{{ $t("archive.search") }}</v-btn>
         </v-col>
       </v-row>
     </v-container>

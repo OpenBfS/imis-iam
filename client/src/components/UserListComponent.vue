@@ -1,5 +1,7 @@
 <template>
-  <div class="ml-4 mr-4 mt-10 pa-2 text-h6 bg-secondary">Users</div>
+  <div class="ml-4 mr-4 mt-10 pa-2 text-h6 bg-secondary">
+    {{ $t("user.title") }}
+  </div>
   <div class="ma-2 pa-2">
     <v-btn
       color="accent"
@@ -9,17 +11,17 @@
       "
     >
       <v-icon>mdi-plus</v-icon>
-      Add
+      {{ $t("button.add") }}
       <!-- Create user dialog -->
     </v-btn>
     <v-table class="ma-2 pa-2">
       <thead>
-        <th class="text-left">ID</th>
-        <th class="text-left">Username</th>
-        <th class="text-left">First Name</th>
-        <th class="text-left">Last Name</th>
-        <th class="text-left">Email</th>
-        <th class="text-left">Actions</th>
+        <th class="text-left">{{ $t("label.id") }}</th>
+        <th class="text-left">{{ $t("label.username") }}</th>
+        <th class="text-left">{{ $t("label.firstname") }}</th>
+        <th class="text-left">{{ $t("label.lastname") }}</th>
+        <th class="text-left">{{ $t("label.email") }}</th>
+        <th class="text-left">{{ $t("label.actions") }}</th>
       </thead>
       <tbody>
         <tr v-for="user in users" :key="user.id">
@@ -42,7 +44,7 @@
                   "
                 ></v-btn>
               </template>
-              <span>Edit</span>
+              <span>{{ $t("label.edit") }}</span>
             </v-tooltip>
             <v-tooltip>
               <template v-slot:activator="{ props }">
@@ -57,7 +59,7 @@
                   "
                 ></v-btn>
               </template>
-              <span>Copy</span>
+              <span>{{ $t("label.copy") }}</span>
             </v-tooltip>
           </td>
         </tr>
@@ -67,7 +69,7 @@
     <v-dialog v-model="showCreateDialog">
       <v-card min-width="500">
         <v-card-title>
-          <span class="text-h5">Create new User</span>
+          <span class="text-h5">{{ $t("user.create_title") }}</span>
         </v-card-title>
         <v-divider></v-divider>
         <v-container>
@@ -75,29 +77,29 @@
             <v-col cols="10">
               <v-text-field
                 variant="underlined"
-                label="Username"
+                :label="$t('label.username')"
                 v-model="user.username"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
-                label="First Name"
+                :label="$t('label.firstname')"
                 v-model="user.firstName"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
-                label="Last Name"
+                :label="$t('label.lastname')"
                 v-model="user.lastName"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
-                label="Email"
+                :label="$t('label.email')"
                 v-model="user.email"
               ></v-text-field>
               <v-select
                 return-object
                 dense
                 clearable
-                label="institutions"
+                :label="$t('user.label_institutions')"
                 :items="institutions"
                 v-model="user.groups"
                 item-title="name"
@@ -117,7 +119,9 @@
             v-bind:message="httpErrorMsg"
           />
           <v-spacer></v-spacer>
-          <v-btn color="accent" @click="createUser()"> Create </v-btn>
+          <v-btn color="accent" @click="createUser()">
+            {{ $t("button.create") }}
+          </v-btn>
           <v-btn
             color="accent"
             @click="
@@ -125,7 +129,7 @@
               hasHttpError = false;
             "
           >
-            Cancel
+            {{ $t("button.cancel") }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -133,7 +137,9 @@
     <v-dialog v-model="showEditDialog">
       <v-card min-width="500">
         <v-card-title>
-          <span class="text-h5">Edit User {{ user.username }}</span>
+          <span class="text-h5">{{
+            $t("user.edit_title", { name: user.username })
+          }}</span>
         </v-card-title>
         <v-divider></v-divider>
         <v-container>
@@ -141,36 +147,36 @@
             <v-col cols="10">
               <v-text-field
                 variant="plain"
-                label="ID"
+                :label="$t('label.id')"
                 readonly
                 v-model="user.id"
               ></v-text-field>
               <v-text-field
                 variant="plain"
-                label="Username"
+                :label="$t('label.username')"
                 readonly
                 v-model="user.username"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
-                label="First Name"
+                :label="$t('label.firstname')"
                 v-model="user.firstName"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
-                label="Last Name"
+                :label="$t('label.lastname')"
                 v-model="user.lastName"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
-                label="Email"
+                :label="$t('label.email')"
                 v-model="user.email"
               ></v-text-field>
               <v-select
                 return-object
                 dense
                 clearable
-                label="institutions"
+                :label="$t('user.label_institutions')"
                 :items="institutions"
                 v-model="user.groups"
                 item-title="name"
@@ -190,7 +196,9 @@
             v-bind:message="httpErrorMsg"
           />
           <v-spacer></v-spacer>
-          <v-btn color="accent" @click="storeUser()"> Save </v-btn>
+          <v-btn color="accent" @click="storeUser()">
+            {{ $t("button.save") }}
+          </v-btn>
           <v-btn
             color="accent"
             @click="
@@ -198,7 +206,7 @@
               hasHttpError = false;
             "
           >
-            Cancel
+            {{ $t("button.cancel") }}
           </v-btn>
           <v-btn
             color="accent"
@@ -208,7 +216,7 @@
               }
             "
           >
-            Reset
+            {{ $t("button.reset") }}
           </v-btn>
         </v-card-actions>
       </v-card>

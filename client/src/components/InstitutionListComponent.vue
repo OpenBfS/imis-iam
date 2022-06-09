@@ -1,14 +1,16 @@
 <template>
-  <div class="ml-4 mr-4 mt-10 pa-2 text-h6 bg-secondary">Institutions</div>
+  <div class="ml-4 mr-4 mt-10 pa-2 text-h6 bg-secondary">
+    {{ $t("institution.title") }}
+  </div>
   <div class="ma-2 pa-2">
     <v-btn color="accent" @click="createVisible = true">
       <v-icon>mdi-plus </v-icon>
-      Add
+      {{ $t("button.add") }}
       <!-- Create institution dialog -->
       <v-dialog v-model="createVisible">
         <v-card>
           <v-card-title>
-            <span class="text-h5">Create new Institution</span>
+            <span class="text-h5">{{ $t("institution.create_title") }}</span>
           </v-card-title>
           <v-card-text>
             <v-container>
@@ -16,7 +18,7 @@
                 <v-col>
                   <v-text-field
                     variant="underlined"
-                    label="Name"
+                    :label="$t('label.name')"
                     v-model="newInstitution.name"
                   ></v-text-field>
                 </v-col>
@@ -32,10 +34,10 @@
                 createVisible = false;
               "
             >
-              Create
+              {{ $t("button.create") }}
             </v-btn>
             <v-btn color="accent" @click="createVisible = false">
-              Cancel
+              {{ $t("button.cancel") }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -44,9 +46,9 @@
   </div>
   <v-table class="ma-2 pa-2">
     <thead>
-      <th class="text-left">ID</th>
-      <th class="text-left">Name</th>
-      <th class="text-left">Actions</th>
+      <th class="text-left">{{ $t("label.id") }}</th>
+      <th class="text-left">{{ $t("label.name") }}</th>
+      <th class="text-left">{{ $t("label.actions") }}</th>
     </thead>
     <tbody>
       <tr v-for="item in institutions" :key="item.id">
@@ -67,7 +69,7 @@
                 "
               ></v-btn>
             </template>
-            <span>Edit</span>
+            <span>{{ $t("label.edit") }}</span>
           </v-tooltip>
         </td>
       </tr>
@@ -77,8 +79,7 @@
     <v-card min-width="500">
       <v-card-title>
         <span class="text-h5">
-          Edit Institution
-          <span class="font-italic">{{ currentInstitution.name }}</span>
+          {{ $t("institution.edit_title", { name: currentInstitution.name }) }}
         </span>
       </v-card-title>
       <v-card-text>
@@ -87,16 +88,16 @@
             <v-col>
               <v-text-field
                 variant="plain"
-                label="ID"
+                :label="$t('label.id')"
                 readonly
                 v-model="currentInstitution.id"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
-                label="Name"
+                :label="$t('label.name')"
                 v-model="currentInstitution.name"
               ></v-text-field>
-              <span class="text-h8">Attributes</span>
+              <span class="text-h8">{{ $t("label.attributes") }}</span>
 
               <div v-if="instAttributes">
                 <v-text-field
@@ -120,14 +121,16 @@
             editVisible = false;
           "
         >
-          Save
+          {{ $t("button.save") }}
         </v-btn>
-        <v-btn color="accent" @click="editVisible = false"> Cancel </v-btn>
+        <v-btn color="accent" @click="editVisible = false">
+          {{ $t("button.cancel") }}
+        </v-btn>
         <v-btn
           color="accent"
           @click="resetInstitutionForm(currentInstitution.id)"
         >
-          Reset
+          {{ $t("button.reset") }}
         </v-btn>
       </v-card-actions>
     </v-card>
