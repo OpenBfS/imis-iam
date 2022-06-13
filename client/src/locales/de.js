@@ -1,40 +1,40 @@
 export default {
-  //Appbar component
+  // Appbar component
   appbar: {
     title: "IAM123",
     button_profile: "Profil",
     button_logout: "Abmelden",
     text_login: "Angemeldet als:",
   },
-  //Applications component
+  // Applications component
   application: {
     title: "Anwendungen",
   },
-  //Archive component
+  // Archive component
   archive: {
     title: "Archiv",
     search: "Durchsuchen",
   },
-  //Institutions component
+  // Institutions component
   institution: {
     title: "Institutionen",
     create_title: "Neue Institution erstellen",
     edit_title: "Institution {name} bearbeiten",
   },
-  //Main component
+  // Main component
   main: {
     title: "Integriertes Mess- und Informationssystem IMIS",
     institutions: "Institutionen",
     users: "Benutzer",
   },
-  //Users component
+  // Users component
   user: {
     title: "Benutzer",
     create_title: "Neuen Benutzer erstellen",
     edit_title: "Benutzer {name} bearbeiten",
     label_institutions: "Institutionen",
   },
-  //Shared button texts
+  // Shared button texts
   button: {
     add: "Hinzufügen",
     create: "Erstellen",
@@ -42,7 +42,7 @@ export default {
     reset: "Zurücksetzen",
     save: "Speichern",
   },
-  //Shared labels
+  // Shared labels
   label: {
     actions: "Aktionen",
     attributes: "Attribute",
@@ -54,5 +54,12 @@ export default {
     lastname: "Nachname",
     name: "Name",
     username: "Benutzername",
+  },
+  // Form labels
+  form: {
+    required_firstname: "Vorname ist erforderlich",
+    required_lastname: "Nachname ist erforderlich",
+    required_email: "Email ist erforderlich",
+    valid_email: "Email muss gültig sein",
   },
 };

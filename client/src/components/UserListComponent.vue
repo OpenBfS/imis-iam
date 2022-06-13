@@ -83,12 +83,12 @@
                   variant="underlined"
                   :label="$t('label.firstname')"
                   v-model="user.firstName"
-                  :rules="[(v) => !!v || 'Firstname is required']"
+                  :rules="[(v) => !!v || $t('form.required_firstname')]"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   :label="$t('label.lastname')"
-                  :rules="[(v) => !!v || 'Lastname is required']"
+                  :rules="[(v) => !!v || $t('form.required_lastname')]"
                   v-model="user.lastName"
                 ></v-text-field>
                 <v-text-field
@@ -96,8 +96,8 @@
                   :label="$t('label.email')"
                   v-model="user.email"
                   :rules="[
-                    (v) => !!v || 'Email is required',
-                    (v) => /.+@.+/.test(v) || 'E-mail must be valid',
+                    (v) => !!v || $t('form.required_email'),
+                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
                   ]"
                 ></v-text-field>
                 <v-select
@@ -171,13 +171,13 @@
                 <v-text-field
                   variant="underlined"
                   :label="$t('label.firstname')"
-                  :rules="[(v) => !!v || 'Firstname is required']"
+                  :rules="[(v) => !!v || $t('form.required_firstname')]"
                   v-model="user.firstName"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   :label="$t('label.lastname')"
-                  :rules="[(v) => !!v || 'Lastname is required']"
+                  :rules="[(v) => !!v || $t('form.required_lastname')]"
                   v-model="user.lastName"
                 ></v-text-field>
                 <v-text-field
@@ -185,8 +185,8 @@
                   :label="$t('label.email')"
                   v-model="user.email"
                   :rules="[
-                    (v) => !!v || 'Email is required',
-                    (v) => /.+@.+/.test(v) || 'E-mail must be valid',
+                    (v) => !!v || $t('form.required_email'),
+                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
                   ]"
                 ></v-text-field>
                 <v-select
