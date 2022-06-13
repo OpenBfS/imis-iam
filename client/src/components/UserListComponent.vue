@@ -12,7 +12,6 @@
     >
       <v-icon>mdi-plus</v-icon>
       {{ $t("button.add") }}
-      <!-- Create user dialog -->
     </v-btn>
     <v-table class="ma-2 pa-2">
       <thead>
@@ -65,7 +64,6 @@
         </tr>
       </tbody>
     </v-table>
-    <!-- Edit user dialog -->
     <v-dialog v-model="showCreateDialog">
       <v-card min-width="500">
         <v-card-title>
@@ -73,43 +71,51 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-container>
-          <v-row jsutify="start" class="ml-2">
-            <v-col cols="10">
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.username')"
-                v-model="user.username"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.firstname')"
-                v-model="user.firstName"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.lastname')"
-                v-model="user.lastName"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.email')"
-                v-model="user.email"
-              ></v-text-field>
-              <v-select
-                return-object
-                dense
-                clearable
-                :label="$t('user.label_institutions')"
-                :items="institutions"
-                v-model="user.groups"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-                multiple
-              >
-              </v-select>
-            </v-col>
-          </v-row>
+          <v-col jsutify="start" cols="10">
+            <v-form v-model="valid">
+              <v-col>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('label.username')"
+                  v-model="user.username"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('label.firstname')"
+                  v-model="user.firstName"
+                  :rules="[(v) => !!v || 'Firstname is required']"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('label.lastname')"
+                  :rules="[(v) => !!v || 'Lastname is required']"
+                  v-model="user.lastName"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('label.email')"
+                  v-model="user.email"
+                  :rules="[
+                    (v) => !!v || 'Email is required',
+                    (v) => /.+@.+/.test(v) || 'E-mail must be valid',
+                  ]"
+                ></v-text-field>
+                <v-select
+                  return-object
+                  dense
+                  clearable
+                  :label="$t('user.label_institutions')"
+                  :items="institutions"
+                  v-model="user.groups"
+                  item-title="name"
+                  item-value="id"
+                  persistent-hint
+                  multiple
+                >
+                </v-select>
+              </v-col>
+            </v-form>
+          </v-col>
         </v-container>
         <v-divider></v-divider>
         <v-card-actions>
@@ -119,7 +125,11 @@
             v-bind:message="httpErrorMsg"
           />
           <v-spacer></v-spacer>
-          <v-btn color="accent" @click="createUser()">
+          <v-btn
+            :color="`${valid ? 'accent' : 'grey'}`"
+            :disabled="!valid"
+            @click="createUser()"
+          >
             {{ $t("button.create") }}
           </v-btn>
           <v-btn
@@ -143,50 +153,58 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-container>
-          <v-row jsutify="start" class="ml-2 pt-2">
-            <v-col cols="10">
-              <v-text-field
-                variant="plain"
-                :label="$t('label.id')"
-                readonly
-                v-model="user.id"
-              ></v-text-field>
-              <v-text-field
-                variant="plain"
-                :label="$t('label.username')"
-                readonly
-                v-model="user.username"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.firstname')"
-                v-model="user.firstName"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.lastname')"
-                v-model="user.lastName"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.email')"
-                v-model="user.email"
-              ></v-text-field>
-              <v-select
-                return-object
-                dense
-                clearable
-                :label="$t('user.label_institutions')"
-                :items="institutions"
-                v-model="user.groups"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-                multiple
-              >
-              </v-select>
-            </v-col>
-          </v-row>
+          <v-col cols="10">
+            <v-form v-model="editValid" ref="editForm">
+              <v-col cols="10">
+                <v-text-field
+                  variant="plain"
+                  :label="$t('label.id')"
+                  readonly
+                  v-model="user.id"
+                ></v-text-field>
+                <v-text-field
+                  variant="plain"
+                  :label="$t('label.username')"
+                  readonly
+                  v-model="user.username"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('label.firstname')"
+                  :rules="[(v) => !!v || 'Firstname is required']"
+                  v-model="user.firstName"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('label.lastname')"
+                  :rules="[(v) => !!v || 'Lastname is required']"
+                  v-model="user.lastName"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('label.email')"
+                  v-model="user.email"
+                  :rules="[
+                    (v) => !!v || 'Email is required',
+                    (v) => /.+@.+/.test(v) || 'E-mail must be valid',
+                  ]"
+                ></v-text-field>
+                <v-select
+                  return-object
+                  dense
+                  clearable
+                  :label="$t('user.label_institutions')"
+                  :items="institutions"
+                  v-model="user.groups"
+                  item-title="name"
+                  item-value="id"
+                  persistent-hint
+                  multiple
+                >
+                </v-select>
+              </v-col>
+            </v-form>
+          </v-col>
         </v-container>
         <v-divider></v-divider>
         <v-card-actions>
@@ -196,7 +214,13 @@
             v-bind:message="httpErrorMsg"
           />
           <v-spacer></v-spacer>
-          <v-btn color="accent" @click="storeUser()">
+          <!-- TODO: Check if the style of a disabled button
+          is fixed by upstream  -->
+          <v-btn
+            @click="storeUser()"
+            :color="`${editValid ? 'accent' : 'grey'}`"
+            :disabled="!editValid"
+          >
             {{ $t("button.save") }}
           </v-btn>
           <v-btn
@@ -224,7 +248,7 @@
   </div>
 </template>
 <script>
-import { computed, onMounted, ref, defineAsyncComponent } from "vue";
+import { computed, onMounted, ref, defineAsyncComponent, watch } from "vue";
 import { useStore } from "vuex";
 import { HTTP } from "../lib/http";
 
@@ -258,9 +282,11 @@ export default {
       delete user.value["id"];
     };
     const onEditClicked = (id) => {
-      savedUser.value = {
-        ...(user.value = users.value.filter((u) => id === u.id)[0]),
+      user.value = {
+        ...users.value.filter((u) => id === u.id)[0],
       };
+      // Save original user data for "reset" button
+      savedUser.value = { ...user.value };
     };
 
     const user = ref({
@@ -327,8 +353,26 @@ export default {
           httpErrorMsg.value = error.response.statusText;
         });
     };
-
+    // Form
+    const valid = ref(false);
+    const editValid = ref(false);
+    const editForm = ref(null);
+    // This is necessary as the form value is not change to true with valid inputs.
+    // TODO: Check if this is fixed by upstream with the next release.
+    watch(
+      () => showEditDialog.value,
+      () => {
+        if (showEditDialog.value) {
+          setTimeout(() => {
+            editForm.value.validate();
+          }, 100);
+        }
+      }
+    );
     return {
+      valid,
+      editForm,
+      editValid,
       savedUser,
       user,
       resetUser,
