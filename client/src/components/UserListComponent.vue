@@ -53,6 +53,7 @@
                   size="small"
                   v-bind="props"
                   @click="
+                    process = 'copy';
                     onCopyClicked(user.id);
                     showCreateDialog = true;
                   "
@@ -72,7 +73,7 @@
         <v-divider></v-divider>
         <v-container>
           <v-col jsutify="start" cols="10">
-            <v-form v-model="valid">
+            <v-form v-model="valid" ref="addForm">
               <v-col>
                 <v-text-field
                   variant="underlined"
@@ -353,10 +354,12 @@ export default {
           httpErrorMsg.value = error.response.statusText;
         });
     };
+    const process = ref("");
     // Form
     const valid = ref(false);
     const editValid = ref(false);
     const editForm = ref(null);
+    const addForm = ref(null);
     // This is necessary as the form value is not change to true with valid inputs.
     // TODO: Check if this is fixed by upstream with the next release.
     watch(
@@ -369,7 +372,19 @@ export default {
         }
       }
     );
+    watch(
+      () => showCreateDialog.value,
+      () => {
+        if (showCreateDialog.value && process.value == "copy") {
+          setTimeout(() => {
+            addForm.value.validate();
+          }, 100);
+        }
+      }
+    );
     return {
+      addForm,
+      process,
       valid,
       editForm,
       editValid,
