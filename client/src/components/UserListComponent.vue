@@ -68,6 +68,11 @@
         </tr>
       </tbody>
     </v-table>
+    <UIAlert
+      v-if="hasLoadingError"
+      v-bind:isSuccessful="!hasLoadingError"
+      v-bind:message="$store.state.application.httpErrorMessage"
+    />
     <v-dialog v-model="showCreateDialog">
       <v-card min-width="500">
         <v-card-title>
@@ -263,8 +268,11 @@ export default {
   },
   setup() {
     const store = useStore();
-    const { hasRequestError: hasHttpError, resetNotification } =
-      useNotification();
+    const {
+      hasRequestError: hasHttpError,
+      hasLoadingError,
+      resetNotification,
+    } = useNotification();
 
     const showCreateDialog = ref(false);
     const showEditDialog = ref(false);
@@ -280,8 +288,18 @@ export default {
     });
 
     onMounted(() => {
-      store.dispatch("user/loadUsers");
-      store.dispatch("institution/loadInstitutions");
+      store
+        .dispatch("user/loadUsers")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+      store
+        .dispatch("institution/loadInstitutions")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
     });
 
     const onCopyClicked = (id) => {
@@ -380,6 +398,7 @@ export default {
     );
     return {
       resetNotification,
+      hasLoadingError,
       addForm,
       process,
       valid,

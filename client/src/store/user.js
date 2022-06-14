@@ -10,12 +10,14 @@ export const user = {
     },
   },
   actions: {
-    //Load all users
     loadUsers({ commit }) {
-      HTTP.get("/iamuser").then((response) => {
-        if (response.status == 200) {
-          commit("setUserList", response.data);
-        }
+      return new Promise((resolve, reject) => {
+        HTTP.get("/iamuser")
+          .then((response) => {
+            commit("setUserList", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
       });
     },
   },

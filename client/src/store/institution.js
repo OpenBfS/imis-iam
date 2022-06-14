@@ -49,13 +49,15 @@ export const institution = {
      * Load all institutions
      */
     loadInstitutions({ commit }) {
-      HTTP.get("/institution")
-        .then((response) => {
-          commit("setInstitutionList", response.data);
-        })
-        .catch((error) => console.log(error)); // TODO: Handle http error in component
+      return new Promise((resolve, reject) => {
+        HTTP.get("/institution")
+          .then((response) => {
+            commit("setInstitutionList", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
     },
-
     loadInstitutionNames({ commit }) {
       HTTP.get("/institution")
         .then((response) => {
