@@ -7,6 +7,7 @@
       color="accent"
       @click="
         resetUser();
+        resetNotification();
         showCreateDialog = true;
       "
     >
@@ -38,6 +39,7 @@
                   size="small"
                   v-bind="props"
                   @click="
+                    resetNotification();
                     onEditClicked(user.id);
                     showEditDialog = true;
                   "
@@ -54,6 +56,7 @@
                   v-bind="props"
                   @click="
                     process = 'copy';
+                    resetNotification();
                     onCopyClicked(user.id);
                     showCreateDialog = true;
                   "
@@ -116,15 +119,15 @@
                 </v-select>
               </v-col>
             </v-form>
+            <UIAlert
+              v-if="hasHttpError"
+              v-bind:isSuccessful="!hasHttpError"
+              v-bind:message="$store.state.application.httpErrorMessage"
+            />
           </v-col>
         </v-container>
         <v-divider></v-divider>
         <v-card-actions>
-          <UIAlert
-            v-if="hasHttpError"
-            v-bind:isSuccessful="!hasHttpError"
-            v-bind:message="httpErrorMsg"
-          />
           <v-spacer></v-spacer>
           <v-btn
             :color="`${valid ? 'accent' : 'grey'}`"
@@ -205,15 +208,15 @@
                 </v-select>
               </v-col>
             </v-form>
+            <UIAlert
+              v-if="hasHttpError"
+              v-bind:isSuccessful="!hasHttpError"
+              v-bind:message="$store.state.application.httpErrorMessage"
+            />
           </v-col>
         </v-container>
         <v-divider></v-divider>
         <v-card-actions>
-          <UIAlert
-            v-if="hasHttpError"
-            v-bind:isSuccessful="!hasHttpError"
-            v-bind:message="httpErrorMsg"
-          />
           <v-spacer></v-spacer>
           <!-- TODO: Check if the style of a disabled button
           is fixed by upstream  -->
@@ -251,7 +254,8 @@
 <script>
 import { computed, onMounted, ref, defineAsyncComponent, watch } from "vue";
 import { useStore } from "vuex";
-import { HTTP } from "../lib/http";
+import { HTTP } from "@/lib/http";
+import { useNotification } from "@/lib/use-notification";
 
 export default {
   components: {
@@ -259,6 +263,9 @@ export default {
   },
   setup() {
     const store = useStore();
+    const { hasRequestError: hasHttpError, resetNotification } =
+      useNotification();
+
     const showCreateDialog = ref(false);
     const showEditDialog = ref(false);
 
@@ -299,9 +306,6 @@ export default {
       groups: [],
     });
 
-    const hasHttpError = ref(false);
-    const httpErrorMsg = ref("");
-
     const resetUser = () => {
       user.value.id = "";
       user.value.username = "";
@@ -314,7 +318,6 @@ export default {
       return institution.map((i) => i.id);
     };
     const createUser = () => {
-      hasHttpError.value = false;
       const payload = { ...user.value };
       payload["groups"] = user.value.groups.length
         ? getInstitutionIds(user.value.groups)
@@ -325,19 +328,13 @@ export default {
           showCreateDialog.value = false;
           store.dispatch("user/loadUsers");
         })
-        .catch((error) => {
+        .catch(() => {
           hasHttpError.value = true;
-          httpErrorMsg.value = error.response.statusText;
         });
     };
 
     const savedUser = ref();
-    const resetUserForm = (id) => {
-      store.dispatch("user/loadUserById", id);
-    };
-
     const storeUser = () => {
-      hasHttpError.value = false;
       const payload = { ...user.value };
       payload["groups"] = user.value.groups.length
         ? getInstitutionIds(user.value.groups)
@@ -349,9 +346,8 @@ export default {
           store.dispatch("user/loadUsers");
           showEditDialog.value = false;
         })
-        .catch((error) => {
+        .catch(() => {
           hasHttpError.value = true;
-          httpErrorMsg.value = error.response.statusText;
         });
     };
     const process = ref("");
@@ -383,6 +379,7 @@ export default {
       }
     );
     return {
+      resetNotification,
       addForm,
       process,
       valid,
@@ -392,14 +389,12 @@ export default {
       user,
       resetUser,
       hasHttpError,
-      httpErrorMsg,
       showCreateDialog,
       showEditDialog,
       newUser,
       institutions,
       users,
       createUser,
-      resetUserForm,
       storeUser,
       onCopyClicked,
       onEditClicked,
