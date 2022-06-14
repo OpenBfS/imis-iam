@@ -1,9 +1,9 @@
 <template>
   <div>
-    <v-alert v-if="isSuccessful" type="success" dense color="blue" text>
+    <v-alert v-if="isSuccessful" variant="contained-text" type="success" text>
       {{ message }}
     </v-alert>
-    <v-alert v-else type="error" dense text>
+    <v-alert v-else variant="contained-text" type="error" text>
       {{ message }}
     </v-alert>
   </div>
