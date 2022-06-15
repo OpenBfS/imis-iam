@@ -27,9 +27,9 @@
           required
         ></v-text-field>
         <v-row>
-          <v-btn @click="save" class="ma-2 pa-2">{{ $t("label.save") }}</v-btn>
+          <v-btn @click="save" class="ma-2 pa-2">{{ $t("button.save") }}</v-btn>
           <v-btn @click="reset" class="ma-2 pa-2">{{
-            $t("label.reset")
+            $t("button.reset")
           }}</v-btn>
         </v-row>
       </v-col>
