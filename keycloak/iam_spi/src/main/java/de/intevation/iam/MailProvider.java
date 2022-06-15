@@ -63,6 +63,25 @@ public class MailProvider implements RealmResourceProvider{
         return this;
     }
 
+    /**
+     * Get all mail types.
+     *
+     * Request:
+     * GET to /mail/type
+     *
+     * Response:
+     * <pre>
+     * <code>
+     *[{
+     *  id: [Integer], //Type id
+     *  name: [String] //Type name
+     *}, {
+     *   //...
+     *}]
+     * </code>
+     * </pre>
+     * @return Response containing mail types as json array
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/type")
@@ -77,6 +96,25 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok(types).build();
     }
 
+    /**
+     * Get all mailing lists.
+     *
+     * Request:
+     * GET to mail/list
+     *
+     * Response:
+     * <pre>
+     * <code>
+     *[{
+     *  id: [Integer], //List id
+     *  name: [String] //List name
+     *}, {
+     * //...
+     *}]
+     * </code>
+     * </pre>
+     * @return Response containing mailing lists as json array
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/list")
@@ -91,6 +129,25 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok(lists).build();
     }
 
+    /**
+     * Get a mailing list by given id.
+     *
+     * Request:
+     * GET to mail/list/{id}
+     *
+     * Response:
+     * <pre>
+     * <code>
+     *{
+     *  id: [Integer], //List id
+     *  name: [String] //List name
+     *}
+     * </code>
+     * </pre>
+     *
+     * @param id List id
+     * @return Response containing list as json object
+     */
     @GET
     @Path("/list/{id}")
     public Response getListById(@PathParam("id") Integer id) {
@@ -102,6 +159,32 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok(list).build();
     }
 
+    /**
+     * Create a new mailing list.
+     *
+     * Request:
+     * POST to mail/list
+     * Body:
+     * <pre>
+     * <code>
+     *{
+     *  name: [String] //New list name
+     *}
+     * </code>
+     * </pre>
+     *
+     * Response:
+     * <pre>
+     * <code>
+     *{
+     *  id: [Integer], //List id
+     *  name: [String] //List name
+     *}
+     * </code>
+     * </pre>
+     * @param list List model
+     * @return Response containing new list as json
+     */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -115,6 +198,30 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok(list).build();
     }
 
+    /**
+     * Update a mailing list.
+     *
+     * <pre>
+     * Request:
+     * PUT to mail/list
+     * Body:
+     * <code>
+     *{
+     *  id: [Integer], //List id
+     *  name: [String], //List name
+     *}
+     * </code>
+     * Response:
+     * <code>
+     *{
+     *  id: [Integer], //List id
+     *  name: [String], //List name
+     *}
+     * </code>
+     * </pre>
+     * @param list List model
+     * @return Response containing updated list as json
+     */
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -130,6 +237,14 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok(mergedList).build();
     }
 
+    /**
+     * Delete the mailing list with the given id.
+     *
+     * Request:
+     * DELETE to mail/list/{id}
+     * @param id List id
+     * @return 200 if deleted successfully, 404 if list was not found
+     */
     @DELETE
     @Path("/list/{id}")
     public Response removeList(@PathParam("id") Integer id) {
@@ -142,16 +257,29 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok().build();
     }
 
+    /**
+     * Join the mailing list with the given id.
+     *
+     * Request:
+     * GET to list/{id}/join
+     * @param headers Request headers
+     * @param id Mailing list id
+     * @return 200 if joined successfully, 404 if not found
+     */
     @GET
     @Path("/list/{id}/join")
     public Response joinList(
         @Context HttpHeaders headers,
         @PathParam("id") Integer id) {
-            String userId = headers.getHeaderString("X-SHIB-user");
-            if (userId == null) {
-                return Response.status(Status.FORBIDDEN).build();
-            }
+        String userId = headers.getHeaderString("X-SHIB-user");
+        if (userId == null) {
+            return Response.status(Status.FORBIDDEN).build();
+        }
         EntityManager em = session.getProvider(JpaConnectionProvider.class).getEntityManager();
+        MailList list = em.find(MailList.class, id);
+        if (list == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
         MailListUser entry = new MailListUser();
         entry.setMailListId(id);
         entry.setUserId(userId);
@@ -159,6 +287,15 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok().build();
     }
 
+    /**
+     * Leave the mailing list with the given id.
+     *
+     * Request:
+     * GET to mail/list/{id}/leave
+     * @param headers Request headers
+     * @param mailListId Mail list id
+     * @return 200 if left successfully, 404 if not found
+     */
     @GET
     @Path("/list/{id}/leave")
     public Response leaveList(
@@ -186,6 +323,31 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok().build();
     }
 
+    /**
+     * Get all archived mails.
+     * <pre>
+     * Request:
+     * GET to mail?type={typeId}
+     * Query params:
+     *   type: [Integer] Filter by mail type, optional
+     * Response:
+     * <code>
+     * [{
+     *   id: [Integer], //Mail id
+     *   sendDate: [Integer], //Time sent as timestamp
+     *   expiryDate: [Integer], //Expiry date as timestamp
+     *   sender: [String], //Sender email address
+     *   text: [String], //Mail text
+     *   subject: [String], //Mail subject
+     *   publish: [Boolean], //True if mail should be published
+     *   type: [Integer], //Mail type id
+     *   receipient: [Integer], //Receipient mailing list id
+     * }]
+     * </code>
+     * </pre>
+     * @param type Mail type id
+     * @return Response containing mails as json array
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMails(
@@ -205,6 +367,29 @@ public class MailProvider implements RealmResourceProvider{
         return Response.ok(result).build();
     }
 
+    /**
+     * Send a mail to a mailing list.
+     * <pre>
+     * Request:
+     * POST to mail
+     * Body:
+     * <code>
+     * {
+     *   sendDate: [Integer], //Time sent as timestamp
+     *   expiryDate: [Integer], //Expiry date as timestamp
+     *   sender: [String], //Sender email address
+     *   text: [String], //Mail text
+     *   subject: [String], //Mail subject
+     *   publish: [Boolean], //True if mail should be published
+     *   type: [Integer], //Mail type id
+     *   receipient: [Integer], //Receipient mailing list id
+     * }
+     * </code>
+     * </pre>
+     * @param headers Request headers
+     * @param mail Mail Model
+     * @return 200 if send successfully
+     */
     @POST
     public Response sendMail(
         @Context HttpHeaders headers,

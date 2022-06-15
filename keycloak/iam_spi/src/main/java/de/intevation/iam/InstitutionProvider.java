@@ -33,6 +33,22 @@ public class InstitutionProvider implements RealmResourceProvider {
         this.session = session;
     }
 
+    /**
+     * Get all institutions.
+     * Response:
+     * <pre>
+     * <code>
+     * [{
+     *   id: [String] Institution ID,
+     *   name: [String] Institution Name
+     * },
+     * {
+     *   ...
+     * }]
+     * </code>
+     * </pre>
+     * @return Array of institutions
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getInstitutions() {
@@ -45,6 +61,19 @@ public class InstitutionProvider implements RealmResourceProvider {
         return Response.ok(institutions.toArray()).build();
     }
 
+    /**
+     * Get institution with the given id.
+     * Response:
+     * <pre>
+     * <code>
+     * {
+     *   id: [String] Institution ID,
+     *   name: [String] Institution Name
+     * }
+     * </code>
+     * </pre>
+     * @return Institution JSON or 404 if not found
+     */
     @GET
     @Path("/{id}")
     public Response getInstitutionById(@PathParam("id") String id) {
@@ -59,6 +88,11 @@ public class InstitutionProvider implements RealmResourceProvider {
         return Response.ok(Institution.fromGroupModel(group)).build();
     }
 
+    /**
+     * Create a new institution.
+     * @param rep Institution representation
+     * @return New Instituion JSON or 400 if no institution is present
+     */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response createInstitution(final Institution rep) {
@@ -70,6 +104,12 @@ public class InstitutionProvider implements RealmResourceProvider {
         return Response.ok(Institution.fromGroupModel(group)).build();
     }
 
+    /**
+     * Update an institution.
+     * @param rep Institution representation
+     * @return New Instituion JSON, 404 if institution is not found
+     *         or 400 if no institution is present
+     */
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateInstitution(final Institution rep) {
@@ -88,6 +128,12 @@ public class InstitutionProvider implements RealmResourceProvider {
         return Response.ok(Institution.fromGroupModel(group)).build();
     }
 
+    /**
+     * Delete the institution with the given id.
+     * </pre>
+     * @param id Institution id
+     * @return 200 if successful or 404 if not found
+     */
     @DELETE
     @Path("/{id}")
     public Response removeInstitution(@PathParam("id") String id) {
