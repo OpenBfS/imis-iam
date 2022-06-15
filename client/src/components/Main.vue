@@ -1,9 +1,22 @@
 <template>
   <v-container>
-    <v-row class="bg-secondary my-2">
+    <v-row class="bg-secondary my-2" style="position: relative">
       <v-col cols="12" class="text-h4">
         {{ $t("main.title") }}
       </v-col>
+      <v-div style="position: absolute; top: 100px; right: 2px">
+        <v-col>
+          <v-btn
+            class="text-none"
+            variant="plain"
+            @click="
+              $route.path == '/mailinglist' ? '' : $router.push('/mailinglist')
+            "
+          >
+            {{ $t("mailinglist.title") }}
+          </v-btn>
+        </v-col>
+      </v-div>
     </v-row>
     <v-row class="mt-4" v-if="notifications.length">
       <v-col

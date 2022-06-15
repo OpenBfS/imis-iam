@@ -62,4 +62,10 @@ export default {
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
   },
+  // MailingList
+  mailinglist: {
+    title: "E-Mail-Verteiler",
+    not_found: "",
+    name: "Name der Mailing-Liste",
+  },
 };

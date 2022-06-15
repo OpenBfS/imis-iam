@@ -3,6 +3,7 @@ import Home from "@/components/Main.vue";
 import InstitutionView from "../views/InstitutionView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import UserView from "../views/UserView.vue";
+import MailingList from "@/components/MailingList.vue";
 
 const routes = [
   {
@@ -33,6 +34,11 @@ const routes = [
     path: "/users",
     name: "User",
     component: UserView,
+  },
+  {
+    path: "/mailinglist",
+    name: "MailingList",
+    component: MailingList,
   },
 ];
 
