@@ -1,0 +1,147 @@
+<template>
+  <v-container>
+    <v-row>
+      <v-col cols="12" class="mt-10 pa-2 text-h6 bg-secondary">
+        {{ $t("mailinglist.title") }}
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="10" class="mt-10">
+        <v-table class="ma-2 pa-2">
+          <thead>
+            <th class="text-left">Name</th>
+            <th class="text-left">actions</th>
+          </thead>
+          <tbody>
+            <tr v-for="list in mailLists" :key="list.id">
+              <td>{{ list.name }}</td>
+              <td>
+                <v-tooltip>
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      variant="plain"
+                      icon="mdi-account-edit-outline"
+                      size="small"
+                      v-bind="props"
+                      @click="
+                        resetNotification();
+                        processType = 'edit';
+                        showManagementDialog = true;
+                      "
+                    ></v-btn>
+                  </template>
+                  <span>{{ $t("label.edit") }}</span>
+                </v-tooltip>
+                <v-tooltip>
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      variant="plain"
+                      icon="mdi-delete"
+                      size="small"
+                      v-bind="props"
+                      @click="
+                        resetNotification();
+                        processType = 'delete';
+                        showManagementDialog = true;
+                      "
+                    ></v-btn>
+                  </template>
+                  <span>{{ $t("label.delete") }}</span>
+                </v-tooltip>
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+
+        <div v-if="!hasLoadingError && mailLists.length == 0">
+          <!-- {{ $t("No mailing lists are available") }} -->
+          No mailing lists are available
+        </div>
+      </v-col>
+      <v-col cols="4">
+        <v-btn
+          color="accent"
+          @click="
+            resetNotification();
+            processType = 'add';
+            showManagementDialog = true;
+          "
+          >Add Mailing-List</v-btn
+        >
+      </v-col>
+      <UIAlert
+        v-if="hasLoadingError"
+        v-bind:isSuccessful="!hasLoadingError"
+        v-bind:message="$store.state.application.httpErrorMessage"
+      />
+    </v-row>
+    <ManageMailing
+      v-if="showManagementDialog"
+      v-bind:processType="processType"
+      v-bind:item="selectedItem"
+      @child-object="checkChildObject"
+    />
+  </v-container>
+</template>
+
+<script>
+import { HTTP } from "@/lib/http";
+import { useNotification } from "@/lib/use-notification";
+import { onMounted, ref, defineAsyncComponent } from "vue";
+
+export default {
+  components: {
+    UIAlert: defineAsyncComponent(() => import("../UI/UIAlert.vue")),
+    ManageMailing: defineAsyncComponent(() =>
+      import("@/components/Mailing/ManageMailing.vue")
+    ),
+  },
+  setup() {
+    const { hasLoadingError, resetNotification } = useNotification();
+    const mailLists = ref([]);
+
+    const getMailLists = () => {
+      resetNotification();
+      HTTP.get("mail/list")
+        .then((response) => {
+          mailLists.value = response.data;
+        })
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
+    onMounted(() => {
+      getMailLists();
+    });
+
+    const showCreateDialog = ref(false);
+    const listName = ref("");
+    const showManagementDialog = ref(false);
+    const deleteList = () => {};
+    const editList = () => {};
+    const selectedItem = ref({});
+    const processType = ref({});
+    const checkChildObject = (e) => {
+      if (e.closeDialog) {
+        showManagementDialog.value = false;
+      }
+      if (e.hasChanges) {
+        getMailLists();
+      }
+    };
+    return {
+      checkChildObject,
+      showManagementDialog,
+      selectedItem,
+      processType,
+      deleteList,
+      editList,
+      resetNotification,
+      mailLists,
+      listName,
+      showCreateDialog,
+      hasLoadingError,
+    };
+  },
+};
+</script>

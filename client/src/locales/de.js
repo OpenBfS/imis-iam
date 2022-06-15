@@ -54,6 +54,7 @@ export default {
     lastname: "Nachname",
     name: "Name",
     username: "Benutzername",
+    delete: "Löschen",
   },
   // Form labels
   form: {

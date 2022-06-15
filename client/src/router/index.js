@@ -3,7 +3,7 @@ import Home from "@/components/Main.vue";
 import InstitutionView from "../views/InstitutionView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import UserView from "../views/UserView.vue";
-import MailingList from "@/components/MailingList.vue";
+import MailingList from "@/components/Mailing/MailingList.vue";
 
 const routes = [
   {
