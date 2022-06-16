@@ -43,6 +43,7 @@ import de.intevation.iam.model.MailType;
  * Class providing rest interfaces for mails, mail types and mailing lists.
  * @author Alexander Woestmann<awoestmann@intevation>
  */
+@Produces(MediaType.APPLICATION_JSON)
 public class MailProvider implements RealmResourceProvider{
     //Constants
     private static final String FROM_DISPLAY_NAME = "fromDisplayName";
@@ -83,7 +84,6 @@ public class MailProvider implements RealmResourceProvider{
      * @return Response containing mail types as json array
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/type")
     public Response getTypes() {
         EntityManager em = session.getProvider(JpaConnectionProvider.class).getEntityManager();
@@ -186,7 +186,6 @@ public class MailProvider implements RealmResourceProvider{
      * @return Response containing new list as json
      */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/list")
     public Response createList(final MailList list) {
@@ -223,7 +222,6 @@ public class MailProvider implements RealmResourceProvider{
      * @return Response containing updated list as json
      */
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/list")
     public Response updateList(final MailList list) {
@@ -254,7 +252,7 @@ public class MailProvider implements RealmResourceProvider{
             return Response.status(Status.NOT_FOUND).build();
         }
         em.remove(list);
-        return Response.ok().build();
+        return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 
     /**
