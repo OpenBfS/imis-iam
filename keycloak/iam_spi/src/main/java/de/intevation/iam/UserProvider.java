@@ -1,7 +1,12 @@
 package de.intevation.iam;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Locale.LanguageRange;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +32,8 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import de.intevation.iam.model.User;
 
 public class UserProvider implements RealmResourceProvider {
+
+    private final String BUNDLE_FILE = "iam";
 
     private KeycloakSession session;
 
@@ -81,10 +88,13 @@ public class UserProvider implements RealmResourceProvider {
         try {
             user = updateUser(realm, rep, user);
         } catch (InvalidUserPropertiesException e) {
+            ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, getLocaleFromHeader(headers));
+
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
-                    .entity(e.getMessage())
+                    .entity(i18n.getString("error_mail_already_used"))
                     .build();
+
         }
 
         return Response.ok(User.fromUserModel(user)).build();
@@ -135,16 +145,24 @@ public class UserProvider implements RealmResourceProvider {
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(final User rep) {
+    public Response createUser(@Context HttpHeaders headers, final User rep) {
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
         RealmModel realm = session.getContext().getRealm();
+        ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, getLocaleFromHeader(headers));
 
-        if(isEmailAlreadyUsed(realm, rep)
-            || isUsernameAlreadyUsed(realm, rep)) {
+        if(isEmailAlreadyUsed(realm, rep)) {
             return Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON).build();
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString("error_mail_already_used"))
+                .build();
+        }
+        if (isUsernameAlreadyUsed(realm, rep)) {
+            return Response.status(Status.CONFLICT)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString("error_username_already_used"))
+                .build();
         }
 
         UserModel newUser = session.users().addUser(realm, rep.getUsername());
@@ -173,6 +191,7 @@ public class UserProvider implements RealmResourceProvider {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(
+        @Context HttpHeaders headers,
         final User rep
     ) {
         RealmModel realm = session.getContext().getRealm();
@@ -181,9 +200,11 @@ public class UserProvider implements RealmResourceProvider {
         try {
             user = updateUser(realm, rep, user);
         } catch (InvalidUserPropertiesException e) {
+            ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, getLocaleFromHeader(headers));
+
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
-                    .entity(e.getMessage())
+                    .entity(i18n.getString("error_mail_already_used"))
                     .build();
         }
 
@@ -265,6 +286,22 @@ public class UserProvider implements RealmResourceProvider {
      */
     private boolean isUsernameAlreadyUsed(RealmModel realm, User user) {
         return session.users().getUserByUsername(realm, user.getUsername()) != null;
+    }
+
+    private Locale getLocaleFromHeader(HttpHeaders headers) {
+        String localeRange = headers.getHeaderString("Accept-Language");
+        if (localeRange == null || localeRange.equals("")) {
+            localeRange = "de-DE";
+        }
+        List<Locale> supportedLocales = new LinkedList<Locale>();
+        supportedLocales.add(Locale.GERMAN);
+        List<LanguageRange> ranges = Locale.LanguageRange.parse(localeRange);
+        List<Locale> locales = Locale.filter(ranges, supportedLocales);
+        if (locales.size() == 0) {
+            return Locale.GERMAN;
+        } else {
+            return locales.get(0);
+        }
     }
 
     private class InvalidUserPropertiesException extends Exception {
