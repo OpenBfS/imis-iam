@@ -26,6 +26,7 @@
                       @click="
                         resetNotification();
                         processType = 'edit';
+                        selectedItem = list;
                         showManagementDialog = true;
                       "
                     ></v-btn>
@@ -42,6 +43,7 @@
                       @click="
                         resetNotification();
                         processType = 'delete';
+                        selectedItem = list;
                         showManagementDialog = true;
                       "
                     ></v-btn>

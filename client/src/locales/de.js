@@ -41,6 +41,7 @@ export default {
     cancel: "Abbrechen",
     reset: "Zurücksetzen",
     save: "Speichern",
+    yes: "Ja",
   },
   // Shared labels
   label: {
