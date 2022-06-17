@@ -1,12 +1,9 @@
 package de.intevation.iam;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Locale.LanguageRange;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,6 +20,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.keycloak.locale.DefaultLocaleSelectorProviderFactory;
+import org.keycloak.locale.LocaleSelectorProvider;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -88,8 +87,10 @@ public class UserProvider implements RealmResourceProvider {
         try {
             user = updateUser(realm, rep, user);
         } catch (InvalidUserPropertiesException e) {
-            ResourceBundle i18n = ResourceBundle.getBundle(
-                BUNDLE_FILE, getLocaleFromHeader(headers));
+            DefaultLocaleSelectorProviderFactory factory = new DefaultLocaleSelectorProviderFactory();
+            LocaleSelectorProvider dlsp = factory.create(session);
+            Locale locale = dlsp.resolveLocale(realm, user);
+            ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, locale);
 
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
@@ -148,8 +149,13 @@ public class UserProvider implements RealmResourceProvider {
             return Response.status(Status.BAD_REQUEST).build();
         }
         RealmModel realm = session.getContext().getRealm();
-        ResourceBundle i18n = ResourceBundle.getBundle(
-            BUNDLE_FILE, getLocaleFromHeader(headers));
+        String id = headers.getHeaderString("X-SHIB-user");
+        UserModel requestingUser = session.users().getUserById(realm, id);
+        DefaultLocaleSelectorProviderFactory factory = new DefaultLocaleSelectorProviderFactory();
+        LocaleSelectorProvider dlsp = factory.create(session);
+        Locale locale = dlsp.resolveLocale(realm, requestingUser);
+        ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, locale);
+
 
         if (isEmailAlreadyUsed(realm, rep)) {
             return Response.status(Status.CONFLICT)
@@ -197,12 +203,16 @@ public class UserProvider implements RealmResourceProvider {
     ) {
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, rep.getId());
+        String id = headers.getHeaderString("X-SHIB-user");
+        UserModel requestingUser = session.users().getUserById(realm, id);
 
         try {
             user = updateUser(realm, rep, user);
         } catch (InvalidUserPropertiesException e) {
-            ResourceBundle i18n = ResourceBundle.getBundle(
-                BUNDLE_FILE, getLocaleFromHeader(headers));
+            DefaultLocaleSelectorProviderFactory factory = new DefaultLocaleSelectorProviderFactory();
+            LocaleSelectorProvider dlsp = factory.create(session);
+            Locale locale = dlsp.resolveLocale(realm, requestingUser);
+            ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, locale);
 
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
@@ -300,22 +310,6 @@ public class UserProvider implements RealmResourceProvider {
         return session.users().getUserByUsername(realm, user.getUsername())
             != null;
     }
-
-    private Locale getLocaleFromHeader(HttpHeaders headers) {
-        String localeRange = headers.getHeaderString("Accept-Language");
-        if (localeRange == null || localeRange.equals("")) {
-            localeRange = "de-DE";
-        }
-        List<Locale> supportedLocales = new LinkedList<Locale>();
-        supportedLocales.add(Locale.GERMAN);
-        List<LanguageRange> ranges = Locale.LanguageRange.parse(localeRange);
-        List<Locale> locales = Locale.filter(ranges, supportedLocales);
-        if (locales.size() == 0) {
-            return Locale.GERMAN;
-        }
-        return locales.get(0);
-    }
-
     private class InvalidUserPropertiesException extends Exception {
         InvalidUserPropertiesException(String message) {
             super(message);
