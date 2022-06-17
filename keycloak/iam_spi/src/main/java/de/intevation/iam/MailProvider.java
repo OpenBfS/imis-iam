@@ -347,7 +347,6 @@ public class MailProvider implements RealmResourceProvider{
      * @return Response containing mails as json array
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getMails(
         @QueryParam("type") Integer type
     ) {
@@ -430,8 +429,9 @@ public class MailProvider implements RealmResourceProvider{
                 return Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
         }
-
-        em.persist(mail);
-        return Response.ok().build();
+        if (mail.getPublish() == true) {
+            em.persist(mail);
+        }
+        return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 }
