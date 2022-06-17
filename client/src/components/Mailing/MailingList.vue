@@ -5,15 +5,34 @@
         {{ $t("mailinglist.title") }}
       </v-col>
     </v-row>
+    <v-row justify="end" class="mt-6">
+      <v-tooltip location="top">
+        <template v-slot:activator="{ props }">
+          <v-btn
+            v-bind="props"
+            size="small"
+            color="accent"
+            class="mr-4"
+            icon="mdi-email-plus"
+            @click="
+              resetNotification();
+              showMailDialog = true;
+            "
+          >
+          </v-btn>
+        </template>
+        <span>{{ $t("button.new_email") }}</span>
+      </v-tooltip>
+    </v-row>
     <v-row>
-      <v-col cols="10" class="mt-10">
+      <v-col cols="10" class="mt-6">
         <v-table class="ma-2 pa-2">
           <thead>
             <th class="text-left">Name</th>
             <th class="text-left">actions</th>
           </thead>
           <tbody>
-            <tr v-for="list in mailLists" :key="list.id">
+            <tr v-for="list in mailingLists" :key="list.id">
               <td>{{ list.name }}</td>
               <td>
                 <v-tooltip>
@@ -55,13 +74,14 @@
           </tbody>
         </v-table>
 
-        <div v-if="!hasLoadingError && mailLists.length == 0">
+        <div v-if="!hasLoadingError && mailingLists.length == 0">
           <!-- {{ $t("No mailing lists are available") }} -->
           No mailing lists are available
         </div>
       </v-col>
       <v-col cols="4">
         <v-btn
+          size="small"
           color="accent"
           @click="
             resetNotification();
@@ -83,6 +103,11 @@
       v-bind:item="selectedItem"
       @child-object="checkChildObject"
     />
+    <MailDialog
+      v-if="showMailDialog"
+      v-bind:mailingLists="mailingLists"
+      @mail-dialog-object="checkMailDialogObject"
+    />
   </v-container>
 </template>
 
@@ -97,16 +122,19 @@ export default {
     ManageMailing: defineAsyncComponent(() =>
       import("@/components/Mailing/ManageMailing.vue")
     ),
+    MailDialog: defineAsyncComponent(() =>
+      import("@/components/Mailing/MailDialog.vue")
+    ),
   },
   setup() {
     const { hasLoadingError, resetNotification } = useNotification();
-    const mailLists = ref([]);
+    const mailingLists = ref([]);
 
     const getMailLists = () => {
       resetNotification();
       HTTP.get("mail/list")
         .then((response) => {
-          mailLists.value = response.data;
+          mailingLists.value = response.data;
         })
         .catch(() => {
           hasLoadingError.value = true;
@@ -131,7 +159,16 @@ export default {
         getMailLists();
       }
     };
+    const showMailDialog = ref(false);
+    const checkMailDialogObject = (e) => {
+      if (e.closeDialog) {
+        showMailDialog.value = false;
+      }
+    };
+    // Mail
     return {
+      checkMailDialogObject,
+      showMailDialog,
       checkChildObject,
       showManagementDialog,
       selectedItem,
@@ -139,7 +176,7 @@ export default {
       deleteList,
       editList,
       resetNotification,
-      mailLists,
+      mailingLists,
       listName,
       showCreateDialog,
       hasLoadingError,

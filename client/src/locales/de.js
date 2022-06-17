@@ -42,6 +42,8 @@ export default {
     reset: "Zurücksetzen",
     save: "Speichern",
     yes: "Ja",
+    new_email: "Neue Email",
+    send: "Versenden",
   },
   // Shared labels
   label: {
@@ -68,6 +70,13 @@ export default {
   mailinglist: {
     title: "E-Mail-Verteiler",
     not_found: "",
-    name: "Name der Mailing-Liste",
+    name: "Name des EmailVerteilers",
+    select_mailing_list: "Wählen Sie eine Mailing Liste",
+    no_Mailing_list: "Keine vorhandene Mailing Listen",
+    write_new_email: "Email erstellen",
+    subject: "Betreff",
+    type: "Art der Meldung",
+    sender: "Absender",
+    publish: "Meldung in Archiv ablegen",
   },
 };
