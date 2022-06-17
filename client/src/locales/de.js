@@ -70,8 +70,7 @@ export default {
   mailinglist: {
     title: "E-Mail-Verteiler",
     not_found: "",
-    name: "Name des EmailVerteilers",
-    select_mailing_list: "Wählen Sie eine Mailing Liste",
+    select_mailing_list: "Name des Email-Verteilers",
     no_Mailing_list: "Keine vorhandene Mailing Listen",
     write_new_email: "Email erstellen",
     subject: "Betreff",
