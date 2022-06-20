@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 
 LABEL maintainer awoestmann@intevation.de
 
-ENV KEYCLOAK_VERSION 18.0.0
+ENV KEYCLOAK_VERSION 18.0.1
 ENV KEYCLOAK_HOME /opt/keycloak
 ENV SRC_DIR /opt/src
 ENV SPI_SRC /opt/iam_spi
