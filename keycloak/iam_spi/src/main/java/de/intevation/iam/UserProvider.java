@@ -60,7 +60,7 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Update profile of the current user
+     * Update profile of the current user.
      * @param headers Request headers
      * @param rep User representation
      * @return Updated profile json if successfull,
@@ -88,7 +88,8 @@ public class UserProvider implements RealmResourceProvider {
         try {
             user = updateUser(realm, rep, user);
         } catch (InvalidUserPropertiesException e) {
-            ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, getLocaleFromHeader(headers));
+            ResourceBundle i18n = ResourceBundle.getBundle(
+                BUNDLE_FILE, getLocaleFromHeader(headers));
 
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
@@ -101,7 +102,7 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Gett all users
+     * Get all users.
      * @return List of user json objects
      */
     @GET
@@ -118,7 +119,7 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Get user by id
+     * Get user by id.
      * @param id User id
      * @return User as json
      */
@@ -137,7 +138,7 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Create a new user
+     * Create a new user.
      * @param rep User representation
      * @return New user json if successfull,
      *         400 if username is empty,
@@ -150,9 +151,10 @@ public class UserProvider implements RealmResourceProvider {
             return Response.status(Status.BAD_REQUEST).build();
         }
         RealmModel realm = session.getContext().getRealm();
-        ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, getLocaleFromHeader(headers));
+        ResourceBundle i18n = ResourceBundle.getBundle(
+            BUNDLE_FILE, getLocaleFromHeader(headers));
 
-        if(isEmailAlreadyUsed(realm, rep)) {
+        if (isEmailAlreadyUsed(realm, rep)) {
             return Response.status(Status.CONFLICT)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(i18n.getString("error_mail_already_used"))
@@ -172,17 +174,19 @@ public class UserProvider implements RealmResourceProvider {
         newUser.setEmail(rep.getEmail());
 
         //Update groups
-        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
-            return rep.getGroups().contains(item.getId());
-        });
-        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getId, Function.identity()));
+        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
+            item -> {
+                return rep.getGroups().contains(item.getId());
+            });
+        Map<String, GroupModel> groupMap = groupsStream.collect(
+            Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, newUser);
 
         return Response.ok(User.fromUserModel(newUser)).build();
     }
 
     /**
-     * Update the given user
+     * Update the given user.
      * @param rep User representation
      * @return Updated user json if succesfull,
      *         403 if not authorized,
@@ -200,7 +204,8 @@ public class UserProvider implements RealmResourceProvider {
         try {
             user = updateUser(realm, rep, user);
         } catch (InvalidUserPropertiesException e) {
-            ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, getLocaleFromHeader(headers));
+            ResourceBundle i18n = ResourceBundle.getBundle(
+                BUNDLE_FILE, getLocaleFromHeader(headers));
 
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
@@ -212,11 +217,15 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Update groups of the given user
+     * Update groups of the given user.
      * @param newGroups Map of new groups: Map<{id},{Group}>
      * @param user User to modifiy
      */
-    private void updateGroups(Map<String, GroupModel> newGroups, UserModel user) {
+    private void updateGroups(
+        Map<String,
+        GroupModel> newGroups,
+        UserModel user
+    ) {
         //Join new groups
         newGroups.forEach((id, group) -> {
             if (!user.isMemberOf(group)) {
@@ -232,15 +241,20 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Update the given Keycloak usermodel with the data from the new one
+     * Update the given Keycloak usermodel with the data from the new one.
      * @param realm Realm
      * @param newUser User containing new data
      * @param oldUser Old keycloak user model
      * @return Updated user
-     * @throws InvalidUserPropertiesException Thrown if new user contains email address already in use
+     * @throws InvalidUserPropertiesException Thrown if new user contains
+     * email address already in use
      */
-    private UserModel updateUser(RealmModel realm, User newUser, UserModel oldUser) throws InvalidUserPropertiesException {
-        if(isEmailAlreadyUsed(realm, newUser)) {
+    private UserModel updateUser(
+        RealmModel realm,
+        User newUser,
+        UserModel oldUser
+    ) throws InvalidUserPropertiesException {
+        if (isEmailAlreadyUsed(realm, newUser)) {
             throw new InvalidUserPropertiesException("Email already in use");
         }
         //Update user
@@ -249,10 +263,12 @@ public class UserProvider implements RealmResourceProvider {
         oldUser.setEmail(newUser.getEmail());
 
         //Get new groups list and update
-        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(item -> {
-            return newUser.getGroups().contains(item.getId());
-        });
-        Map<String, GroupModel> groupMap = groupsStream.collect(Collectors.toMap(GroupModel::getId, Function.identity()));
+        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
+            item -> {
+                return newUser.getGroups().contains(item.getId());
+            });
+        Map<String, GroupModel> groupMap = groupsStream.collect(
+            Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, oldUser);
         return oldUser;
     }
@@ -272,20 +288,20 @@ public class UserProvider implements RealmResourceProvider {
         //If user shall be created
         if (user.getId() == null || user.getId().isEmpty()) {
             return true;
-        } else {
-            //else check if the found user equals the user to be modified
-            return !u.getId().equals(user.getId());
         }
+        //else check if the found user equals the user to be modified
+        return !u.getId().equals(user.getId());
     }
 
     /**
-     * Check if username is already used
+     * Check if username is already used.
      * @param realm Realm
      * @param user User representation to be created
      * @return True if username is already used, else false
      */
     private boolean isUsernameAlreadyUsed(RealmModel realm, User user) {
-        return session.users().getUserByUsername(realm, user.getUsername()) != null;
+        return session.users().getUserByUsername(realm, user.getUsername())
+            != null;
     }
 
     private Locale getLocaleFromHeader(HttpHeaders headers) {
@@ -299,19 +315,18 @@ public class UserProvider implements RealmResourceProvider {
         List<Locale> locales = Locale.filter(ranges, supportedLocales);
         if (locales.size() == 0) {
             return Locale.GERMAN;
-        } else {
-            return locales.get(0);
         }
+        return locales.get(0);
     }
 
     private class InvalidUserPropertiesException extends Exception {
-        public InvalidUserPropertiesException(String message) {
+        InvalidUserPropertiesException(String message) {
             super(message);
         }
     }
 
     @Override
-    public void close() {}
+    public void close() { }
 
     @Override
     public Object getResource() {
