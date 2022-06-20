@@ -4,6 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>BfS IAM KeyCloak API Extension</name>
+    <version>1.0-SNAPSHOT</version>
 
     <groupId>de.intevation</groupId>
     <artifactId>iam</artifactId>
@@ -17,11 +18,17 @@
         <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
     </properties>
 
-    <parent>
-        <artifactId>keycloak-parent</artifactId>
-        <groupId>org.keycloak</groupId>
-        <version>18.0.0</version>
-    </parent>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <artifactId>keycloak-parent</artifactId>
+                <groupId>org.keycloak</groupId>
+                <version>${env.KEYCLOAK_VERSION}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
