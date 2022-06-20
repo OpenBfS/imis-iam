@@ -126,9 +126,6 @@ public class UserProvider implements RealmResourceProvider {
     @GET
     @Path("/{id}")
     public Response getUserById(@PathParam("id") String id) {
-        if (id == null || id.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
         if (user == null) {
