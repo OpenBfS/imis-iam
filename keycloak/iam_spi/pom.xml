@@ -34,6 +34,11 @@
             <artifactId>javax.ws.rs-api</artifactId>
             <version>2.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <!-- KeyCloak libraries-->
         <dependency>
             <groupId>org.keycloak</groupId>
