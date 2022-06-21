@@ -218,7 +218,6 @@ Maven Checkstyle plugin. Some design related checks where removed.
     </module>
     <module name="MissingSwitchDefault"/>
     <module name="SimplifyBooleanExpression">
-      <property name="severity" value="warning"/>
     </module>
     <module name="SimplifyBooleanReturn"/>
     <module name="StringLiteralEquality"/>
