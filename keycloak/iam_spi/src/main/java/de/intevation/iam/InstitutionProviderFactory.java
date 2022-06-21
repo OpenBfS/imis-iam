@@ -7,10 +7,11 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
 
 /**
- * Factory class for the Institution provider
+ * Factory class for the Institution provider.
  * @author Alexander Woestmann <awoestmann@intevation.de>
  */
-public class InstitutionProviderFactory implements RealmResourceProviderFactory {
+public class InstitutionProviderFactory
+        implements RealmResourceProviderFactory {
 
     public static final String ID = "institution";
 
@@ -20,13 +21,13 @@ public class InstitutionProviderFactory implements RealmResourceProviderFactory 
     }
 
     @Override
-    public void init(Scope config) {}
+    public void init(Scope config) { }
 
     @Override
-    public void postInit(KeycloakSessionFactory factory) {}
+    public void postInit(KeycloakSessionFactory factory) { }
 
     @Override
-    public void close() {}
+    public void close() { }
 
     @Override
     public String getId() {

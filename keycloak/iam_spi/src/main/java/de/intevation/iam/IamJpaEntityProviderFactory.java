@@ -16,13 +16,13 @@ public class IamJpaEntityProviderFactory implements JpaEntityProviderFactory{
     }
 
     @Override
-    public void init(Scope config) {}
+    public void init(Scope config) { }
 
     @Override
-    public void postInit(KeycloakSessionFactory factory) {}
+    public void postInit(KeycloakSessionFactory factory) { }
 
     @Override
-    public void close() {}
+    public void close() { }
 
     @Override
     public String getId() {

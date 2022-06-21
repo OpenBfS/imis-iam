@@ -21,20 +21,11 @@ public class MailProviderFactory implements RealmResourceProviderFactory {
     }
 
     @Override
-    public void init(Scope config) {
-        // TODO Auto-generated method stub
-
-    }
+    public void init(Scope config) { }
 
     @Override
-    public void postInit(KeycloakSessionFactory factory) {
-        // TODO Auto-generated method stub
-
-    }
+    public void postInit(KeycloakSessionFactory factory) { }
 
     @Override
-    public void close() {
-        // TODO Auto-generated method stub
-
-    }
+    public void close() { }
 }

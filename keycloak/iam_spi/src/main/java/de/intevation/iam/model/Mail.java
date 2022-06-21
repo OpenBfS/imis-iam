@@ -30,7 +30,7 @@ public class Mail {
     @Column(name = "text", nullable = false)
     private String text;
 
-    @Column(name ="subject", nullable = false)
+    @Column(name = "subject", nullable = false)
     private String subject;
 
     @Column(name = "publish", nullable = false)

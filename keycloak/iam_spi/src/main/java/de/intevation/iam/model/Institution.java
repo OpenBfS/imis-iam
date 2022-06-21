@@ -36,6 +36,11 @@ public class Institution {
         this.attributes = attributes;
     }
 
+    /**
+     * Create an Institution from a GroupModel.
+     * @param group GroupModel to convert
+     * @return Institution instance
+     */
     public static Institution fromGroupModel(GroupModel group) {
         Institution institution = new Institution();
         institution.setId(group.getId());

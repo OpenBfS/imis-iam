@@ -7,7 +7,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
 
 /**
- * RealmResourceProviderFactory used to create the UserUrlProvider
+ * RealmResourceProviderFactory used to create the UserUrlProvider.
  *
  * @author Alexander Woestmann <awoestmann@intevation.de>
  */

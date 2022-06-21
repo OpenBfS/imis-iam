@@ -30,6 +30,10 @@ import de.intevation.iam.util.I18nUtils;
 
 public class UserProvider implements RealmResourceProvider {
 
+    private static final String SHIB_USER_HEADER = "X-SHIB-user";
+    private static final String MAIL_ALREADY_USED_KEY
+        = "error_mail_already_used";
+
     private KeycloakSession session;
 
     /**
@@ -49,7 +53,7 @@ public class UserProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
     public Response getProfile(@Context HttpHeaders headers) {
-        String id = headers.getHeaderString("X-SHIB-user");
+        String id = headers.getHeaderString(SHIB_USER_HEADER);
         if (id == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
@@ -73,7 +77,7 @@ public class UserProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final User rep
     ) {
-        String id = headers.getHeaderString("X-SHIB-user");
+        String id = headers.getHeaderString(SHIB_USER_HEADER);
         if (id == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
@@ -91,7 +95,7 @@ public class UserProvider implements RealmResourceProvider {
 
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
-                    .entity(i18n.getString("error_mail_already_used"))
+                    .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
                     .build();
 
         }
@@ -134,6 +138,7 @@ public class UserProvider implements RealmResourceProvider {
 
     /**
      * Create a new user.
+     * @param headers Request headers
      * @param rep User representation
      * @return New user json if successfull,
      *         400 if username is empty,
@@ -146,7 +151,7 @@ public class UserProvider implements RealmResourceProvider {
             return Response.status(Status.BAD_REQUEST).build();
         }
         RealmModel realm = session.getContext().getRealm();
-        String id = headers.getHeaderString("X-SHIB-user");
+        String id = headers.getHeaderString(SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
@@ -155,7 +160,7 @@ public class UserProvider implements RealmResourceProvider {
         if (isEmailAlreadyUsed(realm, rep)) {
             return Response.status(Status.CONFLICT)
                 .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString("error_mail_already_used"))
+                .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
                 .build();
         }
         if (isUsernameAlreadyUsed(realm, rep)) {
@@ -185,6 +190,7 @@ public class UserProvider implements RealmResourceProvider {
 
     /**
      * Update the given user.
+     * @param headers Request headers
      * @param rep User representation
      * @return Updated user json if succesfull,
      *         403 if not authorized,
@@ -198,7 +204,7 @@ public class UserProvider implements RealmResourceProvider {
     ) {
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, rep.getId());
-        String id = headers.getHeaderString("X-SHIB-user");
+        String id = headers.getHeaderString(SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
 
         try {
@@ -209,7 +215,7 @@ public class UserProvider implements RealmResourceProvider {
 
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
-                    .entity(i18n.getString("error_mail_already_used"))
+                    .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
                     .build();
         }
 

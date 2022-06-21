@@ -429,7 +429,7 @@ public class MailProvider implements RealmResourceProvider{
                 return Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
         }
-        if (mail.getPublish() == true) {
+        if (mail.getPublish()) {
             em.persist(mail);
         }
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
