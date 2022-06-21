@@ -1,7 +1,6 @@
 package de.intevation.iam;
 
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Function;
@@ -20,8 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.keycloak.locale.DefaultLocaleSelectorProviderFactory;
-import org.keycloak.locale.LocaleSelectorProvider;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -29,13 +26,16 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.model.User;
+import de.intevation.iam.util.I18nUtils;
 
 public class UserProvider implements RealmResourceProvider {
 
-    private final String BUNDLE_FILE = "iam";
-
     private KeycloakSession session;
 
+    /**
+     * Constructor.
+     * @param session Session
+     */
     public UserProvider(KeycloakSession session) {
         this.session = session;
     }
@@ -87,10 +87,7 @@ public class UserProvider implements RealmResourceProvider {
         try {
             user = updateUser(realm, rep, user);
         } catch (InvalidUserPropertiesException e) {
-            DefaultLocaleSelectorProviderFactory factory = new DefaultLocaleSelectorProviderFactory();
-            LocaleSelectorProvider dlsp = factory.create(session);
-            Locale locale = dlsp.resolveLocale(realm, user);
-            ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, locale);
+            ResourceBundle i18n = I18nUtils.getI18nBundle(session, realm, user);
 
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
@@ -103,7 +100,7 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Get all users.
+     * Gett all users.
      * @return List of user json objects
      */
     @GET
@@ -151,10 +148,8 @@ public class UserProvider implements RealmResourceProvider {
         RealmModel realm = session.getContext().getRealm();
         String id = headers.getHeaderString("X-SHIB-user");
         UserModel requestingUser = session.users().getUserById(realm, id);
-        DefaultLocaleSelectorProviderFactory factory = new DefaultLocaleSelectorProviderFactory();
-        LocaleSelectorProvider dlsp = factory.create(session);
-        Locale locale = dlsp.resolveLocale(realm, requestingUser);
-        ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, locale);
+        ResourceBundle i18n
+            = I18nUtils.getI18nBundle(session, realm, requestingUser);
 
 
         if (isEmailAlreadyUsed(realm, rep)) {
@@ -209,10 +204,8 @@ public class UserProvider implements RealmResourceProvider {
         try {
             user = updateUser(realm, rep, user);
         } catch (InvalidUserPropertiesException e) {
-            DefaultLocaleSelectorProviderFactory factory = new DefaultLocaleSelectorProviderFactory();
-            LocaleSelectorProvider dlsp = factory.create(session);
-            Locale locale = dlsp.resolveLocale(realm, requestingUser);
-            ResourceBundle i18n = ResourceBundle.getBundle(BUNDLE_FILE, locale);
+            ResourceBundle i18n
+                = I18nUtils.getI18nBundle(session, realm, requestingUser);
 
             return Response.status(Status.CONFLICT)
                     .type(MediaType.APPLICATION_JSON)
