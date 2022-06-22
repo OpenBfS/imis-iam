@@ -282,7 +282,7 @@ public class MailProvider implements RealmResourceProvider{
         entry.setMailListId(id);
         entry.setUserId(userId);
         em.persist(entry);
-        return Response.ok().build();
+        return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 
     /**
@@ -318,7 +318,7 @@ public class MailProvider implements RealmResourceProvider{
             return Response.status(Status.NOT_FOUND).build();
         }
         em.remove(entries.get(0));
-        return Response.ok().build();
+        return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 
     /**
