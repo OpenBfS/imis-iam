@@ -44,6 +44,7 @@ export default {
     yes: "Ja",
     new_email: "Neue Email",
     send: "Versenden",
+    confirm: "Bestätigen",
   },
   // Shared labels
   label: {
@@ -70,6 +71,7 @@ export default {
   mailinglist: {
     title: "E-Mail-Verteiler",
     not_found: "",
+    name: "Name der Mailing-Liste ",
     select_mailing_list: "Name des Email-Verteilers",
     no_Mailing_list: "Keine vorhandene Mailing Listen",
     write_new_email: "Email erstellen",
@@ -77,5 +79,11 @@ export default {
     type: "Art der Meldung",
     sender: "Absender",
     publish: "Meldung in Archiv ablegen",
+    enter_mailinglist: "Mailing-liste beitreten",
+    exit_mailinglist: "Mailing-Liste verlassen",
+    enter: "Beitreten",
+    exit: "Verlassen",
+    confirmation_message: "Bitte bestätigen Sie den Vorgang ",
+    add_mailing_list: "Mailing-Liste Erstellen",
   },
 };

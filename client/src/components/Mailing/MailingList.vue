@@ -35,7 +35,7 @@
             <tr v-for="list in mailingLists" :key="list.id">
               <td>{{ list.name }}</td>
               <td>
-                <v-tooltip>
+                <v-tooltip location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn
                       variant="plain"
@@ -52,7 +52,7 @@
                   </template>
                   <span>{{ $t("label.edit") }}</span>
                 </v-tooltip>
-                <v-tooltip>
+                <v-tooltip location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn
                       variant="plain"
@@ -69,13 +69,45 @@
                   </template>
                   <span>{{ $t("label.delete") }}</span>
                 </v-tooltip>
+                <v-tooltip location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      variant="plain"
+                      icon="mdi-location-enter"
+                      size="small"
+                      v-bind="props"
+                      @click="
+                        resetNotification();
+                        selectedItem = list;
+                        processType = 'enter';
+                        showManagementDialog = true;
+                      "
+                    ></v-btn>
+                  </template>
+                  <span>{{ $t("mailinglist.enter_mailinglist") }}</span>
+                </v-tooltip>
+                <v-tooltip>
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      variant="plain"
+                      icon="mdi-location-exit"
+                      size="small"
+                      v-bind="props"
+                      @click="
+                        processType = 'exit';
+                        resetNotification();
+                        showManagementDialog = true;
+                      "
+                    ></v-btn>
+                  </template>
+                  <span>{{ $t("mailinglist.exit_mailinglist") }}</span>
+                </v-tooltip>
               </td>
             </tr>
           </tbody>
         </v-table>
 
         <div v-if="!hasLoadingError && mailingLists.length == 0">
-          <!-- {{ $t("No mailing lists are available") }} -->
           No mailing lists are available
         </div>
       </v-col>
@@ -88,7 +120,8 @@
             processType = 'add';
             showManagementDialog = true;
           "
-          >Add Mailing-List</v-btn
+        >
+          {{ $t("mailinglist.add_mailing_list") }}</v-btn
         >
       </v-col>
       <UIAlert
@@ -165,7 +198,7 @@ export default {
         showMailDialog.value = false;
       }
     };
-    // Mail
+
     return {
       checkMailDialogObject,
       showMailDialog,
