@@ -75,6 +75,7 @@
                       variant="plain"
                       icon="mdi-location-enter"
                       size="small"
+                      :disabled="isUserInList(list)"
                       v-bind="props"
                       @click="
                         resetNotification();
@@ -93,6 +94,7 @@
                       icon="mdi-location-exit"
                       size="small"
                       v-bind="props"
+                      :disabled="!isUserInList(list)"
                       @click="
                         selectedItem = list;
                         processType = 'exit';
@@ -148,7 +150,8 @@
 <script>
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
-import { onMounted, ref, defineAsyncComponent } from "vue";
+import { onMounted, ref, defineAsyncComponent, computed } from "vue";
+import { useStore } from "vuex";
 
 export default {
   components: {
@@ -161,6 +164,7 @@ export default {
     ),
   },
   setup() {
+    const store = useStore();
     const { hasLoadingError, resetNotification } = useNotification();
     const mailingLists = ref([]);
 
@@ -176,8 +180,16 @@ export default {
     };
     onMounted(() => {
       getMailLists();
+      getMemberships();
     });
-
+    const getMemberships = () => {
+      store
+        .dispatch("profile/getMyMailingLists")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     const showCreateDialog = ref(false);
     const listName = ref("");
     const showManagementDialog = ref(false);
@@ -199,8 +211,15 @@ export default {
         showMailDialog.value = false;
       }
     };
+    const myMailingLists = computed(() => {
+      return store.state.profile.myMailingLists;
+    });
+    const isUserInList = (list) => {
+      return myMailingLists.value.map((l) => l.id).some((r) => r === list.id);
+    };
 
     return {
+      isUserInList,
       checkMailDialogObject,
       showMailDialog,
       checkChildObject,

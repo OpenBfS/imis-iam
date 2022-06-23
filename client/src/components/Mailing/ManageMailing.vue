@@ -107,6 +107,7 @@ import { ref, defineAsyncComponent, onMounted } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useI18n } from "vue-i18n";
+import { useStore } from "vuex";
 export default {
   props: {
     item: Object,
@@ -117,6 +118,7 @@ export default {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
   setup(props, { emit }) {
+    const store = useStore();
     const show = true;
     const { t } = useI18n();
     const { hasRequestError, resetNotification } = useNotification();
@@ -163,6 +165,7 @@ export default {
     const enterMailingList = () => {
       HTTP.get("mail/list/" + props.item.id + "/join")
         .then(() => {
+          store.dispatch("profile/getMyMailingLists");
           emit("child-object", { closeDialog: true });
         })
         .catch(() => {
@@ -172,6 +175,7 @@ export default {
     const exitMailingList = () => {
       HTTP.get("mail/list/" + props.item.id + "/leave")
         .then(() => {
+          store.dispatch("profile/getMyMailingLists");
           emit("child-object", { closeDialog: true });
         })
         .catch(() => {
@@ -204,6 +208,7 @@ export default {
           return props.item.name + " " + t("mailinglist.exit");
       }
     };
+
     return {
       getTitle,
       checkDeleteEnterExit,
