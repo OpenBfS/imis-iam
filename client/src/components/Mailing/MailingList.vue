@@ -94,6 +94,7 @@
                       size="small"
                       v-bind="props"
                       @click="
+                        selectedItem = list;
                         processType = 'exit';
                         resetNotification();
                         showManagementDialog = true;
