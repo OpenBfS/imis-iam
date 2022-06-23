@@ -1,11 +1,17 @@
 package de.intevation.iam.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "mail_list", schema = "keycloak")
@@ -16,6 +22,10 @@ public class MailList {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "mailListId")
+    @JsonIgnore
+    private List<MailListUser> mailListUsers;
 
     public Integer getId() {
         return id;
@@ -31,5 +41,13 @@ public class MailList {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<MailListUser> getMailListUsers() {
+        return mailListUsers;
+    }
+
+    public void setMailListUsers(List<MailListUser> mailListUsers) {
+        this.mailListUsers = mailListUsers;
     }
 }
