@@ -13,6 +13,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -357,9 +358,9 @@ public class MailProvider implements RealmResourceProvider {
      * Get all archived mails.
      * <pre>
      * Request:
-     * GET to mail?type={typeId}
+     * GET to mail?type={typeId}&type={typeId},...
      * Query params:
-     *   type: [Integer] Filter by mail type, optional
+     *   type: [List<Integer>] Filter by mail type(s), optional
      * Response:
      * <code>
      * [{
@@ -375,12 +376,12 @@ public class MailProvider implements RealmResourceProvider {
      * }]
      * </code>
      * </pre>
-     * @param type Mail type id
+     * @param types Mail type ids
      * @return Response containing mails as json array
      */
     @GET
     public Response getMails(
-        @QueryParam("type") Integer type
+        @QueryParam("type") List<Integer> types
     ) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -388,8 +389,11 @@ public class MailProvider implements RealmResourceProvider {
         CriteriaQuery<Mail> critQuery = cb.createQuery(Mail.class);
         Root<Mail> root = critQuery.from(Mail.class);
         critQuery.select(root);
-        if (type != null) {
-            Predicate filter = cb.equal(root.get("type"), type);
+        if (types != null && !types.isEmpty()) {
+            In<Integer> filter = cb.in(root.get("type"));
+            for (Integer type: types) {
+                filter.value(type);
+            }
             critQuery.where(filter);
         }
         TypedQuery<Mail> query = em.createQuery(critQuery);
