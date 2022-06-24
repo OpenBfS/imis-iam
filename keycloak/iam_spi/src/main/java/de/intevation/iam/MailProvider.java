@@ -137,21 +137,8 @@ public class MailProvider implements RealmResourceProvider {
     public Response getLists(
             @Context HttpHeaders headers,
             @QueryParam("subscribed") boolean subscribed) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MailList> critQuery = cb.createQuery(MailList.class);
-        Root<MailList> root = critQuery.from(MailList.class);
-        critQuery.select(root);
-        if (subscribed) {
-            String userId = headers.getHeaderString(USER_ID_HEADER);
-            Join<MailList, MailListUser> join =
-                root.join("mailListUsers", JoinType.LEFT);
-            Predicate filter = cb.equal(join.get("userId"), userId);
-            critQuery.where(filter);
-        }
-        TypedQuery<MailList> query = em.createQuery(critQuery);
-        List<MailList> lists = query.getResultList();
+        List<MailList> lists
+            = getMailLists(headers.getHeaderString(USER_ID_HEADER), subscribed);
         return Response.ok(lists).build();
     }
 
@@ -376,26 +363,41 @@ public class MailProvider implements RealmResourceProvider {
      * }]
      * </code>
      * </pre>
+     * @param headers Request headers
      * @param types Mail type ids
      * @return Response containing mails as json array
      */
     @GET
     public Response getMails(
+        @Context HttpHeaders headers,
         @QueryParam("type") List<Integer> types
     ) {
+        String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Mail> critQuery = cb.createQuery(Mail.class);
         Root<Mail> root = critQuery.from(Mail.class);
         critQuery.select(root);
-        if (types != null && !types.isEmpty()) {
-            In<Integer> filter = cb.in(root.get("type"));
-            for (Integer type: types) {
-                filter.value(type);
-            }
-            critQuery.where(filter);
+        Predicate filter;
+        //Filter by mailing lists the user is subscribed to
+        List<MailList> mailLists = getMailLists(userId, true);
+        In<Integer> listFilter = cb.in(root.get("receipient"));
+        for (MailList list: mailLists) {
+            listFilter.value(list.getId());
         }
+
+        //Filter by mail type
+        if (types != null && !types.isEmpty()) {
+            In<Integer> typeFilter = cb.in(root.get("type"));
+            for (Integer type: types) {
+                typeFilter.value(type);
+            }
+            filter = cb.and(listFilter, typeFilter);
+        } else {
+            filter = listFilter;
+        }
+        critQuery.where(filter);
         TypedQuery<Mail> query = em.createQuery(critQuery);
         List<Mail> result = query.getResultList();
         return Response.ok(result).build();
@@ -478,5 +480,23 @@ public class MailProvider implements RealmResourceProvider {
             em.persist(mail);
         }
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
+    }
+
+    private List<MailList> getMailLists(String userId, boolean subscribed) {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MailList> critQuery = cb.createQuery(MailList.class);
+        Root<MailList> root = critQuery.from(MailList.class);
+        critQuery.select(root);
+        if (subscribed) {
+            Join<MailList, MailListUser> join =
+                root.join("mailListUsers", JoinType.LEFT);
+            Predicate filter = cb.equal(join.get("userId"), userId);
+            critQuery.where(filter);
+        }
+        TypedQuery<MailList> query = em.createQuery(critQuery);
+        List<MailList> lists = query.getResultList();
+        return lists;
     }
 }
