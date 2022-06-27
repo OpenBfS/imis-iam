@@ -85,5 +85,8 @@ export default {
     exit: "Verlassen",
     confirmation_message: "Bitte bestätigen Sie den Vorgang ",
     add_mailing_list: "Mailing-Liste Erstellen",
+    failure_report: "Störungen",
+    maintenance_report: "Wartungsmeldungen",
+    no_mails_available: "Es sind keine Meldungen vorhanden",
   },
 };
