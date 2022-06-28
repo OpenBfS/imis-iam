@@ -4,6 +4,10 @@
       <v-col cols="10">
         <div class="text-h6">{{ $t("mailinglist.failure_maintenance") }}</div>
         <v-card
+          @click="
+            selectedMail = mail;
+            showMailContent = true;
+          "
           max-height="100px"
           class="my-2"
           color="#E57373"
@@ -41,6 +45,10 @@
           {{ $t("mailinglist.current") }}
         </div>
         <v-card
+          @click="
+            selectedMail = mail;
+            showMailContent = true;
+          "
           max-height="150px"
           class="my-2"
           color="#E0E0E0"
@@ -75,6 +83,11 @@
           {{ $t("mailinglist.no_mails_available") }}
         </div>
       </v-col>
+      <MailContent
+        v-if="showMailContent"
+        v-bind:mail="selectedMail"
+        @child-object="checkChildObject"
+      />
     </v-row>
   </v-container>
 </template>
@@ -90,8 +103,13 @@ p {
 <script>
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineAsyncComponent } from "vue";
 export default {
+  components: {
+    MailContent: defineAsyncComponent(() =>
+      import("@/components/Mailing/MailContent.vue")
+    ),
+  },
   setup() {
     const otherMails = ref([]);
     const criticalMails = ref([]);
@@ -105,19 +123,29 @@ export default {
           otherMails.value = response.data.filter(
             (m) => m.type !== 3 || m.type !== 3
           );
-          console.log("crit", criticalMails.value);
-          console.log("other", otherMails.value);
         })
         .catch(() => {
           hasLoadingError.value = true;
         });
     };
-
+    const showMailContent = ref(false);
+    const selectedMail = ref();
+    const showMail = () => {
+      showMailContent.value = true;
+    };
     onMounted(() => {
       getcriticalMails();
     });
-
+    const checkChildObject = (e) => {
+      if (e.closeDialog) {
+        showMailContent.value = false;
+      }
+    };
     return {
+      checkChildObject,
+      showMailContent,
+      selectedMail,
+      showMail,
       otherMails,
       criticalMails,
     };

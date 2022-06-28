@@ -39,6 +39,7 @@ export default {
     add: "Hinzufügen",
     create: "Erstellen",
     cancel: "Abbrechen",
+    close: "Schließen",
     reset: "Zurücksetzen",
     save: "Speichern",
     yes: "Ja",
