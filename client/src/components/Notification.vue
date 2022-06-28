@@ -2,13 +2,13 @@
   <v-container>
     <v-row>
       <v-col cols="10">
-        <div class="text-h6">{{ $t("mailinglist.failure_report") }}</div>
+        <div class="text-h6">{{ $t("mailinglist.failure_maintenance") }}</div>
         <v-card
-          max-height="150px"
+          max-height="100px"
           class="my-2"
           color="#E57373"
           density="compact"
-          v-for="mail in failureMails
+          v-for="mail in criticalMails
             .sort((a, b) => {
               return b.sendDate - a.sendDate;
             })
@@ -33,19 +33,19 @@
         </v-card>
         <div
           class="ml-4 text-caption"
-          v-if="failureMails && failureMails.length === 0"
+          v-if="criticalMails && criticalMails.length === 0"
         >
           {{ $t("mailinglist.no_mails_available") }}
         </div>
         <div class="text-h6 mt-4">
-          {{ $t("mailinglist.maintenance_report") }}
+          {{ $t("mailinglist.current") }}
         </div>
         <v-card
           max-height="150px"
           class="my-2"
           color="#E0E0E0"
           density="compact"
-          v-for="mail in maintenanceMails
+          v-for="mail in otherMails
             .sort((a, b) => {
               return b.sendDate - a.sendDate;
             })
@@ -70,7 +70,7 @@
         </v-card>
         <div
           class="ml-4 text-caption"
-          v-if="maintenanceMails && maintenanceMails.length === 0"
+          v-if="otherMails && otherMails.length === 0"
         >
           {{ $t("mailinglist.no_mails_available") }}
         </div>
@@ -93,35 +93,33 @@ import { useNotification } from "@/lib/use-notification";
 import { ref, onMounted } from "vue";
 export default {
   setup() {
-    const maintenanceMails = ref([]);
-    const failureMails = ref([]);
+    const otherMails = ref([]);
+    const criticalMails = ref([]);
     const { hasLoadingError } = useNotification();
-    const getFailureMails = () => {
-      HTTP.get("mail?type=3")
+    const getcriticalMails = () => {
+      HTTP.get("mail?type=1&type=2&type=3&type=4&type=5&type=6&type=7&type=8")
         .then((response) => {
-          failureMails.value = response.data;
+          criticalMails.value = response.data.filter(
+            (m) => m.type === 3 || m.type === 4
+          );
+          otherMails.value = response.data.filter(
+            (m) => m.type !== 3 || m.type !== 3
+          );
+          console.log("crit", criticalMails.value);
+          console.log("other", otherMails.value);
         })
         .catch(() => {
           hasLoadingError.value = true;
         });
     };
-    const getMaintenanceMails = () => {
-      HTTP.get("mail?type=4")
-        .then((response) => {
-          maintenanceMails.value = response.data;
-        })
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
+
     onMounted(() => {
-      getFailureMails();
-      getMaintenanceMails();
+      getcriticalMails();
     });
 
     return {
-      maintenanceMails,
-      failureMails,
+      otherMails,
+      criticalMails,
     };
   },
 };
