@@ -411,7 +411,7 @@ public class MailProvider implements RealmResourceProvider {
             for (Integer type: types) {
                 typeFilter.value(type);
             }
-            filter = cb.and(listFilter, filter);
+            filter = cb.and(typeFilter, filter);
         }
 
         critQuery.where(filter);
