@@ -1,6 +1,7 @@
 package de.intevation.iam;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -370,7 +371,8 @@ public class MailProvider implements RealmResourceProvider {
     @GET
     public Response getMails(
         @Context HttpHeaders headers,
-        @QueryParam("type") List<Integer> types
+        @QueryParam("type") List<Integer> types,
+        @QueryParam("count") Integer count
     ) {
         String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
@@ -379,6 +381,7 @@ public class MailProvider implements RealmResourceProvider {
         CriteriaQuery<Mail> critQuery = cb.createQuery(Mail.class);
         Root<Mail> root = critQuery.from(Mail.class);
         critQuery.select(root);
+        critQuery.orderBy(cb.desc(root.get("sendDate")));
         Predicate filter;
         //Filter by mailing lists the user is subscribed to
         List<MailList> mailLists = getMailLists(userId, true);
@@ -387,18 +390,37 @@ public class MailProvider implements RealmResourceProvider {
             listFilter.value(list.getId());
         }
 
+        //Filter by mails not archived
+        Predicate archiveFilter = cb.equal(root.get("archived"), false);
+
+        //Filter by expiry date
+        Timestamp now = new Timestamp(new Date().getTime());
+        Predicate expiredFilter = cb.greaterThan(
+                root.<Timestamp>get("expiryDate"), now);
+        Predicate noDateFilter = cb.isNull(root.get("expiryDate"));
+        Predicate dateFilter = cb.or(expiredFilter, noDateFilter);
+
+
+        filter = cb.and(listFilter, archiveFilter);
+        filter = cb.and(filter, dateFilter);
+
         //Filter by mail type
+        In<Integer> typeFilter;
         if (types != null && !types.isEmpty()) {
-            In<Integer> typeFilter = cb.in(root.get("type"));
+            typeFilter = cb.in(root.get("type"));
             for (Integer type: types) {
                 typeFilter.value(type);
             }
-            filter = cb.and(listFilter, typeFilter);
-        } else {
-            filter = listFilter;
+            filter = cb.and(listFilter, filter);
         }
+
         critQuery.where(filter);
+
         TypedQuery<Mail> query = em.createQuery(critQuery);
+        if (count != null) {
+            query.setFirstResult(0);
+            query.setMaxResults(count);
+        }
         List<Mail> result = query.getResultList();
         return Response.ok(result).build();
     }
@@ -476,9 +498,26 @@ public class MailProvider implements RealmResourceProvider {
                 return Response.status(Status.INTERNAL_SERVER_ERROR).build();
             }
         }
-        if (mail.getPublish()) {
-            em.persist(mail);
+        em.persist(mail);
+        return Response.ok().type(MediaType.APPLICATION_JSON).build();
+    }
+
+    /**
+     * Archive the mail with the given id.
+     * @param mailId Mail id
+     * @return 200, 404 if mail could not be found
+     */
+    @GET
+    @Path("/archive/{id}")
+    public Response archiveMail(@PathParam("id") Integer mailId) {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        Mail mail = em.find(Mail.class, mailId);
+        if (mail == null) {
+            return Response.status(Status.NOT_FOUND).build();
         }
+        mail.setArchived(true);
+        em.persist(mail);
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 

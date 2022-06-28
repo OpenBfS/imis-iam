@@ -33,8 +33,8 @@ public class Mail {
     @Column(name = "subject", nullable = false)
     private String subject;
 
-    @Column(name = "publish", nullable = false)
-    private Boolean publish;
+    @Column(name = "archived", nullable = false)
+    private Boolean archived;
 
     @Column(name = "type", nullable = false)
     private Integer type;
@@ -94,12 +94,12 @@ public class Mail {
         this.subject = subject;
     }
 
-    public Boolean getPublish() {
-        return publish;
+    public Boolean getArchived() {
+        return archived;
     }
 
-    public void setPublish(Boolean publish) {
-        this.publish = publish;
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
     }
 
     public Integer getType() {

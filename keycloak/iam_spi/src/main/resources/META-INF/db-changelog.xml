@@ -114,4 +114,16 @@
             <column name="name" value="Hinweis" />
         </insert>
     </changeSet>
+    <changeSet author="awoestmann@intevation.de" id="v0.2">
+        <renameColumn
+            columnDataType="BOOLEAN"
+            tableName="mail"
+            oldColumnName="publish"
+            newColumnName="archived"
+        />
+        <update tableName = "mail">
+            <column name="archived" value="false" />
+            <where>archived='true'</where>
+        </update>
+    </changeSet>
 </databaseChangeLog>

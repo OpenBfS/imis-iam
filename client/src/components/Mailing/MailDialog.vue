@@ -50,7 +50,7 @@
             <v-col cols="4">
               <v-checkbox
                 :label="$t('mailinglist.publish')"
-                v-model="shouldPublish"
+                v-model="archived"
               ></v-checkbox>
             </v-col>
           </v-row>
@@ -112,7 +112,7 @@ export default {
     const selectedList = ref(null);
     const mailText = ref("");
     const subject = ref("");
-    const shouldPublish = ref(false);
+    const archived = ref(false);
     const selectedSender = ref("");
     const sendMail = () => {
       resetNotification();
@@ -120,7 +120,7 @@ export default {
         sender: selectedSender.value,
         text: mailText.value,
         subject: subject.value,
-        publish: shouldPublish.value,
+        archived: archived.value,
         type: selectedType.value.id,
         receipient: selectedList.value.id,
       })
@@ -156,7 +156,7 @@ export default {
       selectedSender,
       selectedType,
       types,
-      shouldPublish,
+      archived,
       subject,
       mailText,
       sendMail,
