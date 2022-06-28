@@ -12,11 +12,7 @@
           class="my-2"
           color="#E57373"
           density="compact"
-          v-for="mail in criticalMails
-            .sort((a, b) => {
-              return b.sendDate - a.sendDate;
-            })
-            .slice(0, 2)"
+          v-for="mail in criticalMails"
           :key="mail.id"
         >
           <v-card-header>
@@ -53,11 +49,7 @@
           class="my-2"
           color="#E0E0E0"
           density="compact"
-          v-for="mail in otherMails
-            .sort((a, b) => {
-              return b.sendDate - a.sendDate;
-            })
-            .slice(0, 2)"
+          v-for="mail in otherMails"
           :key="mail.id"
         >
           <v-card-header>
@@ -114,15 +106,19 @@ export default {
     const otherMails = ref([]);
     const criticalMails = ref([]);
     const { hasLoadingError } = useNotification();
-    const getcriticalMails = () => {
-      HTTP.get("mail?type=1&type=2&type=3&type=4&type=5&type=6&type=7&type=8")
+    const getOtherMails = () => {
+      HTTP.get("mail?count=2&type=1&type=2&type=5&type=6&type=7&type=8")
         .then((response) => {
-          criticalMails.value = response.data.filter(
-            (m) => m.type === 3 || m.type === 4
-          );
-          otherMails.value = response.data.filter(
-            (m) => m.type !== 3 || m.type !== 3
-          );
+          otherMails.value = response.data;
+        })
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
+    const getCriticalMails = () => {
+      HTTP.get("mail?count=2&type=3&type=4")
+        .then((response) => {
+          criticalMails.value = response.data;
         })
         .catch(() => {
           hasLoadingError.value = true;
@@ -134,7 +130,8 @@ export default {
       showMailContent.value = true;
     };
     onMounted(() => {
-      getcriticalMails();
+      getCriticalMails();
+      getOtherMails();
     });
     const checkChildObject = (e) => {
       if (e.closeDialog) {
