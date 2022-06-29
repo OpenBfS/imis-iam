@@ -91,5 +91,6 @@ export default {
     failure_maintenance: "Störungs- und Wartungsmeldungen",
     current: "Aktuelles",
     no_mails_available: "Es sind keine Meldungen vorhanden",
+    archive: "Archivieren",
   },
 };
