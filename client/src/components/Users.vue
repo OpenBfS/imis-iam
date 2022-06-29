@@ -271,7 +271,7 @@ import { useNotification } from "@/lib/use-notification";
 
 export default {
   components: {
-    UIAlert: defineAsyncComponent(() => import("../components/UI/UIAlert.vue")),
+    UIAlert: defineAsyncComponent(() => import("./UI/UIAlert.vue")),
   },
   setup() {
     const store = useStore();
