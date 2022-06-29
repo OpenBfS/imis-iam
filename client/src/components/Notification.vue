@@ -17,17 +17,14 @@
         >
           <v-card-header>
             <div>
-              <div class="d-flex flex-row">
-                <div class="mb-1 subtitle-2">
+              <div class="d-flex flex-row align-center">
+                <div class="subtitle-2">
                   {{ mail.subject }}
                 </div>
                 <div class="ml-4 text-caption">
                   {{ new Date(mail.sendDate).toLocaleDateString() }}
                 </div>
               </div>
-              <p class="text-caption mt-4">
-                {{ mail.text }}
-              </p>
             </div>
           </v-card-header>
         </v-card>
@@ -54,17 +51,14 @@
         >
           <v-card-header>
             <div>
-              <div class="d-flex flex-row">
-                <div class="mb-1 text-subtitle-2">
+              <div class="d-flex flex-row align-center">
+                <div class="text-subtitle-2">
                   {{ mail.subject }}
                 </div>
                 <div class="ml-4 text-caption">
                   {{ new Date(mail.sendDate).toLocaleDateString() }}
                 </div>
               </div>
-              <p class="text-caption mt-4">
-                {{ mail.text }}
-              </p>
             </div>
           </v-card-header>
         </v-card>

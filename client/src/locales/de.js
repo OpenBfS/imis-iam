@@ -77,6 +77,8 @@ export default {
     no_Mailing_list: "Keine vorhandene Mailing Listen",
     write_new_email: "Email erstellen",
     subject: "Betreff",
+    date: "Datum",
+    from: "Von",
     type: "Art der Meldung",
     sender: "Absender",
     publish: "Meldung in Archiv ablegen",

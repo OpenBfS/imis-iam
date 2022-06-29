@@ -6,17 +6,19 @@
           class="d-flex flex-column mr-auto text-medium-emphasis text-body-2 ml-2"
         >
           <div>
-            <span class="subheading mr-2">von: </span>
+            <span class="subheading mr-2">{{ $t("mailinglist.from") }}: </span>
             <span class="mr-1 mr-auto">{{ mail.sender }}</span>
           </div>
           <div>
-            <span class="subheading mr-2">Datum: </span>
+            <span class="subheading mr-2">{{ $t("mailinglist.date") }} : </span>
             <span class="mr-1">{{
               new Date(mail.sendDate).toLocaleDateString()
             }}</span>
           </div>
           <div class="d-flex">
-            <span class="subheading mr-2">Subject: </span>
+            <span class="subheading mr-2"
+              >{{ $t("mailinglist.subject") }} :
+            </span>
             <span class="mr-1">{{ mail.subject }}</span>
           </div>
         </div>
