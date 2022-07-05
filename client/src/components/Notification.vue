@@ -18,7 +18,7 @@
             color="#E57373"
             density="compact"
           >
-            <v-card-header>
+            <v-card-title>
               <div>
                 <div class="d-flex flex-row align-center">
                   <div class="subtitle-2">
@@ -29,13 +29,12 @@
                   </div>
                 </div>
               </div>
-            </v-card-header>
+            </v-card-title>
           </v-card>
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
                 v-bind="props"
-                size="small"
                 color="#E57373"
                 class="ml-2"
                 icon="mdi-archive-arrow-up"
@@ -71,7 +70,7 @@
             color="#E0E0E0"
             density="compact"
           >
-            <v-card-header>
+            <v-card-title>
               <div>
                 <div class="d-flex flex-row align-center">
                   <div class="text-subtitle-2">
@@ -82,13 +81,12 @@
                   </div>
                 </div>
               </div>
-            </v-card-header>
+            </v-card-title>
           </v-card>
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
                 v-bind="props"
-                size="small"
                 color="#E0E0E0"
                 class="ml-2"
                 icon="mdi-archive-arrow-up"
