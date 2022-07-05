@@ -10,7 +10,6 @@
         <template v-slot:activator="{ props }">
           <v-btn
             v-bind="props"
-            size="small"
             color="accent"
             class="mr-4"
             icon="mdi-email-plus"
@@ -34,7 +33,7 @@
           <tbody>
             <tr v-for="list in mailingLists" :key="list.id">
               <td>{{ list.name }}</td>
-              <td>
+              <td class="d-flex">
                 <v-tooltip location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn
