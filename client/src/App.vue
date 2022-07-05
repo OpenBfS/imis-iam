@@ -15,7 +15,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import Appbar from "./components/AppbarComponent.vue";
+import Appbar from "./components/Appbar.vue";
 
 export default {
   name: "App",

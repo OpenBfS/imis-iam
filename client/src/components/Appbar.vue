@@ -1,6 +1,9 @@
 <template>
   <v-app-bar dark id="theme" app clipped-left>
-    <v-toolbar-title @click="$route.path == '/' ? '' : $router.push('/')">
+    <v-toolbar-title
+      style="cursor: pointer"
+      @click="$route.path == '/' ? '' : $router.push('/')"
+    >
       {{ $t("appbar.title") }}
     </v-toolbar-title>
     <v-spacer></v-spacer>
@@ -8,7 +11,7 @@
       {{ $t("appbar.text_login") }} {{ userData.firstName }}
       {{ userData.lastName }} ({{ userData.username }})
     </div>
-    <v-menu right :offset-x="true">
+    <v-menu left>
       <template v-slot:activator="{ props }">
         <v-btn icon v-bind="props">
           <v-icon>mdi-dots-vertical</v-icon>
