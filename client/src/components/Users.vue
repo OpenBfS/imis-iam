@@ -30,7 +30,7 @@
           <td>{{ user.firstName }}</td>
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
-          <td>
+          <td class="d-flex">
             <v-tooltip>
               <template v-slot:activator="{ props }">
                 <v-btn
