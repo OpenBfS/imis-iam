@@ -34,8 +34,8 @@
 <style scoped></style>
 <script>
 import { computed, onMounted } from "vue";
-import { ShibHTTP } from "../lib/http";
-import profileStore from "../store";
+import { ShibHTTP } from "../../lib/http";
+import profileStore from "../../store";
 
 export default {
   /* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz

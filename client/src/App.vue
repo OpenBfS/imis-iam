@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <Appbar />
+    <Sidebar />
     <v-main>
       <router-view />
     </v-main>
@@ -15,15 +16,13 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import Appbar from "./components/Appbar.vue";
+import { defineAsyncComponent } from "vue";
 
 export default {
-  name: "App",
   components: {
-    Appbar,
+    Sidebar: defineAsyncComponent(() => import("@/components/UI/Sidebar.vue")),
+    Appbar: defineAsyncComponent(() => import("@/components/UI/Appbar.vue")),
   },
-  data: () => ({
-    //
-  }),
+  name: "App",
 };
 </script>
