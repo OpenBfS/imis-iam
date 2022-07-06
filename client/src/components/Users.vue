@@ -1,260 +1,274 @@
 <template>
-  <div class="ml-4 mr-4 mt-10 pa-2 text-h6 bg-secondary">
-    {{ $t("user.title") }}
-  </div>
-  <div class="ma-2 pa-2">
-    <v-btn
-      color="accent"
-      @click="
-        resetUser();
-        resetNotification();
-        showCreateDialog = true;
-      "
-    >
-      <v-icon>mdi-plus</v-icon>
-      {{ $t("button.add") }}
-    </v-btn>
-    <v-table class="ma-2 pa-2">
-      <thead>
-        <th class="text-left">{{ $t("label.id") }}</th>
-        <th class="text-left">{{ $t("label.username") }}</th>
-        <th class="text-left">{{ $t("label.firstname") }}</th>
-        <th class="text-left">{{ $t("label.lastname") }}</th>
-        <th class="text-left">{{ $t("label.email") }}</th>
-        <th class="text-left">{{ $t("label.actions") }}</th>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.firstName }}</td>
-          <td>{{ user.lastName }}</td>
-          <td>{{ user.email }}</td>
-          <td class="d-flex">
-            <v-tooltip>
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  variant="plain"
-                  icon="mdi-account-edit-outline"
-                  size="small"
-                  v-bind="props"
-                  @click="
-                    resetNotification();
-                    onEditClicked(user.id);
-                    showEditDialog = true;
-                  "
-                ></v-btn>
-              </template>
-              <span>{{ $t("label.edit") }}</span>
-            </v-tooltip>
-            <v-tooltip>
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  variant="plain"
-                  icon="mdi-content-copy"
-                  size="small"
-                  v-bind="props"
-                  @click="
-                    process = 'copy';
-                    resetNotification();
-                    onCopyClicked(user.id);
-                    showCreateDialog = true;
-                  "
-                ></v-btn>
-              </template>
-              <span>{{ $t("label.copy") }}</span>
-            </v-tooltip>
-          </td>
-        </tr>
-      </tbody>
-    </v-table>
-    <UIAlert
-      v-if="hasLoadingError"
-      v-bind:isSuccessful="!hasLoadingError"
-      v-bind:message="$store.state.application.httpErrorMessage"
-    />
-    <v-dialog v-model="showCreateDialog">
-      <v-card min-width="500">
-        <v-card-title>
-          <span class="text-h5">{{ $t("user.create_title") }}</span>
-        </v-card-title>
-        <v-divider></v-divider>
-        <v-container>
-          <v-col jsutify="start" cols="10">
-            <v-form v-model="valid" ref="addForm">
-              <v-col>
-                <v-text-field
-                  variant="underlined"
-                  :label="$t('label.username')"
-                  v-model="user.username"
-                ></v-text-field>
-                <v-text-field
-                  variant="underlined"
-                  :label="$t('label.firstname')"
-                  v-model="user.firstName"
-                  :rules="[(v) => !!v || $t('form.required_firstname')]"
-                ></v-text-field>
-                <v-text-field
-                  variant="underlined"
-                  :label="$t('label.lastname')"
-                  :rules="[(v) => !!v || $t('form.required_lastname')]"
-                  v-model="user.lastName"
-                ></v-text-field>
-                <v-text-field
-                  variant="underlined"
-                  :label="$t('label.email')"
-                  v-model="user.email"
-                  :rules="[
-                    (v) => !!v || $t('form.required_email'),
-                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
-                  ]"
-                ></v-text-field>
-                <v-select
-                  return-object
-                  dense
-                  clearable
-                  :label="$t('user.label_institutions')"
-                  :items="institutions"
-                  v-model="user.groups"
-                  item-title="name"
-                  item-value="id"
-                  persistent-hint
-                  multiple
-                >
-                </v-select>
-              </v-col>
-            </v-form>
-            <UIAlert
-              v-if="hasHttpError"
-              v-bind:isSuccessful="!hasHttpError"
-              v-bind:message="$store.state.application.httpErrorMessage"
-            />
-          </v-col>
-        </v-container>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            :color="`${valid ? 'accent' : 'grey'}`"
-            :disabled="!valid"
-            @click="createUser()"
-          >
-            {{ $t("button.create") }}
-          </v-btn>
+  <v-container>
+    <v-row>
+      <v-col cols="12" class="mt-10 pa-2 text-h6 bg-secondary">
+        {{ $t("user.title") }}
+      </v-col>
+    </v-row>
+    <v-row justify="end" class="mt-6">
+      <v-tooltip location="top">
+        <template v-slot:activator="{ props }">
           <v-btn
             color="accent"
+            class="mr-4"
+            v-bind="props"
+            icon="mdi-account-plus"
             @click="
-              showCreateDialog = false;
-              hasHttpError = false;
+              resetUser();
+              resetNotification();
+              showCreateDialog = true;
             "
           >
-            {{ $t("button.cancel") }}
           </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="showEditDialog">
-      <v-card min-width="500">
-        <v-card-title>
-          <span class="text-h5">{{
-            $t("user.edit_title", { name: user.username })
-          }}</span>
-        </v-card-title>
-        <v-divider></v-divider>
-        <v-container>
-          <v-col cols="10">
-            <v-form v-model="editValid" ref="editForm">
-              <v-col cols="10">
-                <v-text-field
-                  variant="plain"
-                  :label="$t('label.id')"
-                  readonly
-                  v-model="user.id"
-                ></v-text-field>
-                <v-text-field
-                  variant="plain"
-                  :label="$t('label.username')"
-                  readonly
-                  v-model="user.username"
-                ></v-text-field>
-                <v-text-field
-                  variant="underlined"
-                  :label="$t('label.firstname')"
-                  :rules="[(v) => !!v || $t('form.required_firstname')]"
-                  v-model="user.firstName"
-                ></v-text-field>
-                <v-text-field
-                  variant="underlined"
-                  :label="$t('label.lastname')"
-                  :rules="[(v) => !!v || $t('form.required_lastname')]"
-                  v-model="user.lastName"
-                ></v-text-field>
-                <v-text-field
-                  variant="underlined"
-                  :label="$t('label.email')"
-                  v-model="user.email"
-                  :rules="[
-                    (v) => !!v || $t('form.required_email'),
-                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
-                  ]"
-                ></v-text-field>
-                <v-select
-                  return-object
-                  dense
-                  clearable
-                  :label="$t('user.label_institutions')"
-                  :items="institutions"
-                  v-model="user.groups"
-                  item-title="name"
-                  item-value="id"
-                  persistent-hint
-                  multiple
-                >
-                </v-select>
-              </v-col>
-            </v-form>
-            <UIAlert
-              v-if="hasHttpError"
-              v-bind:isSuccessful="!hasHttpError"
-              v-bind:message="$store.state.application.httpErrorMessage"
-            />
-          </v-col>
-        </v-container>
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <!-- TODO: Check if the style of a disabled button
+        </template>
+        <span>{{ $t("user.add_user") }}</span>
+      </v-tooltip>
+    </v-row>
+    <v-row>
+      <v-col cols="10" class="mt-6">
+        <v-table class="ma-2 pa-2">
+          <thead>
+            <th class="text-left">{{ $t("label.id") }}</th>
+            <th class="text-left">{{ $t("label.username") }}</th>
+            <th class="text-left">{{ $t("label.firstname") }}</th>
+            <th class="text-left">{{ $t("label.lastname") }}</th>
+            <th class="text-left">{{ $t("label.email") }}</th>
+            <th class="text-left">{{ $t("label.actions") }}</th>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id">
+              <td>{{ user.id }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
+              <td>{{ user.email }}</td>
+              <td class="d-flex">
+                <v-tooltip location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      variant="plain"
+                      icon="mdi-account-edit-outline"
+                      size="small"
+                      v-bind="props"
+                      @click="
+                        resetNotification();
+                        onEditClicked(user.id);
+                        showEditDialog = true;
+                      "
+                    ></v-btn>
+                  </template>
+                  <span>{{ $t("label.edit") }}</span>
+                </v-tooltip>
+                <v-tooltip>
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      variant="plain"
+                      icon="mdi-content-copy"
+                      size="small"
+                      v-bind="props"
+                      @click="
+                        process = 'copy';
+                        resetNotification();
+                        onCopyClicked(user.id);
+                        showCreateDialog = true;
+                      "
+                    ></v-btn>
+                  </template>
+                  <span>{{ $t("label.copy") }}</span>
+                </v-tooltip>
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+        <UIAlert
+          v-if="hasLoadingError"
+          v-bind:isSuccessful="!hasLoadingError"
+          v-bind:message="$store.state.application.httpErrorMessage"
+        />
+      </v-col>
+      <v-dialog v-model="showCreateDialog">
+        <v-card min-width="500">
+          <v-card-title>
+            <span class="text-h5">{{ $t("user.create_title") }}</span>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-container>
+            <v-col jsutify="start" cols="10">
+              <v-form v-model="valid" ref="addForm">
+                <v-col>
+                  <v-text-field
+                    variant="underlined"
+                    :label="$t('label.username')"
+                    v-model="user.username"
+                  ></v-text-field>
+                  <v-text-field
+                    variant="underlined"
+                    :label="$t('label.firstname')"
+                    v-model="user.firstName"
+                    :rules="[(v) => !!v || $t('form.required_firstname')]"
+                  ></v-text-field>
+                  <v-text-field
+                    variant="underlined"
+                    :label="$t('label.lastname')"
+                    :rules="[(v) => !!v || $t('form.required_lastname')]"
+                    v-model="user.lastName"
+                  ></v-text-field>
+                  <v-text-field
+                    variant="underlined"
+                    :label="$t('label.email')"
+                    v-model="user.email"
+                    :rules="[
+                      (v) => !!v || $t('form.required_email'),
+                      (v) => /.+@.+/.test(v) || $t('form.valid_email'),
+                    ]"
+                  ></v-text-field>
+                  <v-select
+                    return-object
+                    dense
+                    clearable
+                    :label="$t('user.label_institutions')"
+                    :items="institutions"
+                    v-model="user.groups"
+                    item-title="name"
+                    item-value="id"
+                    persistent-hint
+                    multiple
+                  >
+                  </v-select>
+                </v-col>
+              </v-form>
+              <UIAlert
+                v-if="hasHttpError"
+                v-bind:isSuccessful="!hasHttpError"
+                v-bind:message="$store.state.application.httpErrorMessage"
+              />
+            </v-col>
+          </v-container>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              :color="`${valid ? 'accent' : 'grey'}`"
+              :disabled="!valid"
+              @click="createUser()"
+            >
+              {{ $t("button.create") }}
+            </v-btn>
+            <v-btn
+              color="accent"
+              @click="
+                showCreateDialog = false;
+                hasHttpError = false;
+              "
+            >
+              {{ $t("button.cancel") }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="showEditDialog">
+        <v-card min-width="500">
+          <v-card-title>
+            <span class="text-h5">{{
+              $t("user.edit_title", { name: user.username })
+            }}</span>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-container>
+            <v-col cols="10">
+              <v-form v-model="editValid" ref="editForm">
+                <v-col cols="10">
+                  <v-text-field
+                    variant="plain"
+                    :label="$t('label.id')"
+                    readonly
+                    v-model="user.id"
+                  ></v-text-field>
+                  <v-text-field
+                    variant="plain"
+                    :label="$t('label.username')"
+                    readonly
+                    v-model="user.username"
+                  ></v-text-field>
+                  <v-text-field
+                    variant="underlined"
+                    :label="$t('label.firstname')"
+                    :rules="[(v) => !!v || $t('form.required_firstname')]"
+                    v-model="user.firstName"
+                  ></v-text-field>
+                  <v-text-field
+                    variant="underlined"
+                    :label="$t('label.lastname')"
+                    :rules="[(v) => !!v || $t('form.required_lastname')]"
+                    v-model="user.lastName"
+                  ></v-text-field>
+                  <v-text-field
+                    variant="underlined"
+                    :label="$t('label.email')"
+                    v-model="user.email"
+                    :rules="[
+                      (v) => !!v || $t('form.required_email'),
+                      (v) => /.+@.+/.test(v) || $t('form.valid_email'),
+                    ]"
+                  ></v-text-field>
+                  <v-select
+                    return-object
+                    dense
+                    clearable
+                    :label="$t('user.label_institutions')"
+                    :items="institutions"
+                    v-model="user.groups"
+                    item-title="name"
+                    item-value="id"
+                    persistent-hint
+                    multiple
+                  >
+                  </v-select>
+                </v-col>
+              </v-form>
+              <UIAlert
+                v-if="hasHttpError"
+                v-bind:isSuccessful="!hasHttpError"
+                v-bind:message="$store.state.application.httpErrorMessage"
+              />
+            </v-col>
+          </v-container>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <!-- TODO: Check if the style of a disabled button
           is fixed by upstream  -->
-          <v-btn
-            @click="storeUser()"
-            :color="`${editValid ? 'accent' : 'grey'}`"
-            :disabled="!editValid"
-          >
-            {{ $t("button.save") }}
-          </v-btn>
-          <v-btn
-            color="accent"
-            @click="
-              showEditDialog = false;
-              hasHttpError = false;
-            "
-          >
-            {{ $t("button.cancel") }}
-          </v-btn>
-          <v-btn
-            color="accent"
-            @click="
-              () => {
-                user = { ...savedUser };
-              }
-            "
-          >
-            {{ $t("button.reset") }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
+            <v-btn
+              @click="storeUser()"
+              :color="`${editValid ? 'accent' : 'grey'}`"
+              :disabled="!editValid"
+            >
+              {{ $t("button.save") }}
+            </v-btn>
+            <v-btn
+              color="accent"
+              @click="
+                showEditDialog = false;
+                hasHttpError = false;
+              "
+            >
+              {{ $t("button.cancel") }}
+            </v-btn>
+            <v-btn
+              color="accent"
+              @click="
+                () => {
+                  user = { ...savedUser };
+                }
+              "
+            >
+              {{ $t("button.reset") }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
+  </v-container>
 </template>
 <script>
 /* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz

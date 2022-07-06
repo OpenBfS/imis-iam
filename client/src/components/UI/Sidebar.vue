@@ -1,6 +1,12 @@
 <template>
-  <v-navigation-drawer permanent width="150" location="right" :clipped="true">
-    <v-list class="mt-16" nav>
+  <v-navigation-drawer
+    permanent
+    floating
+    width="150"
+    location="right"
+    :clipped="true"
+  >
+    <v-list style="margin-top: 90px" nav>
       <v-list-item @click="$route.path == '/' ? '' : $router.push('/')">
         <v-list-item-title> Home</v-list-item-title></v-list-item
       >

@@ -27,6 +27,7 @@ export default {
     title: "Institutionen",
     create_title: "Neue Institution erstellen",
     edit_title: "Institution {name} bearbeiten",
+    add_institution: "Institution Hinzufügen",
   },
   // Main component
   main: {
@@ -40,6 +41,7 @@ export default {
     create_title: "Neuen Benutzer erstellen",
     edit_title: "Benutzer {name} bearbeiten",
     label_institutions: "Institutionen",
+    add_user: "Nutzer Hinzufügen",
   },
   // Shared button texts
   button: {
