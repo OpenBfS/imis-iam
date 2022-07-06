@@ -29,7 +29,10 @@
         "
         :title="$t('main.institutions')"
       ></v-list-item>
-      <v-list-item disabled title="Archive"></v-list-item>
+      <v-list-item
+        title="Archive"
+        @click="$route.path == '/archive' ? '' : $router.push('/archive')"
+      ></v-list-item>
       <v-list-item disabled class="ml-2" title="2022"></v-list-item>
       <v-list-item disabled class="ml-2" title="2021"></v-list-item>
       <v-list-item disabled class="ml-2" title="2020"></v-list-item>

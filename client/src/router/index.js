@@ -31,6 +31,11 @@ const routes = [
     name: "MailingList",
     component: MailingList,
   },
+  {
+    path: "/archive",
+    name: "Archive",
+    component: () => import("@/components/Mailing/Archive.vue"),
+  },
 ];
 
 const router = createRouter({
