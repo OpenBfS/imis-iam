@@ -88,7 +88,7 @@ export default {
     const mails = ref([]);
     const { hasLoadingError } = useNotification();
     const getMails = () => {
-      HTTP.get("mail")
+      HTTP.get("mail?archived=true")
         .then((response) => {
           mails.value = response.data;
         })

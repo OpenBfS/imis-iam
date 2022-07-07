@@ -372,13 +372,15 @@ public class MailProvider implements RealmResourceProvider {
      * </pre>
      * @param headers Request headers
      * @param types Mail type ids
+     * @param archived if true only archived mails returned
      * @return Response containing mails as json array
      */
     @GET
     public Response getMails(
         @Context HttpHeaders headers,
         @QueryParam("type") List<Integer> types,
-        @QueryParam("count") Integer count
+        @QueryParam("count") Integer count,
+        @QueryParam("archived") boolean archived
     ) {
         String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
@@ -389,6 +391,7 @@ public class MailProvider implements RealmResourceProvider {
         critQuery.select(root);
         critQuery.orderBy(cb.desc(root.get("sendDate")));
         Predicate filter;
+
         //Filter by mailing lists the user is subscribed to
         List<MailList> mailLists = getMailLists(userId, true);
         In<Integer> listFilter = cb.in(root.get("receipient"));
@@ -396,8 +399,8 @@ public class MailProvider implements RealmResourceProvider {
             listFilter.value(list.getId());
         }
 
-        //Filter by mails not archived
-        Predicate archiveFilter = cb.equal(root.get("archived"), false);
+        //Filter by mails according to "archived" value
+        Predicate archiveFilter = cb.equal(root.get("archived"), archived);
 
         //Filter by expiry date
         Timestamp now = new Timestamp(new Date().getTime());
