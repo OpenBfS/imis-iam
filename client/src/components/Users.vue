@@ -25,7 +25,7 @@
       </v-tooltip>
     </v-row>
     <v-row>
-      <v-col cols="10" class="mt-6">
+      <v-col cols="12" class="mt-6">
         <v-table class="ma-2 pa-2">
           <thead>
             <th class="text-left">{{ $t("label.id") }}</th>
@@ -37,7 +37,9 @@
           </thead>
           <tbody>
             <tr v-for="user in users" :key="user.id">
-              <td>{{ user.id }}</td>
+              <td class="text-truncate" style="max-width: 150px">
+                {{ user.id }}
+              </td>
               <td>{{ user.username }}</td>
               <td>{{ user.firstName }}</td>
               <td>{{ user.lastName }}</td>
