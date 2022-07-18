@@ -100,7 +100,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { onMounted, ref, defineAsyncComponent } from "vue";
+import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
@@ -141,13 +141,13 @@ export default {
         });
     };
     // type
-    const types = ref([]);
     const selectedType = ref();
+    const types = computed(() => {
+      return store.state.mail.mailTypes;
+    });
     const getTypes = () => {
-      HTTP.get("mail/type")
-        .then((response) => {
-          types.value = response.data;
-        })
+      store
+        .dispatch("mail/loadMailTypes")
         .then()
         .catch(() => {
           hasLoadingError.value = true;

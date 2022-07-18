@@ -5,13 +5,27 @@
         {{ $t("archive.title") }}
       </v-col>
     </v-row>
-    <v-row justify="end" class="mt-6">
+    <v-row class="mt-6">
+      <!--TODO: Use @change event when this gets implemented by upstream -->
+      <v-select
+        class="ml-1"
+        style="max-width: 40%"
+        v-model="selectedFilter"
+        :items="mailTypes"
+        item-title="name"
+        item-value="id"
+        return-object
+        multiple
+        density="compact"
+        :hint="$t('mailinglist.filter_by_type')"
+        persistent-hint
+      ></v-select>
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
             v-bind="props"
             color="accent"
-            class="mr-4"
+            class="mr-4 ml-auto"
             icon="mdi-magnify"
             disabled
           >
@@ -67,9 +81,10 @@ tr {
 }
 </style>
 <script>
-import { onMounted, ref, defineAsyncComponent } from "vue";
+import { onMounted, ref, defineAsyncComponent, computed, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
+import { useStore } from "vuex";
 /* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
  * Software engineering by Intevation GmbH
  *
@@ -86,9 +101,16 @@ export default {
   },
   setup() {
     const mails = ref([]);
+    const store = useStore();
     const { hasLoadingError } = useNotification();
     const getMails = () => {
-      HTTP.get("mail?archived=true")
+      let payload = "mail?archived=true";
+      if (selectedFilter.value && selectedFilter.value.length) {
+        selectedFilter.value.forEach((t) => {
+          payload += "&type=" + t.id;
+        });
+      }
+      HTTP.get(payload)
         .then((response) => {
           mails.value = response.data;
         })
@@ -98,6 +120,12 @@ export default {
     };
     onMounted(() => {
       getMails();
+      store
+        .dispatch("mail/loadMailTypes")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
     });
     const selectedMail = ref();
     const showMailContent = ref(false);
@@ -106,7 +134,20 @@ export default {
         showMailContent.value = false;
       }
     };
+    const mailTypes = computed(() => {
+      return store.state.mail.mailTypes;
+    });
+    const selectedFilter = ref([]);
+    watch(
+      () => selectedFilter.value,
+      () => {
+        getMails();
+      }
+    );
+
     return {
+      mailTypes,
+      selectedFilter,
       checkChildObject,
       selectedMail,
       showMailContent,

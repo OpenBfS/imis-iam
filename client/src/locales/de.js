@@ -101,5 +101,6 @@ export default {
     current: "Aktuelles",
     no_mails_available: "Es sind keine Meldungen vorhanden",
     archive: "Archivieren",
+    filter_by_type: "Filtern nach Typ",
   },
 };
