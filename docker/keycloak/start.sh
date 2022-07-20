@@ -25,7 +25,7 @@ wait_for_db () {
 wait_for_db
 ${KEYCLOAK_HOME}/bin/kc.sh build
 ${KEYCLOAK_HOME}/bin/kc.sh start &
-wait-for-it localhost:8080 -t 60 || { echo "Failed starting Keycloak"; exit 1; }
+wait-for-it localhost:8080 -t 120 || { echo "Failed starting Keycloak"; exit 1; }
 
 echo "Configure realm, SAML client and example account if not existing ..."
 KEYCLOAK_URL=http://localhost:8080
