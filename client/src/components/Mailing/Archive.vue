@@ -85,6 +85,7 @@ import { onMounted, ref, defineAsyncComponent, computed, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
+import { useRoute } from "vue-router";
 /* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
  * Software engineering by Intevation GmbH
  *
@@ -102,9 +103,30 @@ export default {
   setup() {
     const mails = ref([]);
     const store = useStore();
+    const route = useRoute();
     const { hasLoadingError } = useNotification();
     const getMails = () => {
-      let payload = "mail?archived=true";
+      let date = "";
+      switch (route.params.year) {
+        case "2022":
+          date += `start=${new Date(
+            "2022-1-1"
+          ).getTime()}&end=${new Date().getTime()}`;
+          break;
+        case "2021":
+          date += `start=${new Date("2021-1-1").getTime()}&end=${new Date(
+            "2021-12-31"
+          ).getTime()}`;
+          break;
+        case "2020":
+          date += `start=${new Date("2001-1-1").getTime()}&end=${new Date(
+            "2020-12-31"
+          ).getTime()}`;
+          break;
+      }
+
+      let payload =
+        date === "" ? "mail?archived=true" : "mail?archived=true&" + date;
       if (selectedFilter.value && selectedFilter.value.length) {
         selectedFilter.value.forEach((t) => {
           payload += "&type=" + t.id;

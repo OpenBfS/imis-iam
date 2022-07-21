@@ -31,11 +31,31 @@
       ></v-list-item>
       <v-list-item
         :title="$t('archive.title')"
-        @click="$route.path == '/archive' ? '' : $router.push('/archive')"
+        @click="
+          $route.path == '/archive/all' ? '' : $router.push('/archive/all')
+        "
       ></v-list-item>
-      <v-list-item disabled class="ml-2" title="2022"></v-list-item>
-      <v-list-item disabled class="ml-2" title="2021"></v-list-item>
-      <v-list-item disabled class="ml-2" title="2020"></v-list-item>
+      <v-list-item
+        @click="
+          $route.path == '/archive/2022' ? '' : $router.push('/archive/2022')
+        "
+        class="ml-2"
+        title="2022"
+      ></v-list-item>
+      <v-list-item
+        @click="
+          $route.path == '/archive/2021' ? '' : $router.push('/archive/2021')
+        "
+        class="ml-2"
+        title="2021"
+      ></v-list-item>
+      <v-list-item
+        @click="
+          $route.path == '/archive/2020' ? '' : $router.push('/archive/2020')
+        "
+        class="ml-2"
+        title="2020"
+      ></v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>

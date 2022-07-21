@@ -32,7 +32,7 @@ const routes = [
     component: MailingList,
   },
   {
-    path: "/archive",
+    path: "/archive/:year",
     name: "Archive",
     component: () => import("@/components/Mailing/Archive.vue"),
   },
