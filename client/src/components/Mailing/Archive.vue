@@ -55,6 +55,9 @@
               <td>{{ mail.sender }}</td>
               <td>{{ new Date(mail.sendDate).toLocaleDateString() }}</td>
             </tr>
+            <tr v-if="mails && !mails.length">
+              <td colspan="3">{{ $t("mailinglist.no_mails_available") }}</td>
+            </tr>
           </tbody>
         </v-table>
 
@@ -119,14 +122,14 @@ export default {
           ).getTime()}`;
           break;
         case "2020":
-          date += `start=${new Date("2001-1-1").getTime()}&end=${new Date(
+          date += `start=${new Date("2020-1-1").getTime()}&end=${new Date(
             "2020-12-31"
           ).getTime()}`;
           break;
       }
-
+      date = date === "" ? date : "&" + date;
       let payload =
-        date === "" ? "mail?archived=true" : "mail?archived=true&" + date;
+        date === "" ? "mail?archived=true" : "mail?archived=true" + date;
       if (selectedFilter.value && selectedFilter.value.length) {
         selectedFilter.value.forEach((t) => {
           payload += "&type=" + t.id;
@@ -164,6 +167,14 @@ export default {
       () => selectedFilter.value,
       () => {
         getMails();
+      }
+    );
+    watch(
+      () => route.params,
+      (previousParams, toParams) => {
+        if (toParams.year !== previousParams.year) {
+          getMails();
+        }
       }
     );
 

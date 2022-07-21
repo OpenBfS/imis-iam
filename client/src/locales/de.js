@@ -99,7 +99,7 @@ export default {
     add_mailing_list: "Mailing-Liste Erstellen",
     failure_maintenance: "Störungs- und Wartungsmeldungen",
     current: "Aktuelles",
-    no_mails_available: "Es sind keine Meldungen vorhanden",
+    no_mails_available: "Es sind keine Mails vorhanden",
     archive: "Archivieren",
     filter_by_type: "Filtern nach Typ",
   },
