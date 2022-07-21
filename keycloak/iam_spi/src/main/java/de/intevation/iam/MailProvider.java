@@ -380,7 +380,9 @@ public class MailProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         @QueryParam("type") List<Integer> types,
         @QueryParam("count") Integer count,
-        @QueryParam("archived") boolean archived
+        @QueryParam("archived") boolean archived,
+        @QueryParam("start") String start,
+        @QueryParam("end") String end
     ) {
         String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
@@ -407,11 +409,20 @@ public class MailProvider implements RealmResourceProvider {
         Predicate expiredFilter = cb.greaterThan(
                 root.<Timestamp>get("expiryDate"), now);
         Predicate noDateFilter = cb.isNull(root.get("expiryDate"));
-        Predicate dateFilter = cb.or(expiredFilter, noDateFilter);
+        Predicate dateExpiredOrNoDateFilter = cb.or(expiredFilter, noDateFilter);
 
 
         filter = cb.and(listFilter, archiveFilter);
-        filter = cb.and(filter, dateFilter);
+        filter = cb.and(filter, dateExpiredOrNoDateFilter);
+
+        //Filter mails by start and end date
+        if (start != null &&  end != null){
+            Timestamp startDate = new Timestamp(Long.parseLong(start));
+            Timestamp endDate = new Timestamp(Long.parseLong(end));
+            Predicate dateFilter = cb.between(
+                root.<Timestamp>get("sendDate"), startDate, endDate);
+            filter = cb.and(filter, dateFilter);
+        }
 
         //Filter by mail type
         In<Integer> typeFilter;
