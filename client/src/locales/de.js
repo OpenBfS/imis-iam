@@ -69,6 +69,8 @@ export default {
     name: "Name",
     username: "Benutzername",
     delete: "Löschen",
+    from: "Von:",
+    to: "Bis:",
   },
   // Form labels
   form: {

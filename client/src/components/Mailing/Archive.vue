@@ -5,11 +5,11 @@
         {{ $t("archive.title") }}
       </v-col>
     </v-row>
-    <v-row class="mt-6">
+    <v-row class="mt-6" align="center">
       <!--TODO: Use @change event when this gets implemented by upstream -->
       <v-select
         class="ml-1"
-        style="max-width: 40%"
+        style="max-width: 20%"
         v-model="selectedFilter"
         :items="mailTypes"
         item-title="name"
@@ -20,6 +20,22 @@
         :hint="$t('mailinglist.filter_by_type')"
         persistent-hint
       ></v-select>
+      <!-- TODO: Use the v-date-picker from vuetify when this gets implemented -->
+      <div class="d-flex mx-3 flex-column" style="width: 20%">
+        <div class="d-flex">
+          <label class="v-col-4" for="from">{{ $t("label.from") }}</label
+          ><input
+            class="ml-2"
+            type="date"
+            name="startDate"
+            v-model="startDate"
+          />
+        </div>
+        <div class="d-flex">
+          <label for="to" class="v-col-4">{{ $t("label.to") }}</label
+          ><input class="ml-2" type="date" name="endDate" v-model="endDate" />
+        </div>
+      </div>
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
@@ -127,6 +143,11 @@ export default {
           ).getTime()}`;
           break;
       }
+      if (startDate.value != "" && endDate.value != "") {
+        date += `start=${new Date(startDate.value).getTime()}&end=${new Date(
+          endDate.value
+        ).getTime()}`;
+      }
       date = date === "" ? date : "&" + date;
       let payload =
         date === "" ? "mail?archived=true" : "mail?archived=true" + date;
@@ -177,8 +198,15 @@ export default {
         }
       }
     );
+    const startDate = ref("");
+    const endDate = ref("");
+    watch([() => endDate.value, () => startDate.value], () => {
+      getMails();
+    });
 
     return {
+      endDate,
+      startDate,
       mailTypes,
       selectedFilter,
       checkChildObject,
