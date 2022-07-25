@@ -36,6 +36,14 @@
           ><input class="ml-2" type="date" name="endDate" v-model="endDate" />
         </div>
       </div>
+      <v-text-field
+        class="mx-1"
+        density="compact"
+        variant="underlined"
+        style="max-width: 20%"
+        :label="$t('mailinglist.filter_by_sender')"
+        v-model="sender"
+      ></v-text-field>
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
@@ -149,8 +157,10 @@ export default {
         ).getTime()}`;
       }
       date = date === "" ? date : "&" + date;
+
       let payload =
         date === "" ? "mail?archived=true" : "mail?archived=true" + date;
+      payload += "&sender=" + sender.value;
       if (selectedFilter.value && selectedFilter.value.length) {
         selectedFilter.value.forEach((t) => {
           payload += "&type=" + t.id;
@@ -180,6 +190,7 @@ export default {
         showMailContent.value = false;
       }
     };
+    // Filters
     const mailTypes = computed(() => {
       return store.state.mail.mailTypes;
     });
@@ -203,8 +214,17 @@ export default {
     watch([() => endDate.value, () => startDate.value], () => {
       getMails();
     });
-
+    const sender = ref("");
+    watch(
+      () => sender.value,
+      (oldValue, newValue) => {
+        if (oldValue !== newValue) {
+          getMails();
+        }
+      }
+    );
     return {
+      sender,
       endDate,
       startDate,
       mailTypes,

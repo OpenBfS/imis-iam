@@ -382,7 +382,8 @@ public class MailProvider implements RealmResourceProvider {
         @QueryParam("count") Integer count,
         @QueryParam("archived") boolean archived,
         @QueryParam("start") String start,
-        @QueryParam("end") String end
+        @QueryParam("end") String end,
+        @QueryParam("sender") String sender
     ) {
         String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
@@ -424,6 +425,10 @@ public class MailProvider implements RealmResourceProvider {
             filter = cb.and(filter, dateFilter);
         }
 
+        if (sender != null && !sender.equals("")){
+            Predicate senderFilter = cb.equal(root.get("sender"), sender);
+            filter= cb.and(filter, senderFilter);
+        }
         //Filter by mail type
         In<Integer> typeFilter;
         if (types != null && !types.isEmpty()) {

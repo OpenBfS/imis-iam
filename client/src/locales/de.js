@@ -104,5 +104,7 @@ export default {
     no_mails_available: "Es sind keine Mails vorhanden",
     archive: "Archivieren",
     filter_by_type: "Filtern nach Typ",
+    filter_by_sender: "Filteren nach Absender",
+    filter_by_maillist: "Filter nach E-Mail-Verteiler",
   },
 };
