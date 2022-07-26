@@ -10,10 +10,14 @@ export const mail = {
   namespaced: true,
   state: () => ({
     mailTypes: [],
+    mailingLists: [],
   }),
   mutations: {
     setMailTypes: (state, data) => {
       state.mailTypes = data;
+    },
+    setMailinglists: (state, data) => {
+      state.mailingLists = data;
     },
   },
   actions: {
@@ -22,6 +26,16 @@ export const mail = {
         HTTP.get("mail/type")
           .then((response) => {
             commit("setMailTypes", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
+    },
+    loadMailinglists({ commit }) {
+      return new Promise((resolve, reject) => {
+        HTTP.get("mail/list")
+          .then((response) => {
+            commit("setMailinglists", response.data);
             resolve(response);
           })
           .catch((error) => reject(error));

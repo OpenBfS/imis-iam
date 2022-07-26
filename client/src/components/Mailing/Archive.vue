@@ -8,7 +8,7 @@
     <v-row class="mt-6" align="center">
       <!--TODO: Use @change event when this gets implemented by upstream -->
       <v-select
-        class="ml-1"
+        class="mx-1"
         style="max-width: 20%"
         v-model="selectedFilter"
         :items="mailTypes"
@@ -18,6 +18,19 @@
         multiple
         density="compact"
         :hint="$t('mailinglist.filter_by_type')"
+        persistent-hint
+      ></v-select>
+      <v-select
+        class="mx-1 text-truncate"
+        style="max-width: 20%"
+        v-model="selectedMailinglist"
+        :items="mailinglists"
+        item-title="name"
+        item-value="id"
+        return-object
+        multiple
+        density="compact"
+        :hint="$t('mailinglist.filter_by_maillist')"
         persistent-hint
       ></v-select>
       <!-- TODO: Use the v-date-picker from vuetify when this gets implemented -->
@@ -36,9 +49,11 @@
           ><input class="ml-2" type="date" name="endDate" v-model="endDate" />
         </div>
       </div>
+      <!-- TODO: Check if the dinsty attribute is implemented for the
+      v-select element to use the same density for all components. -->
       <v-text-field
+        density="comfortable"
         class="mx-1"
-        density="compact"
         variant="underlined"
         style="max-width: 20%"
         :label="$t('mailinglist.filter_by_sender')"
@@ -161,6 +176,11 @@ export default {
       let payload =
         date === "" ? "mail?archived=true" : "mail?archived=true" + date;
       payload += "&sender=" + sender.value;
+      if (selectedMailinglist.value && selectedMailinglist.value.length) {
+        selectedMailinglist.value.forEach((l) => {
+          payload += "&list=" + l.id;
+        });
+      }
       if (selectedFilter.value && selectedFilter.value.length) {
         selectedFilter.value.forEach((t) => {
           payload += "&type=" + t.id;
@@ -178,6 +198,12 @@ export default {
       getMails();
       store
         .dispatch("mail/loadMailTypes")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+      store
+        .dispatch("mail/loadMailinglists")
         .then()
         .catch(() => {
           hasLoadingError.value = true;
@@ -223,7 +249,22 @@ export default {
         }
       }
     );
+    const selectedMailinglist = ref([]);
+    const mailinglists = computed(() => {
+      return store.state.mail.mailingLists;
+    });
+    watch(
+      () => selectedMailinglist.value,
+      (oldValue, newValue) => {
+        if (oldValue !== newValue) {
+          getMails();
+        }
+      }
+    );
+
     return {
+      mailinglists,
+      selectedMailinglist,
       sender,
       endDate,
       startDate,
