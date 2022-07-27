@@ -59,19 +59,6 @@
         :label="$t('mailinglist.filter_by_sender')"
         v-model="sender"
       ></v-text-field>
-      <v-tooltip location="top">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-bind="props"
-            color="accent"
-            class="mr-4 ml-auto"
-            icon="mdi-magnify"
-            disabled
-          >
-          </v-btn>
-        </template>
-        <span>{{ $t("archive.search") }}</span>
-      </v-tooltip>
     </v-row>
     <v-row>
       <v-col cols="12" class="mt-6">
