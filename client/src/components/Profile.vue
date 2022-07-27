@@ -1,40 +1,60 @@
 <template>
-  <v-form ref="form" v-model="valid" lazy-validation>
-    <v-container>
-      <v-col cols="6">
-        <div class="mb-4 text-h6">
-          {{ $t("label.username") }}: {{ userData.username }}
-        </div>
-        <v-text-field
-          v-model="userData.firstName"
-          :label="$t('label.firstname')"
-          variant="underlined"
-          :rules="nameRules"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="userData.lastName"
-          :label="$t('label.lastname')"
-          variant="underlined"
-          :rules="nameRules"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="userData.email"
-          :label="$t('label.email')"
-          variant="underlined"
-          :rules="emailRules"
-          required
-        ></v-text-field>
-        <v-row>
-          <v-btn @click="save" class="ma-2 pa-2">{{ $t("button.save") }}</v-btn>
-          <v-btn @click="reset" class="ma-2 pa-2">{{
+  <v-container>
+    <v-row>
+      <v-col cols="12" class="mt-10 pa-2 text-h6 bg-secondary">
+        {{ $t("user.edit_my_profile") }}
+      </v-col>
+    </v-row>
+    <v-row class="mt-6" justify="start">
+      <v-col cols="10">
+        <v-form v-model="valid" ref="from" class="pa-2">
+          <v-text-field
+            v-model="user.firstName"
+            :label="$t('label.firstname')"
+            variant="underlined"
+            :rules="[(v) => !!v || $t('form.required_firstname')]"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="user.lastName"
+            :label="$t('label.lastname')"
+            variant="underlined"
+            :rules="[(v) => !!v || $t('form.required_lastname')]"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="user.email"
+            :label="$t('label.email')"
+            variant="underlined"
+            :rules="[
+              (v) => !!v || $t('form.required_email'),
+              (v) => /.+@.+/.test(v) || $t('form.valid_email'),
+            ]"
+            required
+          ></v-text-field>
+        </v-form>
+        <div class="d-flex">
+          <v-btn
+            @click="save"
+            :disabled="
+              !valid ||
+              JSON.stringify(orgiginalUserData) === JSON.stringify(user)
+            "
+            class="ma-2 pa-2"
+            >{{ $t("button.save") }}</v-btn
+          >
+          <v-btn @click="user = { ...orgiginalUserData }" class="ma-2 pa-2">{{
             $t("button.reset")
           }}</v-btn>
-        </v-row>
+        </div>
+        <UIAlert
+          v-if="hasLoadingError || hasRequestError"
+          v-bind:isSuccessful="false"
+          v-bind:message="$store.state.application.httpErrorMessage"
+        />
       </v-col>
-    </v-container>
-  </v-form>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -45,39 +65,50 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { computed, onMounted } from "vue";
-import profileStore from "../store";
+import { computed, onMounted, ref, defineAsyncComponent } from "vue";
+import { useStore } from "vuex";
+import { useNotification } from "@/lib/use-notification";
+import { HTTP } from "@/lib/http";
 export default {
+  components: {
+    UIAlert: defineAsyncComponent(() => import("./UI/UIAlert.vue")),
+  },
   setup() {
-    //Validation rules
-    const nameRules = [(v) => !!v || "Name is required"];
-    const emailRules = [(v) => !!v || "Email is required"];
-    const valid = true;
+    const store = useStore();
+    const { hasLoadingError, hasRequestError } = useNotification();
+    const valid = ref(false);
 
-    //Form data
-    const userData = computed(() => {
-      return profileStore.state.profile.userData;
+    const orgiginalUserData = computed(() => {
+      return store.state.profile.userData;
     });
+    const user = ref({});
     onMounted(() => {
-      profileStore.dispatch("profile/loadProfile");
+      store
+        .dispatch("profile/loadProfile")
+        .then(() => {
+          user.value = { ...orgiginalUserData.value };
+        })
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
     });
-
-    //Functions
     const save = () => {
-      if (valid == true) {
-        profileStore.dispatch("profile/storeProfile");
-      }
+      HTTP.put("/iamuser/profile", user.value)
+        .then((response) => {
+          store.commit("profile/setUserData", response.data);
+        })
+        .catch(() => {
+          hasRequestError.value = true;
+        });
     };
-    const reset = () => {
-      profileStore.dispatch("profile/loadProfile");
-    };
+
     return {
-      emailRules,
-      nameRules,
-      userData,
+      user,
       valid,
       save,
-      reset,
+      orgiginalUserData,
+      hasLoadingError,
+      hasRequestError,
     };
   },
 };
