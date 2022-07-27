@@ -12,6 +12,7 @@
     "@mdi/font": "5.9.55",
     "axios": "^0.21.1",
     "core-js": "^3.8.3",
+     "debounce": "^1.2.1",
     "fontsource-roboto": "^3.0.3",
     "roboto-fontface": "*",
     "vue": "^3.2.13",

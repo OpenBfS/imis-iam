@@ -128,6 +128,7 @@ import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
+import { debounce } from "debounce";
 /* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
  * Software engineering by Intevation GmbH
  *
@@ -241,11 +242,14 @@ export default {
       getMails();
     });
     const sender = ref("");
+    const triggerFilter = debounce(()=>{
+        getMails()
+    }, 500)
     watch(
       () => sender.value,
       (oldValue, newValue) => {
         if (oldValue !== newValue) {
-          getMails();
+          triggerFilter();
         }
       }
     );
@@ -253,6 +257,7 @@ export default {
     const mailinglists = computed(() => {
       return store.state.mail.mailingLists;
     });
+
     watch(
       () => selectedMailinglist.value,
       (oldValue, newValue) => {
