@@ -150,27 +150,28 @@ export default {
     const { hasLoadingError } = useNotification();
     const getMails = () => {
       let date = "";
-      switch (route.params.year) {
-        case "2022":
-          date += `start=${new Date(
-            "2022-1-1"
-          ).getTime()}&end=${new Date().getTime()}`;
-          break;
-        case "2021":
-          date += `start=${new Date("2021-1-1").getTime()}&end=${new Date(
-            "2021-12-31"
-          ).getTime()}`;
-          break;
-        case "2020":
-          date += `start=${new Date("2020-1-1").getTime()}&end=${new Date(
-            "2020-12-31"
-          ).getTime()}`;
-          break;
-      }
       if (startDate.value != "" && endDate.value != "") {
         date += `start=${new Date(startDate.value).getTime()}&end=${new Date(
           endDate.value
         ).getTime()}`;
+      } else {
+        switch (route.params.year) {
+          case "2022":
+            date += `start=${new Date(
+              "2022-1-1"
+            ).getTime()}&end=${new Date().getTime()}`;
+            break;
+          case "2021":
+            date += `start=${new Date("2021-1-1").getTime()}&end=${new Date(
+              "2021-12-31"
+            ).getTime()}`;
+            break;
+          case "2020":
+            date += `start=${new Date("2020-1-1").getTime()}&end=${new Date(
+              "2020-12-31"
+            ).getTime()}`;
+            break;
+        }
       }
       date = date === "" ? date : "&" + date;
 
@@ -232,6 +233,8 @@ export default {
       () => route.params,
       (previousParams, toParams) => {
         if (toParams.year !== previousParams.year) {
+          startDate.value = "";
+          endDate.value = "";
           getMails();
         }
       }
@@ -242,9 +245,9 @@ export default {
       getMails();
     });
     const sender = ref("");
-    const triggerFilter = debounce(()=>{
-        getMails()
-    }, 500)
+    const triggerFilter = debounce(() => {
+      getMails();
+    }, 500);
     watch(
       () => sender.value,
       (oldValue, newValue) => {
