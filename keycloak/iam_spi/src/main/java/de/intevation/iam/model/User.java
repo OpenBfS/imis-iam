@@ -21,6 +21,7 @@ public class User {
     private String email;
     private String username;
     private List<String> groups;
+    private List<Integer> institutions;
 
     public String getId() {
         return id;
@@ -52,15 +53,25 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
-
     public List<String> getGroups() {
         return groups;
     }
     public void setGroups(List<String> groups) {
         this.groups = groups;
     }
+    public List<Integer> getInstitutions() {
+        return institutions;
+    }
+    public void setInstitutions(List<Integer> institutions) {
+        this.institutions = institutions;
+    }
 
-    public static User fromUserModel (UserModel userModel) {
+    /**
+     * Create a User from a Keycloak UserModel.
+     * @param userModel Keycloak UserModel
+     * @return User instance
+     */
+    public static User fromUserModel(UserModel userModel) {
         User user = new User();
         user.setId(userModel.getId());
         user.setUsername(userModel.getUsername());
@@ -75,5 +86,4 @@ public class User {
         user.setGroups(groupNames);
         return user;
     }
-
 }

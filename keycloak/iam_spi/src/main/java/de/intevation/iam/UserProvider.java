@@ -7,12 +7,18 @@
 package de.intevation.iam;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -25,12 +31,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
+import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.User;
 import de.intevation.iam.util.I18nUtils;
 
@@ -110,7 +118,7 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Gett all users.
+     * Get all users.
      * @return List of user json objects
      */
     @GET
@@ -190,7 +198,7 @@ public class UserProvider implements RealmResourceProvider {
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, newUser);
-
+        updateInstitutions(rep.getInstitutions(), rep);
         return Response.ok(User.fromUserModel(newUser)).build();
     }
 
@@ -234,8 +242,7 @@ public class UserProvider implements RealmResourceProvider {
      * @param user User to modifiy
      */
     private void updateGroups(
-        Map<String,
-        GroupModel> newGroups,
+        Map<String, GroupModel> newGroups,
         UserModel user
     ) {
         //Join new groups
@@ -250,6 +257,52 @@ public class UserProvider implements RealmResourceProvider {
                 user.leaveGroup(group);
             }
         });
+    }
+
+    /**
+     * Update groups of the given user.
+     * @param newInstitutionIds List of new institution ids
+     * @param user User to modifiy
+     */
+    private void updateInstitutions(
+        List<Integer> newInstitutionIds,
+        User user
+    ) {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+
+        //Get institutions the user has already joined
+        CriteriaQuery<InstitutionUser> query
+            = cb.createQuery(InstitutionUser.class);
+        Root<InstitutionUser> root = query.from(InstitutionUser.class);
+        query.select(root);
+        Predicate userFilter = cb.equal(root.get("userId"), user.getId());
+        query.where(userFilter);
+        List<InstitutionUser> joinedInstitutions
+            = em.createQuery(query).getResultList();
+
+        //Join new institutions
+        newInstitutionIds.forEach(institutionId -> {
+            if (joinedInstitutions.stream()
+                .filter(inst -> institutionId.equals(inst.getInstitutionId()))
+                .findAny()
+                .orElse(null) == null
+            ) {
+                InstitutionUser iu = new InstitutionUser();
+                iu.setInstitutionId(institutionId);
+                iu.setUserId(user.getId());
+                em.persist(iu);
+            }
+        });
+
+        joinedInstitutions.forEach(institutionUser -> {
+            if (!newInstitutionIds.contains(
+                    institutionUser.getInstitutionId())) {
+                em.remove(institutionUser);
+            }
+        });
+
     }
 
     /**
@@ -282,6 +335,8 @@ public class UserProvider implements RealmResourceProvider {
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, oldUser);
+
+        updateInstitutions(newUser.getInstitutions(), newUser);
         return oldUser;
     }
 
