@@ -34,6 +34,7 @@ import de.intevation.iam.model.InstitutionCategory;
  * Class providing rest interfaces to create, get and delete Institutions.
  * @author Alexander Woestmann <awoestmann@intevation.de>
  */
+@Produces(MediaType.APPLICATION_JSON)
 public class InstitutionProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
@@ -172,7 +173,7 @@ public class InstitutionProvider implements RealmResourceProvider {
      * @return Array of institution categories
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/category")
     public Response getInstitutionCategories() {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -201,7 +202,7 @@ public class InstitutionProvider implements RealmResourceProvider {
      * @return InstitutionCategory JSON or 404 if not found
      */
     @GET
-    @Path("/{id}")
+    @Path("/category/{id}")
     public Response getInstitutionCategoryById(@PathParam("id") Integer id) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
