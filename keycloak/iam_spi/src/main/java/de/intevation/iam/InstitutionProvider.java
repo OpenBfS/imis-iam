@@ -54,7 +54,24 @@ public class InstitutionProvider implements RealmResourceProvider {
      * <code>
      * [{
      *   id: [String] Institution ID,
-     *   name: [String] Institution Name
+     *   name: [String] Institution Name,
+     *   shortName: [String] Institution short name,
+     *   category: [Integer] Institution category id,
+     *   serviceBuildingStreet: [String] Institution service building street,
+     *   serviceBuildingPostalCode: [String] Institution service building
+     *      postal code,
+     *   serviceBuildingLocation: [String] Institution service building
+     *      location,
+     *   addressStreet: [String] Institution address street,
+     *   addressPostalCode: [String] Institution address postal code,
+     *   addressLocation: [String] Institution address location,
+     *   centralPhone: [String] Central phone
+     *   centralFax: [String] Central fax
+     *   centralMail: [String] Central mail,
+     *   imisId: [String] Institution imis id,
+     *   xCoordinate: [Float] X coordinate,
+     *   yCoordinate: [Float] Y coordinate,
+     *   active: [Boolean] True if institution is active
      * },
      * {
      *   ...
@@ -83,8 +100,25 @@ public class InstitutionProvider implements RealmResourceProvider {
      * <code>
      * {
      *   id: [String] Institution ID,
-     *   name: [String] Institution Name
-     * }
+     *   name: [String] Institution Name,
+     *   shortName: [String] Institution short name,
+     *   category: [Integer] Institution category id,
+     *   serviceBuildingStreet: [String] Institution service building street,
+     *   serviceBuildingPostalCode: [String] Institution service building
+     *      postal code,
+     *   serviceBuildingLocation: [String] Institution service building
+     *      location,
+     *   addressStreet: [String] Institution address street,
+     *   addressPostalCode: [String] Institution address postal code,
+     *   addressLocation: [String] Institution address location,
+     *   centralPhone: [String] Central phone
+     *   centralFax: [String] Central fax
+     *   centralMail: [String] Central mail,
+     *   imisId: [String] Institution imis id,
+     *   xCoordinate: [Float] X coordinate,
+     *   yCoordinate: [Float] Y coordinate,
+     *   active: [Boolean] True if institution is active
+     * },
      * </code>
      * </pre>
      * @param id Institution id
@@ -104,6 +138,33 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     /**
      * Create a new institution.
+     * Request:
+     *
+     * <pre>
+     * <code>
+     * {
+     *   name: [String] Institution Name, mandatory
+     *   shortName: [String] Institution short name, mandatory
+     *   category: [Integer] Institution category id,
+     *   serviceBuildingStreet: [String] Institution service building street,
+     *      mandatory
+     *   serviceBuildingPostalCode: [String] Institution service building
+     *      postal code, mandatory
+     *   serviceBuildingLocation: [String] Institution service building
+     *      location, mandatory
+     *   addressStreet: [String] Institution address street,
+     *   addressPostalCode: [String] Institution address postal code,
+     *   addressLocation: [String] Institution address location,
+     *   centralPhone: [String] Central phone, mandatory
+     *   centralFax: [String] Central fax
+     *   centralMail: [String] Central mail, mandatory
+     *   imisId: [String] Institution imis id,
+     *   xCoordinate: [Float] X coordinate,
+     *   yCoordinate: [Float] Y coordinate,
+     *   active: [Boolean] True if institution is active
+     * },
+     * </code>
+     * </pre>
      * @param rep Institution representation
      * @return New Instituion JSON or 400 if no institution is present
      */
@@ -121,6 +182,34 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     /**
      * Update an institution.
+     * Request:
+     *
+     * <pre>
+     * <code>
+     * {
+     *   id: [String] Institution ID,
+     *   name: [String] Institution Name, mandatory
+     *   shortName: [String] Institution short name, mandatory
+     *   category: [Integer] Institution category id,
+     *   serviceBuildingStreet: [String] Institution service building street,
+     *      mandatory
+     *   serviceBuildingPostalCode: [String] Institution service building
+     *      postal code, mandatory
+     *   serviceBuildingLocation: [String] Institution service building
+     *      location, mandatory
+     *   addressStreet: [String] Institution address street,
+     *   addressPostalCode: [String] Institution address postal code,
+     *   addressLocation: [String] Institution address location,
+     *   centralPhone: [String] Central phone, mandatory
+     *   centralFax: [String] Central fax
+     *   centralMail: [String] Central mail, mandatory
+     *   imisId: [String] Institution imis id,
+     *   xCoordinate: [Float] X coordinate,
+     *   yCoordinate: [Float] Y coordinate,
+     *   active: [Boolean] True if institution is active
+     * },
+     * </code>
+     * </pre>
      * @param rep Institution representation
      * @return New Instituion JSON, 404 if institution is not found
      *         or 400 if no institution is present
