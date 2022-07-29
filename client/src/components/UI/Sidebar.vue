@@ -37,24 +37,30 @@
       ></v-list-item>
       <v-list-item
         @click="
-          $route.path == '/archive/2022' ? '' : $router.push('/archive/2022')
+          $route.path == `/archive/${currentYear}`
+            ? ''
+            : $router.push(`/archive/${currentYear}`)
         "
         class="ml-2"
-        title="2022"
+        :title="currentYear"
       ></v-list-item>
       <v-list-item
         @click="
-          $route.path == '/archive/2021' ? '' : $router.push('/archive/2021')
+          $route.path == `/archive/${currentYear - 1}`
+            ? ''
+            : $router.push(`/archive/${currentYear - 1}`)
         "
         class="ml-2"
-        title="2021"
+        :title="currentYear - 1"
       ></v-list-item>
       <v-list-item
         @click="
-          $route.path == '/archive/2020' ? '' : $router.push('/archive/2020')
+          $route.path == `/archive/${currentYear - 2}`
+            ? ''
+            : $router.push(`/archive/${currentYear - 2}`)
         "
         class="ml-2"
-        title="2020"
+        :title="currentYear - 2"
       ></v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -68,7 +74,14 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-export default {};
+export default {
+  setup() {
+    const currentYear = new Date().getFullYear();
+    return {
+      currentYear,
+    };
+  },
+};
 </script>
 
 <style></style>

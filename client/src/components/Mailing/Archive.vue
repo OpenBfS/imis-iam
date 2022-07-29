@@ -8,7 +8,7 @@
     <v-row class="mt-6" align="center">
       <!--TODO: Use @change event when this gets implemented by upstream -->
       <v-select
-        class="ml-1"
+        class="mx-1"
         style="max-width: 20%"
         v-model="selectedFilter"
         :items="mailTypes"
@@ -18,6 +18,19 @@
         multiple
         density="compact"
         :hint="$t('mailinglist.filter_by_type')"
+        persistent-hint
+      ></v-select>
+      <v-select
+        class="mx-1 text-truncate"
+        style="max-width: 20%"
+        v-model="selectedMailinglist"
+        :items="mailinglists"
+        item-title="name"
+        item-value="id"
+        return-object
+        multiple
+        density="compact"
+        :hint="$t('mailinglist.filter_by_maillist')"
         persistent-hint
       ></v-select>
       <!-- TODO: Use the v-date-picker from vuetify when this gets implemented -->
@@ -36,27 +49,16 @@
           ><input class="ml-2" type="date" name="endDate" v-model="endDate" />
         </div>
       </div>
+      <!-- TODO: Check if the dinsty attribute is implemented for the
+      v-select element to use the same density for all components. -->
       <v-text-field
+        density="comfortable"
         class="mx-1"
-        density="compact"
         variant="underlined"
         style="max-width: 20%"
         :label="$t('mailinglist.filter_by_sender')"
         v-model="sender"
       ></v-text-field>
-      <v-tooltip location="top">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-bind="props"
-            color="accent"
-            class="mr-4 ml-auto"
-            icon="mdi-magnify"
-            disabled
-          >
-          </v-btn>
-        </template>
-        <span>{{ $t("archive.search") }}</span>
-      </v-tooltip>
     </v-row>
     <v-row>
       <v-col cols="12" class="mt-6">
@@ -113,6 +115,7 @@ import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
+import { debounce } from "debounce";
 /* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
  * Software engineering by Intevation GmbH
  *
@@ -134,33 +137,39 @@ export default {
     const { hasLoadingError } = useNotification();
     const getMails = () => {
       let date = "";
-      switch (route.params.year) {
-        case "2022":
-          date += `start=${new Date(
-            "2022-1-1"
-          ).getTime()}&end=${new Date().getTime()}`;
-          break;
-        case "2021":
-          date += `start=${new Date("2021-1-1").getTime()}&end=${new Date(
-            "2021-12-31"
-          ).getTime()}`;
-          break;
-        case "2020":
-          date += `start=${new Date("2020-1-1").getTime()}&end=${new Date(
-            "2020-12-31"
-          ).getTime()}`;
-          break;
-      }
       if (startDate.value != "" && endDate.value != "") {
         date += `start=${new Date(startDate.value).getTime()}&end=${new Date(
           endDate.value
         ).getTime()}`;
+      } else {
+        switch (route.params.year) {
+          case "2022":
+            date += `start=${new Date(
+              "2022-1-1"
+            ).getTime()}&end=${new Date().getTime()}`;
+            break;
+          case "2021":
+            date += `start=${new Date("2021-1-1").getTime()}&end=${new Date(
+              "2021-12-31"
+            ).getTime()}`;
+            break;
+          case "2020":
+            date += `start=${new Date("2020-1-1").getTime()}&end=${new Date(
+              "2020-12-31"
+            ).getTime()}`;
+            break;
+        }
       }
       date = date === "" ? date : "&" + date;
 
       let payload =
         date === "" ? "mail?archived=true" : "mail?archived=true" + date;
       payload += "&sender=" + sender.value;
+      if (selectedMailinglist.value && selectedMailinglist.value.length) {
+        selectedMailinglist.value.forEach((l) => {
+          payload += "&list=" + l.id;
+        });
+      }
       if (selectedFilter.value && selectedFilter.value.length) {
         selectedFilter.value.forEach((t) => {
           payload += "&type=" + t.id;
@@ -178,6 +187,12 @@ export default {
       getMails();
       store
         .dispatch("mail/loadMailTypes")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+      store
+        .dispatch("mail/loadMailinglists")
         .then()
         .catch(() => {
           hasLoadingError.value = true;
@@ -205,6 +220,8 @@ export default {
       () => route.params,
       (previousParams, toParams) => {
         if (toParams.year !== previousParams.year) {
+          startDate.value = "";
+          endDate.value = "";
           getMails();
         }
       }
@@ -215,15 +232,34 @@ export default {
       getMails();
     });
     const sender = ref("");
+    const triggerFilter = debounce(() => {
+      getMails();
+    }, 500);
     watch(
       () => sender.value,
+      (oldValue, newValue) => {
+        if (oldValue !== newValue) {
+          triggerFilter();
+        }
+      }
+    );
+    const selectedMailinglist = ref([]);
+    const mailinglists = computed(() => {
+      return store.state.mail.mailingLists;
+    });
+
+    watch(
+      () => selectedMailinglist.value,
       (oldValue, newValue) => {
         if (oldValue !== newValue) {
           getMails();
         }
       }
     );
+
     return {
+      mailinglists,
+      selectedMailinglist,
       sender,
       endDate,
       startDate,

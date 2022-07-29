@@ -77,48 +77,7 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Update profile of the current user.
-     * @param headers Request headers
-     * @param rep User representation
-     * @return Updated profile json if successfull,
-     *         403 if not authorized,
-     *         409 if email address is already used
-     */
-    @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/profile")
-    public Response updateProfile(
-        @Context HttpHeaders headers,
-        final User rep
-    ) {
-        String id = headers.getHeaderString(SHIB_USER_HEADER);
-        if (id == null) {
-            return Response.status(Status.FORBIDDEN).build();
-        }
-        RealmModel realm = session.getContext().getRealm();
-        UserModel user = session.users().getUserById(realm, id);
-        rep.setId(id);
-        if (!user.getId().equals(rep.getId())) {
-            return Response.status(Status.FORBIDDEN).build();
-        }
-
-        try {
-            user = updateUser(realm, rep, user);
-        } catch (InvalidUserPropertiesException e) {
-            ResourceBundle i18n = I18nUtils.getI18nBundle(session, realm, user);
-
-            return Response.status(Status.CONFLICT)
-                    .type(MediaType.APPLICATION_JSON)
-                    .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
-                    .build();
-
-        }
-
-        return Response.ok(User.fromUserModel(user)).build();
-    }
-
-    /**
-     * Get all users.
+     * Gett all users.
      * @return List of user json objects
      */
     @GET

@@ -154,7 +154,6 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { useStore } from "vuex";
@@ -172,14 +171,14 @@ export default {
   setup() {
     const store = useStore();
     const { hasLoadingError, resetNotification } = useNotification();
-    const mailingLists = ref([]);
-
+    const mailingLists = computed(() => {
+      return store.state.mail.mailingLists;
+    });
     const getMailLists = () => {
       resetNotification();
-      HTTP.get("mail/list")
-        .then((response) => {
-          mailingLists.value = response.data;
-        })
+      store
+        .dispatch("mail/loadMailinglists")
+        .then()
         .catch(() => {
           hasLoadingError.value = true;
         });

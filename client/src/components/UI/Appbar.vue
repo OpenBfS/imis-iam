@@ -18,10 +18,7 @@
         </v-btn>
       </template>
       <v-list dense>
-        <v-list-item
-          link
-          @click="$route.path == '/profile' ? '' : $router.push('/profile')"
-        >
+        <v-list-item link @click="showManageUserDialog = true">
           {{ $t("appbar.button_profile") }}
         </v-list-item>
         <v-list-item link @click="logout">
@@ -30,28 +27,50 @@
       </v-list>
     </v-menu>
   </v-app-bar>
+  <ManageUser
+    v-if="showManageUserDialog"
+    v-bind:processType="'edit'"
+    v-bind:copiedItem="{ ...userData }"
+    v-bind:item="{ ...user }"
+    @child-object="checkChildObject"
+  />
 </template>
 <style scoped></style>
 <script>
-import { computed, onMounted } from "vue";
+/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ * Software engineering by Intevation GmbH
+ *
+ * This file is Free Software under the GNU GPL (v>=3)
+ * and comes with ABSOLUTELY NO WARRANTY!
+ */
+
+import { computed, defineAsyncComponent, ref } from "vue";
 import { ShibHTTP } from "../../lib/http";
-import profileStore from "../../store";
+import { useStore } from "vuex";
 
 export default {
-  /* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
-   * Software engineering by Intevation GmbH
-   *
-   * This file is Free Software under the GNU GPL (v>=3)
-   * and comes with ABSOLUTELY NO WARRANTY!
-   */
-
+  components: {
+    ManageUser: defineAsyncComponent(() =>
+      import("@/components/User/ManageUser.vue")
+    ),
+  },
   setup() {
+    const store = useStore();
     const userData = computed(() => {
-      return profileStore.state.profile.userData;
+      return store.state.profile.userData;
     });
-    onMounted(() => {
-      profileStore.dispatch("profile/loadProfile");
+    const user = computed(() => {
+      return { ...userData.value };
     });
+    const checkChildObject = (e) => {
+      if (e.closeDialog) {
+        showManageUserDialog.value = false;
+      }
+      if (e.hasChanges) {
+        store.dispatch("user/loadProfile");
+      }
+    };
+    const showManageUserDialog = ref(false);
     const logout = () => {
       console.log("logout");
       ShibHTTP.get("Shibboleth.sso/Logout").then((response) => {
@@ -60,8 +79,11 @@ export default {
       });
     };
     return {
+      showManageUserDialog,
+      user,
       userData,
       logout,
+      checkChildObject,
     };
   },
 };

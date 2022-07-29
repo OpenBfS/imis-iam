@@ -42,6 +42,7 @@ export default {
     edit_title: "Benutzer {name} bearbeiten",
     label_institutions: "Institutionen",
     add_user: "Nutzer Hinzufügen",
+    edit_my_profile: "Mein Profil bearbeiten",
   },
   // Shared button texts
   button: {

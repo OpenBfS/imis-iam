@@ -22,14 +22,14 @@ export const profile = {
   },
   actions: {
     loadProfile({ commit }) {
-      HTTP.get("/iamuser/profile").then((response) => {
-        if (response.status == 200) {
-          commit("setUserData", response.data);
-        }
+      return new Promise((resolve, reject) => {
+        HTTP.get("/iamuser/profile")
+          .then((response) => {
+            commit("setUserData", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
       });
-    },
-    storeProfile(context) {
-      HTTP.put("/iamuser/profile", context.state.userData);
     },
     getMyMailingLists({ commit }) {
       return new Promise((resolve, reject) => {

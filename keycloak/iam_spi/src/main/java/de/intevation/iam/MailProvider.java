@@ -376,6 +376,7 @@ public class MailProvider implements RealmResourceProvider {
      * @return Response containing mails as json array
      */
     @GET
+    @SuppressWarnings("checkstyle:parameternumber")
     public Response getMails(
         @Context HttpHeaders headers,
         @QueryParam("type") List<Integer> types,
@@ -383,7 +384,8 @@ public class MailProvider implements RealmResourceProvider {
         @QueryParam("archived") boolean archived,
         @QueryParam("start") String start,
         @QueryParam("end") String end,
-        @QueryParam("sender") String sender
+        @QueryParam("sender") String sender,
+        @QueryParam("list") List<Integer> flists
     ) {
         String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
@@ -398,8 +400,17 @@ public class MailProvider implements RealmResourceProvider {
         //Filter by mailing lists the user is subscribed to
         List<MailList> mailLists = getMailLists(userId, true);
         In<Integer> listFilter = cb.in(root.get("receipient"));
-        for (MailList list: mailLists) {
-            listFilter.value(list.getId());
+        if (flists != null && !flists.isEmpty()){
+            for (MailList list: mailLists) {
+                if (flists.contains(list.getId())){
+                    listFilter.value(list.getId());
+                }
+            }
+        }else {
+            for (MailList list: mailLists) {
+                listFilter.value(list.getId());
+            }
+
         }
 
         //Filter by mails according to "archived" value
