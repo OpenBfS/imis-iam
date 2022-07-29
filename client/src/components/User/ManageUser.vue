@@ -77,9 +77,11 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
+        <!-- ":color" It is necessary to handle color like this as disabled
+        does not have style effect yet. TODO: Check this if fixed by upstream -->
         <v-btn
-          :color="`${valid ? 'accent' : 'grey'}`"
-          :disabled="!valid"
+          :color="`${valid && !hasNoChanges ? 'accent' : 'grey'}`"
+          :disabled="!valid || hasNoChanges"
           @click="
             ['add', 'copy'].indexOf(processType) !== -1
               ? createUser()
@@ -119,6 +121,13 @@
 </template>
 
 <script>
+/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ * Software engineering by Intevation GmbH
+ *
+ * This file is Free Software under the GNU GPL (v>=3)
+ * and comes with ABSOLUTELY NO WARRANTY!
+ */
+
 import { computed, onMounted, defineAsyncComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
@@ -195,8 +204,17 @@ export default {
     });
     // Form
     const valid = ref(false);
+    // Activate button only if some values are changed for "edit"
+    // to avoid useless requests
+    const hasNoChanges = computed(() => {
+      return (
+        props.processType === "edit" &&
+        JSON.stringify(originalUser.value) === JSON.stringify(user.value)
+      );
+    });
 
     return {
+      hasNoChanges,
       hasRequestError,
       hasLoadingError,
       valid,
