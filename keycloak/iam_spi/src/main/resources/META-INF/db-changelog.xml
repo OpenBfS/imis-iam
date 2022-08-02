@@ -172,7 +172,6 @@
                 <constraints nullable="false" />
             </column>
             <column name="imis_id" type="VARCHAR">
-                <constraints nullable="false" />
             </column>
             <column name="x_coordinate" type="FLOAT">
             </column>
