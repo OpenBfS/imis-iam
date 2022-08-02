@@ -78,6 +78,7 @@ export default {
     new_email: "Neue Email",
     send: "Versenden",
     confirm: "Bestätigen",
+    delete: "Löschen",
   },
   // Shared labels
   label: {
@@ -94,6 +95,7 @@ export default {
     delete: "Löschen",
     from: "Von:",
     to: "Bis:",
+    confirm_deletion: "Bitte Bestätigen Sie das Löschen der {name} Institution",
   },
   // Form labels
   form: {

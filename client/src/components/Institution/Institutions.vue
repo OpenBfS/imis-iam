@@ -13,6 +13,7 @@
             class="mr-4"
             v-bind="props"
             @click="
+              resetUser();
               processType = 'add';
               showManageDialog = true;
             "
@@ -35,7 +36,7 @@
             <tr v-for="item in institutions" :key="item.id">
               <td>{{ item.name }}</td>
               <td>{{ item.shortName }}</td>
-              <td>
+              <td class="d-flex">
                 <v-tooltip location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn
@@ -47,6 +48,22 @@
                     ></v-btn>
                   </template>
                   <span>{{ $t("label.edit") }}</span>
+                </v-tooltip>
+                <v-tooltip location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn
+                      variant="plain"
+                      icon="mdi-delete"
+                      size="small"
+                      v-bind="props"
+                      @click="
+                        institution = { ...item };
+                        processType = 'delete';
+                        showManageDialog = true;
+                      "
+                    ></v-btn>
+                  </template>
+                  <span>{{ $t("label.delete") }}</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -84,6 +101,7 @@
 import { computed, onMounted, ref, defineAsyncComponent } from "vue";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
+import { expInstitution } from "@/components/Institution/institution";
 
 export default {
   components: {
@@ -102,23 +120,8 @@ export default {
     const institutions = computed(() => {
       return store.state.institution.institutions;
     });
-    const servicePlace = { SBStreet: "", SBPostalCode: "", SBLocation: "" };
-    const place = { street: "", postalCode: "", location: "" };
-    const imis = { id: "", mail: "" };
-    const central = { CPhone: "", CMail: "", CFax: "" };
-    const institution = ref({
-      id: "",
-      name: "",
-      shortName: "",
-      phone: "",
-      fax: "",
-      mail: "",
-      ...central,
-      ...imis,
-      ...servicePlace,
-      ...place,
-      categories: [],
-    });
+    const institution = ref({ ...expInstitution });
+
     const getInstitutions = () => {
       store
         .dispatch("institution/loadInstitutions")
@@ -138,8 +141,11 @@ export default {
         getInstitutions();
       }
     };
-
+    const resetUser = () => {
+      institution.value = { ...expInstitution };
+    };
     return {
+      resetUser,
       hasLoadingError,
       showManageDialog,
       institution,

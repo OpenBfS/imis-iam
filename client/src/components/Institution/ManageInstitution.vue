@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="show">
-    <v-card min-width="600">
+    <v-card min-width="600" v-if="['add', 'edit'].indexOf(processType) !== -1">
       <v-card-title v-if="processType === 'add'">
         <span class="text-h5">{{ $t("institution.create_title") }}</span>
       </v-card-title>
@@ -134,6 +134,30 @@
         </v-btn>
       </v-card-actions>
     </v-card>
+    <v-card v-else>
+      <v-card-text>
+        <span class="text-h5">{{
+          $t("label.confirm_deletion", { name: institution.name })
+        }}</span>
+      </v-card-text>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="accent" @click="deleteInstitution()">
+          {{ $t("button.delete") }}
+        </v-btn>
+        <v-btn
+          color="accent"
+          @click="
+            $emit('child-object', {
+              closeDialog: true,
+            })
+          "
+        >
+          {{ $t("button.cancel") }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
 </template>
 
@@ -153,7 +177,7 @@ export default {
   setup(props, { emit }) {
     const show = true;
     const institution = ref(props.item);
-    const { hasLoadingError, hastRequestError } = useNotification();
+    const { hasLoadingError, hasRequestError } = useNotification();
     const categories = ref([]);
     const getCategories = () => {
       HTTP.get("institution/category")
@@ -181,13 +205,23 @@ export default {
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
         })
-        .cathc(() => {
-          hastRequestError.value = true;
+        .catch(() => {
+          hasRequestError.value = true;
+        });
+    };
+    const deleteInstitution = () => {
+      HTTP.delete("institution/" + institution.value.id)
+        .then(() => {
+          emit("child-object", { closeDialog: true, hasChanges: true });
+        })
+        .catch(() => {
+          hasRequestError.value = true;
         });
     };
     return {
+      deleteInstitution,
       hasLoadingError,
-      hastRequestError,
+      hasRequestError,
       createInstitution,
       valid,
       show,
