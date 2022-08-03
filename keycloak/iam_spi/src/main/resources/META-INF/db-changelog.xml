@@ -173,6 +173,8 @@
             </column>
             <column name="imis_id" type="VARCHAR">
             </column>
+            <column name="imis_mail" type="VARCHAR">
+            </column>
             <column name="x_coordinate" type="FLOAT">
             </column>
             <column name="y_coordinate" type="FLOAT">
