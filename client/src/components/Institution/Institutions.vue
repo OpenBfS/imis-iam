@@ -44,7 +44,6 @@
                       icon="mdi-account-edit-outline"
                       size="small"
                       v-bind="props"
-                      disabled
                       @click="
                         institution = { ...item };
                         processType = 'edit';

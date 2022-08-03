@@ -143,9 +143,11 @@
         <v-btn
           :color="`${valid ? 'accent' : 'grey'}`"
           :disabled="!valid"
-          @click="createInstitution()"
+          @click="
+            processType == 'add' ? createInstitution() : updateInstitution()
+          "
         >
-          {{ $t("button.create") }}
+          {{ processType == "add" ? $t("button.create") : $t("button.save") }}
         </v-btn>
         <v-btn
           color="accent"
@@ -203,6 +205,7 @@ export default {
     const show = true;
     const institution = ref(props.item);
     const { hasLoadingError, hasRequestError } = useNotification();
+    const form = ref(false);
     const categories = ref([]);
     const getCategories = () => {
       HTTP.get("institution/category")
@@ -215,12 +218,30 @@ export default {
     };
     onMounted(() => {
       getCategories();
+      // This is necessary as the form value is not change to true with valid inputs.
+      // TODO: Check if this is fixed by upstream with the next release.
+      if (props.processType === "edit") {
+        setTimeout(() => {
+          form.value.validate();
+        }, 100);
+      }
     });
     const valid = ref(null);
     const createInstitution = () => {
       let payload = { ...institution.value };
       payload.category = payload.category.id;
       HTTP.post("/institution", payload)
+        .then(() => {
+          emit("child-object", { closeDialog: true, hasChanges: true });
+        })
+        .catch(() => {
+          hasRequestError.value = true;
+        });
+    };
+    const updateInstitution = () => {
+      let payload = { ...institution.value };
+      payload.category = payload.category.id;
+      HTTP.put("/institution", payload)
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
         })
@@ -238,6 +259,8 @@ export default {
         });
     };
     return {
+      form,
+      updateInstitution,
       deleteInstitution,
       hasLoadingError,
       hasRequestError,
