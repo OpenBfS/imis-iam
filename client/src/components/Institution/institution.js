@@ -5,10 +5,18 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-const serviceBuildingPlace = { SBStreet: "", SBPostalCode: "", SBLocation: "" };
-const addressPlace = { AStreet: "", APostalCode: "", ALocation: "" };
-const imis = { id: "", mail: "" };
-const central = { CPhone: "", CMail: "", CFax: "" };
+const serviceBuildingPlace = {
+  serviceBuildingLocation: "",
+  serviceBuildingPostalCode: "",
+  serviceBuildingStreet: "",
+};
+const addressPlace = {
+  addressStreet: "",
+  addressPostalCode: "",
+  addressLocation: "",
+};
+const imis = { imisId: "", imisMail: "" };
+const central = { centralMail: "", centralPhone: "", centralFax: "" };
 const expInstitution = {
   name: "",
   shortName: "",
@@ -16,7 +24,7 @@ const expInstitution = {
   ...imis,
   ...serviceBuildingPlace,
   ...addressPlace,
-  categories: [],
+  category: [],
   active: false,
   xCoordinate: "",
   yCoordinate: "",

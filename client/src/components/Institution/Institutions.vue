@@ -45,6 +45,11 @@
                       size="small"
                       v-bind="props"
                       disabled
+                      @click="
+                        institution = { ...item };
+                        processType = 'edit';
+                        showManageDialog = true;
+                      "
                     ></v-btn>
                   </template>
                   <span>{{ $t("label.edit") }}</span>

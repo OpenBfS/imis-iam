@@ -6,7 +6,7 @@
       </v-card-title>
       <v-card-title v-if="processType === 'edit'">
         <span class="text-h5">
-          {{ $t("institution.edit_title", { name: currentInstitution.name }) }}
+          {{ $t("institution.edit_title", { name: institution.name }) }}
         </span>
       </v-card-title>
       <v-divider></v-divider>
@@ -36,7 +36,7 @@
                   (v) =>
                     !!v || $t('institution.required_service_building_street'),
                 ]"
-                v-model="institution.SBStreet"
+                v-model="institution.serviceBuildingStreet"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
@@ -46,7 +46,7 @@
                   (v) =>
                     !!v || $t('institution.required_service_building_location'),
                 ]"
-                v-model="institution.SBLocation"
+                v-model="institution.serviceBuildingLocation"
               ></v-text-field>
               <v-text-field
                 variant="underlined"
@@ -58,24 +58,16 @@
                     $t('institution.required_service_building_postalcode'),
                 ]"
                 type="number"
-                v-model="institution.SBPostalCode"
+                v-model="institution.serviceBuildingPostalCode"
               ></v-text-field>
-
               <v-text-field
                 variant="underlined"
                 density="compact"
                 :label="$t('institution.central_phone')"
                 :rules="[(v) => !!v || $t('form.required_central_phone')]"
-                v-model="institution.CPhone"
+                v-model="institution.centralPhone"
                 type="number"
               ></v-text-field>
-              <!-- <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.central_fax')"
-                v-model="institution.CFax"
-                type="number"
-              ></v-text-field> -->
               <v-text-field
                 variant="underlined"
                 density="compact"
@@ -84,23 +76,56 @@
                   (v) => !!v || $t('institution.required_central_mail'),
                   (v) => /.+@.+/.test(v) || $t('form.valid_email'),
                 ]"
-                v-model="institution.CMail"
+                v-model="institution.centralMail"
               ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.central_fax')"
+                v-model="institution.centralFax"
+                type="number"
+              ></v-text-field>
+
+              <v-text-field
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.address_street')"
+                v-model="institution.addressStreet"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.address_postalcode')"
+                v-model="institution.addressPostalCode"
+                type="number"
+              ></v-text-field
+              ><v-text-field
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.address_location')"
+                v-model="institution.addressLocation"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.imis_Id')"
+                v-model="institution.imisId"
+              ></v-text-field>
+              <v-checkbox
+                v-model="institution.active"
+                :label="$t('institution.active')"
+              ></v-checkbox>
               <v-select
                 return-object
                 dense
                 clearable
                 :label="$t('institution.categories')"
                 :items="categories"
-                v-model="institution.categories"
+                v-model="institution.category"
                 item-title="name"
                 item-value="id"
                 persistent-hint
-                multiple
-                :rules="[
-                  (v) =>
-                    !!(v && v.length) || $t('institution.required_category'),
-                ]"
+                :rules="[(v) => !!v || $t('institution.required_category')]"
               >
               </v-select>
             </v-col>
@@ -193,15 +218,9 @@ export default {
     });
     const valid = ref(null);
     const createInstitution = () => {
-      HTTP.post("/institution", {
-        name: institution.value.name,
-        shortName: institution.value.shortName,
-        serviceBuildingStreet: institution.value.SBStreet,
-        serviceBuildingPostalCode: institution.value.SBPostalCode,
-        serviceBuildingLocation: institution.value.SBLocation,
-        centralPhone: institution.value.CPhone,
-        centralMail: institution.value.CMail,
-      })
+      let payload = { ...institution.value };
+      payload.category = payload.category.id;
+      HTTP.post("/institution", payload)
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
         })

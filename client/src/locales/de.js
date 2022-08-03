@@ -50,6 +50,13 @@ export default {
     postal_code: "PLZ",
     categories: "Kategorien",
     required_category: "Kategorie ist erforderlich",
+    central_fax: "Zentrales Fax",
+    address_street: "Postanschrift: Straße",
+    address_postalcode: "Postanschrift: PLZ",
+    address_location: "Postanschrift: Ort",
+    imis_Id: "IMIS-Kennung",
+    imis_mail: "IMIS-E-Mail",
+    active: "Aktiv",
   },
   // Main component
   main: {
