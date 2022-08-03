@@ -177,7 +177,7 @@
             </column>
             <column name="y_coordinate" type="FLOAT">
             </column>
-            <column name="active" type="BOOLEAN">
+            <column name="active" type="BOOLEAN" defaultValue="true">
             </column>
         </createTable>
         <createTable tableName="institution_user">
