@@ -13,23 +13,26 @@
       <v-container class="pa-1 mt-4 mx-2">
         <v-row justify="center">
           <v-col jsutify="start" cols="11">
+            <!-- For now a '*' is prepended to the label value to indicate the required ones.
+                TODO: Use "Label" slot when this gets implemented by upstream -->
             <v-form v-model="valid" ref="form">
               <div class="group_class">
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="$t('label.name')"
+                  :label="'* ' + $t('label.name')"
                   v-model="institution.name"
                   :rules="[(v) => !!v || $t('institution.required_name')]"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="$t('institution.shortname')"
+                  :label="'* ' + $t('institution.shortname')"
                   :rules="[(v) => !!v || $t('institution.required_shortname')]"
                   v-model="institution.shortName"
                 ></v-text-field>
                 <v-checkbox
+                  density="compact"
                   v-model="institution.active"
                   :label="$t('institution.active')"
                 ></v-checkbox>
@@ -38,7 +41,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="$t('institution.service_building_location')"
+                  :label="'* ' + $t('institution.service_building_location')"
                   :rules="[
                     (v) =>
                       !!v ||
@@ -49,7 +52,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="$t('institution.service_building_postalcode')"
+                  :label="'* ' + $t('institution.service_building_postalcode')"
                   :rules="[
                     (v) =>
                       !!v ||
@@ -61,7 +64,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="$t('institution.service_building_street')"
+                  :label="'* ' + $t('institution.service_building_street')"
                   :rules="[
                     (v) =>
                       !!v || $t('institution.required_service_building_street'),
@@ -74,7 +77,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="$t('institution.address_location')"
+                  :label="'* ' + $t('institution.address_location')"
                   v-model="institution.addressLocation"
                 ></v-text-field>
                 <v-text-field
@@ -95,25 +98,27 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="$t('institution.central_phone')"
+                  :label="'* ' + $t('institution.central_phone')"
                   :rules="[(v) => !!v || $t('form.required_central_phone')]"
                   v-model="institution.centralPhone"
+                  type="number"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="'* ' + $t('institution.central_email')"
+                  :rules="[
+                    (v) => !!v || $t('institution.required_central_mail'),
+                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
+                  ]"
+                  v-model="institution.centralMail"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
                   :label="$t('institution.central_fax')"
                   v-model="institution.centralFax"
-                ></v-text-field>
-                <v-text-field
-                  variant="underlined"
-                  density="compact"
-                  :label="$t('institution.central_email')"
-                  :rules="[
-                    (v) => !!v || $t('institution.required_central_mail'),
-                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
-                  ]"
-                  v-model="institution.centralMail"
+                  type="number"
                 ></v-text-field>
               </div>
               <div class="group_class">
@@ -128,6 +133,9 @@
                   density="compact"
                   :label="$t('institution.imis_mail')"
                   v-model="institution.imisMail"
+                  :rules="[
+                    (v) => /.+@.+/.test(v) || v == '' || $t('form.valid_email'),
+                  ]"
                 ></v-text-field>
               </div>
               <div class="group_class">
@@ -135,7 +143,7 @@
                   return-object
                   dense
                   clearable
-                  :label="$t('institution.categories')"
+                  :label="'* ' + $t('institution.categories')"
                   :items="categories"
                   v-model="institution.category"
                   item-title="name"
