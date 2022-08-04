@@ -32,6 +32,7 @@ export default {
     fax: "Fax",
     phone: "Telephon",
     shortname: "Kurzbezeichnung",
+    required_name: "Institutionsname ist erfoderlich",
     required_shortname: "Kurzbezeichnung ist erforderlich",
     service_building_location: "Ort des Dienstgebäudes",
     required_service_building_location:

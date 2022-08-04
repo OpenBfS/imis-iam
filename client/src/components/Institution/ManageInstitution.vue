@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="show">
-    <v-card min-width="600" v-if="['add', 'edit'].indexOf(processType) !== -1">
+    <v-card width="80vw" v-if="['add', 'edit'].indexOf(processType) !== -1">
       <v-card-title v-if="processType === 'add'">
         <span class="text-h5">{{ $t("institution.create_title") }}</span>
       </v-card-title>
@@ -10,127 +10,144 @@
         </span>
       </v-card-title>
       <v-divider></v-divider>
-      <v-container>
-        <v-col jsutify="start" cols="10">
-          <v-form v-model="valid" ref="form">
-            <v-col>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('label.name')"
-                v-model="institution.name"
-                :rules="[(v) => !!v || $t('form.required_name')]"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.shortname')"
-                :rules="[(v) => !!v || $t('institution.required_shortname')]"
-                v-model="institution.shortName"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.service_building_street')"
-                :rules="[
-                  (v) =>
-                    !!v || $t('institution.required_service_building_street'),
-                ]"
-                v-model="institution.serviceBuildingStreet"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.service_building_location')"
-                :rules="[
-                  (v) =>
-                    !!v || $t('institution.required_service_building_location'),
-                ]"
-                v-model="institution.serviceBuildingLocation"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.service_building_postalcode')"
-                :rules="[
-                  (v) =>
-                    !!v ||
-                    $t('institution.required_service_building_postalcode'),
-                ]"
-                type="number"
-                v-model="institution.serviceBuildingPostalCode"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.central_phone')"
-                :rules="[(v) => !!v || $t('form.required_central_phone')]"
-                v-model="institution.centralPhone"
-                type="number"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.central_email')"
-                :rules="[
-                  (v) => !!v || $t('institution.required_central_mail'),
-                  (v) => /.+@.+/.test(v) || $t('form.valid_email'),
-                ]"
-                v-model="institution.centralMail"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.central_fax')"
-                v-model="institution.centralFax"
-                type="number"
-              ></v-text-field>
+      <v-container class="pa-1 mt-4 mx-2">
+        <v-row justify="center">
+          <v-col jsutify="start" cols="11">
+            <v-form v-model="valid" ref="form">
+              <div class="group_class">
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('label.name')"
+                  v-model="institution.name"
+                  :rules="[(v) => !!v || $t('institution.required_name')]"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.shortname')"
+                  :rules="[(v) => !!v || $t('institution.required_shortname')]"
+                  v-model="institution.shortName"
+                ></v-text-field>
+                <v-checkbox
+                  v-model="institution.active"
+                  :label="$t('institution.active')"
+                ></v-checkbox>
+              </div>
+              <div class="group_class">
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.service_building_location')"
+                  :rules="[
+                    (v) =>
+                      !!v ||
+                      $t('institution.required_service_building_location'),
+                  ]"
+                  v-model="institution.serviceBuildingLocation"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.service_building_postalcode')"
+                  :rules="[
+                    (v) =>
+                      !!v ||
+                      $t('institution.required_service_building_postalcode'),
+                  ]"
+                  type="number"
+                  v-model="institution.serviceBuildingPostalCode"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.service_building_street')"
+                  :rules="[
+                    (v) =>
+                      !!v || $t('institution.required_service_building_street'),
+                  ]"
+                  v-model="institution.serviceBuildingStreet"
+                ></v-text-field>
+              </div>
 
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.address_street')"
-                v-model="institution.addressStreet"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.address_postalcode')"
-                v-model="institution.addressPostalCode"
-                type="number"
-              ></v-text-field
-              ><v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.address_location')"
-                v-model="institution.addressLocation"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.imis_Id')"
-                v-model="institution.imisId"
-              ></v-text-field>
-              <v-checkbox
-                v-model="institution.active"
-                :label="$t('institution.active')"
-              ></v-checkbox>
-              <v-select
-                return-object
-                dense
-                clearable
-                :label="$t('institution.categories')"
-                :items="categories"
-                v-model="institution.category"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-                :rules="[(v) => !!v || $t('institution.required_category')]"
-              >
-              </v-select>
-            </v-col>
-          </v-form>
-        </v-col>
+              <div class="group_class">
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.address_location')"
+                  v-model="institution.addressLocation"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.address_postalcode')"
+                  v-model="institution.addressPostalCode"
+                  type="number"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.address_street')"
+                  v-model="institution.addressStreet"
+                ></v-text-field>
+              </div>
+              <div class="group_class">
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.central_phone')"
+                  :rules="[(v) => !!v || $t('form.required_central_phone')]"
+                  v-model="institution.centralPhone"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.central_fax')"
+                  v-model="institution.centralFax"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.central_email')"
+                  :rules="[
+                    (v) => !!v || $t('institution.required_central_mail'),
+                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
+                  ]"
+                  v-model="institution.centralMail"
+                ></v-text-field>
+              </div>
+              <div class="group_class">
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.imis_Id')"
+                  v-model="institution.imisId"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.imis_mail')"
+                  v-model="institution.imisMail"
+                ></v-text-field>
+              </div>
+              <div class="group_class">
+                <v-select
+                  return-object
+                  dense
+                  clearable
+                  :label="$t('institution.categories')"
+                  :items="categories"
+                  v-model="institution.category"
+                  item-title="name"
+                  item-value="id"
+                  persistent-hint
+                  :rules="[(v) => !!v || $t('institution.required_category')]"
+                >
+                </v-select>
+              </div>
+            </v-form>
+          </v-col>
+        </v-row>
         <UIAlert
           v-if="hasLoadingError || hasRequestError"
           v-bind:isSuccessful="false"
@@ -187,7 +204,19 @@
     </v-card>
   </v-dialog>
 </template>
-
+<style lang="scss" scoped>
+form > div {
+  display: flex;
+  padding-top: 8px;
+}
+.group_class > div {
+  max-width: 33.3333333333%;
+  width: 100%;
+}
+.group_class > div:nth-child(2) {
+  padding: 0 10px;
+}
+</style>
 <script>
 import { onMounted, ref, defineAsyncComponent } from "vue";
 import { HTTP } from "@/lib/http";
