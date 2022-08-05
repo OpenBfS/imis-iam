@@ -4,7 +4,6 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
-
 import { Promise } from "core-js";
 import { HTTP } from "../lib/http";
 export const institution = {

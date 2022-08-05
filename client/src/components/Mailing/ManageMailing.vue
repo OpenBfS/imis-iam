@@ -1,3 +1,11 @@
+<!--
+/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ * Software engineering by Intevation GmbH
+ *
+ * This file is Free Software under the GNU GPL (v>=3)
+ * and comes with ABSOLUTELY NO WARRANTY!
+ */
+ -->
 <template>
   <v-dialog v-model="show" v-if="['add', 'edit'].indexOf(processType) !== -1">
     <v-card width="400px">
@@ -103,13 +111,6 @@
 </template>
 
 <script>
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
-
 import { ref, defineAsyncComponent, onMounted } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";

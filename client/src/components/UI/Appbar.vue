@@ -1,3 +1,11 @@
+<!--
+/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ * Software engineering by Intevation GmbH
+ *
+ * This file is Free Software under the GNU GPL (v>=3)
+ * and comes with ABSOLUTELY NO WARRANTY!
+ */
+ -->
 <template>
   <v-app-bar dark id="theme" app clipped-left>
     <v-toolbar-title
@@ -37,13 +45,6 @@
 </template>
 <style scoped></style>
 <script>
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
-
 import { computed, defineAsyncComponent, ref } from "vue";
 import { ShibHTTP } from "../../lib/http";
 import { useStore } from "vuex";
