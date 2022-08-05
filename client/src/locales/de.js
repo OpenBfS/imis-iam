@@ -58,6 +58,8 @@ export default {
     imis_Id: "IMIS-Kennung",
     imis_mail: "IMIS-E-Mail",
     active: "Aktiv",
+    new_category: "Kategorie Hinzufügen",
+    category_name: "Kategorienname",
   },
   // Main component
   main: {

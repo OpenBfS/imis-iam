@@ -138,7 +138,7 @@
                   ]"
                 ></v-text-field>
               </div>
-              <div class="group_class">
+              <div class="group_class align-center">
                 <v-select
                   return-object
                   dense
@@ -149,9 +149,50 @@
                   item-title="name"
                   item-value="id"
                   persistent-hint
+                  density="compact"
                   :rules="[(v) => !!v || $t('institution.required_category')]"
                 >
                 </v-select>
+                <v-btn
+                  variant="plain"
+                  v-if="!showAddCategory"
+                  @click="showAddCategory = true"
+                >
+                  {{ $t("institution.new_category") }}
+                </v-btn>
+                <div v-if="showAddCategory" class="d-flex align-baseline mt-1">
+                  <v-text-field
+                    variant="underlined"
+                    density="compact"
+                    :label="$t('institution.category_name')"
+                    v-model="newCategorie"
+                  ></v-text-field>
+                  <v-tooltip location="top">
+                    <template v-slot:activator="{ props }">
+                      <v-icon
+                        v-bind="props"
+                        color="accent"
+                        size="small"
+                        class="mx-1"
+                        icon="mdi-plus"
+                      ></v-icon>
+                    </template>
+                    <span>{{ $t("button.add") }}</span>
+                  </v-tooltip>
+                  <v-tooltip location="top">
+                    <template v-slot:activator="{ props }">
+                      <v-icon
+                        v-bind="props"
+                        style="opacity: 1"
+                        color="accent"
+                        size="small"
+                        icon="mdi-close"
+                        @click="showAddCategory = false"
+                      ></v-icon>
+                    </template>
+                    <span>{{ $t("button.close") }}</span>
+                  </v-tooltip>
+                </div>
               </div>
             </v-form>
           </v-col>
@@ -295,7 +336,21 @@ export default {
           hasRequestError.value = true;
         });
     };
+    const showAddCategory = ref(false);
+    const newCategorie = ref("");
+    const addCategory = () => {
+      HTTP.put("/category")
+        .then(() => {
+          getCategories();
+        })
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     return {
+      addCategory,
+      showAddCategory,
+      newCategorie,
       form,
       updateInstitution,
       deleteInstitution,
