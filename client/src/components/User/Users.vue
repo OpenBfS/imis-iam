@@ -1,3 +1,11 @@
+<!--
+/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ * Software engineering by Intevation GmbH
+ *
+ * This file is Free Software under the GNU GPL (v>=3)
+ * and comes with ABSOLUTELY NO WARRANTY!
+ */
+ -->
 <template>
   <v-container>
     <v-row>
@@ -97,20 +105,13 @@
   </v-container>
 </template>
 <script>
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
-
 import { computed, onMounted, ref, defineAsyncComponent } from "vue";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
 
 export default {
   components: {
-    UIAlert: defineAsyncComponent(() => import("./UI/UIAlert.vue")),
+    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
     ManageUser: defineAsyncComponent(() =>
       import("@/components/User/ManageUser.vue")
     ),

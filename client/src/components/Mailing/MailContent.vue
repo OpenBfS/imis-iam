@@ -1,3 +1,11 @@
+<!--
+/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ * Software engineering by Intevation GmbH
+ *
+ * This file is Free Software under the GNU GPL (v>=3)
+ * and comes with ABSOLUTELY NO WARRANTY!
+ */
+ -->
 <template>
   <v-dialog v-model="show">
     <v-card width="60vw" max-height="80vh" class="overflow-y-auto">
@@ -49,13 +57,6 @@
 </template>
 
 <script>
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
-
 export default {
   props: {
     mail: Object,

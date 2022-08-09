@@ -1,3 +1,11 @@
+<!--
+/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ * Software engineering by Intevation GmbH
+ *
+ * This file is Free Software under the GNU GPL (v>=3)
+ * and comes with ABSOLUTELY NO WARRANTY!
+ */
+ -->
 <template>
   <v-container>
     <v-row class="bg-secondary my-2" style="position: relative">
@@ -19,13 +27,6 @@
 </template>
 
 <script>
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
-
 import Applications from "../components/ApplicationComponent.vue";
 import { defineAsyncComponent } from "vue";
 export default {
