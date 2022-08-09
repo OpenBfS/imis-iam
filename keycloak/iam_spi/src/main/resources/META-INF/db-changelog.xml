@@ -126,4 +126,70 @@
             <where>archived='true'</where>
         </update>
     </changeSet>
+    <changeSet author="awoestmann@intevation.de" id="v0.4">
+        <createTable tableName="user_position">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="position" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createTable tableName="user_iam_attributes">
+            <column name="id" type="VARCHAR">
+                <constraints
+                    primaryKey="true"
+                    foreignKeyName="fk_user_entity_attributes"
+                    references="user_entity(id)"
+                />
+            </column>
+            <column name="position_id" type="INT">
+                <constraints
+                    nullable="false"
+                    foreignKeyName="fk_user_attributes_position"
+                    references="user_position(id)"
+                />
+            </column>
+            <column name="title" type="VARCHAR">
+            </column>
+            <column name="phone" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="mobile" type="VARCHAR">
+            </column>
+            <column name="fax" type="VARCHAR">
+            </column>
+            <column name="oe" type="VARCHAR">
+            </column>
+            <column name="bfs_location" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <!--Insert positions-->
+        <insert tableName="user_position">
+            <column name="id" value="1" />
+            <column name="position" value="Leiter" />
+        </insert>
+        <insert tableName="user_position">
+            <column name="id" value="2" />
+            <column name="position" value="Vertreter" />
+        </insert>
+        <insert tableName="user_position">
+            <column name="id" value="3" />
+            <column name="position" value="Radiologischer Ansprechpartner" />
+        </insert>
+        <insert tableName="user_position">
+            <column name="id" value="4" />
+            <column name="position" value="Mitarbeiter" />
+        </insert>
+        <insert tableName="user_position">
+            <column name="id" value="5" />
+            <column name="position" value="IT-Ansprechperson" />
+        </insert>
+        <insert tableName="user_position">
+            <column name="id" value="6" />
+            <column name="position" value="Störplatz" />
+        </insert>
+    </changeSet>
 </databaseChangeLog>

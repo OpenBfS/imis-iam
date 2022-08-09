@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
+
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.UserModel;
 
@@ -21,6 +23,7 @@ public class User {
     private String email;
     private String username;
     private List<String> groups;
+    private UserIamAttributes attributes;
 
     public String getId() {
         return id;
@@ -60,7 +63,20 @@ public class User {
         this.groups = groups;
     }
 
-    public static User fromUserModel (UserModel userModel) {
+    public UserIamAttributes getAttributes() {
+        return attributes;
+    }
+    public void setAttributes(UserIamAttributes attributes) {
+        this.attributes = attributes;
+    }
+
+    /**
+     * Generate user from given usermodel.
+     * @param userModel Keycloak usermodel
+     * @param em EntityManager
+     * @return Generated user
+     */
+    public static User fromUserModel(UserModel userModel, EntityManager em) {
         User user = new User();
         user.setId(userModel.getId());
         user.setUsername(userModel.getUsername());
@@ -73,7 +89,7 @@ public class User {
             groupNames.add(group.getName());
         });
         user.setGroups(groupNames);
+        user.setAttributes(em.find(UserIamAttributes.class, userModel.getId()));
         return user;
     }
-
 }
