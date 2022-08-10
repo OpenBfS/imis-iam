@@ -62,6 +62,26 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
+     * Get profile of the current users.
+     * @param headers Request header
+     * @return User profile as json, 403 if not authorized
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/profile")
+    public Response getProfile(@Context HttpHeaders headers) {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        String id = headers.getHeaderString(SHIB_USER_HEADER);
+        if (id == null) {
+            return Response.status(Status.FORBIDDEN).build();
+        }
+        RealmModel realm = session.getContext().getRealm();
+        UserModel user = session.users().getUserById(realm, id);
+        return Response.ok(User.fromUserModel(user, em)).build();
+    }
+
+    /**
      * Gett all users.
      * @return List of user json objects
      */
@@ -193,7 +213,7 @@ public class UserProvider implements RealmResourceProvider {
         if (attributes.getId() == null) {
             attributes.setId(rep.getId());
         }
-        em.persist(attributes);
+        em.merge(attributes);
         return Response.ok(User.fromUserModel(user, em)).build();
     }
 
