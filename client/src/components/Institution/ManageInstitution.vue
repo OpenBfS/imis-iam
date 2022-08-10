@@ -66,7 +66,6 @@
                       !!v ||
                       $t('institution.required_service_building_postalcode'),
                   ]"
-                  type="number"
                   v-model="institution.serviceBuildingPostalCode"
                 ></v-text-field>
                 <v-text-field
@@ -93,7 +92,6 @@
                   density="compact"
                   :label="$t('institution.address_postalcode')"
                   v-model="institution.addressPostalCode"
-                  type="number"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
@@ -107,16 +105,17 @@
                   variant="underlined"
                   density="compact"
                   :label="'* ' + $t('institution.central_phone')"
-                  :rules="[(v) => !!v || $t('form.required_central_phone')]"
+                  :rules="[
+                    (v) => !!v || $t('institution.required_central_phone'),
+                  ]"
                   v-model="institution.centralPhone"
-                  type="number"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
                   :label="'* ' + $t('institution.central_email')"
                   :rules="[
-                    (v) => !!v || $t('institution.required_central_mail'),
+                    (v) => !!v || $t('institution.required_central_email'),
                     (v) => /.+@.+/.test(v) || $t('form.valid_email'),
                   ]"
                   v-model="institution.centralMail"
@@ -126,7 +125,6 @@
                   density="compact"
                   :label="$t('institution.central_fax')"
                   v-model="institution.centralFax"
-                  type="number"
                 ></v-text-field>
               </div>
               <div class="group_class">
@@ -141,9 +139,6 @@
                   density="compact"
                   :label="$t('institution.imis_mail')"
                   v-model="institution.imisMail"
-                  :rules="[
-                    (v) => /.+@.+/.test(v) || v == '' || $t('form.valid_email'),
-                  ]"
                 ></v-text-field>
               </div>
               <div class="group_class align-center">
