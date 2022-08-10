@@ -27,6 +27,38 @@ export default {
     create_title: "Neue Institution erstellen",
     edit_title: "Institution {name} bearbeiten",
     add_institution: "Institution Hinzufügen",
+    no_institutions_available: "Es sind keine Institutionen vorhanden",
+    fax: "Fax",
+    phone: "Telephon",
+    shortname: "Kurzbezeichnung",
+    required_name: "Institutionsname ist erfoderlich",
+    required_shortname: "Kurzbezeichnung ist erforderlich",
+    service_building_location: "Ort des Dienstgebäudes",
+    required_service_building_location:
+      "Ort des Dienstgebäudes ist erforderlich",
+    service_building_street: "Straße des Dienstgebäudes",
+    required_service_building_street: "Straße des Dienstgebäudes",
+    service_building_postalcode: "PLZ des Dinestgebäudes",
+    required_service_building_postalcode:
+      "PLZ des Dinestgebäude ist erforderlich",
+    central_phone: "Zentrales Telefon",
+    required_central_phone: "Zentrales Telefon ist erforederlich",
+    central_email: "Zentrale E-Mail",
+    required_central_email: "Zentrale E-Mail ist erforderlich",
+    place: "Ort",
+    street: "Straße",
+    postal_code: "PLZ",
+    categories: "Kategorien",
+    required_category: "Kategorie ist erforderlich",
+    central_fax: "Zentrales Fax",
+    address_street: "Postanschrift: Straße",
+    address_postalcode: "Postanschrift: PLZ",
+    address_location: "Postanschrift: Ort",
+    imis_Id: "IMIS-Kennung",
+    imis_mail: "IMIS-E-Mail",
+    active: "Aktiv",
+    new_category: "Kategorie Hinzufügen",
+    category_name: "Kategorienname",
   },
   // Main component
   main: {
@@ -55,6 +87,7 @@ export default {
     new_email: "Neue Email",
     send: "Versenden",
     confirm: "Bestätigen",
+    delete: "Löschen",
   },
   // Shared labels
   label: {
@@ -71,6 +104,7 @@ export default {
     delete: "Löschen",
     from: "Von:",
     to: "Bis:",
+    confirm_deletion: "Bitte Bestätigen Sie das Löschen der {name} Institution",
   },
   // Form labels
   form: {

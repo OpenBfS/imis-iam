@@ -126,6 +126,108 @@
             <where>archived='true'</where>
         </update>
     </changeSet>
+    <changeSet author="awoestmann@intevation.de" id="v0.3">
+        <createTable tableName="institution_category">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createTable tableName="institution">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="name" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="short_name" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="category_id" type="INT">
+                <constraints foreignKeyName="fk_institution_institution_category" references="institution_category(id)" />
+            </column>
+            <column name="service_building_street" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="service_building_postal_code" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="service_building_location" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="address_street" type="VARCHAR">
+            </column>
+            <column name="address_postal_code" type="VARCHAR">
+            </column>
+            <column name="address_location" type="VARCHAR">
+            </column>
+            <column name="central_phone" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="central_fax" type="VARCHAR">
+            </column>
+            <column name="central_mail" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="imis_id" type="VARCHAR">
+            </column>
+            <column name="imis_mail" type="VARCHAR">
+            </column>
+            <column name="x_coordinate" type="FLOAT">
+            </column>
+            <column name="y_coordinate" type="FLOAT">
+            </column>
+            <column name="active" type="BOOLEAN" defaultValue="true">
+            </column>
+        </createTable>
+        <createTable tableName="institution_user">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="institution_id" type="INT">
+                <constraints foreignKeyName="fk_institution_user_institution" references="institution(id)" />
+            </column>
+            <column name="user_id" type="VARCHAR(36)">
+                <constraints foreignKeyName="fk_institution_user_user" references="user_entity(id)" />
+            </column>
+        </createTable>
+
+        <insert tableName="institution_category">
+            <column name="name" value="Bundesministerium" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Leitstelle" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Bundesbehörde" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Landesministerium" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Landesdatenzentrale" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Landesmessstelle" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Landesmessstelle REI" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Betreiber KTA" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Aufsichtsbehörde" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Sonstige" />
+        </insert>
+        <insert tableName="institution_category">
+            <column name="name" value="Alle" />
+        </insert>
+    </changeSet>
     <changeSet author="awoestmann@intevation.de" id="v0.4">
         <createTable tableName="user_position">
             <column name="id" type="SERIAL">

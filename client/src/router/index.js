@@ -6,7 +6,7 @@
  */
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/components/Main.vue";
-import Institution from "@/components/Institutions.vue";
+import Institution from "@/components/Institution/Institutions.vue";
 import UserView from "@/components/User/Users.vue";
 import MailingList from "@/components/Mailing/MailingList.vue";
 
