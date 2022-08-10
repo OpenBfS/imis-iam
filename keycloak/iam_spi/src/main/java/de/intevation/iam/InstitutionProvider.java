@@ -302,6 +302,33 @@ public class InstitutionProvider implements RealmResourceProvider {
         return Response.ok(in).build();
     }
 
+    /**
+     * Create a new category.
+     * Response:
+     * <pre>
+     * <code>
+     * {
+     *   id: [String] InstitutionCategory ID,
+     *   name: [String] InstitutionCategory Name
+     * }
+     * </code>
+     * </pre>
+     * @param intCategory Institution category representation
+     * @return InstitutionCategory JSON or 404 if not found
+     */
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/category")
+    public Response createInstitutionCategory(final InstitutionCategory intCategory){
+    if(intCategory == null){
+        return Response.status(Status.BAD_REQUEST).build();
+    }
+    EntityManager em = session.getProvider(
+        JpaConnectionProvider.class).getEntityManager();
+    em.persist(intCategory);
+    return Response.ok(intCategory).build();
+}
+
     @Override
     public void close() { }
 

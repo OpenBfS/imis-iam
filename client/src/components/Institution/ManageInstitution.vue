@@ -173,12 +173,13 @@
                     variant="underlined"
                     density="compact"
                     :label="$t('institution.category_name')"
-                    v-model="newCategorie"
+                    v-model="newCategory"
                   ></v-text-field>
                   <v-tooltip location="top">
                     <template v-slot:activator="{ props }">
                       <v-icon
                         v-bind="props"
+                        @click="addCategory"
                         color="accent"
                         size="small"
                         class="mx-1"
@@ -345,20 +346,23 @@ export default {
         });
     };
     const showAddCategory = ref(false);
-    const newCategorie = ref("");
+    const newCategory = ref("");
     const addCategory = () => {
-      HTTP.put("/category")
-        .then(() => {
-          getCategories();
-        })
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
+      if (newCategory.value && newCategory.value !== "") {
+        HTTP.post("institution/category", { name: newCategory.value })
+          .then(() => {
+            newCategory.value = "";
+            getCategories();
+          })
+          .catch(() => {
+            hasLoadingError.value = true;
+          });
+      }
     };
     return {
       addCategory,
       showAddCategory,
-      newCategorie,
+      newCategory,
       form,
       updateInstitution,
       deleteInstitution,

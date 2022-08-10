@@ -128,7 +128,7 @@
     </changeSet>
     <changeSet author="awoestmann@intevation.de" id="v0.3">
         <createTable tableName="institution_category">
-            <column name="id" type="Integer">
+            <column name="id" type="SERIAL">
                 <constraints primaryKey="true" />
             </column>
             <column name="name" type="VARCHAR">
@@ -195,47 +195,36 @@
         </createTable>
 
         <insert tableName="institution_category">
-            <column name="id" value="1" />
             <column name="name" value="Bundesministerium" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="2" />
             <column name="name" value="Leitstelle" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="3" />
             <column name="name" value="Bundesbehörde" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="4" />
             <column name="name" value="Landesministerium" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="5" />
             <column name="name" value="Landesdatenzentrale" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="6" />
             <column name="name" value="Landesmessstelle" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="7" />
             <column name="name" value="Landesmessstelle REI" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="8" />
             <column name="name" value="Betreiber KTA" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="9" />
             <column name="name" value="Aufsichtsbehörde" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="10" />
             <column name="name" value="Sonstige" />
         </insert>
         <insert tableName="institution_category">
-            <column name="id" value="11" />
             <column name="name" value="Alle" />
         </insert>
     </changeSet>
