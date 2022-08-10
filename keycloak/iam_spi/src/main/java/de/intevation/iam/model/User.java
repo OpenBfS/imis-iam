@@ -90,11 +90,11 @@ public class User {
         user.setLastName(userModel.getLastName());
         user.setEmail(userModel.getEmail());
         Stream<GroupModel> groups = userModel.getGroupsStream();
-        List<String> groupNames = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<String>();
         groups.forEach(group -> {
-            groupNames.add(group.getName());
+            groupIds.add(group.getId());
         });
-        user.setGroups(groupNames);
+        user.setGroups(groupIds);
         user.setAttributes(em.find(UserIamAttributes.class, userModel.getId()));
         return user;
     }

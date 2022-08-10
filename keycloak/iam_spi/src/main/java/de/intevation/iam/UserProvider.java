@@ -43,6 +43,7 @@ import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.User;
 import de.intevation.iam.model.UserPosition;
 import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.model.UserMembership;
 import de.intevation.iam.util.I18nUtils;
 
 public class UserProvider implements RealmResourceProvider {
@@ -235,6 +236,23 @@ public class UserProvider implements RealmResourceProvider {
         TypedQuery<UserPosition> query = em.createQuery(critQuery);
         List<UserPosition> positions = query.getResultList();
         return Response.ok(positions).build();
+    }
+
+    /**
+     * Get all memberships.
+     * @return Memberships as Json Array
+     */
+    @GET
+    @Path("/membership")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMemberships() {
+        RealmModel realm = session.getContext().getRealm();
+        Stream<GroupModel> groups = realm.getGroupsStream();
+        ArrayList<UserMembership> memberships = new ArrayList<UserMembership>();
+        groups.forEach(group -> {
+            memberships.add(UserMembership.fromGroupModel(group));
+        });
+        return Response.ok(memberships.toArray()).build();
     }
 
     /**
