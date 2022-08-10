@@ -168,27 +168,21 @@
 
         <!--Insert positions-->
         <insert tableName="user_position">
-            <column name="id" value="1" />
             <column name="position" value="Leiter" />
         </insert>
         <insert tableName="user_position">
-            <column name="id" value="2" />
             <column name="position" value="Vertreter" />
         </insert>
         <insert tableName="user_position">
-            <column name="id" value="3" />
             <column name="position" value="Radiologischer Ansprechpartner" />
         </insert>
         <insert tableName="user_position">
-            <column name="id" value="4" />
             <column name="position" value="Mitarbeiter" />
         </insert>
         <insert tableName="user_position">
-            <column name="id" value="5" />
             <column name="position" value="IT-Ansprechperson" />
         </insert>
         <insert tableName="user_position">
-            <column name="id" value="6" />
             <column name="position" value="Störplatz" />
         </insert>
     </changeSet>
