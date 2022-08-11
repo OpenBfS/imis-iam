@@ -12,7 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "mail", schema = "keycloak")
+@Table(name = "user_position", schema = "keycloak")
 public class UserPosition {
     @Id
     private Integer id;
