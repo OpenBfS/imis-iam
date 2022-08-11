@@ -10,7 +10,7 @@
   <v-container>
     <v-row>
       <v-col cols="12" class="mt-10 pa-2 text-h6 bg-secondary">
-        {{ $t("user.title") }}
+        {{ $t("user.user_title") }}
       </v-col>
     </v-row>
     <v-row justify="end" class="mt-6">
@@ -37,10 +37,10 @@
       <v-col cols="12" class="mt-6">
         <v-table class="ma-2 pa-2">
           <thead>
-            <th class="text-left">{{ $t("label.id") }}</th>
-            <th class="text-left">{{ $t("label.username") }}</th>
-            <th class="text-left">{{ $t("label.firstname") }}</th>
-            <th class="text-left">{{ $t("label.lastname") }}</th>
+            <th class="text-left">{{ $t("user.id") }}</th>
+            <th class="text-left">{{ $t("user.username") }}</th>
+            <th class="text-left">{{ $t("user.firstname") }}</th>
+            <th class="text-left">{{ $t("user.lastname") }}</th>
             <th class="text-left">{{ $t("label.email") }}</th>
             <th class="text-left">{{ $t("label.actions") }}</th>
           </thead>
@@ -108,6 +108,7 @@
 import { computed, onMounted, ref, defineAsyncComponent } from "vue";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
+import { expUser } from "@/components/User/user";
 
 export default {
   components: {
@@ -154,21 +155,10 @@ export default {
       processType.value = "edit";
       showManageUserDialog.value = true;
     };
-    const user = ref({
-      id: "",
-      username: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      groups: [],
-    });
+    const user = ref({ ...expUser });
+
     const resetUser = () => {
-      user.value.id = "";
-      user.value.username = "";
-      user.value.firstName = "";
-      user.value.lastName = "";
-      user.value.email = "";
-      user.value.groups = [];
+      user.value = { ...expUser };
     };
     const savedUser = ref();
     const checkChildObject = (e) => {
