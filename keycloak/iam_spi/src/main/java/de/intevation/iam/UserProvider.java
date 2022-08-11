@@ -159,6 +159,7 @@ public class UserProvider implements RealmResourceProvider {
         newUser.setFirstName(rep.getFirstName());
         newUser.setLastName(rep.getLastName());
         newUser.setEmail(rep.getEmail());
+        rep.setId(newUser.getId());
 
         //Update groups
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
@@ -170,7 +171,7 @@ public class UserProvider implements RealmResourceProvider {
         updateGroups(groupMap, newUser);
         UserIamAttributes attributes = rep.getAttributes();
         if (attributes.getId() == null) {
-            attributes.setId(rep.getId());
+            attributes.setId(newUser.getId());
         }
         em.persist(attributes);
         updateInstitutions(rep.getInstitutions(), rep);
