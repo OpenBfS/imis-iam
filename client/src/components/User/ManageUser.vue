@@ -19,13 +19,13 @@
       </v-card-title>
       <v-divider></v-divider>
       <v-container class="pa-1 mt-4">
-        <v-row jsutify="start">
-          <v-col cols="11">
+        <v-row justify="center">
+          <v-col jsutify="start" cols="11">
             <v-form v-model="valid" ref="form">
               <div class="two_group_class">
                 <v-text-field
                   :variant="
-                    ['add', 'copy'].indexOf(processType) !== 1
+                    ['add', 'copy'].indexOf(processType) !== -1
                       ? 'underlined'
                       : 'plain'
                   "
@@ -86,7 +86,6 @@
               </div>
               <div class="two_group_class">
                 <v-select
-                  return-object
                   dense
                   clearable
                   :label="$t('user.oe')"
@@ -98,7 +97,6 @@
                 >
                 </v-select>
                 <v-select
-                  return-object
                   dense
                   clearable
                   :label="$t('user.bfslocation')"
@@ -112,7 +110,6 @@
               </div>
               <div class="three_group_class">
                 <v-select
-                  return-object
                   dense
                   clearable
                   :label="'* ' + $t('user.label_institutions')"
@@ -128,7 +125,6 @@
                 >
                 </v-select>
                 <v-select
-                  return-object
                   dense
                   clearable
                   :label="'* ' + $t('user.label_memberships')"
@@ -143,9 +139,7 @@
                   ]"
                 >
                 </v-select>
-
                 <v-select
-                  return-object
                   dense
                   clearable
                   :label="'* ' + $t('user.label_positions')"
@@ -192,7 +186,7 @@
           color="accent"
           @click="
             () => {
-              user = { ...originalUser };
+              user = cloneObject(originalUser);
             }
           "
         >
@@ -236,9 +230,9 @@ form > div {
 </style>
 <script>
 import { computed, onMounted, defineAsyncComponent, ref } from "vue";
-import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
+import { useStore } from "vuex";
 
 export default {
   components: {
@@ -255,37 +249,53 @@ export default {
     const user = ref(props.item);
     const originalUser = ref(props.copiedItem);
     const { hasLoadingError, hasRequestError } = useNotification();
-    const institutions = computed(() => {
-      return store.state.institution.institutions;
-    });
-    onMounted(() => {
+
+    const getUserMemberships = () => {
+      HTTP.get("iamuser/membership")
+        .then((response) => {
+          store.commit("user/setMemberships", response.data);
+        })
+        .catch(() => {
+          hasLoadingError.value = false;
+        });
+    };
+    const getUserPsositions = () => {
+      HTTP.get("iamuser/position")
+        .then((response) => {
+          store.commit("user/setPositions", response.data);
+        })
+        .catch(() => {
+          hasLoadingError.value = false;
+        });
+    };
+    const getInstitutions = () => {
       store
         .dispatch("institution/loadInstitutions")
         .then()
         .catch(() => {
           hasLoadingError.value = true;
         });
-    });
-
-    const extractIds = (items) => {
-      return items.map((i) => i.id);
     };
-    const formPayload = () => {
-      const payload = { ...user.value };
-      payload["institutions"] = user.value.institutions.length
-        ? extractIds(user.value.institutions)
-        : [];
-      payload["groups"] = user.value.groups.length
-        ? extractIds(user.value.groups)
-        : [];
-      payload["attributes"]["position"] =
-        Object.keys(user.value.attributes.position).length > 0
-          ? user.value.attributes.position.id
-          : null;
-      return payload;
+    onMounted(() => {
+      getUserMemberships();
+      getUserPsositions();
+      getInstitutions();
+    });
+    const positions = computed(() => {
+      return store.state.user.positions;
+    });
+    const memeberships = computed(() => {
+      return store.state.user.memberships;
+    });
+    const institutions = computed(() => {
+      return store.state.institution.institutions;
+    });
+    // Deep Copy for objects
+    const cloneObject = (obj) => {
+      return JSON.parse(JSON.stringify(obj));
     };
     const createUser = () => {
-      HTTP.post("/iamuser", formPayload())
+      HTTP.post("/iamuser", user.value)
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
         })
@@ -294,7 +304,7 @@ export default {
         });
     };
     const updateUser = () => {
-      HTTP.put("/iamuser", formPayload())
+      HTTP.put("/iamuser", user.value)
         .then(() => {
           // Update current user Profile and thus the data in App bar.
           if (store.state.profile.userData.id === user.value.id) {
@@ -309,7 +319,7 @@ export default {
     const form = ref(false);
     onMounted(() => {
       // This is necessary as the form value is not change to true with valid inputs.
-      // TODO: Check if this is fixed by upstream with the next release.
+      // TODO: Check if this gets fixed by upstream with the next release.
       if (props.processType === "edit") {
         setTimeout(() => {
           form.value.validate();
@@ -326,31 +336,9 @@ export default {
         JSON.stringify(originalUser.value) === JSON.stringify(user.value)
       );
     });
-    const memeberships = ref();
-    const getUserMemberships = () => {
-      HTTP.get("iamuser/membership")
-        .then((response) => {
-          memeberships.value = response.data;
-        })
-        .catch(() => {
-          hasLoadingError.value = false;
-        });
-    };
-    const positions = ref();
-    const getUserPsositions = () => {
-      HTTP.get("iamuser/position")
-        .then((response) => {
-          positions.value = response.data;
-        })
-        .catch(() => {
-          hasLoadingError.value = false;
-        });
-    };
-    onMounted(() => {
-      getUserMemberships();
-      getUserPsositions();
-    });
+
     return {
+      cloneObject,
       positions,
       memeberships,
       hasNoChanges,

@@ -99,15 +99,15 @@
       v-if="showManageUserDialog"
       v-bind:processType="processType"
       v-bind:copiedItem="savedUser"
-      v-bind:item="{ ...user }"
+      v-bind:item="user"
       @child-object="checkChildObject"
     />
   </v-container>
 </template>
 <script>
-import { computed, onMounted, ref, defineAsyncComponent } from "vue";
-import { useStore } from "vuex";
+import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
+import { useStore } from "vuex";
 import { expUser } from "@/components/User/user";
 
 export default {
@@ -120,9 +120,20 @@ export default {
   setup() {
     const store = useStore();
     const { hasLoadingError, resetNotification } = useNotification();
+    // User
+    // Deep Copy for objects
+    const cloneObject = (obj) => {
+      return JSON.parse(JSON.stringify(obj));
+    };
     const users = computed(() => {
       return store.state.user.users;
     });
+    const user = ref(cloneObject(expUser));
+    const savedUser = ref();
+    const resetUser = () => {
+      user.value = cloneObject(expUser);
+    };
+
     onMounted(() => {
       store
         .dispatch("user/loadUsers")
@@ -130,47 +141,33 @@ export default {
         .catch(() => {
           hasLoadingError.value = true;
         });
-      store
-        .dispatch("institution/loadInstitutions")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
     });
+    // Handle requests
     const processType = ref("");
+    const showManageUserDialog = ref(false);
     const onCopyClicked = (id) => {
-      savedUser.value = users.value.filter((u) => id === u.id)[0];
-      user.value = { ...savedUser.value };
+      user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
       delete user.value["id"];
       processType.value = "copy";
-      savedUser.value = { ...user.value };
       showManageUserDialog.value = true;
     };
     const onEditClicked = (id) => {
-      user.value = {
-        ...users.value.filter((u) => id === u.id)[0],
-      };
+      user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
       // Save original user data for "reset" button
-      savedUser.value = { ...user.value };
+      savedUser.value = cloneObject(user.value);
       processType.value = "edit";
       showManageUserDialog.value = true;
     };
-    const user = ref({ ...expUser });
-
-    const resetUser = () => {
-      user.value = { ...expUser };
-    };
-    const savedUser = ref();
     const checkChildObject = (e) => {
       if (e.closeDialog) {
         showManageUserDialog.value = false;
+        resetUser();
       }
       if (e.hasChanges) {
         resetUser();
         store.dispatch("user/loadUsers");
       }
     };
-    const showManageUserDialog = ref(false);
     return {
       checkChildObject,
       showManageUserDialog,
