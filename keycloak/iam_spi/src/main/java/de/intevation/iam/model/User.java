@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.UserModel;
@@ -96,6 +100,21 @@ public class User {
         });
         user.setGroups(groupIds);
         user.setAttributes(em.find(UserIamAttributes.class, userModel.getId()));
+        //Get institutions the user has already joined
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<InstitutionUser> query
+            = cb.createQuery(InstitutionUser.class);
+        Root<InstitutionUser> root = query.from(InstitutionUser.class);
+        query.select(root);
+        Predicate userFilter = cb.equal(root.get("userId"), user.getId());
+        query.where(userFilter);
+        List<InstitutionUser> joinedInstitutions
+            = em.createQuery(query).getResultList();
+        List<Integer> institutionIds = new ArrayList<Integer>();
+        joinedInstitutions.forEach(inst -> {
+            institutionIds.add(inst.getInstitutionId());
+        });
+        user.setInstitutions(institutionIds);
         return user;
     }
 }
