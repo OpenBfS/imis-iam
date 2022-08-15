@@ -318,9 +318,10 @@ export default {
     };
     const form = ref(false);
     onMounted(() => {
-      // This is necessary as the form value is not change to true with valid inputs.
+      // This is necessary as the form value is not change to true with valid inputs
+      // for the first load by filling the fields (copy, edit).
       // TODO: Check if this gets fixed by upstream with the next release.
-      if (props.processType === "edit") {
+      if (["edit", "copy"].indexOf(props.processType) !== -1) {
         setTimeout(() => {
           form.value.validate();
         }, 100);
@@ -329,11 +330,15 @@ export default {
     // Form
     const valid = ref(false);
     // Activate button only if some values are changed for "edit"
+    // and username and email are changed for "copy"
     // to avoid useless requests
     const hasNoChanges = computed(() => {
       return (
-        props.processType === "edit" &&
-        JSON.stringify(originalUser.value) === JSON.stringify(user.value)
+        (props.processType === "edit" &&
+          JSON.stringify(originalUser.value) === JSON.stringify(user.value)) ||
+        (props.processType === "copy" &&
+          (user.value.username === originalUser.value.username ||
+            user.value.email === originalUser.value.email))
       );
     });
 

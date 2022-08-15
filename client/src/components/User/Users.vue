@@ -147,6 +147,7 @@ export default {
     const showManageUserDialog = ref(false);
     const onCopyClicked = (id) => {
       user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
+      savedUser.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
       delete user.value["id"];
       processType.value = "copy";
       showManageUserDialog.value = true;
