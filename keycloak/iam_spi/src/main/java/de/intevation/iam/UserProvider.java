@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -40,6 +41,9 @@ import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.User;
+import de.intevation.iam.model.UserPosition;
+import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.model.UserMembership;
 import de.intevation.iam.util.I18nUtils;
 
 public class UserProvider implements RealmResourceProvider {
@@ -67,13 +71,15 @@ public class UserProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
     public Response getProfile(@Context HttpHeaders headers) {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
         String id = headers.getHeaderString(SHIB_USER_HEADER);
         if (id == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
-        return Response.ok(User.fromUserModel(user)).build();
+        return Response.ok(User.fromUserModel(user, em)).build();
     }
 
     /**
@@ -83,12 +89,13 @@ public class UserProvider implements RealmResourceProvider {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsers() {
-
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         Stream<UserModel> users = session.users().getUsersStream(realm);
         ArrayList<User> userList = new ArrayList<User>();
         users.forEach(user -> {
-            userList.add(User.fromUserModel(user));
+            userList.add(User.fromUserModel(user, em));
         });
         return Response.ok(userList).build();
     }
@@ -101,12 +108,14 @@ public class UserProvider implements RealmResourceProvider {
     @GET
     @Path("/{id}")
     public Response getUserById(@PathParam("id") String id) {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        return Response.ok(User.fromUserModel(user)).build();
+        return Response.ok(User.fromUserModel(user, em)).build();
     }
 
     /**
@@ -123,6 +132,8 @@ public class UserProvider implements RealmResourceProvider {
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         String id = headers.getHeaderString(SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
@@ -148,6 +159,7 @@ public class UserProvider implements RealmResourceProvider {
         newUser.setFirstName(rep.getFirstName());
         newUser.setLastName(rep.getLastName());
         newUser.setEmail(rep.getEmail());
+        rep.setId(newUser.getId());
 
         //Update groups
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
@@ -157,8 +169,13 @@ public class UserProvider implements RealmResourceProvider {
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, newUser);
+        UserIamAttributes attributes = rep.getAttributes();
+        if (attributes.getId() == null) {
+            attributes.setId(newUser.getId());
+        }
+        em.persist(attributes);
         updateInstitutions(rep.getInstitutions(), rep);
-        return Response.ok(User.fromUserModel(newUser)).build();
+        return Response.ok(User.fromUserModel(newUser, em)).build();
     }
 
     /**
@@ -175,6 +192,8 @@ public class UserProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final User rep
     ) {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, rep.getId());
         String id = headers.getHeaderString(SHIB_USER_HEADER);
@@ -192,7 +211,49 @@ public class UserProvider implements RealmResourceProvider {
                     .build();
         }
 
-        return Response.ok(User.fromUserModel(user)).build();
+        UserIamAttributes attributes = rep.getAttributes();
+        if (attributes.getId() == null) {
+            attributes.setId(rep.getId());
+        }
+        em.merge(attributes);
+        return Response.ok(User.fromUserModel(user, em)).build();
+    }
+
+    /**
+     * Get all position entries.
+     * @return Positions as json
+     */
+    @GET
+    @Path("/position")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPositions() {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<UserPosition> critQuery
+                = cb.createQuery(UserPosition.class);
+        Root<UserPosition> root = critQuery.from(UserPosition.class);
+        critQuery.select(root);
+        TypedQuery<UserPosition> query = em.createQuery(critQuery);
+        List<UserPosition> positions = query.getResultList();
+        return Response.ok(positions).build();
+    }
+
+    /**
+     * Get all memberships.
+     * @return Memberships as Json Array
+     */
+    @GET
+    @Path("/membership")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMemberships() {
+        RealmModel realm = session.getContext().getRealm();
+        Stream<GroupModel> groups = realm.getGroupsStream();
+        ArrayList<UserMembership> memberships = new ArrayList<UserMembership>();
+        groups.forEach(group -> {
+            memberships.add(UserMembership.fromGroupModel(group));
+        });
+        return Response.ok(memberships.toArray()).build();
     }
 
     /**

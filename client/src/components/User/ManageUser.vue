@@ -8,7 +8,7 @@
  -->
 <template>
   <v-dialog v-model="show">
-    <v-card min-width="600">
+    <v-card width="80vw">
       <v-card-title v-if="['add', 'copy'].indexOf(processType) !== -1">
         <span class="text-h5">{{ $t("user.create_title") }}</span>
       </v-card-title>
@@ -18,69 +18,148 @@
         }}</span>
       </v-card-title>
       <v-divider></v-divider>
-      <v-container>
-        <v-col jsutify="start" cols="10">
-          <v-form v-model="valid" ref="form">
-            <v-col>
-              <v-text-field
-                v-if="processType === 'edit'"
-                variant="plain"
-                :label="$t('label.id')"
-                readonly
-                v-model="user.id"
-              ></v-text-field>
-              <v-text-field
-                :variant="
-                  ['add', 'copy'].indexOf(processType) !== -1
-                    ? 'underlined'
-                    : 'plain'
-                "
-                :label="$t('label.username')"
-                v-model="user.username"
-                :readonly="processType === 'edit'"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.firstname')"
-                v-model="user.firstName"
-                :rules="[(v) => !!v || $t('form.required_firstname')]"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.lastname')"
-                :rules="[(v) => !!v || $t('form.required_lastname')]"
-                v-model="user.lastName"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                :label="$t('label.email')"
-                v-model="user.email"
-                :rules="[
-                  (v) => !!v || $t('form.required_email'),
-                  (v) => /.+@.+/.test(v) || $t('form.valid_email'),
-                ]"
-              ></v-text-field>
-              <v-select
-                return-object
-                dense
-                clearable
-                :label="$t('user.label_institutions')"
-                :items="institutions"
-                v-model="user.groups"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-                multiple
-              >
-              </v-select>
-            </v-col>
-          </v-form>
-          <UIAlert
-            v-if="hasLoadingError || hasRequestError"
-            v-bind:isSuccessful="false"
-            v-bind:message="$store.state.application.httpErrorMessage"
-          />
-        </v-col>
+      <v-container class="pa-1 mt-4">
+        <v-row justify="center">
+          <v-col jsutify="start" cols="11">
+            <v-form v-model="valid" ref="form">
+              <div class="two_group_class">
+                <v-text-field
+                  :variant="
+                    ['add', 'copy'].indexOf(processType) !== -1
+                      ? 'underlined'
+                      : 'plain'
+                  "
+                  :label="'* ' + $t('user.username')"
+                  v-model="user.username"
+                  :rules="[(v) => !!v || $t('user.required_username')]"
+                  :readonly="processType === 'edit'"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('user.title')"
+                  v-model="user.attributes.title"
+                ></v-text-field>
+              </div>
+              <div class="two_group_class">
+                <v-text-field
+                  variant="underlined"
+                  :label="'* ' + $t('user.firstname')"
+                  v-model="user.firstName"
+                  :rules="[(v) => !!v || $t('user.required_firstname')]"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="'* ' + $t('user.lastname')"
+                  :rules="[(v) => !!v || $t('form.required_lastname')]"
+                  v-model="user.lastName"
+                ></v-text-field>
+              </div>
+              <div class="one_group_class">
+                <v-text-field
+                  variant="underlined"
+                  :label="'* ' + $t('label.email')"
+                  v-model="user.email"
+                  :rules="[
+                    (v) => !!v || $t('form.required_email'),
+                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
+                  ]"
+                ></v-text-field>
+              </div>
+
+              <div class="three_group_class">
+                <v-text-field
+                  variant="underlined"
+                  :label="'* ' + $t('user.phone')"
+                  :rules="[(v) => !!v || $t('form.required_telephone')]"
+                  v-model="user.attributes.phone"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('user.mobile')"
+                  v-model="user.attributes.mobile"
+                ></v-text-field>
+                <v-text-field
+                  variant="underlined"
+                  :label="$t('user.fax')"
+                  v-model="user.attributes.fax"
+                ></v-text-field>
+              </div>
+              <div class="two_group_class">
+                <v-select
+                  dense
+                  clearable
+                  :label="$t('user.oe')"
+                  :items="[]"
+                  v-model="user.attributes.oe"
+                  item-title="name"
+                  item-value="id"
+                  persistent-hint
+                >
+                </v-select>
+                <v-select
+                  dense
+                  clearable
+                  :label="$t('user.bfslocation')"
+                  :items="[]"
+                  v-model="user.attributes.bfslocation"
+                  item-title="name"
+                  item-value="id"
+                  persistent-hint
+                >
+                </v-select>
+              </div>
+              <div class="three_group_class">
+                <v-select
+                  dense
+                  clearable
+                  :label="'* ' + $t('user.label_institutions')"
+                  :items="institutions"
+                  v-model="user.institutions"
+                  item-title="name"
+                  item-value="id"
+                  persistent-hint
+                  multiple
+                  :rules="[
+                    (v) => !!(v && v.length) || $t('user.required_institution'),
+                  ]"
+                >
+                </v-select>
+                <v-select
+                  dense
+                  clearable
+                  :label="'* ' + $t('user.label_memberships')"
+                  :items="memeberships"
+                  v-model="user.groups"
+                  item-title="name"
+                  item-value="id"
+                  persistent-hint
+                  multiple
+                  :rules="[
+                    (v) => !!(v && v.length) || $t('user.required_membership'),
+                  ]"
+                >
+                </v-select>
+                <v-select
+                  dense
+                  clearable
+                  :label="'* ' + $t('user.label_positions')"
+                  :items="positions"
+                  v-model="user.attributes.position"
+                  item-title="position"
+                  item-value="id"
+                  persistent-hint
+                  :rules="[(v) => !!v || $t('user.required_position')]"
+                >
+                </v-select>
+              </div>
+            </v-form>
+            <UIAlert
+              v-if="hasLoadingError || hasRequestError"
+              v-bind:isSuccessful="false"
+              v-bind:message="$store.state.application.httpErrorMessage"
+            />
+          </v-col>
+        </v-row>
       </v-container>
       <v-divider></v-divider>
       <v-card-actions>
@@ -107,7 +186,7 @@
           color="accent"
           @click="
             () => {
-              user = { ...originalUser };
+              user = cloneObject(originalUser);
             }
           "
         >
@@ -127,12 +206,33 @@
     </v-card>
   </v-dialog>
 </template>
-
+<style lang="scss" scoped>
+form > div {
+  display: flex;
+  padding-top: 8px;
+}
+.three_group_class > div {
+  max-width: 33.3333333333%;
+  width: 100%;
+}
+.two_group_class > div {
+  max-width: 50%;
+  width: 100%;
+}
+.one_group_class > div {
+  max-width: 100%;
+  width: 100%;
+}
+.three_group_class > div:nth-child(2),
+.two_group_class > div:nth-child(2) {
+  padding: 0 10px;
+}
+</style>
 <script>
 import { computed, onMounted, defineAsyncComponent, ref } from "vue";
-import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
+import { useStore } from "vuex";
 
 export default {
   components: {
@@ -149,26 +249,53 @@ export default {
     const user = ref(props.item);
     const originalUser = ref(props.copiedItem);
     const { hasLoadingError, hasRequestError } = useNotification();
-    const institutions = computed(() => {
-      return store.state.institution.institutions;
-    });
-    onMounted(() => {
+
+    const getUserMemberships = () => {
+      HTTP.get("iamuser/membership")
+        .then((response) => {
+          store.commit("user/setMemberships", response.data);
+        })
+        .catch(() => {
+          hasLoadingError.value = false;
+        });
+    };
+    const getUserPsositions = () => {
+      HTTP.get("iamuser/position")
+        .then((response) => {
+          store.commit("user/setPositions", response.data);
+        })
+        .catch(() => {
+          hasLoadingError.value = false;
+        });
+    };
+    const getInstitutions = () => {
       store
         .dispatch("institution/loadInstitutions")
         .then()
         .catch(() => {
           hasLoadingError.value = true;
         });
+    };
+    onMounted(() => {
+      getUserMemberships();
+      getUserPsositions();
+      getInstitutions();
     });
-    const getInstitutionIds = (institution) => {
-      return institution.map((i) => i.id);
+    const positions = computed(() => {
+      return store.state.user.positions;
+    });
+    const memeberships = computed(() => {
+      return store.state.user.memberships;
+    });
+    const institutions = computed(() => {
+      return store.state.institution.institutions;
+    });
+    // Deep Copy for objects
+    const cloneObject = (obj) => {
+      return JSON.parse(JSON.stringify(obj));
     };
     const createUser = () => {
-      const payload = { ...user.value };
-      payload["groups"] = user.value.groups.length
-        ? getInstitutionIds(user.value.groups)
-        : [];
-      HTTP.post("/iamuser", payload)
+      HTTP.post("/iamuser", user.value)
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
         })
@@ -177,11 +304,7 @@ export default {
         });
     };
     const updateUser = () => {
-      const payload = { ...user.value };
-      payload["groups"] = user.value.length
-        ? getInstitutionIds(user.value)
-        : [];
-      HTTP.put("/iamuser", payload)
+      HTTP.put("/iamuser", user.value)
         .then(() => {
           // Update current user Profile and thus the data in App bar.
           if (store.state.profile.userData.id === user.value.id) {
@@ -196,7 +319,7 @@ export default {
     const form = ref(false);
     onMounted(() => {
       // This is necessary as the form value is not change to true with valid inputs.
-      // TODO: Check if this is fixed by upstream with the next release.
+      // TODO: Check if this gets fixed by upstream with the next release.
       if (props.processType === "edit") {
         setTimeout(() => {
           form.value.validate();
@@ -215,6 +338,9 @@ export default {
     });
 
     return {
+      cloneObject,
+      positions,
+      memeberships,
       hasNoChanges,
       hasRequestError,
       hasLoadingError,

@@ -10,7 +10,7 @@
   <v-container>
     <v-row>
       <v-col cols="12" class="mt-10 pa-2 text-h6 bg-secondary">
-        {{ $t("user.title") }}
+        {{ $t("user.user_title") }}
       </v-col>
     </v-row>
     <v-row justify="end" class="mt-6">
@@ -37,10 +37,10 @@
       <v-col cols="12" class="mt-6">
         <v-table class="ma-2 pa-2">
           <thead>
-            <th class="text-left">{{ $t("label.id") }}</th>
-            <th class="text-left">{{ $t("label.username") }}</th>
-            <th class="text-left">{{ $t("label.firstname") }}</th>
-            <th class="text-left">{{ $t("label.lastname") }}</th>
+            <th class="text-left">{{ $t("user.id") }}</th>
+            <th class="text-left">{{ $t("user.username") }}</th>
+            <th class="text-left">{{ $t("user.firstname") }}</th>
+            <th class="text-left">{{ $t("user.lastname") }}</th>
             <th class="text-left">{{ $t("label.email") }}</th>
             <th class="text-left">{{ $t("label.actions") }}</th>
           </thead>
@@ -99,15 +99,16 @@
       v-if="showManageUserDialog"
       v-bind:processType="processType"
       v-bind:copiedItem="savedUser"
-      v-bind:item="{ ...user }"
+      v-bind:item="user"
       @child-object="checkChildObject"
     />
   </v-container>
 </template>
 <script>
-import { computed, onMounted, ref, defineAsyncComponent } from "vue";
-import { useStore } from "vuex";
+import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
+import { useStore } from "vuex";
+import { expUser } from "@/components/User/user";
 
 export default {
   components: {
@@ -119,9 +120,20 @@ export default {
   setup() {
     const store = useStore();
     const { hasLoadingError, resetNotification } = useNotification();
+    // User
+    // Deep Copy for objects
+    const cloneObject = (obj) => {
+      return JSON.parse(JSON.stringify(obj));
+    };
     const users = computed(() => {
       return store.state.user.users;
     });
+    const user = ref(cloneObject(expUser));
+    const savedUser = ref();
+    const resetUser = () => {
+      user.value = cloneObject(expUser);
+    };
+
     onMounted(() => {
       store
         .dispatch("user/loadUsers")
@@ -129,58 +141,33 @@ export default {
         .catch(() => {
           hasLoadingError.value = true;
         });
-      store
-        .dispatch("institution/loadInstitutions")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
     });
+    // Handle requests
     const processType = ref("");
+    const showManageUserDialog = ref(false);
     const onCopyClicked = (id) => {
-      savedUser.value = users.value.filter((u) => id === u.id)[0];
-      user.value = { ...savedUser.value };
+      user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
       delete user.value["id"];
       processType.value = "copy";
-      savedUser.value = { ...user.value };
       showManageUserDialog.value = true;
     };
     const onEditClicked = (id) => {
-      user.value = {
-        ...users.value.filter((u) => id === u.id)[0],
-      };
+      user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
       // Save original user data for "reset" button
-      savedUser.value = { ...user.value };
+      savedUser.value = cloneObject(user.value);
       processType.value = "edit";
       showManageUserDialog.value = true;
     };
-    const user = ref({
-      id: "",
-      username: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      groups: [],
-    });
-    const resetUser = () => {
-      user.value.id = "";
-      user.value.username = "";
-      user.value.firstName = "";
-      user.value.lastName = "";
-      user.value.email = "";
-      user.value.groups = [];
-    };
-    const savedUser = ref();
     const checkChildObject = (e) => {
       if (e.closeDialog) {
         showManageUserDialog.value = false;
+        resetUser();
       }
       if (e.hasChanges) {
         resetUser();
         store.dispatch("user/loadUsers");
       }
     };
-    const showManageUserDialog = ref(false);
     return {
       checkChildObject,
       showManageUserDialog,

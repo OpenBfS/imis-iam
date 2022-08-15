@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.UserModel;
 
@@ -21,6 +27,7 @@ public class User {
     private String email;
     private String username;
     private List<String> groups;
+    private UserIamAttributes attributes;
     private List<Integer> institutions;
 
     public String getId() {
@@ -66,12 +73,20 @@ public class User {
         this.institutions = institutions;
     }
 
+    public UserIamAttributes getAttributes() {
+        return attributes;
+    }
+    public void setAttributes(UserIamAttributes attributes) {
+        this.attributes = attributes;
+    }
+
     /**
-     * Create a User from a Keycloak UserModel.
-     * @param userModel Keycloak UserModel
-     * @return User instance
+     * Generate user from given usermodel.
+     * @param userModel Keycloak usermodel
+     * @param em EntityManager
+     * @return Generated user
      */
-    public static User fromUserModel(UserModel userModel) {
+    public static User fromUserModel(UserModel userModel, EntityManager em) {
         User user = new User();
         user.setId(userModel.getId());
         user.setUsername(userModel.getUsername());
@@ -79,11 +94,27 @@ public class User {
         user.setLastName(userModel.getLastName());
         user.setEmail(userModel.getEmail());
         Stream<GroupModel> groups = userModel.getGroupsStream();
-        List<String> groupNames = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<String>();
         groups.forEach(group -> {
-            groupNames.add(group.getName());
+            groupIds.add(group.getId());
         });
-        user.setGroups(groupNames);
+        user.setGroups(groupIds);
+        user.setAttributes(em.find(UserIamAttributes.class, userModel.getId()));
+        //Get institutions the user has already joined
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<InstitutionUser> query
+            = cb.createQuery(InstitutionUser.class);
+        Root<InstitutionUser> root = query.from(InstitutionUser.class);
+        query.select(root);
+        Predicate userFilter = cb.equal(root.get("userId"), user.getId());
+        query.where(userFilter);
+        List<InstitutionUser> joinedInstitutions
+            = em.createQuery(query).getResultList();
+        List<Integer> institutionIds = new ArrayList<Integer>();
+        joinedInstitutions.forEach(inst -> {
+            institutionIds.add(inst.getInstitutionId());
+        });
+        user.setInstitutions(institutionIds);
         return user;
     }
 }

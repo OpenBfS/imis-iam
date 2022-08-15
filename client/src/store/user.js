@@ -9,10 +9,18 @@ export const user = {
   namespaced: true,
   state: () => ({
     users: [],
+    memberships: [],
+    positions: [],
   }),
   mutations: {
     setUserList: (state, data) => {
       state.users = data;
+    },
+    setMemberships: (state, data) => {
+      state.memberships = data;
+    },
+    setPositions: (state, data) => {
+      state.positions = data;
     },
   },
   actions: {

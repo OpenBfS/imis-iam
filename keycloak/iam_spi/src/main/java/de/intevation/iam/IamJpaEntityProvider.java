@@ -17,6 +17,8 @@ import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.Mail;
 import de.intevation.iam.model.MailList;
 import de.intevation.iam.model.MailListUser;
+import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.model.UserPosition;
 
 
 public class IamJpaEntityProvider implements JpaEntityProvider {
@@ -35,6 +37,8 @@ public class IamJpaEntityProvider implements JpaEntityProvider {
         entities.add(Mail.class);
         entities.add(MailList.class);
         entities.add(MailListUser.class);
+        entities.add(UserIamAttributes.class);
+        entities.add(UserPosition.class);
         entities.add(Institution.class);
         entities.add(InstitutionCategory.class);
         entities.add(InstitutionUser.class);
