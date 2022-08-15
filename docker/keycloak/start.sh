@@ -71,4 +71,8 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
      -d @${DIR}/ldap_provider.json
 
 echo "... done"
+
+#Insert attributes for exampleuser
+psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_user_attributes.sql -w
+
 wait $!

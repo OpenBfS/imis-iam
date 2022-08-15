@@ -287,5 +287,10 @@
         <insert tableName="user_position">
             <column name="position" value="Störplatz" />
         </insert>
+        <addUniqueConstraint
+            columnNames="id"
+            constraintName="user_iam_attributes_id_unique"
+            tableName="user_iam_attributes"
+        />
     </changeSet>
 </databaseChangeLog>
