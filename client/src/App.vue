@@ -17,6 +17,7 @@
         v-bind:isSuccessful="false"
         v-bind:message="$store.state.application.httpErrorMessage"
       />
+      <ExportDialog v-if="$store.state.application.showImportDialog" />
     </v-main>
   </v-app>
 </template>
@@ -31,6 +32,9 @@ export default {
     Sidebar: defineAsyncComponent(() => import("@/components/UI/Sidebar.vue")),
     Appbar: defineAsyncComponent(() => import("@/components/UI/Appbar.vue")),
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
+    ExportDialog: defineAsyncComponent(() =>
+      import("@/components/UI/ExportDialog.vue")
+    ),
   },
   name: "App",
   setup() {

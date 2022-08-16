@@ -23,6 +23,7 @@ export default {
   },
   // Institutions component
   institution: {
+    export: "Institutionen-Liste exportieren",
     title: "Institutionen",
     create_title: "Neue Institution erstellen",
     edit_title: "Institution {name} bearbeiten",
@@ -68,6 +69,7 @@ export default {
   },
   // Users component
   user: {
+    export: "Benutzer-Liste exportieren",
     user_title: "Benutzer",
     create_title: "Neuen Benutzer erstellen",
     edit_title: "Benutzer {name} bearbeiten",
@@ -111,6 +113,7 @@ export default {
   },
   // Shared labels
   label: {
+    import: "Importieren",
     actions: "Aktionen",
     attributes: "Attribute",
     copy: "Kopieren",
@@ -121,6 +124,17 @@ export default {
     from: "Von:",
     to: "Bis:",
     confirm_deletion: "Bitte Bestätigen Sie das Löschen der {name} Institution",
+    semicolon: "Semikolon",
+    comma: "Komma",
+    space: "Leerzeichen",
+    dot: "Punkt",
+    doublequotes: "Doppelte Anführungszeichen",
+    singlequotes: "Einfache Anführungszeichen",
+    field_seperator: "Feldtrenner",
+    row_delimiter: "Zeilenende",
+    csv_options: "Zusätzliche CSV-Optionen",
+    encoding: "Encoding",
+    quote_type: "Textbegrenzung",
   },
   // Form labels
   form: {

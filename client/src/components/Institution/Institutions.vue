@@ -31,6 +31,22 @@
         </template>
         <span>{{ $t("institution.add_institution") }}</span>
       </v-tooltip>
+      <v-tooltip location="top">
+        <template v-slot:activator="{ props }">
+          <v-btn
+            color="accent"
+            class="mr-4"
+            v-bind="props"
+            icon="mdi-import"
+            @click="
+              $store.commit('application/setListToImport', 'institutions');
+              $store.commit('application/setShowImportDialog', true);
+            "
+          >
+          </v-btn>
+        </template>
+        <span>{{ $t("institution.export") }}</span>
+      </v-tooltip>
     </v-row>
     <v-row>
       <v-col cols="12" class="t-6">

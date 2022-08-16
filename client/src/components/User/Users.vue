@@ -32,6 +32,22 @@
         </template>
         <span>{{ $t("user.add_user") }}</span>
       </v-tooltip>
+      <v-tooltip location="top">
+        <template v-slot:activator="{ props }">
+          <v-btn
+            color="accent"
+            class="mr-4"
+            v-bind="props"
+            icon="mdi-import"
+            @click="
+              $store.commit('application/setListToImport', 'users');
+              $store.commit('application/setShowImportDialog', true);
+            "
+          >
+          </v-btn>
+        </template>
+        <span>{{ $t("user.export") }}</span>
+      </v-tooltip>
     </v-row>
     <v-row>
       <v-col cols="12" class="mt-6">
