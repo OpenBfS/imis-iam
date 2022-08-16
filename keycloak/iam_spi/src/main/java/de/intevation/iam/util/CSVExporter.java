@@ -20,6 +20,8 @@ import java.util.Arrays;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+import de.intevation.iam.model.UserIamAttributes;
+
 public class CSVExporter<T> {
 
     private char fieldSeparator = ',';
@@ -37,11 +39,12 @@ public class CSVExporter<T> {
             return null;
         }
         StringBuffer result = new StringBuffer();
+        String[] header = getHeader(objects.get(0));
         CSVFormat format = CSVFormat.DEFAULT
             .withDelimiter(fieldSeparator)
             .withQuote(quoteType)
             .withRecordSeparator(rowDelimiter)
-            .withHeader(getHeader(objects.get(0)));
+            .withHeader(header);
         try {
             CSVPrinter printer = new CSVPrinter(result, format);
             objects.forEach(object -> {
@@ -51,10 +54,12 @@ public class CSVExporter<T> {
                             : getPropertyDescriptors(object)) {
                         Object value = propertyDescriptor.getReadMethod()
                             .invoke(object);
-                        if (value != null) {
-                            row.add(value.toString());
+                        if (value.getClass()
+                            == de.intevation.iam.model.UserIamAttributes.class
+                        ) {
+                            row.addAll(parseNestedModel(value));
                         } else {
-                            row.add("");
+                            row.add(value.toString());
                         }
                     }
                     printer.printRecord(row);
@@ -77,19 +82,49 @@ public class CSVExporter<T> {
             result.toString().getBytes(encoding));
     }
 
-    private String[] getHeader(T object) {
+    ArrayList<String> parseNestedModel(Object object) {
+        ArrayList<String> row = new ArrayList<String>();
+        for (PropertyDescriptor propertyDescriptor
+            : getPropertyDescriptors(object)) {
+            Object value;
+            try {
+                value = propertyDescriptor.getReadMethod()
+                    .invoke(object);
+                if (value != null) {
+                    row.add(value.toString());
+                } else {
+                    row.add("");
+                }
+            } catch (IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return row;
+    }
+
+    private String[] getHeader(Object object) {
         ArrayList<String> fields = new ArrayList<String>();
 
         for (
             PropertyDescriptor propertyDescriptor
             : getPropertyDescriptors(object)) {
-            fields.add(propertyDescriptor.getName());
+            //Check for nested models
+            if (propertyDescriptor.getPropertyType()
+                == de.intevation.iam.model.UserIamAttributes.class) {
+                String[] nestedHeader = getHeader(new UserIamAttributes());
+                fields.addAll(Arrays.asList(nestedHeader));
+            } else {
+                fields.add(propertyDescriptor.getName());
+            }
         }
-
+        System.out.println(fields.toString());
         return fields.toArray(new String[0]);
     }
 
-    private PropertyDescriptor[] getPropertyDescriptors(T object) {
+    private PropertyDescriptor[] getPropertyDescriptors(Object object) {
         try {
             PropertyDescriptor[] propertyDescriptorArray
                 = Introspector.getBeanInfo(
@@ -100,6 +135,7 @@ public class CSVExporter<T> {
             propertyDescriptors.removeIf(entry -> {
                 return entry.getName().equals("class");
             });
+
             PropertyDescriptor[] array
                 = new PropertyDescriptor[propertyDescriptors.size()];
             array = propertyDescriptors.toArray(array);
