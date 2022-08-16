@@ -18,8 +18,10 @@
               dense
               clearable
               :label="$t('label.field_seperator')"
-              :items="['semicolon', 'comma', 'space', 'peroid']"
+              :items="fieldSeparators"
               v-model="csvOptions.fieldSeperator"
+              item-title="name"
+              item-value="value"
               persistent-hint
             >
             </v-select>
@@ -45,7 +47,9 @@
               dense
               clearable
               :label="$t('label.quote_type')"
-              :items="['douplequotes', 'singlequotes']"
+              :items="quoteTypes"
+              item-title="name"
+              item-value="value"
               v-model="csvOptions.quoteType"
               persistent-hint
             >
@@ -97,24 +101,37 @@ export default {
       encoding: "",
       quoteType: "",
     });
-    //["semicolon", "comma", "space", "dot"];
-    const getFieldSeprators = () => {
-      return [
-        t("label.semicolon"),
-        t("label.comma"),
-        t("label.space"),
-        t("label.dot"),
-      ];
-    };
-    const getQuoteType = () => {
-      return [t("label.doublequotes"), t("label.singlequotes")];
-    };
-    const getRowDelimiter = () => {
-      return ["Linux", "Windows"];
-    };
-    const getEncoding = () => {
-      return ["utf-8", "ascii", "base64"];
-    };
+    // Use objects to enable translation of the itemes in <v-select> element
+    // TODO: Use slots to change the appearance of the items in the element
+    // when this gets implemented by Vuetify upstream.
+    const fieldSeparators = [
+      {
+        name: t("label.semicolon"),
+        value: "semicolon",
+      },
+      {
+        name: t("label.comma"),
+        value: "comma",
+      },
+      {
+        name: t("label.space"),
+        value: "space",
+      },
+      {
+        name: t("label.period"),
+        value: "period",
+      },
+    ];
+    const quoteTypes = [
+      {
+        name: t("label.singlequotes"),
+        value: "singlequote",
+      },
+      {
+        name: t("label.doublequotes"),
+        value: "douplequote",
+      },
+    ];
     const importRequest = (itemsName) => {
       let payload = "";
       if (csvOptions.value && csvOptions.value.fieldSeperator !== "") {
@@ -152,11 +169,9 @@ export default {
     };
 
     return {
+      fieldSeparators,
+      quoteTypes,
       csvOptions,
-      getQuoteType,
-      getRowDelimiter,
-      getEncoding,
-      getFieldSeprators,
       importFile,
       show,
       hasRequestError,

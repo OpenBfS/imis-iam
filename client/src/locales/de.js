@@ -127,7 +127,7 @@ export default {
     semicolon: "Semikolon",
     comma: "Komma",
     space: "Leerzeichen",
-    dot: "Punkt",
+    period: "Punkt",
     doublequotes: "Doppelte Anführungszeichen",
     singlequotes: "Einfache Anführungszeichen",
     field_seperator: "Feldtrenner",
