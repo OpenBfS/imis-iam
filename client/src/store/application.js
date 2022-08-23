@@ -8,19 +8,19 @@ export const application = {
   namespaced: true,
   state: () => ({
     httpErrorMessage: "",
-    showImportDialog: false,
-    listToImport: "",
+    showExportDialog: false,
+    listToExport: "",
   }),
   mutations: {
     setHttpErrorMessage: (state, message) => {
       state.httpErrorMessage = message;
     },
-    setShowImportDialog: (state, message) => {
-      state.showImportDialog = message;
+    setShowExportDialog: (state, message) => {
+      state.showExportDialog = message;
     },
 
-    setListToImport: (state, message) => {
-      state.listToImport = message;
+    setlistToExport: (state, message) => {
+      state.listToExport = message;
     },
   },
 };

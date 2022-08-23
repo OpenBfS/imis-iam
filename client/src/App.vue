@@ -17,7 +17,7 @@
         v-bind:isSuccessful="false"
         v-bind:message="$store.state.application.httpErrorMessage"
       />
-      <ExportDialog v-if="$store.state.application.showImportDialog" />
+      <ExportDialog v-if="$store.state.application.showExportDialog" />
     </v-main>
   </v-app>
 </template>

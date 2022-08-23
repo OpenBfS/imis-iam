@@ -39,8 +39,8 @@
             v-bind="props"
             icon="mdi-import"
             @click="
-              $store.commit('application/setListToImport', 'institutions');
-              $store.commit('application/setShowImportDialog', true);
+              $store.commit('application/setlistToExport', 'institutions');
+              $store.commit('application/setShowExportDialog', true);
             "
           >
           </v-btn>

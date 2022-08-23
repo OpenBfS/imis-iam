@@ -65,12 +65,12 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="accent" @click="importFile">
+        <v-btn color="accent" @click="exportFile">
           {{ $t("label.export") }}
         </v-btn>
         <v-btn
           color="accent"
-          @click="$store.commit('application/setShowImportDialog', false)"
+          @click="$store.commit('application/setShowExportDialog', false)"
         >
           {{ $t("button.cancel") }}
         </v-btn>
@@ -128,11 +128,11 @@ export default {
         value: "singlequote",
       },
       {
-        name: t("label.doublequotes"),
+        name: t("label.doublequote"),
         value: "douplequote",
       },
     ];
-    const importRequest = (itemsName) => {
+    const exportRequest = (itemsName) => {
       let payload = "";
       if (csvOptions.value && csvOptions.value.fieldSeperator !== "") {
         payload += "fieldSeparator=" + csvOptions.value.fieldSeperator;
@@ -164,13 +164,13 @@ export default {
           hasRequestError.value = true;
         });
     };
-    const importFile = () => {
-      switch (store.state.application.listToImport) {
+    const exportFile = () => {
+      switch (store.state.application.listToExport) {
         case "users":
-          importRequest("user");
+          exportRequest("user");
           break;
         case "institutions":
-          importRequest("institution");
+          exportRequest("institution");
           break;
       }
     };
@@ -179,7 +179,7 @@ export default {
       fieldSeparators,
       quoteTypes,
       csvOptions,
-      importFile,
+      exportFile,
       show,
       hasRequestError,
     };

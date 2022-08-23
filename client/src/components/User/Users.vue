@@ -40,8 +40,8 @@
             v-bind="props"
             icon="mdi-import"
             @click="
-              $store.commit('application/setListToImport', 'users');
-              $store.commit('application/setShowImportDialog', true);
+              $store.commit('application/setlistToExport', 'users');
+              $store.commit('application/setShowExportDialog', true);
             "
           >
           </v-btn>
