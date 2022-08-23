@@ -135,27 +135,29 @@ export default {
     const importRequest = (itemsName) => {
       let payload = "";
       if (csvOptions.value && csvOptions.value.fieldSeperator !== "") {
-        payload += "fieldSeparator:" + csvOptions.value.fieldSeperator;
+        payload += "fieldSeparator=" + csvOptions.value.fieldSeperator;
       }
       if (csvOptions.value && csvOptions.value.rowDelimiter !== "") {
-        const row = "rowDelimiter:" + csvOptions.value.rowDelimiter;
+        const row = "rowDelimiter=" + csvOptions.value.rowDelimiter;
         payload += payload === "" ? row : "&" + row;
       }
       if (csvOptions.value && csvOptions.value.encoding !== "") {
-        const encoding = "encoding:" + csvOptions.value.encoding;
+        const encoding = "encoding=" + csvOptions.value.encoding;
         payload += payload === "" ? encoding : "&" + encoding;
       }
       if (csvOptions.value && csvOptions.value.quoteType !== "") {
-        const quoteType = "quoteType:" + csvOptions.value.quoteType;
+        const quoteType = "quoteType=" + csvOptions.value.quoteType;
         payload += payload === "" ? quoteType : "&" + quoteType;
       }
       HTTP.get("export/" + itemsName + (payload !== "" ? "?" + payload : ""))
         .then((response) => {
-          const blob = new Blob([response.data], {type: 'application/octet-stream'})
-          const link = document.createElement('a')
-          link.href = URL.createObjectURL(blob)
-          link.download = 'export.csv'
-          link.click()
+          const blob = new Blob([response.data], {
+            type: "application/octet-stream",
+          });
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = "export.csv";
+          link.click();
           URL.revokeObjectURL(link.href);
         })
         .catch(() => {
