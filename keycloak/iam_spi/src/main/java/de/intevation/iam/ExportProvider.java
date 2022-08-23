@@ -27,6 +27,22 @@ public class ExportProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
 
+    private enum CsvOptions {
+        comma(","), period("."), semicolon(";"), space(" "),
+        singlequote("'"), doublequote("\""),
+        linux("\n"), windows("\r\n");
+
+        private final String value;
+
+        CsvOptions(String v) {
+            this.value = v;
+        }
+
+        public char getChar() {
+            return this.value.charAt(0);
+        }
+    }
+
     /**
      * Constructor.
      * @param session
@@ -46,20 +62,23 @@ public class ExportProvider implements RealmResourceProvider {
     @GET
     @Path("/user")
     public Response exportUsers(
-        @QueryParam("fieldSeparator") Character fieldSeparator,
-        @QueryParam("quoteType") Character quoteType,
-        @QueryParam("rowDelimiter") Character rowDelimiter,
+        @QueryParam("fieldSeparator") String fieldSeparator,
+        @QueryParam("quoteType") String quoteType,
+        @QueryParam("rowDelimiter") String rowDelimiter,
         @QueryParam("encoding") String encoding
     ) {
         CSVExporter<User> exporter = new CSVExporter<User>();
         if (fieldSeparator != null) {
-            exporter.setFieldSeparator(fieldSeparator);
+            exporter.setFieldSeparator(
+                    CsvOptions.valueOf(fieldSeparator).getChar());
         }
         if (quoteType != null) {
-            exporter.setQuoteType(quoteType);
+            exporter.setQuoteType(
+                    CsvOptions.valueOf(quoteType).getChar());
         }
         if (rowDelimiter != null) {
-            exporter.setRowDelimiter(rowDelimiter);
+            exporter.setRowDelimiter(
+                    CsvOptions.valueOf(rowDelimiter).getChar());
         }
         if (encoding != null) {
             Charset charset = Charset.forName(encoding);
@@ -88,19 +107,22 @@ public class ExportProvider implements RealmResourceProvider {
     @GET
     @Path("/institution")
     public Response exportInstitutions(
-        @QueryParam("fieldSeparator") Character fieldSeparator,
-        @QueryParam("quoteType") Character quoteType,
-        @QueryParam("rowDelimiter") Character rowDelimiter,
+        @QueryParam("fieldSeparator") String fieldSeparator,
+        @QueryParam("quoteType") String quoteType,
+        @QueryParam("rowDelimiter") String rowDelimiter,
         @QueryParam("encoding") String encoding) {
         CSVExporter<Institution> exporter = new CSVExporter<Institution>();
         if (fieldSeparator != null) {
-            exporter.setFieldSeparator(fieldSeparator);
+            exporter.setFieldSeparator(
+                    CsvOptions.valueOf(fieldSeparator).getChar());
         }
         if (quoteType != null) {
-            exporter.setQuoteType(quoteType);
+            exporter.setQuoteType(
+                    CsvOptions.valueOf(quoteType).getChar());
         }
         if (rowDelimiter != null) {
-            exporter.setRowDelimiter(rowDelimiter);
+            exporter.setRowDelimiter(
+                    CsvOptions.valueOf(rowDelimiter).getChar());
         }
         if (encoding != null) {
             Charset charset = Charset.forName(encoding);
