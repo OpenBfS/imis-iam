@@ -129,7 +129,7 @@ export default {
       },
       {
         name: t("label.doublequote"),
-        value: "douplequote",
+        value: "doublequote",
       },
     ];
     const exportRequest = (itemsName) => {
