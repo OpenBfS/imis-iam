@@ -1,4 +1,4 @@
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+/* Copyright (C) <%= YEAR %> by Bundesamt fuer Strahlenschutz
  * Software engineering by Intevation GmbH
  *
  * This file is Free Software under the GNU GPL (v>=3)
