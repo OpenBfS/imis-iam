@@ -70,6 +70,15 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
      -H "Authorization: Bearer $TKN" \
      -d @${DIR}/ldap_provider.json
 
+echo "Creating client roles"
+for name in "Nutzer" "Redakteur" "Chefredakteur" "technischer Administrator"
+do
+    curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$(jq .id ${DIR}/iam_client.json | tr -d '"')/roles" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN" \
+        -d "{\"name\": \"${name}\"}"
+done
+
 echo "... done"
 
 #Insert attributes for exampleuser

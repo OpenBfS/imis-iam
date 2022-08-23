@@ -33,26 +33,31 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
+import org.keycloak.models.ClientModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
+import de.intevation.iam.auth.Authorization;
 import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.User;
 import de.intevation.iam.model.UserPosition;
 import de.intevation.iam.model.UserIamAttributes;
 import de.intevation.iam.model.UserMembership;
+import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
 
 public class UserProvider implements RealmResourceProvider {
 
-    private static final String SHIB_USER_HEADER = "X-SHIB-user";
     private static final String MAIL_ALREADY_USED_KEY
         = "error_mail_already_used";
 
     private KeycloakSession session;
+
+    private Authorization auth;
 
     /**
      * Constructor.
@@ -60,6 +65,7 @@ public class UserProvider implements RealmResourceProvider {
      */
     public UserProvider(KeycloakSession session) {
         this.session = session;
+        this.auth = new Authorization(session);
     }
 
     /**
@@ -73,13 +79,13 @@ public class UserProvider implements RealmResourceProvider {
     public Response getProfile(@Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-        String id = headers.getHeaderString(SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (id == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(User.fromUserModel(user, em, realm)).build();
     }
 
     /**
@@ -95,7 +101,7 @@ public class UserProvider implements RealmResourceProvider {
         Stream<UserModel> users = session.users().getUsersStream(realm);
         ArrayList<User> userList = new ArrayList<User>();
         users.forEach(user -> {
-            userList.add(User.fromUserModel(user, em));
+            userList.add(User.fromUserModel(user, em, realm));
         });
         return Response.ok(userList).build();
     }
@@ -115,7 +121,7 @@ public class UserProvider implements RealmResourceProvider {
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(User.fromUserModel(user, em, realm)).build();
     }
 
     /**
@@ -135,7 +141,7 @@ public class UserProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
-        String id = headers.getHeaderString(SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
@@ -175,7 +181,7 @@ public class UserProvider implements RealmResourceProvider {
         }
         em.persist(attributes);
         updateInstitutions(rep.getInstitutions(), rep);
-        return Response.ok(User.fromUserModel(newUser, em)).build();
+        return Response.ok(User.fromUserModel(newUser, em, realm)).build();
     }
 
     /**
@@ -196,7 +202,7 @@ public class UserProvider implements RealmResourceProvider {
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, rep.getId());
-        String id = headers.getHeaderString(SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
 
         try {
@@ -216,7 +222,7 @@ public class UserProvider implements RealmResourceProvider {
             attributes.setId(rep.getId());
         }
         em.merge(attributes);
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(User.fromUserModel(user, em, realm)).build();
     }
 
     /**
@@ -257,6 +263,24 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
+     * Get all available iam roles.
+     * @return Roles as JSON array
+     */
+    @GET
+    @Path("/roles")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRoles() {
+        RealmModel realm = session.getContext().getRealm();
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        Stream<RoleModel> roles = client.getRolesStream();
+        List<String> roleNames = new ArrayList<String>();
+        roles.forEach(role -> {
+            roleNames.add(role.getName());
+        });
+        return Response.ok(roleNames).build();
+    }
+
+    /**
      * Update groups of the given user.
      * @param newGroups Map of new groups: Map<{id},{Group}>
      * @param user User to modifiy
@@ -275,6 +299,25 @@ public class UserProvider implements RealmResourceProvider {
         user.getGroupsStream().forEach(group -> {
             if (!newGroups.containsKey(group.getId())) {
                 user.leaveGroup(group);
+            }
+        });
+    }
+
+    private void updateRoles(
+        Map<String, RoleModel> newRoles,
+        UserModel user,
+        ClientModel client
+    ) {
+        //Grant new roles
+        newRoles.forEach((id, role) -> {
+            if (!user.hasRole(role)) {
+                user.grantRole(role);
+            }
+        });
+        //Remove roles if necessary
+        user.getClientRoleMappingsStream(client).forEach(role -> {
+            if (!newRoles.containsKey(role.getId())) {
+                user.deleteRoleMapping(role);
             }
         });
     }
@@ -355,6 +398,15 @@ public class UserProvider implements RealmResourceProvider {
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, oldUser);
+
+        //Update roles
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        Stream<RoleModel> roleStream = client.getRolesStream().filter(item -> {
+            return newUser.getRoles().contains(item.getName());
+        });
+        Map<String, RoleModel> roleMap = roleStream.collect(
+            Collectors.toMap(RoleModel::getId, Function.identity()));
+        updateRoles(roleMap, oldUser, client);
 
         updateInstitutions(newUser.getInstitutions(), newUser);
         return oldUser;
