@@ -124,7 +124,7 @@ export default {
     ];
     const quoteTypes = [
       {
-        name: t("label.singlequotes"),
+        name: t("label.singlequote"),
         value: "singlequote",
       },
       {
