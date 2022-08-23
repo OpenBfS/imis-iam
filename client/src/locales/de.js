@@ -113,7 +113,7 @@ export default {
   },
   // Shared labels
   label: {
-    import: "Importieren",
+    export: "Exportieren",
     actions: "Aktionen",
     attributes: "Attribute",
     copy: "Kopieren",

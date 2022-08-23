@@ -66,7 +66,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="accent" @click="importFile">
-          {{ $t("label.import") }}
+          {{ $t("label.export") }}
         </v-btn>
         <v-btn
           color="accent"
@@ -151,7 +151,12 @@ export default {
       }
       HTTP.get("export/" + itemsName + (payload !== "" ? "?" + payload : ""))
         .then((response) => {
-          console.log(response.data);
+          const blob = new Blob([response.data], {type: 'application/octet-stream'})
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = 'export.csv'
+          link.click()
+          URL.revokeObjectURL(link.href);
         })
         .catch(() => {
           hasRequestError.value = true;
