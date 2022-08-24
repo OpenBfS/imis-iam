@@ -14,37 +14,32 @@
         <v-row justify="center">
           <v-col justify="center" cols="10">
             <v-select
-              dense
-              clearable
               :label="$t('label.field_seperator')"
               :items="fieldSeparators"
               v-model="csvOptions.fieldSeperator"
               item-title="name"
               item-value="value"
-              persistent-hint
             >
             </v-select>
             <v-select
-              dense
-              clearable
               :label="$t('label.row_delimiter')"
-              :items="['linux', 'windows']"
+              :items="rowDelimiters"
+              item-title="name"
+              item-value="value"
               v-model="csvOptions.rowDelimiter"
               persistent-hint
             >
             </v-select>
             <v-select
-              dense
-              clearable
               :label="$t('label.encoding')"
-              :items="['utf-8', 'utf-16', 'ascii']"
+              :items="encoding"
+              item-title="name"
+              item-value="value"
               v-model="csvOptions.encoding"
               persistent-hint
             >
             </v-select>
             <v-select
-              dense
-              clearable
               :label="$t('label.quote_type')"
               :items="quoteTypes"
               item-title="name"
@@ -94,23 +89,17 @@ export default {
     const store = useStore();
     const { t } = useI18n();
     const { hasRequestError } = useNotification();
-    const csvOptions = ref({
-      fieldSeperator: "",
-      rowDelimiter: "",
-      encoding: "",
-      quoteType: "",
-    });
     // Use objects to enable translation of the itemes in <v-select> element
     // TODO: Use slots to change the appearance of the items in the element
     // when this gets implemented by Vuetify upstream.
     const fieldSeparators = [
       {
-        name: t("label.semicolon"),
-        value: "semicolon",
-      },
-      {
         name: t("label.comma"),
         value: "comma",
+      },
+      {
+        name: t("label.semicolon"),
+        value: "semicolon",
       },
       {
         name: t("label.space"),
@@ -123,14 +112,45 @@ export default {
     ];
     const quoteTypes = [
       {
-        name: t("label.singlequote"),
-        value: "singlequote",
-      },
-      {
         name: t("label.doublequote"),
         value: "doublequote",
       },
+      {
+        name: t("label.singlequote"),
+        value: "singlequote",
+      },
     ];
+    const rowDelimiters = [
+      {
+        name: t("label.linux"),
+        value: "linux",
+      },
+      {
+        name: t("label.windows"),
+        value: "windows",
+      },
+    ];
+    const encoding = [
+      {
+        name: "utf-8",
+        value: "utf-8",
+      },
+      {
+        name: "utf-16",
+        value: "utf-16",
+      },
+      {
+        name: "ascii",
+        value: "ascii",
+      },
+    ];
+    const csvOptions = ref({
+      fieldSeperator: fieldSeparators[0].value,
+      rowDelimiter: rowDelimiters[0].value,
+      encoding: encoding[0].value,
+      quoteType: quoteTypes[0].value,
+    });
+
     const exportRequest = (itemsName) => {
       let payload = "";
       if (csvOptions.value && csvOptions.value.fieldSeperator !== "") {
@@ -175,6 +195,8 @@ export default {
     };
 
     return {
+      encoding,
+      rowDelimiters,
       fieldSeparators,
       quoteTypes,
       csvOptions,

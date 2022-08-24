@@ -26,7 +26,7 @@ public class CSVExporter<T> {
 
     private char fieldSeparator = ',';
     private char quoteType = '\"';
-    private char rowDelimiter = ';';
+    private char rowDelimiter = '\n';
     private Charset encoding = Charset.forName("UTF-8");
 
     /**

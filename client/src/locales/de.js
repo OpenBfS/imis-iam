@@ -113,6 +113,8 @@ export default {
   },
   // Shared labels
   label: {
+    linux: "Linux",
+    windows: "Windows",
     export: "Exportieren",
     actions: "Aktionen",
     attributes: "Attribute",
