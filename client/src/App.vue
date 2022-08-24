@@ -14,7 +14,6 @@
       <router-view />
       <UIAlert
         v-if="hasLoadingError"
-        v-bind:isSuccessful="false"
         v-bind:message="$store.state.application.httpErrorMessage"
       />
       <ExportDialog v-if="$store.state.application.showExportDialog" />

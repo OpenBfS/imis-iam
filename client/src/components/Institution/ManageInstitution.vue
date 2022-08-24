@@ -203,7 +203,6 @@
         </v-row>
         <UIAlert
           v-if="hasLoadingError || hasRequestError"
-          v-bind:isSuccessful="false"
           v-bind:message="$store.state.application.httpErrorMessage"
         />
       </v-container>
