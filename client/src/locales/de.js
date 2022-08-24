@@ -38,12 +38,12 @@ export default {
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
     service_building_street: "Straße des Dienstgebäudes",
-    required_service_building_street: "Straße des Dienstgebäudes",
-    service_building_postalcode: "PLZ des Dinestgebäudes",
+    required_service_building_street: "Straße des Dienstgebäudes ist erforderlich",
+    service_building_postalcode: "PLZ des Dienstgebäudes",
     required_service_building_postalcode:
-      "PLZ des Dinestgebäude ist erforderlich",
+      "PLZ des Dienstgebäude ist erforderlich",
     central_phone: "Zentrales Telefon",
-    required_central_phone: "Zentrales Telefon ist erforederlich",
+    required_central_phone: "Zentrales Telefon ist erforderlich",
     central_email: "Zentrale E-Mail",
     required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
