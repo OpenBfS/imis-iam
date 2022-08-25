@@ -35,7 +35,7 @@ public class UserAuthorizer implements Authorizer {
             return false;
         }
         switch (requestMethod) {
-            case GET: return true;
+            case GET: return authorizeGet(session, userId);
             case PUT: return authorizeUpdate((User) data, session, userId);
             case POST: return authorizeCreate((User) data, session, userId);
             default: return false;
@@ -50,6 +50,16 @@ public class UserAuthorizer implements Authorizer {
         return data;
     }
 
+    private boolean authorizeGet(
+        KeycloakSession session,
+        String userId
+    ) {
+        RealmModel realm = session.getContext().getRealm();
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        UserModel requestingUser = session.users().getUserById(realm, userId);
+        return AuthUtils.isUserAtLeastNutzer(requestingUser, client);
+    }
+
     private boolean authorizeCreate(
         User user,
         KeycloakSession session,
@@ -62,7 +72,7 @@ public class UserAuthorizer implements Authorizer {
         if (requestingUser == null) {
             return false;
         }
-        return !AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
     }
 
     private boolean authorizeUpdate(
@@ -99,6 +109,6 @@ public class UserAuthorizer implements Authorizer {
             }
         }
         // Else only allow users with other roles than "Nutzer" to edit
-        return !AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
     }
 }

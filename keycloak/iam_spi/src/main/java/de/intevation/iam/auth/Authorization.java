@@ -13,6 +13,10 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.keycloak.models.KeycloakSession;
 
+import de.intevation.iam.model.Institution;
+import de.intevation.iam.model.InstitutionCategory;
+import de.intevation.iam.model.Mail;
+import de.intevation.iam.model.MailList;
 import de.intevation.iam.model.User;
 import de.intevation.iam.util.RequestMethod;
 
@@ -20,6 +24,10 @@ public class Authorization {
 
     private Map<Class<?>, Authorizer> authorizers;
     private UserAuthorizer userAuthorizer;
+    private InstitutionAuthorizer institutionAuthorizer;
+    private InstitutionCategoryAuthorizer institutionCategoryAuthorizer;
+    private MailAuthorizer mailAuthorizer;
+    private MailListAuthorizer mailListAuthorizer;
     private KeycloakSession session;
 
     /**
@@ -29,8 +37,16 @@ public class Authorization {
     public Authorization(KeycloakSession session) {
         this.session = session;
         this.userAuthorizer = new UserAuthorizer();
+        this.institutionAuthorizer = new InstitutionAuthorizer();
+        this.institutionCategoryAuthorizer = new InstitutionCategoryAuthorizer();
+        this.mailAuthorizer = new MailAuthorizer();
+        this.mailListAuthorizer = new MailListAuthorizer();
         this.authorizers = Map.ofEntries(
-            Map.entry(User.class, userAuthorizer)
+            Map.entry(User.class, userAuthorizer),
+            Map.entry(Institution.class, institutionAuthorizer),
+            Map.entry(InstitutionCategory.class, institutionCategoryAuthorizer),
+            Map.entry(Mail.class, mailAuthorizer),
+            Map.entry(MailList.class, mailListAuthorizer)
         );
     }
 

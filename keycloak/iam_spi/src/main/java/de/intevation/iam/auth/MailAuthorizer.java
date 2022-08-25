@@ -33,10 +33,20 @@ public class MailAuthorizer implements Authorizer {
             return false;
         }
         switch (requestMethod) {
-            case GET: return true;
+            case GET: return authorizeGet(session, userId);
             case POST: return authorizeSendMail((Mail) data, session, userId);
             default: return false;
         }
+    }
+
+    private boolean authorizeGet(
+        KeycloakSession session,
+        String userId
+    ) {
+        RealmModel realm = session.getContext().getRealm();
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        UserModel requestingUser = session.users().getUserById(realm, userId);
+        return AuthUtils.isUserAtLeastNutzer(requestingUser, client);
     }
 
     private boolean authorizeSendMail(
@@ -50,7 +60,7 @@ public class MailAuthorizer implements Authorizer {
         if (requestingUser == null) {
             return false;
         }
-        return !AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
     }
 
     @Override

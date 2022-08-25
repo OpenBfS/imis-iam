@@ -44,10 +44,12 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
+import de.intevation.iam.auth.Authorization;
 import de.intevation.iam.model.Mail;
 import de.intevation.iam.model.MailList;
 import de.intevation.iam.model.MailListUser;
 import de.intevation.iam.model.MailType;
+import de.intevation.iam.util.RequestMethod;
 
 /**
  * Class providing rest interfaces for mails, mail types and mailing lists.
@@ -63,12 +65,15 @@ public class MailProvider implements RealmResourceProvider {
     //Keycloak session
     private KeycloakSession session;
 
+    private Authorization auth;
+
     /**
      * Constructor.
      * @param session Keycloak session
      */
     public MailProvider(KeycloakSession session) {
         this.session = session;
+        this.auth = new Authorization(session);
     }
 
     @Override
@@ -209,9 +214,14 @@ public class MailProvider implements RealmResourceProvider {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/list")
-    public Response createList(final MailList list) {
+    public Response createList(final MailList list,
+            @Context HttpHeaders headers) {
         if (list == null) {
             return Response.status(Status.BAD_REQUEST).build();
+        }
+        if (!auth.isAuthorizedById(
+                list, RequestMethod.POST, headers, MailList.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -246,13 +256,18 @@ public class MailProvider implements RealmResourceProvider {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/list")
-    public Response updateList(final MailList list) {
+    public Response updateList(final MailList list,
+            @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
         if (list == null || list.getId() == null
                 || em.find(MailList.class, list.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
+        }
+        if (!auth.isAuthorizedById(
+                list, RequestMethod.PUT, headers, MailList.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         MailList mergedList = em.merge(list);
         return Response.ok(mergedList).build();
@@ -268,12 +283,17 @@ public class MailProvider implements RealmResourceProvider {
      */
     @DELETE
     @Path("/list/{id}")
-    public Response removeList(@PathParam("id") Integer id) {
+    public Response removeList(@PathParam("id") Integer id,
+            @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         MailList list = em.find(MailList.class, id);
         if (list == null) {
             return Response.status(Status.NOT_FOUND).build();
+        }
+        if (!auth.isAuthorizedById(
+                list, RequestMethod.DELETE, headers, MailList.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         em.remove(list);
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
@@ -390,6 +410,12 @@ public class MailProvider implements RealmResourceProvider {
         String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
+
+        if (!auth.isAuthorizedById(
+                null, RequestMethod.GET, headers, Mail.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Mail> critQuery = cb.createQuery(Mail.class);
         Root<Mail> root = critQuery.from(Mail.class);
@@ -492,6 +518,10 @@ public class MailProvider implements RealmResourceProvider {
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
+        if (!auth.isAuthorizedById(
+                mail, RequestMethod.POST, headers, Mail.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
 
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -545,12 +575,17 @@ public class MailProvider implements RealmResourceProvider {
      */
     @GET
     @Path("/archive/{id}")
-    public Response archiveMail(@PathParam("id") Integer mailId) {
+    public Response archiveMail(@PathParam("id") Integer mailId,
+            @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         Mail mail = em.find(Mail.class, mailId);
         if (mail == null) {
             return Response.status(Status.NOT_FOUND).build();
+        }
+        if (!auth.isAuthorizedById(
+            mail, RequestMethod.POST, headers, Mail.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         mail.setArchived(true);
         em.persist(mail);

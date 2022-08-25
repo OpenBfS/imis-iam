@@ -49,6 +49,7 @@ import de.intevation.iam.model.UserIamAttributes;
 import de.intevation.iam.model.UserMembership;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
+import de.intevation.iam.util.RequestMethod;
 
 public class UserProvider implements RealmResourceProvider {
 
@@ -113,11 +114,17 @@ public class UserProvider implements RealmResourceProvider {
      */
     @GET
     @Path("/{id}")
-    public Response getUserById(@PathParam("id") String id) {
+    public Response getUserById(
+            @PathParam("id") String id,
+            @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
+        if (!auth.isAuthorizedById(
+                user, RequestMethod.GET, headers, User.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
@@ -137,6 +144,10 @@ public class UserProvider implements RealmResourceProvider {
     public Response createUser(@Context HttpHeaders headers, final User rep) {
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
+        }
+        if (!auth.isAuthorizedById(
+                rep, RequestMethod.POST, headers, User.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -198,6 +209,10 @@ public class UserProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final User rep
     ) {
+        if (!auth.isAuthorizedById(
+                rep, RequestMethod.PUT, headers, User.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();

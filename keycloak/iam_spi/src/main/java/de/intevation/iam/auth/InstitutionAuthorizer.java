@@ -38,6 +38,8 @@ public class InstitutionAuthorizer implements Authorizer {
                 return authorizeUpdate((Institution) data, session, userId);
             case POST:
                 return authorizeCreate((Institution) data, session, userId);
+            case DELETE:
+                return authorizeDelete((Institution) data, session, userId);
             default: return false;
                 }
     }
@@ -62,7 +64,7 @@ public class InstitutionAuthorizer implements Authorizer {
         if (requestingUser == null) {
             return false;
         }
-        return !AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
     }
 
     private boolean authorizeUpdate(
@@ -77,7 +79,22 @@ public class InstitutionAuthorizer implements Authorizer {
         if (requestingUser == null) {
             return false;
         }
-        return !AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+    }
+
+    private boolean authorizeDelete(
+        Institution institution,
+        KeycloakSession session,
+        String userId
+    ) {
+        //Only allow users with other roles than "Nutzer" to edit
+        RealmModel realm = session.getContext().getRealm();
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        UserModel requestingUser = session.users().getUserById(realm, userId);
+        if (requestingUser == null) {
+            return false;
+        }
+        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
     }
 
 }
