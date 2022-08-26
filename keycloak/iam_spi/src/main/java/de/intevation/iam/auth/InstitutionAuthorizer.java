@@ -20,7 +20,7 @@ import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class InstitutionAuthorizer implements Authorizer {
+public class InstitutionAuthorizer implements Authorizer<Institution> {
 
     @Override
     public boolean isAuthorizedById(
@@ -45,10 +45,15 @@ public class InstitutionAuthorizer implements Authorizer {
     }
 
     @Override
-    public List<Object> filter(
-            List<Object> data,
+    public List<Institution> filter(
+            List<Institution> data,
             HttpHeaders headers,
             KeycloakSession session) {
+        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        data.forEach(institution -> {
+            institution.setReadonly(
+                !authorizeUpdate(institution, session, userId));
+        });
         return data;
     }
 

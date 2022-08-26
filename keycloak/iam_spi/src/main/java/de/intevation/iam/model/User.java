@@ -35,7 +35,14 @@ public class User {
     private UserIamAttributes attributes;
     private List<Integer> institutions;
     private List<String> roles;
+    private Boolean readonly;
 
+    public Boolean getReadonly() {
+        return readonly;
+    }
+    public void setReadonly(Boolean readonly) {
+        this.readonly = readonly;
+    }
     public String getId() {
         return id;
     }

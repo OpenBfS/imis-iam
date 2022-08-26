@@ -22,7 +22,7 @@ import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class UserAuthorizer implements Authorizer {
+public class UserAuthorizer implements Authorizer<User> {
 
     @Override
     public boolean isAuthorizedById(
@@ -43,10 +43,15 @@ public class UserAuthorizer implements Authorizer {
     }
 
     @Override
-    public List<Object> filter(
-            List<Object> data,
+    public List<User> filter(
+            List<User> data,
             HttpHeaders headers,
             KeycloakSession session) {
+        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        data.forEach(user -> {
+            user.setReadonly(
+                !authorizeUpdate(user, session, userId));
+        });
         return data;
     }
 

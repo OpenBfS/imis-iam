@@ -20,10 +20,13 @@ import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class MailListAuthorizer implements Authorizer {
+public class MailListAuthorizer implements Authorizer<MailList> {
 
     @Override
-    public boolean isAuthorizedById(Object data, RequestMethod requestMethod, HttpHeaders headers,
+    public boolean isAuthorizedById(
+            Object data,
+            RequestMethod requestMethod,
+            HttpHeaders headers,
             KeycloakSession session) {
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
@@ -33,7 +36,8 @@ public class MailListAuthorizer implements Authorizer {
             case GET: return authorizeGet(session, userId);
             case PUT: return authorizeUpdate((MailList) data, session, userId);
             case POST: return authorizeCreate((MailList) data, session, userId);
-            case DELETE: return authorizeDelete((MailList) data, session, userId);
+            case DELETE:
+                return authorizeDelete((MailList) data, session, userId);
             default: return false;
         }
     }
@@ -83,7 +87,10 @@ public class MailListAuthorizer implements Authorizer {
     }
 
     @Override
-    public List<Object> filter(List<Object> data, HttpHeaders headers, KeycloakSession session) {
+    public List<MailList> filter(
+            List<MailList> data,
+            HttpHeaders headers,
+            KeycloakSession session) {
         return data;
     }
 }

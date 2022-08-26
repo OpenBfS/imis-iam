@@ -15,7 +15,7 @@ import org.keycloak.models.KeycloakSession;
 
 import de.intevation.iam.util.RequestMethod;
 
-public interface Authorizer {
+public interface Authorizer <T> {
 
     /**
      * Check if user is authorized for the given data and request method.
@@ -38,8 +38,8 @@ public interface Authorizer {
      * @param session Keycloak session
      * @return Filtered list
      */
-    List<Object> filter(
-        List<Object> data,
+    List<T> filter(
+        List<T> data,
         HttpHeaders headers,
         KeycloakSession session);
 }

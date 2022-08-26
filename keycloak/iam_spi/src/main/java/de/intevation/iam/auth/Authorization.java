@@ -38,7 +38,8 @@ public class Authorization {
         this.session = session;
         this.userAuthorizer = new UserAuthorizer();
         this.institutionAuthorizer = new InstitutionAuthorizer();
-        this.institutionCategoryAuthorizer = new InstitutionCategoryAuthorizer();
+        this.institutionCategoryAuthorizer
+                = new InstitutionCategoryAuthorizer();
         this.mailAuthorizer = new MailAuthorizer();
         this.mailListAuthorizer = new MailListAuthorizer();
         this.authorizers = Map.ofEntries(
@@ -68,10 +69,19 @@ public class Authorization {
             data, requestMethod, headers, this.session);
     }
 
-    public List<Object> filter(
-        List<Object> data,
-        HttpHeaders headers) {
-        Authorizer authorizer = authorizers.get(data.getClass());
+    /**
+     * Filter the given list and set the readonly param.
+     * @param <T> List type
+     * @param data Data
+     * @param headers Request headers
+     * @param clazz Object class
+     * @return Filtered list
+     */
+    public <T> List<T> filter(
+        List<T> data,
+        HttpHeaders headers,
+        Class<T> clazz) {
+        Authorizer authorizer = authorizers.get(clazz);
         return authorizer.filter(data, headers, session);
     }
 }

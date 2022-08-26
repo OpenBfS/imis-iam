@@ -20,7 +20,7 @@ import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class MailAuthorizer implements Authorizer {
+public class MailAuthorizer implements Authorizer<Mail> {
 
     @Override
     public boolean isAuthorizedById(
@@ -64,8 +64,8 @@ public class MailAuthorizer implements Authorizer {
     }
 
     @Override
-    public List<Object> filter(
-            List<Object> data,
+    public List<Mail> filter(
+            List<Mail> data,
             HttpHeaders headers,
             KeycloakSession session) {
         return data;

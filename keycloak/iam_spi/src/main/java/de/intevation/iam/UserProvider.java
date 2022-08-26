@@ -90,26 +90,29 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Gett all users.
+     * Get all users.
+     * @param headers Request headers
      * @return List of user json objects
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsers() {
+    public Response getUsers(@Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         Stream<UserModel> users = session.users().getUsersStream(realm);
-        ArrayList<User> userList = new ArrayList<User>();
-        users.forEach(user -> {
+        List<User> userList = new ArrayList<User>();
+        for (UserModel user: users.collect(Collectors.toList())) {
             userList.add(User.fromUserModel(user, em, realm));
-        });
+        }
+        userList = auth.filter(userList, headers, User.class);
         return Response.ok(userList).build();
     }
 
     /**
      * Get user by id.
      * @param id User id
+     * @param headers Request headers
      * @return User as json
      */
     @GET

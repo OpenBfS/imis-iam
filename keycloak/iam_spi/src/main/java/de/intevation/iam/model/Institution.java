@@ -81,6 +81,17 @@ public class Institution {
     @Transient
     private Map<String, List<String>> attributes;
 
+    @Transient
+    private Boolean readonly;
+
+    public Boolean getReadonly() {
+        return readonly;
+    }
+
+    public void setReadonly(Boolean readonly) {
+        this.readonly = readonly;
+    }
+
     public Integer getId() {
         return id;
     }

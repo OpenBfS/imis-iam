@@ -14,6 +14,8 @@ import java.util.Arrays;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -93,9 +95,10 @@ public class ExportProvider implements RealmResourceProvider {
      * Export users to csv.
      *
      * @param fieldSeparator Char used as field separator
-     * @param quoteType      Char used for quotes
-     * @param rowDelimiter   Char used as row delimiter
-     * @param encoding       Encoding to use
+     * @param quoteType Char used for quotes
+     * @param rowDelimiter Char used as row delimiter
+     * @param encoding Encoding to use
+     * @param headers Request headers
      * @return Resulting csv data
      */
     @GET
@@ -104,7 +107,8 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("fieldSeparator") String fieldSeparator,
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
-            @QueryParam("encoding") String encoding) {
+            @QueryParam("encoding") String encoding,
+            @Context HttpHeaders headers) {
         CSVExporter<User> exporter = new CSVExporter<User>();
         if (fieldSeparator != null) {
             if (!isValidFieldSeperator(fieldSeparator)) {
@@ -144,8 +148,9 @@ public class ExportProvider implements RealmResourceProvider {
         }
 
         UserProvider userProvider = new UserProvider(session);
-        Response userResponse = userProvider.getUsers();
-        ArrayList<User> users = userResponse.readEntity(ArrayList.class);
+        Response userResponse = userProvider.getUsers(headers);
+        ArrayList<User> users
+            = userResponse.readEntity(ArrayList.class);
         InputStream result = exporter.export(users);
         return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM)
                 .header("Content-Disposition",
@@ -157,9 +162,10 @@ public class ExportProvider implements RealmResourceProvider {
      * Export institutions as csv.
      *
      * @param fieldSeparator Char used as field separator
-     * @param quoteType      Char used for quotes
-     * @param rowDelimiter   Char used as row delimiter
-     * @param encoding       Encoding to use
+     * @param quoteType Char used for quotes
+     * @param rowDelimiter Char used as row delimiter
+     * @param encoding Encoding to use
+     * @param headers Request headers
      * @return Institutions as CSV
      */
     @GET
@@ -168,7 +174,8 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("fieldSeparator") String fieldSeparator,
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
-            @QueryParam("encoding") String encoding) {
+            @QueryParam("encoding") String encoding,
+            @Context HttpHeaders headers) {
         CSVExporter<Institution> exporter = new CSVExporter<Institution>();
         if (fieldSeparator != null) {
             if (!isValidFieldSeperator(fieldSeparator)) {
@@ -208,8 +215,9 @@ public class ExportProvider implements RealmResourceProvider {
         }
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
-        Response instResponse = instProvider.getInstitutions();
-        ArrayList<Institution> institutions = instResponse.readEntity(ArrayList.class);
+        Response instResponse = instProvider.getInstitutions(headers);
+        ArrayList<Institution> institutions
+            = instResponse.readEntity(ArrayList.class);
         InputStream result = exporter.export(institutions);
         return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM)
                 .header("Content-Disposition",

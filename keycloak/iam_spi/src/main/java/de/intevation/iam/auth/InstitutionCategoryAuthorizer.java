@@ -20,10 +20,14 @@ import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class InstitutionCategoryAuthorizer implements Authorizer {
+public class InstitutionCategoryAuthorizer
+    implements Authorizer<InstitutionCategory> {
 
     @Override
-    public boolean isAuthorizedById(Object data, RequestMethod requestMethod, HttpHeaders headers,
+    public boolean isAuthorizedById(
+            Object data,
+            RequestMethod requestMethod,
+            HttpHeaders headers,
             KeycloakSession session) {
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null || userId.isEmpty()) {
@@ -31,7 +35,9 @@ public class InstitutionCategoryAuthorizer implements Authorizer {
         }
         switch (requestMethod) {
             case GET: return authorizeGet(session, userId);
-            case POST: return authorizeCreate((InstitutionCategory) data, session, userId);
+            case POST:
+                return authorizeCreate(
+                    (InstitutionCategory) data, session, userId);
             default: return false;
         }
     }
@@ -61,10 +67,11 @@ public class InstitutionCategoryAuthorizer implements Authorizer {
         return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
     }
 
-
-
     @Override
-    public List<Object> filter(List<Object> data, HttpHeaders headers, KeycloakSession session) {
+    public List<InstitutionCategory> filter(
+            List<InstitutionCategory> data,
+            HttpHeaders headers,
+            KeycloakSession session) {
         return data;
     }
 
