@@ -38,10 +38,11 @@ export default {
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
     service_building_street: "Straße des Dienstgebäudes",
-    required_service_building_street: "Straße des Dienstgebäudes ist erforderlich",
+    required_service_building_street:
+      "Straße des Dienstgebäudes ist erforderlich",
     service_building_postalcode: "PLZ des Dienstgebäudes",
     required_service_building_postalcode:
-      "PLZ des Dienstgebäude ist erforderlich",
+      "PLZ des Dienstgebäudes ist erforderlich",
     central_phone: "Zentrales Telefon",
     required_central_phone: "Zentrales Telefon ist erforderlich",
     central_email: "Zentrale E-Mail",
@@ -142,6 +143,10 @@ export default {
   form: {
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
+    valid_phone: "Telefon muss gültig sein",
+    required_phone: "Telefon is erförderlich",
+    valid_fax: "Faxnummer muss gültig sein",
+    valid_postalcode: "PLZ muss gültig sein",
   },
   // MailingList
   mailinglist: {
