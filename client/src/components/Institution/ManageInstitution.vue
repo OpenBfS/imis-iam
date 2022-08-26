@@ -1,10 +1,9 @@
 <!--
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
+ Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ Software engineering by Intevation GmbH
+
+ This file is Free Software under the GNU GPL (v>=3)
+ and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
   <v-dialog v-model="show">
@@ -30,13 +29,13 @@
                   density="compact"
                   :label="'* ' + $t('label.name')"
                   v-model="institution.name"
-                  :rules="[(v) => !!v || $t('institution.required_name')]"
+                  :rules="reqField($t('institution.required_name'))"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
                   :label="'* ' + $t('institution.shortname')"
-                  :rules="[(v) => !!v || $t('institution.required_shortname')]"
+                  :rules="reqField($t('institution.required_shortname'))"
                   v-model="institution.shortName"
                 ></v-text-field>
                 <v-checkbox
@@ -50,41 +49,44 @@
                   variant="underlined"
                   density="compact"
                   :label="'* ' + $t('institution.service_building_location')"
-                  :rules="[
-                    (v) =>
-                      !!v ||
-                      $t('institution.required_service_building_location'),
-                  ]"
+                  :rules="
+                    reqField(
+                      $t('institution.required_service_building_location')
+                    )
+                  "
                   v-model="institution.serviceBuildingLocation"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
                   :label="'* ' + $t('institution.service_building_postalcode')"
-                  :rules="[
-                    (v) =>
-                      !!v ||
+                  :rules="
+                    reqValidPostalcode(
                       $t('institution.required_service_building_postalcode'),
-                  ]"
+                      $t('form.valid_postalcode')
+                    )
+                  "
                   v-model="institution.serviceBuildingPostalCode"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
                   :label="'* ' + $t('institution.service_building_street')"
-                  :rules="[
-                    (v) =>
-                      !!v || $t('institution.required_service_building_street'),
-                  ]"
                   v-model="institution.serviceBuildingStreet"
+                  :rules="
+                    reqField($t('institution.required_service_building_street'))
+                  "
                 ></v-text-field>
               </div>
 
               <div class="group_class">
+                <!-- TODO: Readd this rules once the validation for
+                    optional fields gets implemented by upstream.
+                :rules="validPostalcode($t('form.valid_postalcode'))" -->
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.address_location')"
+                  :label="$t('institution.address_location')"
                   v-model="institution.addressLocation"
                 ></v-text-field>
                 <v-text-field
@@ -105,21 +107,29 @@
                   variant="underlined"
                   density="compact"
                   :label="'* ' + $t('institution.central_phone')"
-                  :rules="[
-                    (v) => !!v || $t('institution.required_central_phone'),
-                  ]"
+                  :rules="
+                    reqValidPhone(
+                      $t('institution.required_central_phone'),
+                      $t('form.valid_phone')
+                    )
+                  "
                   v-model="institution.centralPhone"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
                   :label="'* ' + $t('institution.central_email')"
-                  :rules="[
-                    (v) => !!v || $t('institution.required_central_email'),
-                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
-                  ]"
+                  :rules="
+                    reqValidmail(
+                      $t('institution.required_central_email'),
+                      $t('form.valid_email')
+                    )
+                  "
                   v-model="institution.centralMail"
                 ></v-text-field>
+                <!--TODO: Readd this rules once the validation for
+                    optional fields gets implemented by upstream.
+                    :rules="validFax($t('form.valid_fax'))" -->
                 <v-text-field
                   variant="underlined"
                   density="compact"
@@ -134,6 +144,9 @@
                   :label="$t('institution.imis_Id')"
                   v-model="institution.imisId"
                 ></v-text-field>
+                <!-- TODO: Readd this rules once the validation for
+                    optional fields gets implemented by upstream.
+                    :rules="validMail($t('form.valid_email'))"  -->
                 <v-text-field
                   variant="underlined"
                   density="compact"
@@ -153,7 +166,7 @@
                   item-value="id"
                   persistent-hint
                   density="compact"
-                  :rules="[(v) => !!v || $t('institution.required_category')]"
+                  :rules="reqField($t('institution.required_category'))"
                 >
                 </v-select>
                 <v-btn
@@ -203,7 +216,6 @@
         </v-row>
         <UIAlert
           v-if="hasLoadingError || hasRequestError"
-          v-bind:isSuccessful="false"
           v-bind:message="$store.state.application.httpErrorMessage"
         />
       </v-container>
@@ -274,6 +286,7 @@ form > div {
 import { onMounted, ref, defineAsyncComponent } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
+import { useForm } from "@/lib/use-form";
 export default {
   components: {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
@@ -287,7 +300,17 @@ export default {
     const show = true;
     const institution = ref(props.item);
     const { hasLoadingError, hasRequestError } = useNotification();
-    const form = ref(false);
+    const {
+      form,
+      valid,
+      reqValidmail,
+      validMail,
+      reqField,
+      reqValidPhone,
+      validFax,
+      validPostalcode,
+      reqValidPostalcode,
+    } = useForm();
     const categories = ref([]);
     const getCategories = () => {
       HTTP.get("institution/category")
@@ -308,7 +331,6 @@ export default {
         }, 100);
       }
     });
-    const valid = ref(null);
     const createInstitution = () => {
       let payload = { ...institution.value };
       payload.category = payload.category.id;
@@ -355,6 +377,13 @@ export default {
       }
     };
     return {
+      reqValidPostalcode,
+      validPostalcode,
+      validFax,
+      reqValidPhone,
+      reqField,
+      reqValidmail,
+      validMail,
       addCategory,
       showAddCategory,
       newCategory,

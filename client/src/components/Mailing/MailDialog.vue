@@ -1,10 +1,9 @@
 <!--
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
+ Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ Software engineering by Intevation GmbH
+
+ This file is Free Software under the GNU GPL (v>=3)
+ and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
   <v-dialog v-model="show">
@@ -69,7 +68,6 @@
         </v-row>
         <UIAlert
           v-if="hasRequestError || hasLoadingError"
-          v-bind:isSuccessful="false"
           v-bind:message="$store.state.application.httpErrorMessage"
         />
       </v-container>

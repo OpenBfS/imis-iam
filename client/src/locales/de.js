@@ -38,12 +38,13 @@ export default {
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
     service_building_street: "Straße des Dienstgebäudes",
-    required_service_building_street: "Straße des Dienstgebäudes",
-    service_building_postalcode: "PLZ des Dinestgebäudes",
+    required_service_building_street:
+      "Straße des Dienstgebäudes ist erforderlich",
+    service_building_postalcode: "PLZ des Dienstgebäudes",
     required_service_building_postalcode:
-      "PLZ des Dinestgebäude ist erforderlich",
+      "PLZ des Dienstgebäudes ist erforderlich",
     central_phone: "Zentrales Telefon",
-    required_central_phone: "Zentrales Telefon ist erforederlich",
+    required_central_phone: "Zentrales Telefon ist erforderlich",
     central_email: "Zentrale E-Mail",
     required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
@@ -113,6 +114,8 @@ export default {
   },
   // Shared labels
   label: {
+    linux: "Linux",
+    windows: "Windows",
     export: "Exportieren",
     actions: "Aktionen",
     attributes: "Attribute",
@@ -128,8 +131,8 @@ export default {
     comma: "Komma",
     space: "Leerzeichen",
     period: "Punkt",
-    doublequotes: "Doppelte Anführungszeichen",
-    singlequotes: "Einfache Anführungszeichen",
+    doublequote: "Doppelte Anführungszeichen",
+    singlequote: "Einfache Anführungszeichen",
     field_seperator: "Feldtrenner",
     row_delimiter: "Zeilenende",
     csv_options: "Zusätzliche CSV-Optionen",
@@ -140,6 +143,10 @@ export default {
   form: {
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
+    valid_phone: "Telefon muss gültig sein",
+    required_phone: "Telefon is erförderlich",
+    valid_fax: "Faxnummer muss gültig sein",
+    valid_postalcode: "PLZ muss gültig sein",
   },
   // MailingList
   mailinglist: {

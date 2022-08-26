@@ -27,7 +27,7 @@ module.exports = {
       {
         templateFile: "./src/license/jsTemplate.txt",
         messages: {
-          whenFailedToMatch: "Missing license header",
+          whenFailedToMatch: "Missing or wrong license header",
         },
       },
     ],
@@ -41,7 +41,7 @@ module.exports = {
           {
             templateFile: "./src/license/vueTemplate.txt",
             messages: {
-              whenFailedToMatch: "Missing license header",
+              whenFailedToMatch: "Missing or wrong license header",
             },
           },
         ],

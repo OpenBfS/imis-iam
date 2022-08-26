@@ -1,17 +1,16 @@
 <!--
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
+ Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ Software engineering by Intevation GmbH
+
+ This file is Free Software under the GNU GPL (v>=3)
+ and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
   <div>
-    <v-alert v-if="isSuccessful" variant="contained-text" type="success" text>
+    <v-alert v-if="isSuccessful" variant="text" type="success">
       {{ message }}
     </v-alert>
-    <v-alert v-else variant="contained-text" type="error" text>
+    <v-alert v-else type="error" variant="text">
       {{ message }}
     </v-alert>
   </div>
@@ -20,7 +19,7 @@
 <script>
 export default {
   props: {
-    isSuccessful: Boolean,
+    isSuccessful: { type: Boolean, default: false },
     message: String,
   },
 };

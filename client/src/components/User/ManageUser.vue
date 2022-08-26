@@ -1,10 +1,9 @@
 <!--
-/* Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
- * Software engineering by Intevation GmbH
- *
- * This file is Free Software under the GNU GPL (v>=3)
- * and comes with ABSOLUTELY NO WARRANTY!
- */
+ Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ Software engineering by Intevation GmbH
+
+ This file is Free Software under the GNU GPL (v>=3)
+ and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
   <v-dialog v-model="show">
@@ -31,7 +30,7 @@
                   "
                   :label="'* ' + $t('user.username')"
                   v-model="user.username"
-                  :rules="[(v) => !!v || $t('user.required_username')]"
+                  :rules="reqField($t('user.required_username'))"
                   :readonly="processType === 'edit'"
                 ></v-text-field>
                 <v-text-field
@@ -45,12 +44,12 @@
                   variant="underlined"
                   :label="'* ' + $t('user.firstname')"
                   v-model="user.firstName"
-                  :rules="[(v) => !!v || $t('user.required_firstname')]"
+                  :rules="reqField($t('user.required_firstname'))"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   :label="'* ' + $t('user.lastname')"
-                  :rules="[(v) => !!v || $t('form.required_lastname')]"
+                  :rules="reqField($t('user.required_lastname'))"
                   v-model="user.lastName"
                 ></v-text-field>
               </div>
@@ -59,10 +58,12 @@
                   variant="underlined"
                   :label="'* ' + $t('label.email')"
                   v-model="user.email"
-                  :rules="[
-                    (v) => !!v || $t('form.required_email'),
-                    (v) => /.+@.+/.test(v) || $t('form.valid_email'),
-                  ]"
+                  :rules="
+                    reqValidmail(
+                      $t('form.required_email'),
+                      $t('form.valid_email')
+                    )
+                  "
                 ></v-text-field>
               </div>
 
@@ -70,7 +71,12 @@
                 <v-text-field
                   variant="underlined"
                   :label="'* ' + $t('user.phone')"
-                  :rules="[(v) => !!v || $t('form.required_telephone')]"
+                  :rules="
+                    reqValidPhone(
+                      $t('form.required_phone'),
+                      $t('form.valid_phone')
+                    )
+                  "
                   v-model="user.attributes.phone"
                 ></v-text-field>
                 <v-text-field
@@ -148,14 +154,13 @@
                   item-title="position"
                   item-value="id"
                   persistent-hint
-                  :rules="[(v) => !!v || $t('user.required_position')]"
+                  :rules="reqField($t('user.required_position'))"
                 >
                 </v-select>
               </div>
             </v-form>
             <UIAlert
               v-if="hasLoadingError || hasRequestError"
-              v-bind:isSuccessful="false"
               v-bind:message="$store.state.application.httpErrorMessage"
             />
           </v-col>
@@ -233,6 +238,7 @@ import { computed, onMounted, defineAsyncComponent, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
+import { useForm } from "@/lib/use-form";
 
 export default {
   components: {
@@ -316,7 +322,6 @@ export default {
           hasRequestError.value = true;
         });
     };
-    const form = ref(false);
     onMounted(() => {
       // This is necessary as the form value is not change to true with valid inputs
       // for the first load by filling the fields (copy, edit).
@@ -328,7 +333,7 @@ export default {
       }
     });
     // Form
-    const valid = ref(false);
+    const { form, valid, reqField, reqValidPhone, reqValidmail } = useForm();
     // Activate button only if some values are changed for "edit"
     // and username and email are changed for "copy"
     // to avoid useless requests
@@ -343,6 +348,9 @@ export default {
     });
 
     return {
+      reqField,
+      reqValidPhone,
+      reqValidmail,
       cloneObject,
       positions,
       memeberships,
