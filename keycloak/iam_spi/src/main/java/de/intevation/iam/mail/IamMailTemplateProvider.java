@@ -7,6 +7,7 @@
 package de.intevation.iam.mail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,32 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
         super(session, freeMarker);
         setRealm(session.getContext().getRealm());
         sender = new DefaultEmailSenderProvider(session);
+    }
+
+    public void sendAccountExpiredNotification(List<UserModel> receipientList, UserModel user) throws EmailException {
+        Map<String, Object> bodyAttributes = new HashMap<>();
+        bodyAttributes.put("username", user.getUsername());
+        Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
+
+        EmailTemplate template = processTemplate(
+            "accountExpiredSubject", Collections.emptyList(),
+            "accountExpired.ftl", bodyAttributes);
+        for(UserModel rec: receipientList) {
+            sender.send(realmSmtpConfig, rec,
+                    template.getSubject(), template.getTextBody(), template.getHtmlBody());
+        }
+    }
+
+    public void sendExtendAccountValidityReminder(UserModel user) throws EmailException {
+        Map<String, Object> bodyAttributes = new HashMap<>();
+        bodyAttributes.put("username", user.getUsername());
+        Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
+
+        EmailTemplate template = processTemplate(
+            "extendAccountValiditySubject", Collections.emptyList(),
+            "extendAccountValidity.ftl", bodyAttributes);
+        sender.send(realmSmtpConfig, user,
+                template.getSubject(), template.getTextBody(), template.getHtmlBody());
     }
 
     public void sendReminder(List<UserModel> users, String topic) {
