@@ -612,6 +612,7 @@
     "ssl": ""
   },
   "loginTheme": "iam_theme",
+  "emailTheme": "iam_theme",
   "eventsEnabled": false,
   "eventsListeners": [
     "jboss-logging"
