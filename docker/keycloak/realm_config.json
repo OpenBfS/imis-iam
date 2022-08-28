@@ -615,6 +615,7 @@
   "emailTheme": "iam_theme",
   "eventsEnabled": false,
   "eventsListeners": [
+    "iam-event-listener",
     "jboss-logging"
   ],
   "enabledEventTypes": [],

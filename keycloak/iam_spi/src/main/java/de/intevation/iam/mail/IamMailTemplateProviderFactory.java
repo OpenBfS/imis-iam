@@ -10,7 +10,8 @@ import org.keycloak.email.freemarker.FreeMarkerEmailTemplateProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.theme.FreeMarkerUtil;
 
-public class IamMailTemplateProviderFactory extends FreeMarkerEmailTemplateProviderFactory {
+public class IamMailTemplateProviderFactory
+        extends FreeMarkerEmailTemplateProviderFactory {
 
     private FreeMarkerUtil freeMarker;
 
