@@ -114,7 +114,7 @@
                 >
                 </v-select>
               </div>
-              <div class="three_group_class">
+              <div class="two_group_class">
                 <v-select
                   dense
                   clearable
@@ -143,6 +143,19 @@
                   :rules="[
                     (v) => !!(v && v.length) || $t('user.required_membership'),
                   ]"
+                >
+                </v-select>
+              </div>
+              <div class="two_group_class">
+                <v-select
+                  dense
+                  clearable
+                  :label="'* ' + $t('user.label_roles')"
+                  :items="userRoles"
+                  v-model="user.roles"
+                  multiple
+                  persistent-hint
+                  :rules="reqField($t('user.required_roles'))"
                 >
                 </v-select>
                 <v-select
@@ -296,6 +309,9 @@ export default {
     const institutions = computed(() => {
       return store.state.institution.institutions;
     });
+    const userRoles = computed(() => {
+      return store.state.user.roles;
+    });
     // Deep Copy for objects
     const cloneObject = (obj) => {
       return JSON.parse(JSON.stringify(obj));
@@ -348,6 +364,7 @@ export default {
     });
 
     return {
+      userRoles,
       reqField,
       reqValidPhone,
       reqValidmail,

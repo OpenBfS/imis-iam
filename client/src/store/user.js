@@ -24,7 +24,7 @@ export const user = {
       state.positions = data;
     },
     setRoles: (state, data) => {
-      state.roless = data;
+      state.roles = data;
     },
   },
   actions: {

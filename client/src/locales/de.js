@@ -90,13 +90,15 @@ export default {
     username: "Benutzername",
     required_telephone: "Telefone ist erforderlich",
     label_memberships: "Mitgliedschaften",
-    label_positions: "Position",
+    label_positions: "Positionen",
     required_firstname: "Vorname ist erforderlich",
     required_lastname: "Nachname ist erforderlich",
     required_username: "Benutzername ist erforderlich",
     required_membership: "Mitgliedschaft ist erforderlich",
     required_position: "Position ist erforderlich",
     required_institution: "Insititution ist erforderlich",
+    label_roles: "Rollen",
+    required_roles: "Role ist erforderlich",
   },
   // Shared button texts
   button: {
