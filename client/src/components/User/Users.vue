@@ -16,6 +16,7 @@
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
+            v-if="isAllowedToAdd"
             color="accent"
             class="mr-4"
             v-bind="props"
@@ -75,6 +76,7 @@
                       variant="plain"
                       icon="mdi-account-edit-outline"
                       size="small"
+                      v-if="!user.readonly"
                       v-bind="props"
                       @click="
                         resetNotification();
@@ -90,6 +92,7 @@
                       variant="plain"
                       icon="mdi-content-copy"
                       size="small"
+                      v-if="!user.readonly && isAllowedToAdd"
                       v-bind="props"
                       @click="
                         resetNotification();
@@ -136,6 +139,9 @@ export default {
     const store = useStore();
     const { hasLoadingError, resetNotification } = useNotification();
     // User
+    const isAllowedToAdd = computed(() => {
+      return store.state.profile.isAllowedToManage;
+    });
     // Deep Copy for objects
     const cloneObject = (obj) => {
       return JSON.parse(JSON.stringify(obj));
@@ -152,6 +158,12 @@ export default {
     onMounted(() => {
       store
         .dispatch("user/loadUsers")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+      store
+        .dispatch("user/loadRoles")
         .then()
         .catch(() => {
           hasLoadingError.value = true;
@@ -185,6 +197,7 @@ export default {
       }
     };
     return {
+      isAllowedToAdd,
       checkChildObject,
       showManageUserDialog,
       resetNotification,

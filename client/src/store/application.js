@@ -10,6 +10,7 @@ export const application = {
     httpErrorMessage: "",
     showExportDialog: false,
     listToExport: "",
+    isAllowedToManageUser: false,
   }),
   mutations: {
     setHttpErrorMessage: (state, message) => {

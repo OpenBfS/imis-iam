@@ -17,6 +17,7 @@
         <template v-slot:activator="{ props }">
           <v-btn
             color="accent"
+            v-if="isAllowedToAdd"
             class="mr-4"
             v-bind="props"
             @click="
@@ -53,7 +54,14 @@
           <thead>
             <th class="text-left">{{ $t("label.name") }}</th>
             <th class="text-left">{{ $t("institution.shortname") }}</th>
-            <th class="text-left">{{ $t("label.actions") }}</th>
+            <th
+              v-if="
+                institutions && institutions.length && !institutions[0].readonly
+              "
+              class="text-left"
+            >
+              {{ $t("label.actions") }}
+            </th>
           </thead>
           <tbody>
             <tr v-for="item in institutions" :key="item.id">
@@ -63,6 +71,7 @@
                 <v-tooltip location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn
+                      v-if="!item.readonly"
                       variant="plain"
                       icon="mdi-account-edit-outline"
                       size="small"
@@ -79,6 +88,7 @@
                 <v-tooltip location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn
+                      v-if="!item.readonly"
                       variant="plain"
                       icon="mdi-delete"
                       size="small"
@@ -134,7 +144,9 @@ export default {
     const { hasLoadingError } = useNotification();
     const processType = ref("");
     const showManageDialog = ref(false);
-
+    const isAllowedToAdd = computed(() => {
+      return store.state.profile.isAllowedToManage;
+    });
     // Institutions
     const institutions = computed(() => {
       return store.state.institution.institutions;
@@ -164,6 +176,7 @@ export default {
       institution.value = { ...expInstitution };
     };
     return {
+      isAllowedToAdd,
       resetUser,
       hasLoadingError,
       showManageDialog,

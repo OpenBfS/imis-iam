@@ -16,6 +16,7 @@
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
+            v-if="isAllowedToManage"
             v-bind="props"
             color="accent"
             class="mr-4"
@@ -44,6 +45,7 @@
                 <v-tooltip location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn
+                      v-if="isAllowedToManage"
                       variant="plain"
                       icon="mdi-account-edit-outline"
                       size="small"
@@ -61,6 +63,7 @@
                 <v-tooltip location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn
+                      v-if="isAllowedToManage"
                       variant="plain"
                       icon="mdi-delete"
                       size="small"
@@ -122,6 +125,7 @@
       </v-col>
       <v-col cols="4">
         <v-btn
+          v-if="isAllowedToManage"
           size="small"
           color="accent"
           @click="
@@ -174,6 +178,9 @@ export default {
     const mailingLists = computed(() => {
       return store.state.mail.mailingLists;
     });
+    const isAllowedToManage = computed(() => {
+      return store.state.profile.isAllowedToManage;
+    });
     const getMailLists = () => {
       resetNotification();
       store
@@ -224,6 +231,7 @@ export default {
     };
 
     return {
+      isAllowedToManage,
       isUserInList,
       checkMailDialogObject,
       showMailDialog,

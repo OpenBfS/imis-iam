@@ -11,6 +11,7 @@ export const user = {
     users: [],
     memberships: [],
     positions: [],
+    roles: [],
   }),
   mutations: {
     setUserList: (state, data) => {
@@ -22,6 +23,9 @@ export const user = {
     setPositions: (state, data) => {
       state.positions = data;
     },
+    setRoles: (state, data) => {
+      state.roless = data;
+    },
   },
   actions: {
     loadUsers({ commit }) {
@@ -29,6 +33,16 @@ export const user = {
         HTTP.get("/iamuser")
           .then((response) => {
             commit("setUserList", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
+    },
+    loadRoles({ commit }) {
+      return new Promise((resolve, reject) => {
+        HTTP.get("iamuser/roles")
+          .then((response) => {
+            commit("setRoles", response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
