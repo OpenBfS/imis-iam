@@ -85,10 +85,6 @@ public class UserAuthorizer implements Authorizer<User> {
         KeycloakSession session,
         String userId
     ) {
-        //Check if user is updating its own profile
-        if (user.getId().equals(userId)) {
-            return true;
-        }
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
@@ -104,7 +100,8 @@ public class UserAuthorizer implements Authorizer<User> {
                 .forEach(role -> oldRoles.add(role.getName()));
         List<String> newRoles = user.getRoles();
         if (oldRoles.size() != newRoles.size()) {
-            return false;
+            return AuthUtils.isUserAtLeastChefredakteur(
+                    requestingUser, client);
         }
         for (int i = 0; i < newRoles.size(); i++) {
             if (!oldRoles.contains(newRoles.get(i))
@@ -114,6 +111,8 @@ public class UserAuthorizer implements Authorizer<User> {
             }
         }
         // Else only allow users with other roles than "Nutzer" to edit
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        // or allow users to edit their own profile
+        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client)
+                || user.getId().equals(userId);
     }
 }
