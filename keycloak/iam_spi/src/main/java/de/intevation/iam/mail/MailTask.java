@@ -6,15 +6,28 @@
  */
 package de.intevation.iam.mail;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.keycloak.connections.jpa.JpaConnectionProvider;
+import org.keycloak.email.EmailException;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionTask;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+
+import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.util.DateUtils;
 
 /**
  * Task sending email reminders or notfications if run.
@@ -25,10 +38,70 @@ public class MailTask implements KeycloakSessionTask {
 
     private static final Logger LOG = Logger.getLogger("MailTask");
     private IamMailTemplateProvider mailTemplateProvider;
+    private RealmModel realm;
+
+    /**
+     * Check for expired user accounts, disable them and send email notfication.
+     * @param session Keycloak session
+     * @throws EmailException
+     */
+    private void checkForExpiredAcccounts(KeycloakSession session)
+            throws EmailException {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<UserIamAttributes> query
+                = cb.createQuery(UserIamAttributes.class);
+        Root<UserIamAttributes> root = query.from(UserIamAttributes.class);
+        query.select(root);
+        Predicate inactivityFilter = cb.greaterThan(root.get("expiryDate"),
+        new Timestamp(System.currentTimeMillis()));
+        query.where(inactivityFilter);
+        List<UserIamAttributes> userAttributes
+                = em.createQuery(query).getResultList();
+        List<UserModel> users = new ArrayList<>();
+        userAttributes.forEach(user -> {
+            LOG.info(String.format("Expired user: %s", user.getId()));
+            UserModel userModel = session.users().getUserById(
+                    realm, user.getId());
+            users.add(userModel);
+            userModel.setEnabled(false);
+            user.setExpiredNotificationSent(true);
+        });
+        //TODO
+        mailTemplateProvider.sendAccountExpiredNotification(null, users);
+    }
+
+    private void sendAccountInactivityNotifications(KeycloakSession session)
+            throws EmailException {
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<UserIamAttributes> query
+                = cb.createQuery(UserIamAttributes.class);
+        Root<UserIamAttributes> root = query.from(UserIamAttributes.class);
+        query.select(root);
+        Predicate filter;
+        Predicate sentFilter = cb.equal(
+                root.get("inactivityNotificationSent"), false);
+        Predicate inactivityFilter = cb.lessThan(root.get("expiryDate"),
+        DateUtils.getAccountInactivityDate());
+        filter = cb.and(sentFilter, inactivityFilter);
+        query.where(filter);
+        List<UserIamAttributes> userAttributes
+                = em.createQuery(query).getResultList();
+        List<UserModel> users = new ArrayList<>();
+        userAttributes.forEach(user -> {
+            LOG.info(String.format("Inactive user: %s", user.getId()));
+            users.add(session.users().getUserById(realm, user.getId()));
+            user.setInactivityNotificationSent(true);
+        });
+        //TODO
+        mailTemplateProvider.sendAccountInactivityNotification(null, users);
+    }
 
     private void sendReminders(KeycloakSession session) {
         //TODO: Replace example reminders
-        RealmModel realm = session.realms().getRealmByName(IMIS_REALM);
         mailTemplateProvider.setRealm(realm);
         LOG.info(String.format("Sending reminders for realm %s",
                 realm.getName()));
@@ -49,6 +122,14 @@ public class MailTask implements KeycloakSessionTask {
         LOG.info("Running mail task");
         mailTemplateProvider
                 = new IamMailTemplateProviderFactory().create(session);
-        sendReminders(session);
+        realm = session.realms().getRealmByName(IMIS_REALM);
+        mailTemplateProvider.setRealm(realm);
+        try {
+            checkForExpiredAcccounts(session);
+            sendAccountInactivityNotifications(session);
+        } catch (EmailException e) {
+            LOG.warning("MailTask failed");
+            e.printStackTrace();
+        }
     }
 }

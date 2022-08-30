@@ -50,26 +50,61 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
     }
 
     /**
+     * Send a notifcation about inactive accounts to the given receipient.
+     * @param receipient Receipient
+     * @param inactiveAccounts List of inactive accounts
+     * @throws EmailException
+     */
+    public void sendAccountInactivityNotification(
+        UserModel receipient,
+        List<UserModel> inactiveAccounts
+    ) throws EmailException {
+        StringBuilder usernamesBuilder = new StringBuilder();
+        inactiveAccounts.forEach(acc -> {
+            if (usernamesBuilder.length() == 0) {
+                usernamesBuilder.append(", ");
+            }
+            usernamesBuilder.append(acc.getUsername());
+        });
+        Map<String, Object> bodyAttributes = new HashMap<>();
+        bodyAttributes.put("users", usernamesBuilder.toString());
+        Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
+
+        EmailTemplate template = processTemplate(
+            "accountInactive", Collections.emptyList(),
+            "accountInactive.ftl", bodyAttributes);
+        sender.send(realmSmtpConfig, receipient,
+                template.getSubject(),
+                template.getTextBody(), template.getHtmlBody());
+    }
+
+    /**
      * Send notfications for expired accounts.
-     * @param receipientList List of receipients
-     * @param user Expired account
+     * @param receipient Receipient
+     * @param expiredUsers Expired account
      * @throws EmailException
      */
     public void sendAccountExpiredNotification(
-            List<UserModel> receipientList,
-            UserModel user) throws EmailException {
+            UserModel receipient,
+            List<UserModel> expiredUsers) throws EmailException {
+        StringBuilder usernamesBuilder = new StringBuilder();
+        expiredUsers.forEach(acc -> {
+            if (usernamesBuilder.length() == 0) {
+                usernamesBuilder.append(", ");
+            }
+            usernamesBuilder.append(acc.getUsername());
+        });
+
         Map<String, Object> bodyAttributes = new HashMap<>();
-        bodyAttributes.put("username", user.getUsername());
+        bodyAttributes.put("username", usernamesBuilder.toString());
         Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
 
         EmailTemplate template = processTemplate(
             "accountExpiredSubject", Collections.emptyList(),
             "accountExpired.ftl", bodyAttributes);
-        for (UserModel rec: receipientList) {
-            sender.send(realmSmtpConfig, rec,
-                    template.getSubject(),
-                    template.getTextBody(), template.getHtmlBody());
-        }
+        sender.send(realmSmtpConfig, receipient,
+                template.getSubject(),
+                template.getTextBody(), template.getHtmlBody());
     }
 
     /**

@@ -406,7 +406,7 @@ public class MailProvider implements RealmResourceProvider {
                     listFilter.value(list.getId());
                 }
             }
-        }else {
+        } else {
             for (MailList list: mailLists) {
                 listFilter.value(list.getId());
             }

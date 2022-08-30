@@ -288,4 +288,19 @@
             <column name="position" value="Störplatz" />
         </insert>
     </changeSet>
+    <changeSet author="awoestmann@intevation.de" id="v0.5">
+        <!--Add expiryDate column to user attributes-->
+        <addColumn
+            tableName="user_iam_attributes">
+            <column name="expiry_date"
+                type="TIMESTAMP WITHOUT TIMEZONE"
+                defaultValueComputed = "current_date + interval '12 month'"/>
+            <column name="inactivity_notification_sent"
+                type="BOOLEAN"
+                defaultValue="false" />
+            <column name="expired_notification_sent"
+                type="BOOLEAN"
+                defaultValue="false" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
