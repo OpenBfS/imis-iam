@@ -17,6 +17,7 @@
       />
       <ExportDialog v-if="$store.state.application.showExportDialog" />
     </v-main>
+    <Appfooter />
   </v-app>
 </template>
 
@@ -29,6 +30,10 @@ export default {
   components: {
     Sidebar: defineAsyncComponent(() => import("@/components/UI/Sidebar.vue")),
     Appbar: defineAsyncComponent(() => import("@/components/UI/Appbar.vue")),
+    Appfooter: defineAsyncComponent(() =>
+      import("@/components/UI/Appfooter.vue")
+    ),
+
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
     ExportDialog: defineAsyncComponent(() =>
       import("@/components/UI/ExportDialog.vue")

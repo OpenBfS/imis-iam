@@ -10,6 +10,13 @@ export const application = {
     httpErrorMessage: "",
     showExportDialog: false,
     listToExport: "",
+    footerLinks: {
+      contact: process.env.VUE_APP_FOOTER_CONTACT,
+      help: process.env.VUE_APP_FOOTER_HELP,
+      accessibility: process.env.VUE_APP_FOOTER_ACCESSIBILITY,
+      privacy: process.env.VUE_APP_FOOTER_PRIVACY,
+      socialMedia: process.env.VUE_APP_FOOTER_SOCIALMEDIA,
+    },
   }),
   mutations: {
     setHttpErrorMessage: (state, message) => {
@@ -18,7 +25,6 @@ export const application = {
     setShowExportDialog: (state, message) => {
       state.showExportDialog = message;
     },
-
     setlistToExport: (state, message) => {
       state.listToExport = message;
     },

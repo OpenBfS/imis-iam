@@ -114,6 +114,12 @@ export default {
   },
   // Shared labels
   label: {
+    accessibility: "Barrierefreiheit",
+    help: "Hilfe",
+    contact: "Impressum",
+    data_privacy: "Datenschutz",
+    copyright: "Copyrightholder",
+    social_media: "Social Media",
     linux: "Linux",
     windows: "Windows",
     export: "Exportieren",
