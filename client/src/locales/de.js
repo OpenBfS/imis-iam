@@ -114,6 +114,8 @@ export default {
   },
   // Shared labels
   label: {
+    faq: "FAQ",
+    report_problem: "Problem melden",
     accessibility: "Barrierefreiheit",
     help: "Hilfe",
     contact: "Impressum",

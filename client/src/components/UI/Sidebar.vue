@@ -66,8 +66,18 @@
             ? ''
             : $router.push(`/archive/${currentYear - 2}`)
         "
-        class="ml-2"
+        class="ml-2 mb-16"
         :title="currentYear - 2"
+      ></v-list-item>
+      <v-list-item
+        disabled
+        class="ml-2 mt-16"
+        :title="$t('label.faq')"
+      ></v-list-item>
+      <v-list-item
+        @click="reportProblem"
+        class="ml-2"
+        :title="$t('label.report_problem')"
       ></v-list-item>
     </v-list>
   </v-navigation-drawer>
@@ -77,8 +87,13 @@
 export default {
   setup() {
     const currentYear = new Date().getFullYear();
+    const reportProblem = () => {
+      const url = "mailto:imisnotifications@example.test";
+      window.open(url);
+    };
     return {
       currentYear,
+      reportProblem,
     };
   },
 };
