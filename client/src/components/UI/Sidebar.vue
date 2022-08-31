@@ -94,8 +94,12 @@ export default {
       return store.state.application.reportMail;
     });
     const reportProblem = () => {
-      const url = "mailto:" + reportMail.value;
-      window.open(url);
+      const link = document.createElement("a");
+      link.href = "mailto:" + reportMail.value;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     };
     return {
       currentYear,
