@@ -84,11 +84,17 @@
 </template>
 
 <script>
+import { computed } from "vue";
+import { useStore } from "vuex";
 export default {
   setup() {
     const currentYear = new Date().getFullYear();
+    const store = useStore();
+    const reportMail = computed(() => {
+      return store.state.application.reportMail;
+    });
     const reportProblem = () => {
-      const url = "mailto:imisnotifications@example.test";
+      const url = "mailto:" + reportMail.value;
       window.open(url);
     };
     return {

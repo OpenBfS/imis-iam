@@ -17,6 +17,7 @@ export const application = {
       privacy: process.env.VUE_APP_FOOTER_PRIVACY,
       socialMedia: process.env.VUE_APP_FOOTER_SOCIALMEDIA,
     },
+    reportMail: process.env.VUE_APP_REPORT_MAIL,
   }),
   mutations: {
     setHttpErrorMessage: (state, message) => {
