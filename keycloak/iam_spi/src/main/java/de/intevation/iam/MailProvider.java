@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -48,6 +49,8 @@ import de.intevation.iam.model.Mail;
 import de.intevation.iam.model.MailList;
 import de.intevation.iam.model.MailListUser;
 import de.intevation.iam.model.MailType;
+import de.intevation.iam.util.Constants;
+import de.intevation.iam.util.I18nUtils;
 
 /**
  * Class providing rest interfaces for mails, mail types and mailing lists.
@@ -59,6 +62,7 @@ public class MailProvider implements RealmResourceProvider {
     private static final String FROM_DISPLAY_NAME = "fromDisplayName";
     private static final String FROM_ADDRESS = "from";
     private static final String USER_ID_HEADER = "X-SHIB-user";
+    private static final String ERROR_EMPTY_LIST_KEY = "error_mail_list_empty";
 
     //Keycloak session
     private KeycloakSession session;
@@ -204,15 +208,30 @@ public class MailProvider implements RealmResourceProvider {
      * </code>
      * </pre>
      * @param list List model
+     * @param headers Request headers
      * @return Response containing new list as json
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/list")
-    public Response createList(final MailList list) {
+    public Response createList(final MailList list,
+            @Context HttpHeaders headers) {
         if (list == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
+        if (list.getUsers() == null
+                || list.getUsers().size() == 0) {
+            RealmModel realm = session.getContext().getRealm();
+            String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+            UserModel requestingUser = session.users().getUserById(realm, id);
+            ResourceBundle i18n
+                = I18nUtils.getI18nBundle(session, realm, requestingUser);
+            return Response.status(Status.BAD_REQUEST)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
+                .build();
+        }
+        list.updateMailListUsers();
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         em.persist(list);
@@ -241,12 +260,14 @@ public class MailProvider implements RealmResourceProvider {
      * </code>
      * </pre>
      * @param list List model
+     * @param headers Request headers
      * @return Response containing updated list as json
      */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/list")
-    public Response updateList(final MailList list) {
+    public Response updateList(final MailList list,
+            @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
@@ -254,7 +275,21 @@ public class MailProvider implements RealmResourceProvider {
                 || em.find(MailList.class, list.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
+        if (list.getUsers() == null
+                || list.getUsers().size() == 0) {
+            RealmModel realm = session.getContext().getRealm();
+            String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+            UserModel requestingUser = session.users().getUserById(realm, id);
+            ResourceBundle i18n
+                = I18nUtils.getI18nBundle(session, realm, requestingUser);
+            return Response.status(Status.BAD_REQUEST)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
+                .build();
+        }
+        list.updateMailListUsers();
         MailList mergedList = em.merge(list);
+        mergedList.updateUsers();
         return Response.ok(mergedList).build();
     }
 
@@ -572,6 +607,7 @@ public class MailProvider implements RealmResourceProvider {
         }
         TypedQuery<MailList> query = em.createQuery(critQuery);
         List<MailList> lists = query.getResultList();
+        lists.forEach(list -> list.updateUsers());
         return lists;
     }
 }

@@ -44,11 +44,11 @@ import de.intevation.iam.model.User;
 import de.intevation.iam.model.UserPosition;
 import de.intevation.iam.model.UserIamAttributes;
 import de.intevation.iam.model.UserMembership;
+import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
 
 public class UserProvider implements RealmResourceProvider {
 
-    private static final String SHIB_USER_HEADER = "X-SHIB-user";
     private static final String MAIL_ALREADY_USED_KEY
         = "error_mail_already_used";
 
@@ -73,7 +73,7 @@ public class UserProvider implements RealmResourceProvider {
     public Response getProfile(@Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-        String id = headers.getHeaderString(SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (id == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
@@ -135,7 +135,7 @@ public class UserProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
-        String id = headers.getHeaderString(SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
@@ -196,7 +196,7 @@ public class UserProvider implements RealmResourceProvider {
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, rep.getId());
-        String id = headers.getHeaderString(SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
 
         try {

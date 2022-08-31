@@ -18,4 +18,6 @@ public class Constants {
      * Time in months after which an account will expire.
      */
     public static final int ACCOUNT_EXPIRY_TIME = 12;
+
+    public static final String SHIB_USER_HEADER = "X-SHIB-user";
 }
