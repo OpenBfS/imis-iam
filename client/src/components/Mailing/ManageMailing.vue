@@ -16,19 +16,32 @@
       </v-card-title>
       <v-divider></v-divider>
       <v-container>
-        <v-row>
-          <v-col cols="10">
+        <v-row justify="center">
+          <v-form v-model="valid" class="v-col v-col-10">
             <v-text-field
               variant="underlined"
               :label="$t('mailinglist.name')"
               v-model="listName"
             ></v-text-field>
+            <v-select
+              dense
+              clearable
+              :label="$t('main.users')"
+              :items="users"
+              v-model="selectedUsers"
+              item-title="username"
+              item-value="id"
+              persistent-hint
+              multiple
+              :rules="reqField($t('user.required_position'))"
+            >
+            </v-select>
             <UIAlert
               v-if="hasRequestError"
               v-bind:isSuccessful="!hasRequestError"
               v-bind:message="$store.state.application.httpErrorMessage"
             />
-          </v-col>
+          </v-form>
         </v-row>
       </v-container>
       <v-divider></v-divider>
@@ -110,11 +123,12 @@
 </template>
 
 <script>
-import { ref, defineAsyncComponent, onMounted } from "vue";
+import { ref, defineAsyncComponent, onMounted, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
+import { useForm } from "@/lib/use-form";
 export default {
   props: {
     item: Object,
@@ -127,12 +141,30 @@ export default {
   setup(props, { emit }) {
     const store = useStore();
     const show = true;
+    const { valid, reqField } = useForm();
     const { t } = useI18n();
-    const { hasRequestError, resetNotification } = useNotification();
+    const { hasRequestError, hasLoadingError, resetNotification } =
+      useNotification();
     const listName = ref("");
+    const users = computed(() => {
+      return store.state.user.users;
+    });
+    const selectedUsers = ref([]);
+
+    const getUsers = () => {
+      store
+        .dispatch("user/loadUsers")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     const createMailList = () => {
       resetNotification();
-      HTTP.post("mail/list", { name: listName.value })
+      HTTP.post("mail/list", {
+        name: listName.value,
+        users: selectedUsers.value,
+      })
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
           listName.value = "";
@@ -152,6 +184,7 @@ export default {
     };
     // Edit
     onMounted(() => {
+      getUsers();
       if (props.processType === "edit") {
         listName.value = props.item.name;
       }
@@ -217,6 +250,10 @@ export default {
     };
 
     return {
+      reqField,
+      valid,
+      users,
+      selectedUsers,
       getTitle,
       checkDeleteEnterExit,
       editMailList,
