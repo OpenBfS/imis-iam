@@ -25,8 +25,10 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionTask;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.UserProvider;
 
 import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 
 /**
@@ -54,9 +56,13 @@ public class MailTask implements KeycloakSessionTask {
                 = cb.createQuery(UserIamAttributes.class);
         Root<UserIamAttributes> root = query.from(UserIamAttributes.class);
         query.select(root);
-        Predicate inactivityFilter = cb.greaterThan(root.get("expiryDate"),
+        Predicate filter;
+        Predicate sentFilter = cb.equal(
+                root.get("expiredNotificationSent"), false);
+        Predicate inactivityFilter = cb.lessThan(root.get("expiryDate"),
         new Timestamp(System.currentTimeMillis()));
-        query.where(inactivityFilter);
+        filter = cb.and(sentFilter, inactivityFilter);
+        query.where(filter);
         List<UserIamAttributes> userAttributes
                 = em.createQuery(query).getResultList();
         List<UserModel> users = new ArrayList<>();
@@ -67,9 +73,12 @@ public class MailTask implements KeycloakSessionTask {
             users.add(userModel);
             userModel.setEnabled(false);
             user.setExpiredNotificationSent(true);
+            em.merge(user);
         });
-        //TODO
-        mailTemplateProvider.sendAccountExpiredNotification(null, users);
+        if (users != null && users.size() > 0) {
+            mailTemplateProvider.sendAccountExpiredNotification(
+                getNotificationReceipient(session), users);
+        }
     }
 
     private void sendAccountInactivityNotifications(KeycloakSession session)
@@ -90,14 +99,18 @@ public class MailTask implements KeycloakSessionTask {
         query.where(filter);
         List<UserIamAttributes> userAttributes
                 = em.createQuery(query).getResultList();
+        if (userAttributes.size() == 0) {
+            return;
+        }
         List<UserModel> users = new ArrayList<>();
         userAttributes.forEach(user -> {
             LOG.info(String.format("Inactive user: %s", user.getId()));
             users.add(session.users().getUserById(realm, user.getId()));
             user.setInactivityNotificationSent(true);
+            em.merge(user);
         });
-        //TODO
-        mailTemplateProvider.sendAccountInactivityNotification(null, users);
+        mailTemplateProvider.sendAccountInactivityNotification(
+                    getNotificationReceipient(session), users);
     }
 
     private void sendReminders(KeycloakSession session) {
@@ -115,6 +128,19 @@ public class MailTask implements KeycloakSessionTask {
             mailTemplateProvider.sendReminder(
                     userList, "exampleReminder Topic");
         });
+    }
+
+    private UserModel getNotificationReceipient(KeycloakSession session) {
+        UserProvider userProvider = session.users();
+        UserModel receipient = userProvider.getUserByEmail(
+                realm, Constants.NOTIFICATION_RECEIPIENT);
+        if (receipient == null) {
+            receipient = userProvider.addUser(realm, Constants.NOTIFICATION_USERNAME);
+            receipient.setEmail(Constants.NOTIFICATION_RECEIPIENT);
+            receipient.setEnabled(false);
+            receipient.setSingleAttribute("locale", "de");
+        }
+        return receipient;
     }
 
     @Override
