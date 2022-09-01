@@ -1,4 +1,4 @@
 <#import "template.ftl" as layout>
 <@layout.emailLayout>
-${kcSanitize(msg("accountExpired", username))?no_esc}
+${kcSanitize(msg("accountExpiredBodyHtml", username))?no_esc}
 </@layout.emailLayout>

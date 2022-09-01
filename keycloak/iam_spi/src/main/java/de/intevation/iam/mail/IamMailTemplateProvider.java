@@ -61,7 +61,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
     ) throws EmailException {
         StringBuilder usernamesBuilder = new StringBuilder();
         inactiveAccounts.forEach(acc -> {
-            if (usernamesBuilder.length() == 0) {
+            if (usernamesBuilder.length() > 0) {
                 usernamesBuilder.append(", ");
             }
             usernamesBuilder.append(acc.getUsername());
@@ -70,6 +70,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
         bodyAttributes.put("users", usernamesBuilder.toString());
         Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
 
+        this.setUser(receipient);
         EmailTemplate template = processTemplate(
             "accountInactive", Collections.emptyList(),
             "accountInactive.ftl", bodyAttributes);
@@ -89,7 +90,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
             List<UserModel> expiredUsers) throws EmailException {
         StringBuilder usernamesBuilder = new StringBuilder();
         expiredUsers.forEach(acc -> {
-            if (usernamesBuilder.length() == 0) {
+            if (usernamesBuilder.length() > 0) {
                 usernamesBuilder.append(", ");
             }
             usernamesBuilder.append(acc.getUsername());
@@ -98,7 +99,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
         Map<String, Object> bodyAttributes = new HashMap<>();
         bodyAttributes.put("username", usernamesBuilder.toString());
         Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
-
+        this.setUser(receipient);
         EmailTemplate template = processTemplate(
             "accountExpiredSubject", Collections.emptyList(),
             "accountExpired.ftl", bodyAttributes);
@@ -117,7 +118,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
         Map<String, Object> bodyAttributes = new HashMap<>();
         bodyAttributes.put("username", user.getUsername());
         Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
-
+        this.setUser(user);
         EmailTemplate template = processTemplate(
             "extendAccountValiditySubject", Collections.emptyList(),
             "extendAccountValidity.ftl", bodyAttributes);
@@ -140,6 +141,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
 
         users.forEach(user -> {
             try {
+                this.setUser(user);
                 EmailTemplate template = processTemplate(
                         "reminderSubject", subjectAttributes,
                         "reminder.ftl", bodyAttributes);

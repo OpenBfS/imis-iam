@@ -19,5 +19,15 @@ public class Constants {
      */
     public static final int ACCOUNT_EXPIRY_TIME = 12;
 
+    /**
+     * Header containing userid.
+     */
     public static final String SHIB_USER_HEADER = "X-SHIB-user";
+
+    /**
+     * Email address to send notifications to.
+     */
+    public static final String NOTIFICATION_RECEIPIENT = "notifiation@receipient.example";
+
+    public static final String NOTIFICATION_USERNAME = "imis3Notifications";
 }
