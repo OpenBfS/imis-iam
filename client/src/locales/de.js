@@ -81,7 +81,7 @@ export default {
     fax: "Fax",
     mobile: "Handy",
     oe: "OE",
-    bfslocation: "Standort BFS",
+    bfslocation: "Standort BfS",
     title: "title",
     firstname: "Vorname",
     id: "ID",
@@ -114,6 +114,7 @@ export default {
   },
   // Shared labels
   label: {
+    no_data_text: "Keine Daten vorhanden",
     faq: "FAQ",
     report_problem: "Problem melden",
     accessibility: "Barrierefreiheit",

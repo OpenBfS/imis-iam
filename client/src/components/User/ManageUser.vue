@@ -92,6 +92,7 @@
               </div>
               <div class="two_group_class">
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
                   :label="$t('user.oe')"
@@ -103,6 +104,7 @@
                 >
                 </v-select>
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
                   :label="$t('user.bfslocation')"
@@ -116,6 +118,7 @@
               </div>
               <div class="three_group_class">
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
                   :label="'* ' + $t('user.label_institutions')"
@@ -131,6 +134,7 @@
                 >
                 </v-select>
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
                   :label="'* ' + $t('user.label_memberships')"
@@ -146,6 +150,7 @@
                 >
                 </v-select>
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
                   :label="'* ' + $t('user.label_positions')"

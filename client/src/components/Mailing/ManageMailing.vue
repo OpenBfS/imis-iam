@@ -24,6 +24,7 @@
               v-model="listName"
             ></v-text-field>
             <v-select
+              :no-data-text="$t('label.no_data_text')"
               dense
               clearable
               :label="$t('main.users')"

@@ -15,6 +15,7 @@
     <v-row class="mt-6" align="center">
       <!--TODO: Use @change event when this gets implemented by upstream -->
       <v-select
+        :no-data-text="$t('label.no_data_text')"
         class="mx-1"
         style="max-width: 20%"
         v-model="selectedFilter"
@@ -28,6 +29,7 @@
         persistent-hint
       ></v-select>
       <v-select
+        :no-data-text="$t('label.no_data_text')"
         class="mx-1 text-truncate"
         style="max-width: 20%"
         v-model="selectedMailinglist"

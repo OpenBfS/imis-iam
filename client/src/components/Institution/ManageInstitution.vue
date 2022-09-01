@@ -156,6 +156,7 @@
               </div>
               <div class="group_class align-center">
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   return-object
                   dense
                   clearable
