@@ -45,7 +45,7 @@
                   <template v-slot:activator="{ props }">
                     <v-btn
                       variant="plain"
-                      icon="mdi-account-edit-outline"
+                      icon="mdi-pencil"
                       size="small"
                       v-bind="props"
                       @click="

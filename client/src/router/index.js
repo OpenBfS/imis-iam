@@ -8,7 +8,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/components/Main.vue";
 import Institution from "@/components/Institution/Institutions.vue";
 import UserView from "@/components/User/Users.vue";
-import MailingList from "@/components/Mailing/MailingList.vue";
+import MailingList from "@/components/Mailing/MailingLists.vue";
 
 const routes = [
   {
@@ -27,7 +27,7 @@ const routes = [
     component: UserView,
   },
   {
-    path: "/mailinglist",
+    path: "/mailinglists",
     name: "MailingList",
     component: MailingList,
   },

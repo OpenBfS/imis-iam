@@ -19,7 +19,7 @@
       >
       <v-list-item
         @click="
-          $route.path == '/mailinglist' ? '' : $router.push('/mailinglist')
+          $route.path == '/mailinglist' ? '' : $router.push('/mailinglists')
         "
       >
         <v-list-item-title>
