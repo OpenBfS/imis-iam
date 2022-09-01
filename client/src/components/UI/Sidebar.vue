@@ -75,7 +75,8 @@
         :title="$t('label.faq')"
       ></v-list-item>
       <v-list-item
-        @click="reportProblem"
+        link
+        :href="`mailto:${reportMail}`"
         class="ml-2"
         :title="$t('label.report_problem')"
       ></v-list-item>
@@ -93,17 +94,9 @@ export default {
     const reportMail = computed(() => {
       return store.state.application.reportMail;
     });
-    const reportProblem = () => {
-      const link = document.createElement("a");
-      link.href = "mailto:" + reportMail.value;
-      link.target = "_blank";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
     return {
+      reportMail,
       currentYear,
-      reportProblem,
     };
   },
 };
