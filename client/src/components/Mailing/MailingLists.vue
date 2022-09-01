@@ -185,9 +185,10 @@ export default {
     };
     onMounted(() => {
       getMailLists();
-      getMemberships();
+      getMyMailinglist();
     });
-    const getMemberships = () => {
+
+    const getMyMailinglist = () => {
       store
         .dispatch("profile/getMyMailingLists")
         .then()
@@ -208,6 +209,7 @@ export default {
       }
       if (e.hasChanges) {
         getMailLists();
+        getMyMailinglist();
       }
     };
     const showMailDialog = ref(false);
