@@ -34,7 +34,7 @@
               item-value="id"
               persistent-hint
               multiple
-              :rules="reqField($t('user.required_position'))"
+              :rules="reqMultipleSelect($t('mailinglist.required_user'))"
             >
             </v-select>
             <UIAlert
@@ -142,7 +142,8 @@ export default {
   setup(props, { emit }) {
     const store = useStore();
     const show = true;
-    const { valid, reqField } = useForm();
+
+    const { valid, reqField, reqMultipleSelect } = useForm();
     const { t } = useI18n();
     const { hasRequestError, hasLoadingError, resetNotification } =
       useNotification();
@@ -207,8 +208,7 @@ export default {
     const enterMailingList = () => {
       HTTP.get("mail/list/" + props.item.id + "/join")
         .then(() => {
-          store.dispatch("profile/getMyMailingLists");
-          emit("child-object", { closeDialog: true });
+          emit("child-object", { closeDialog: true, hasChanges: true });
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -217,8 +217,7 @@ export default {
     const exitMailingList = () => {
       HTTP.get("mail/list/" + props.item.id + "/leave")
         .then(() => {
-          store.dispatch("profile/getMyMailingLists");
-          emit("child-object", { closeDialog: true });
+          emit("child-object", { closeDialog: true, hasChanges: true });
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -253,6 +252,7 @@ export default {
 
     return {
       reqField,
+      reqMultipleSelect,
       valid,
       users,
       selectedUsers,

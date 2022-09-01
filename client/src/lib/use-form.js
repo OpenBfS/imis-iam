@@ -53,6 +53,9 @@ export function useForm() {
   const reqField = (reqMsg) => {
     return [(v) => !!v || reqMsg];
   };
+  const reqMultipleSelect = (reqMsg) => {
+    return [(v) => !!(v && v.length) || reqMsg];
+  };
   return {
     form,
     valid,
@@ -64,5 +67,6 @@ export function useForm() {
     validFax,
     validPostalcode,
     reqValidPostalcode,
+    reqMultipleSelect,
   };
 }

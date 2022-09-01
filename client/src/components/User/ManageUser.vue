@@ -128,9 +128,7 @@
                   item-value="id"
                   persistent-hint
                   multiple
-                  :rules="[
-                    (v) => !!(v && v.length) || $t('user.required_institution'),
-                  ]"
+                  :rules="reqMultipleSelect($('user.required_institution'))"
                 >
                 </v-select>
                 <v-select
@@ -338,7 +336,14 @@ export default {
       }
     });
     // Form
-    const { form, valid, reqField, reqValidPhone, reqValidmail } = useForm();
+    const {
+      form,
+      valid,
+      reqField,
+      reqValidPhone,
+      reqValidmail,
+      reqMultipleSelect,
+    } = useForm();
     // Activate button only if some values are changed for "edit"
     // and username and email are changed for "copy"
     // to avoid useless requests
@@ -353,6 +358,7 @@ export default {
     });
 
     return {
+      reqMultipleSelect,
       reqField,
       reqValidPhone,
       reqValidmail,
