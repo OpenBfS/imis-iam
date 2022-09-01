@@ -7,6 +7,7 @@
 package de.intevation.iam;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -231,10 +232,11 @@ public class MailProvider implements RealmResourceProvider {
                 .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
                 .build();
         }
-        list.updateMailListUsers();
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
+        //Create list and add user entries
         em.persist(list);
+        updateMailListUsers(list, em);
         return Response.ok(list).build();
     }
 
@@ -270,9 +272,9 @@ public class MailProvider implements RealmResourceProvider {
             @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-
+        MailList originalList = em.find(MailList.class, list.getId());
         if (list == null || list.getId() == null
-                || em.find(MailList.class, list.getId()) == null) {
+                || originalList == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
         if (list.getUsers() == null
@@ -287,7 +289,8 @@ public class MailProvider implements RealmResourceProvider {
                 .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
                 .build();
         }
-        list.updateMailListUsers();
+        list.setMailListUsers(originalList.getMailListUsers());
+        updateMailListUsers(list, em);
         MailList mergedList = em.merge(list);
         mergedList.updateUsers();
         return Response.ok(mergedList).build();
@@ -605,9 +608,48 @@ public class MailProvider implements RealmResourceProvider {
             Predicate filter = cb.equal(join.get("userId"), userId);
             critQuery.where(filter);
         }
+        critQuery.orderBy(cb.asc(root.get("name")));
         TypedQuery<MailList> query = em.createQuery(critQuery);
         List<MailList> lists = query.getResultList();
         lists.forEach(list -> list.updateUsers());
         return lists;
+    }
+
+    /**
+     * Update mailListUser list using the users id array.
+     */
+    public void updateMailListUsers(MailList list, EntityManager em) {
+        List<String> users = list.getUsers();
+        if (users == null) {
+            return;
+        }
+        List<MailListUser> mailListUsers = list.getMailListUsers();
+        if (mailListUsers != null) {
+            List<MailListUser> itemsToRemove = new ArrayList<>();
+            //Delete removed users no longer subscribed
+            for (MailListUser mlu: mailListUsers) {
+                if (!users.contains(mlu.getUserId())) {
+                    itemsToRemove.add(mlu);
+                    em.remove(mlu);
+                }
+            }
+            mailListUsers.removeAll(itemsToRemove);
+        }
+        else {
+            mailListUsers = new ArrayList<>();
+        }
+        //Add new subscriptions
+        for(String userId: users) {
+            if (mailListUsers.stream()
+                        .filter(mlu -> userId.equals(mlu.getUserId()))
+                        .findAny()
+                        .orElse(null) == null) {
+                MailListUser newEntry = new MailListUser();
+                newEntry.setMailListId(list.getId());
+                newEntry.setUserId(userId);
+                mailListUsers.add(newEntry);
+                em.persist(newEntry);
+            }
+        }
     }
 }

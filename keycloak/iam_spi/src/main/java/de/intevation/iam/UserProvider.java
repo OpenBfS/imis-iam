@@ -45,6 +45,7 @@ import de.intevation.iam.model.UserPosition;
 import de.intevation.iam.model.UserIamAttributes;
 import de.intevation.iam.model.UserMembership;
 import de.intevation.iam.util.Constants;
+import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;
 
 public class UserProvider implements RealmResourceProvider {
@@ -173,6 +174,10 @@ public class UserProvider implements RealmResourceProvider {
         if (attributes.getId() == null) {
             attributes.setId(newUser.getId());
         }
+        attributes.setExpiredNotificationSent(false);
+        attributes.setInactivityNotificationSent(false);
+        attributes.setExpiryDate(
+                DateUtils.getAccountExpiryDate());
         em.persist(attributes);
         updateInstitutions(rep.getInstitutions(), rep);
         return Response.ok(User.fromUserModel(newUser, em)).build();

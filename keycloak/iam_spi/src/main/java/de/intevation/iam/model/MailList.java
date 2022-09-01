@@ -80,30 +80,4 @@ public class MailList {
         users = new ArrayList<String>();
         mailListUsers.forEach(mlu -> users.add(mlu.getUserId()));
     }
-
-    /**
-     * Update mailListUser list using the users id array.
-     */
-    public void updateMailListUsers() {
-        if (getUsers() == null) {
-            return;
-        }
-        //Delete removed users no longer subscribed
-        mailListUsers.forEach(mlu -> {
-            if (!users.contains(mlu.getUserId())) {
-                mailListUsers.remove(mlu);
-            }
-        });
-        //Add new subscriptions
-        users.forEach(userId -> {
-            if (mailListUsers.stream()
-                    .filter(mlu -> userId.equals(mlu.getUserId()))
-                    .findAny() == null) {
-                MailListUser newEntry = new MailListUser();
-                newEntry.setMailListId(getId());
-                newEntry.setUserId(userId);
-                mailListUsers.add(newEntry);
-            }
-        });
-    }
 }

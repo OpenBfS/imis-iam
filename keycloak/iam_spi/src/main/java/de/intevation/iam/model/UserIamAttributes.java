@@ -37,16 +37,13 @@ public class UserIamAttributes {
     @Column(name = "expiry_date", nullable = false)
     @JsonIgnore
     private Timestamp expiryDate;
-    @Column(name = "inactivity_notification_sent", nullable = false)
+    @Column(name = "inactivity_notification_sent")
     @JsonIgnore
     private Boolean inactivityNotificationSent;
-    @Column(name = "expired_notification_sent", nullable = false)
+    @Column(name = "expired_notification_sent")
     @JsonIgnore
     private Boolean expiredNotificationSent;
 
-    public Boolean getInactivityNotificationSent() {
-        return inactivityNotificationSent;
-    }
     public String getId() {
         return id;
     }
@@ -100,6 +97,9 @@ public class UserIamAttributes {
     }
     public void setExpiryDate(Timestamp expiryDate) {
         this.expiryDate = expiryDate;
+    }
+    public Boolean getInactivityNotificationSent() {
+        return inactivityNotificationSent;
     }
     public void setInactivityNotificationSent(
             Boolean inactivityNotificationSent) {
