@@ -100,7 +100,7 @@
                       icon="mdi-location-exit"
                       size="small"
                       v-bind="props"
-                      :disabled="!isUserInList(list)"
+                      :disabled="!isUserInList(list) || list.users.length <= 1"
                       @click="
                         selectedItem = list;
                         processType = 'exit';
