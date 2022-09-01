@@ -128,7 +128,7 @@
                   item-value="id"
                   persistent-hint
                   multiple
-                  :rules="reqMultipleSelect($('user.required_institution'))"
+                  :rules="reqMultipleSelect($t('user.required_institution'))"
                 >
                 </v-select>
                 <v-select
