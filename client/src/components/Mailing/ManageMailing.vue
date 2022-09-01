@@ -150,7 +150,6 @@ export default {
       return store.state.user.users;
     });
     const selectedUsers = ref([]);
-
     const getUsers = () => {
       store
         .dispatch("user/loadUsers")
@@ -187,12 +186,14 @@ export default {
       getUsers();
       if (props.processType === "edit") {
         listName.value = props.item.name;
+        selectedUsers.value = props.item.users;
       }
     });
     const editMailList = () => {
       HTTP.put("mail/list/", {
         id: props.item.id,
         name: listName.value,
+        users: selectedUsers.value,
       })
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
