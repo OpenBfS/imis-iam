@@ -15,16 +15,21 @@ HTTP.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      if (error.response.status === 404) {
-        store.commit(
-          "application/setHttpErrorMessage",
-          `Page '${error.response.config.url}' not found`
-        );
-      } else {
-        store.commit(
-          "application/setHttpErrorMessage",
-          error.response.statusText
-        );
+      switch (error.response.status) {
+        case 404:
+          store.commit(
+            "application/setHttpErrorMessage",
+            `Page '${error.response.config.url}' not found`
+          );
+          break;
+        case 409:
+          store.commit("application/setHttpErrorMessage", error.response.data);
+          break;
+        default:
+          store.commit(
+            "application/setHttpErrorMessage",
+            error.response.statusText
+          );
       }
       // Handle other type of errors.
     } else if (error.request) {
