@@ -174,12 +174,22 @@ public class UserProvider implements RealmResourceProvider {
                 .build();
         }
 
-        UserModel newUser = session.users().addUser(realm, rep.getUsername());
+        UserModel newUserModel
+                = session.users().addUser(realm, rep.getUsername());
 
-        newUser.setFirstName(rep.getFirstName());
-        newUser.setLastName(rep.getLastName());
-        newUser.setEmail(rep.getEmail());
-        rep.setId(newUser.getId());
+        newUserModel.setFirstName(rep.getFirstName());
+        newUserModel.setLastName(rep.getLastName());
+        newUserModel.setEmail(rep.getEmail());
+        rep.setId(newUserModel.getId());
+
+        //Update roles
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        Stream<RoleModel> roleStream = client.getRolesStream().filter(item -> {
+            return rep.getRoles().contains(item.getName());
+        });
+        Map<String, RoleModel> roleMap = roleStream.collect(
+            Collectors.toMap(RoleModel::getId, Function.identity()));
+        updateRoles(roleMap, newUserModel, client);
 
         //Update groups
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
@@ -188,14 +198,14 @@ public class UserProvider implements RealmResourceProvider {
             });
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
-        updateGroups(groupMap, newUser);
+        updateGroups(groupMap, newUserModel);
         UserIamAttributes attributes = rep.getAttributes();
         if (attributes.getId() == null) {
-            attributes.setId(newUser.getId());
+            attributes.setId(newUserModel.getId());
         }
         em.persist(attributes);
         updateInstitutions(rep.getInstitutions(), rep);
-        return Response.ok(User.fromUserModel(newUser, em, realm)).build();
+        return Response.ok(User.fromUserModel(newUserModel, em, realm)).build();
     }
 
     /**
