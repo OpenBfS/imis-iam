@@ -77,7 +77,14 @@ public class UserAuthorizer implements Authorizer<User> {
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        //If no roles are set, check if user is "Redakteur"
+        //Else check if user is "Chefredakteur"
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        } else {
+            return AuthUtils.isUserAtLeastChefredakteur(
+                    requestingUser, client);
+        }
     }
 
     private boolean authorizeUpdate(
