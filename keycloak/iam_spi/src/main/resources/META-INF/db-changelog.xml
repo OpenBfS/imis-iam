@@ -303,4 +303,31 @@
                 defaultValue="false" />
         </addColumn>
     </changeSet>
+    <changeSet author="awoestmann@intevation.de" id="v0.6">
+        <!--Add "ON DELETE CASCADE" to mail list and institution mapping tables-->
+        <dropForeignKeyConstraint
+            baseTableName="mail_list_user"
+            constraintName="fk_mail_list_user_list"
+        />
+        <addForeignKeyConstraint
+            constraintName="fk_mail_list_user_list"
+            baseTableName="mail_list_user"
+            baseColumnNames="mail_list_id"
+            referencedTableName="mail_list"
+            referencedColumnNames="id"
+            onDelete="CASCADE"
+        />
+        <dropForeignKeyConstraint
+            baseTableName="institution_user"
+            constraintName="fk_institution_user_institution"
+        />
+        <addForeignKeyConstraint
+            constraintName="fk_institution_user_institution"
+            baseTableName="institution_user"
+            baseColumnNames="institution_id"
+            referencedTableName="institution"
+            referencedColumnNames="id"
+            onDelete="CASCADE"
+        />
+    </changeSet>
 </databaseChangeLog>
