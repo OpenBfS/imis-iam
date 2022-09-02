@@ -163,6 +163,8 @@ export default {
     const onCopyClicked = (id) => {
       user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
       savedUser.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
+      user.value.email = "";
+      user.value.username = "";
       delete user.value["id"];
       processType.value = "copy";
       showManageUserDialog.value = true;
