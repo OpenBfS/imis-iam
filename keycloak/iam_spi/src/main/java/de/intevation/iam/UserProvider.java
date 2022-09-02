@@ -133,6 +133,9 @@ public class UserProvider implements RealmResourceProvider {
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
+        if (rep.getAttributes().getId() != null || rep.getAttributes().getId().equals("")) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
