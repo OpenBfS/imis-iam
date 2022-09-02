@@ -165,6 +165,7 @@ export default {
       savedUser.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
       user.value.email = "";
       user.value.username = "";
+      delete user.value.attributes.id;
       delete user.value["id"];
       processType.value = "copy";
       showManageUserDialog.value = true;
