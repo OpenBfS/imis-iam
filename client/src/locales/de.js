@@ -159,6 +159,7 @@ export default {
   },
   // MailingList
   mailinglist: {
+    recipient: "Empfänger",
     required_user: "Mailing-Liste muss mindestens einen Nutzer beinhalten",
     title: "E-Mail-Verteiler",
     not_found: "",

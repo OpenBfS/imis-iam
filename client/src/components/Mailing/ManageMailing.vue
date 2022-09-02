@@ -27,7 +27,7 @@
               :no-data-text="$t('label.no_data_text')"
               dense
               clearable
-              :label="$t('main.users')"
+              :label="$t('mailinglist.recipient')"
               :items="users"
               v-model="selectedUsers"
               item-title="username"
