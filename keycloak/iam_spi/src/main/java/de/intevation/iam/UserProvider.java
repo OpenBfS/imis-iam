@@ -118,7 +118,6 @@ public class UserProvider implements RealmResourceProvider {
         }
         return Response.ok(User.fromUserModel(user, em)).build();
     }
-
     /**
      * Create a new user.
      * @param headers Request headers
@@ -133,7 +132,8 @@ public class UserProvider implements RealmResourceProvider {
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (rep.getAttributes().getId() != null || rep.getAttributes().getId().equals("")) {
+        UserIamAttributes attributes = rep.getAttributes();
+        if (attributes != null && attributes.getId() != null && !attributes.getId().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
         EntityManager em = session.getProvider(
@@ -173,7 +173,6 @@ public class UserProvider implements RealmResourceProvider {
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, newUser);
-        UserIamAttributes attributes = rep.getAttributes();
         if (attributes.getId() == null) {
             attributes.setId(newUser.getId());
         }
