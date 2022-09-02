@@ -220,6 +220,14 @@ public class UserProvider implements RealmResourceProvider {
         if (attributes.getId() == null) {
             attributes.setId(rep.getId());
         }
+        //Set expiry date and notification flags
+        UserIamAttributes dbAttributes
+                = em.find(UserIamAttributes.class, attributes.getId());
+        attributes.setExpiryDate(dbAttributes.getExpiryDate());
+        attributes.setExpiredNotificationSent(
+                dbAttributes.getExpiredNotificationSent());
+        attributes.setInactivityNotificationSent(
+                dbAttributes.getInactivityNotificationSent());
         em.merge(attributes);
         return Response.ok(User.fromUserModel(user, em)).build();
     }
