@@ -28,7 +28,7 @@
                       ? 'underlined'
                       : 'plain'
                   "
-                  :label="'* ' + $t('user.username')"
+                  :label="$t('user.username')"
                   v-model="user.username"
                   :rules="reqField($t('user.required_username'))"
                   :readonly="processType === 'edit'"
@@ -42,13 +42,13 @@
               <div class="two_group_class">
                 <v-text-field
                   variant="underlined"
-                  :label="'* ' + $t('user.firstname')"
+                  :label="$t('user.firstname')"
                   v-model="user.firstName"
                   :rules="reqField($t('user.required_firstname'))"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
-                  :label="'* ' + $t('user.lastname')"
+                  :label="$t('user.lastname')"
                   :rules="reqField($t('user.required_lastname'))"
                   v-model="user.lastName"
                 ></v-text-field>
@@ -56,7 +56,7 @@
               <div class="one_group_class">
                 <v-text-field
                   variant="underlined"
-                  :label="'* ' + $t('label.email')"
+                  :label="$t('label.email')"
                   v-model="user.email"
                   :rules="
                     reqValidmail(
@@ -70,7 +70,7 @@
               <div class="three_group_class">
                 <v-text-field
                   variant="underlined"
-                  :label="'* ' + $t('user.phone')"
+                  :label="$t('user.phone')"
                   :rules="
                     reqValidPhone(
                       $t('form.required_phone'),
@@ -121,7 +121,7 @@
                   :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
-                  :label="'* ' + $t('user.label_institutions')"
+                  :label="$t('user.label_institutions')"
                   :items="institutions"
                   v-model="user.institutions"
                   item-title="name"
@@ -135,7 +135,7 @@
                   :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
-                  :label="'* ' + $t('user.label_memberships')"
+                  :label="$t('user.label_memberships')"
                   :items="memeberships"
                   v-model="user.groups"
                   item-title="name"
@@ -151,7 +151,7 @@
                   :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
-                  :label="'* ' + $t('user.label_positions')"
+                  :label="$t('user.label_positions')"
                   :items="positions"
                   v-model="user.attributes.position"
                   item-title="position"

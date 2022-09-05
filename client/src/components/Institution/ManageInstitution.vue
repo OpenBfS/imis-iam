@@ -27,14 +27,14 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('label.name')"
+                  :label="$t('label.name')"
                   v-model="institution.name"
                   :rules="reqField($t('institution.required_name'))"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.shortname')"
+                  :label="$t('institution.shortname')"
                   :rules="reqField($t('institution.required_shortname'))"
                   v-model="institution.shortName"
                 ></v-text-field>
@@ -48,7 +48,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.service_building_location')"
+                  :label="$t('institution.service_building_location')"
                   :rules="
                     reqField(
                       $t('institution.required_service_building_location')
@@ -59,7 +59,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.service_building_postalcode')"
+                  :label="$t('institution.service_building_postalcode')"
                   :rules="
                     reqValidPostalcode(
                       $t('institution.required_service_building_postalcode'),
@@ -71,7 +71,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.service_building_street')"
+                  :label="$t('institution.service_building_street')"
                   v-model="institution.serviceBuildingStreet"
                   :rules="
                     reqField($t('institution.required_service_building_street'))
@@ -106,7 +106,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.central_phone')"
+                  :label="$t('institution.central_phone')"
                   :rules="
                     reqValidPhone(
                       $t('institution.required_central_phone'),
@@ -118,7 +118,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.central_email')"
+                  :label="$t('institution.central_email')"
                   :rules="
                     reqValidmail(
                       $t('institution.required_central_email'),
@@ -160,7 +160,7 @@
                   return-object
                   dense
                   clearable
-                  :label="'* ' + $t('institution.categories')"
+                  :label="$t('institution.categories')"
                   :items="categories"
                   v-model="institution.category"
                   item-title="name"
