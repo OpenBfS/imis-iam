@@ -79,7 +79,7 @@
         <v-btn
           size="small"
           :disabled="!selectedList || !selectedType"
-          :color="selectedList && selectedType ? 'accent' : 'grey'"
+          color="accent"
           @click="sendMail()"
         >
           {{ $t("button.send") }}

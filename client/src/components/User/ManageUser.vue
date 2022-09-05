@@ -172,10 +172,8 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <!-- ":color" It is necessary to handle color like this as disabled
-        does not have style effect yet. TODO: Check this if fixed by upstream -->
         <v-btn
-          :color="`${valid && !hasNoChanges ? 'accent' : 'grey'}`"
+          color="accent"
           :disabled="!valid || hasNoChanges"
           @click="
             ['add', 'copy'].indexOf(processType) !== -1

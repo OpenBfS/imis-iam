@@ -80,7 +80,7 @@
               </div>
 
               <div class="group_class">
-                <!-- TODO: Readd this rules once the validation for
+                <!-- TODO: Read this rules once the validation for
                     optional fields gets implemented by upstream.
                 :rules="validPostalcode($t('form.valid_postalcode'))" -->
                 <v-text-field
@@ -127,7 +127,7 @@
                   "
                   v-model="institution.centralMail"
                 ></v-text-field>
-                <!--TODO: Readd this rules once the validation for
+                <!--TODO: Read this rules once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validFax($t('form.valid_fax'))" -->
                 <v-text-field
@@ -144,7 +144,7 @@
                   :label="$t('institution.imis_Id')"
                   v-model="institution.imisId"
                 ></v-text-field>
-                <!-- TODO: Readd this rules once the validation for
+                <!-- TODO: Read this rules once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validMail($t('form.valid_email'))"  -->
                 <v-text-field
@@ -224,7 +224,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          :color="`${valid ? 'accent' : 'grey'}`"
+          color="accent"
           :disabled="!valid"
           @click="
             processType == 'add' ? createInstitution() : updateInstitution()
