@@ -7,11 +7,7 @@
  -->
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="12" class="mt-10 pa-2 text-h6 bg-secondary">
-        {{ $t("mailinglist.title") }}
-      </v-col>
-    </v-row>
+    <UIHeader v-bind:title="$t('mailinglist.title')" />
     <v-row justify="end" class="mt-6">
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
@@ -160,6 +156,9 @@ import { useStore } from "vuex";
 
 export default {
   components: {
+    UIHeader: defineAsyncComponent(() =>
+      import("@/components/UI/UIHeader.vue")
+    ),
     UIAlert: defineAsyncComponent(() => import("../UI/UIAlert.vue")),
     ManageMailing: defineAsyncComponent(() =>
       import("@/components/Mailing/ManageMailing.vue")

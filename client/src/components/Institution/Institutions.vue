@@ -7,11 +7,7 @@
  -->
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="12" class="mt-10 pa-2 text-h6 bg-secondary">
-        {{ $t("institution.title") }}
-      </v-col>
-    </v-row>
+    <UIHeader v-bind:title="$t('institution.title')" />
     <v-row justify="end" class="mt-6">
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
@@ -126,6 +122,9 @@ export default {
   components: {
     ManageInstitution: defineAsyncComponent(() =>
       import("@/components/Institution/ManageInstitution.vue")
+    ),
+    UIHeader: defineAsyncComponent(() =>
+      import("@/components/UI/UIHeader.vue")
     ),
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
