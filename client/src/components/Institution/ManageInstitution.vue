@@ -157,7 +157,6 @@
               <div class="group_class align-center">
                 <v-select
                   :no-data-text="$t('label.no_data_text')"
-                  return-object
                   dense
                   clearable
                   :label="$t('institution.categories')"
@@ -334,7 +333,6 @@ export default {
     });
     const createInstitution = () => {
       let payload = { ...institution.value };
-      payload.category = payload.category.id;
       HTTP.post("/institution", payload)
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
@@ -345,7 +343,6 @@ export default {
     };
     const updateInstitution = () => {
       let payload = { ...institution.value };
-      payload.category = payload.category.id;
       HTTP.put("/institution", payload)
         .then(() => {
           emit("child-object", { closeDialog: true, hasChanges: true });
