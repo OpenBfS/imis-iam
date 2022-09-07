@@ -234,9 +234,7 @@
         <v-btn
           color="accent"
           @click="
-            $emit('child-object', {
-              closeDialog: true,
-            })
+            $store.commit('application/setShowManageInstitutionDialog', false)
           "
         >
           {{ $t("button.cancel") }}
@@ -258,9 +256,7 @@
         <v-btn
           color="accent"
           @click="
-            $emit('child-object', {
-              closeDialog: true,
-            })
+            $store.commit('application/setShowManageInstitutionDialog', false)
           "
         >
           {{ $t("button.cancel") }}
@@ -287,6 +283,7 @@ import { onMounted, ref, defineAsyncComponent } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
+import { useStore } from "vuex";
 export default {
   components: {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
@@ -296,8 +293,9 @@ export default {
     copiedItem: Object,
     processType: String,
   },
-  setup(props, { emit }) {
+  setup(props) {
     const show = true;
+    const store = useStore();
     const institution = ref(props.item);
     const { hasLoadingError, hasRequestError } = useNotification();
     const {
@@ -331,11 +329,20 @@ export default {
         }, 100);
       }
     });
+    const getInstitutions = () => {
+      store
+        .dispatch("institution/loadInstitutions")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     const createInstitution = () => {
       let payload = { ...institution.value };
       HTTP.post("/institution", payload)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -345,7 +352,8 @@ export default {
       let payload = { ...institution.value };
       HTTP.put("/institution", payload)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -354,7 +362,8 @@ export default {
     const deleteInstitution = () => {
       HTTP.delete("institution/" + institution.value.id)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;

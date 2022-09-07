@@ -16,9 +16,10 @@
             class="mr-4"
             v-bind="props"
             @click="
-              resetUser();
-              processType = 'add';
-              showManageDialog = true;
+              resetInstitution();
+              $store.commit('application/setManagedItem', institution);
+              $store.commit('application/setProcessType', 'add');
+              $store.commit('application/setShowManageInstitutionDialog', true);
             "
             icon="mdi-plus"
           >
@@ -64,9 +65,14 @@
                       size="small"
                       v-bind="props"
                       @click="
-                        institution = { ...item };
-                        processType = 'edit';
-                        showManageDialog = true;
+                        $store.commit('application/setManagedItem', {
+                          ...item,
+                        });
+                        $store.commit('application/setProcessType', 'edit');
+                        $store.commit(
+                          'application/setShowManageInstitutionDialog',
+                          true
+                        );
                       "
                     ></v-btn>
                   </template>
@@ -80,9 +86,14 @@
                       size="small"
                       v-bind="props"
                       @click="
-                        institution = { ...item };
-                        processType = 'delete';
-                        showManageDialog = true;
+                        $store.commit('application/setManagedItem', {
+                          ...item,
+                        });
+                        $store.commit('application/setProcessType', 'delet');
+                        $store.commit(
+                          'application/setShowManageInstitutionDialog',
+                          true
+                        );
                       "
                     ></v-btn>
                   </template>
@@ -103,12 +114,6 @@
         />
       </v-col>
     </v-row>
-    <ManageInstitution
-      v-if="showManageDialog"
-      v-bind:item="institution"
-      v-bind:processType="processType"
-      @child-object="checkChildObject"
-    />
   </v-container>
 </template>
 
@@ -120,9 +125,6 @@ import { expInstitution } from "@/components/Institution/institution";
 
 export default {
   components: {
-    ManageInstitution: defineAsyncComponent(() =>
-      import("@/components/Institution/ManageInstitution.vue")
-    ),
     UIHeader: defineAsyncComponent(() =>
       import("@/components/UI/UIHeader.vue")
     ),
@@ -151,23 +153,15 @@ export default {
     onMounted(() => {
       getInstitutions();
     });
-    const checkChildObject = (e) => {
-      if (e.closeDialog) {
-        showManageDialog.value = false;
-      }
-      if (e.hasChanges) {
-        getInstitutions();
-      }
-    };
-    const resetUser = () => {
+
+    const resetInstitution = () => {
       institution.value = { ...expInstitution };
     };
     return {
-      resetUser,
+      resetInstitution,
       hasLoadingError,
       showManageDialog,
       institution,
-      checkChildObject,
       institutions,
       processType,
     };
