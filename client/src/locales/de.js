@@ -114,6 +114,7 @@ export default {
   },
   // Shared labels
   label: {
+    search: "Suche",
     no_data_text: "Keine Daten vorhanden",
     faq: "FAQ",
     report_problem: "Problem melden",

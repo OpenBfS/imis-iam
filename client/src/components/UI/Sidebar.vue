@@ -15,17 +15,20 @@
   >
     <v-list style="margin-top: 90px" nav>
       <v-list-item @click="$route.path == '/' ? '' : $router.push('/')">
-        <v-list-item-title> Home</v-list-item-title></v-list-item
+        <v-list-item-title> Home</v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        @click="$route.path == '/search' ? '' : $router.push('/search')"
       >
+        <v-list-item-title> {{ $t("label.search") }}</v-list-item-title>
+      </v-list-item>
       <v-list-item
         @click="
           $route.path == '/mailinglist' ? '' : $router.push('/mailinglists')
         "
       >
-        <v-list-item-title>
-          {{ $t("mailinglist.title") }}</v-list-item-title
-        ></v-list-item
-      >
+        <v-list-item-title> {{ $t("mailinglist.title") }}</v-list-item-title>
+      </v-list-item>
       <v-list-item
         @click="$route.path == '/users' ? '' : $router.push('/users')"
         :title="$t('main.users')"
