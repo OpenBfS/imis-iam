@@ -11,8 +11,12 @@ export const user = {
     users: [],
     memberships: [],
     positions: [],
+    foundUsers: [],
   }),
   mutations: {
+    setFoundUsers: (state, data) => {
+      state.foundUsers = data;
+    },
     setUsers: (state, data) => {
       state.users = data;
     },

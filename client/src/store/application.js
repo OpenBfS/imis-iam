@@ -23,10 +23,14 @@ export const application = {
       socialMedia: process.env.VUE_APP_FOOTER_SOCIALMEDIA,
     },
     reportMail: process.env.VUE_APP_REPORT_MAIL,
+    searchSting: "",
   }),
   mutations: {
     setShowManageUserDialog: (state, data) => {
       state.showManageUserDialog = data;
+    },
+    setSearchString: (state, data) => {
+      state.setSavedItem = data;
     },
     setSavedItem: (state, data) => {
       state.setSavedItem = data;

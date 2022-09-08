@@ -8,12 +8,18 @@
 <template>
   <v-card>
     <v-list density="compact" nav lines="">
-      <v-list-item-subtitle
-        >{{ type === "users" ? "Found users:" : "Found institutions:" }}
+      <v-list-item-subtitle>
+        {{
+          `${
+            type === "users"
+              ? $t("search.found_users")
+              : $t("search.found_institution")
+          }`
+        }}
       </v-list-item-subtitle>
       <v-list-item
-        v-for="(item, i) in items"
-        :key="i"
+        v-for="item in items"
+        :key="item.id"
         :value="item"
         active-color="accent"
         @click="selectItem(item)"
@@ -27,26 +33,20 @@
 </template>
 
 <script>
-import { computed, onMounted, ref } from "@vue/runtime-core";
+import { computed } from "@vue/runtime-core";
 import { useStore } from "vuex";
 export default {
   props: {
     type: String,
+    default: () => "users",
   },
   setup(props) {
     const store = useStore();
-    const users = computed(() => {
-      return store.state.user.users;
-    });
-    const institutions = computed(() => {
-      return store.state.institution.institutions;
-    });
-    const items = ref([]);
-    onMounted(() => {
+    const items = computed(() => {
       if (props.type === "users") {
-        items.value = users.value;
+        return store.state.user.foundUsers;
       } else {
-        items.value = institutions.value;
+        return store.state.institution.foundInstitutions;
       }
     });
     const cloneObject = (obj) => {
@@ -60,15 +60,11 @@ export default {
       } else {
         store.commit("application/setShowManageInstitutionDialog", true);
       }
-      console.log(item);
     };
     return {
       items,
       selectItem,
-      users,
     };
   },
 };
 </script>
-
-<style></style>

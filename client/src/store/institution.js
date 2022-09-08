@@ -18,6 +18,7 @@ export const institution = {
     newInstitution: {
       name: "",
     },
+    foundInstitutions: [],
   }),
   mutations: {
     //Convert current institution attributes to string arrays
@@ -31,6 +32,9 @@ export const institution = {
     },
     setInstitutionList: (state, data) => {
       state.institutions = data;
+    },
+    setFoundInstitutions: (state, data) => {
+      state.foundInstitutions = data;
     },
     setInstitutionNames: (state, data) => {
       var names = [];
@@ -51,9 +55,6 @@ export const institution = {
         }
       });
     },
-    /**
-     * Load all institutions
-     */
     loadInstitutions({ commit }) {
       return new Promise((resolve, reject) => {
         HTTP.get("/institution")

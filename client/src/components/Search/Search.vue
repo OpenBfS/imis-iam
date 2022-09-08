@@ -23,7 +23,10 @@
 </template>
 
 <script>
-import { ref, defineAsyncComponent } from "vue";
+import { ref, defineAsyncComponent, watch } from "vue";
+import { debounce } from "debounce";
+import { useStore } from "vuex";
+
 export default {
   components: {
     UIHeader: defineAsyncComponent(() =>
@@ -34,10 +37,35 @@ export default {
     ),
   },
   setup() {
+    const store = new useStore();
     const searchString = ref("");
-    const userTab = ref("");
-    const institutionTab = ref();
-    return { searchString, userTab, institutionTab };
+    const searchRequest = () => {
+      // Simulate the search request
+      // ToDo: Replace this with the right request for search
+      // once this gets implemnted in backend
+      Promise.all([
+        store.dispatch("user/loadUsers"),
+        store.dispatch("institution/loadInstitutions"),
+      ]).then(() => {
+        store.commit("user/setFoundUsers", store.state.user.users.slice(0, 3));
+        store.commit(
+          "institution/setFoundInstitutions",
+          store.state.institution.institutions.slice(0, 3)
+        );
+      });
+    };
+    const triggerSearch = debounce(() => {
+      searchRequest();
+    }, 500);
+    watch(
+      () => searchString.value,
+      (oldV, newV) => {
+        if (oldV !== newV) {
+          triggerSearch();
+        }
+      }
+    );
+    return { searchString };
   },
 };
 </script>

@@ -11,7 +11,6 @@
       <v-tab value="users">{{ $t("main.users") }}</v-tab>
       <v-tab value="institutions">{{ $t("main.institutions") }}</v-tab>
     </v-tabs>
-
     <v-card-text>
       <v-window v-model="tab">
         <v-window-item value="users">
