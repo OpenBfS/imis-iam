@@ -19,8 +19,9 @@
             @click="
               resetUser();
               resetNotification();
-              processType = 'add';
-              showManageUserDialog = true;
+              $store.commit('application/setManagedItem', user);
+              $store.commit('application/setProcessType', 'add');
+              $store.commit('application/setShowManageUserDialog', true);
             "
           >
           </v-btn>
@@ -106,13 +107,6 @@
         />
       </v-col>
     </v-row>
-    <ManageUser
-      v-if="showManageUserDialog"
-      v-bind:processType="processType"
-      v-bind:copiedItem="savedUser"
-      v-bind:item="user"
-      @child-object="checkChildObject"
-    />
   </v-container>
 </template>
 <script>
@@ -126,9 +120,6 @@ export default {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
     UIHeader: defineAsyncComponent(() =>
       import("@/components/UI/UIHeader.vue")
-    ),
-    ManageUser: defineAsyncComponent(() =>
-      import("@/components/User/ManageUser.vue")
     ),
   },
   setup() {
@@ -149,6 +140,7 @@ export default {
     };
 
     onMounted(() => {
+      resetUser();
       store
         .dispatch("user/loadUsers")
         .then()
@@ -166,28 +158,22 @@ export default {
       user.value.username = "";
       delete user.value.attributes.id;
       delete user.value["id"];
-      processType.value = "copy";
-      showManageUserDialog.value = true;
+      store.commit("application/setManagedItem", user.value);
+      store.commit("application/setSavedItem", savedUser.value);
+      store.commit("application/setProcessType", "copy");
+      store.commit("application/setShowManageUserDialog", true);
     };
     const onEditClicked = (id) => {
       user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
       // Save original user data for "reset" button
       savedUser.value = cloneObject(user.value);
-      processType.value = "edit";
-      showManageUserDialog.value = true;
+      store.commit("application/setManagedItem", user.value);
+      store.commit("application/setSavedItem", savedUser.value);
+      store.commit("application/setProcessType", "edit");
+      store.commit("application/setShowManageUserDialog", true);
     };
-    const checkChildObject = (e) => {
-      if (e.closeDialog) {
-        showManageUserDialog.value = false;
-        resetUser();
-      }
-      if (e.hasChanges) {
-        resetUser();
-        store.dispatch("user/loadUsers");
-      }
-    };
+
     return {
-      checkChildObject,
       showManageUserDialog,
       resetNotification,
       hasLoadingError,

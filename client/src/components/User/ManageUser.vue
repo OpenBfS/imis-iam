@@ -201,9 +201,10 @@
         <v-btn
           color="accent"
           @click="
+            $store.commit('application/setShowManageUserDialog', false);
             $emit('child-object', {
               closeDialog: true,
-            })
+            });
           "
         >
           {{ $t("button.cancel") }}

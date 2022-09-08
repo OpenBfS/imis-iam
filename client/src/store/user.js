@@ -13,7 +13,7 @@ export const user = {
     positions: [],
   }),
   mutations: {
-    setUserList: (state, data) => {
+    setUsers: (state, data) => {
       state.users = data;
     },
     setMemberships: (state, data) => {
@@ -28,7 +28,7 @@ export const user = {
       return new Promise((resolve, reject) => {
         HTTP.get("/iamuser")
           .then((response) => {
-            commit("setUserList", response.data);
+            commit("setUsers", response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
