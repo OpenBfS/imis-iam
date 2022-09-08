@@ -72,7 +72,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
 
         this.setUser(receipient);
         EmailTemplate template = processTemplate(
-            "accountInactive", Collections.emptyList(),
+            "accountInactiveSubject", Collections.emptyList(),
             "accountInactive.ftl", bodyAttributes);
         sender.send(realmSmtpConfig, receipient,
                 template.getSubject(),
