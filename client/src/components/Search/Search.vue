@@ -13,6 +13,7 @@
         prepend-inner-icon="mdi-magnify"
         class="v-col v-col-5"
         v-model="searchString"
+        clearable
         density="comfortable"
       >
       </v-text-field>

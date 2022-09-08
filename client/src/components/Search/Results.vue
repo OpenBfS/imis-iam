@@ -7,9 +7,17 @@
  -->
 <template>
   <v-card>
-    <v-tabs v-model="tab" background-color="primary" grow>
-      <v-tab value="users">{{ $t("main.users") }}</v-tab>
-      <v-tab value="institutions">{{ $t("main.institutions") }}</v-tab>
+    <v-tabs density="compact" v-model="tab" background-color="primary" grow>
+      <v-tab value="users"
+        >{{ $t("main.users") }} ({{
+          $store.state.user.foundUsers.length
+        }})</v-tab
+      >
+      <v-tab value="institutions"
+        >{{ $t("main.institutions") }} ({{
+          $store.state.institution.foundInstitutions.length
+        }})</v-tab
+      >
     </v-tabs>
     <v-card-text>
       <v-window v-model="tab">
