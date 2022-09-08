@@ -10,14 +10,15 @@
     <UIHeader v-bind:title="$t('label.search')" />
     <v-row justify="start" class="mt-6">
       <v-text-field
-        class="v-col v-col-10"
+        prepend-inner-icon="mdi-magnify"
+        class="v-col v-col-5"
         v-model="searchString"
         density="comfortable"
       >
       </v-text-field>
     </v-row>
     <v-row>
-      <Results />
+      <Results class="v-col v-col-6" />
     </v-row>
   </v-container>
 </template>
