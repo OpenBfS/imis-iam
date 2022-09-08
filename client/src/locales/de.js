@@ -154,7 +154,7 @@ export default {
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
     valid_phone: "Telefon muss gültig sein",
-    required_phone: "Telefon is erförderlich",
+    required_phone: "Telefon ist erforderlich",
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
   },
