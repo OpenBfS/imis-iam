@@ -16,6 +16,17 @@
         v-bind:message="$store.state.application.httpErrorMessage"
       />
       <ExportDialog v-if="$store.state.application.showExportDialog" />
+      <ManageUser
+        v-if="$store.state.application.showManageUserDialog"
+        v-bind:processType="$store.state.application.processType"
+        v-bind:item="$store.state.application.managedItem"
+        v-bind:copiedItem="$store.state.application.savedItem"
+      />
+      <ManageInstitution
+        v-if="$store.state.application.showManageInstitutionDialog"
+        v-bind:item="$store.state.application.managedItem"
+        v-bind:processType="$store.state.application.processType"
+      />
     </v-main>
     <Appfooter />
   </v-app>
@@ -28,12 +39,17 @@ import { useNotification } from "./lib/use-notification";
 
 export default {
   components: {
+    ManageUser: defineAsyncComponent(() =>
+      import("@/components/User/ManageUser.vue")
+    ),
+    ManageInstitution: defineAsyncComponent(() =>
+      import("@/components/Institution/ManageInstitution.vue")
+    ),
     Sidebar: defineAsyncComponent(() => import("@/components/UI/Sidebar.vue")),
     Appbar: defineAsyncComponent(() => import("@/components/UI/Appbar.vue")),
     Appfooter: defineAsyncComponent(() =>
       import("@/components/UI/Appfooter.vue")
     ),
-
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
     ExportDialog: defineAsyncComponent(() =>
       import("@/components/UI/ExportDialog.vue")

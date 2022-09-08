@@ -60,7 +60,6 @@ export default {
       } else {
         store.commit("application/setShowManageInstitutionDialog", true);
       }
-      console.log(item);
     };
     return {
       items,
@@ -70,5 +69,3 @@ export default {
   },
 };
 </script>
-
-<style></style>
