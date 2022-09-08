@@ -189,4 +189,8 @@ export default {
     filter_by_maillist: "Filter nach E-Mail-Verteiler",
     maintenance: "Wartungensmeldungen",
   },
+  search: {
+    found_users: "Gefundene Nutzer",
+    found_institution: "Gefunden Institutionen:",
+  },
 };
