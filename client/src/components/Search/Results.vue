@@ -7,7 +7,7 @@
  -->
 <template>
   <v-card>
-    <v-tabs density="compact" v-model="tab" background-color="primary" grow>
+    <v-tabs density="compact" v-model="tab" grow>
       <v-tab value="users"
         >{{ $t("main.users") }} ({{
           $store.state.user.foundUsers.length
