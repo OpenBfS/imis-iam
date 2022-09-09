@@ -47,59 +47,7 @@
     </v-row>
     <v-row>
       <v-col cols="12" class="mt-6">
-        <v-table class="ma-2 pa-2">
-          <thead>
-            <th class="text-left">{{ $t("user.id") }}</th>
-            <th class="text-left">{{ $t("user.username") }}</th>
-            <th class="text-left">{{ $t("user.firstname") }}</th>
-            <th class="text-left">{{ $t("user.lastname") }}</th>
-            <th class="text-left">{{ $t("label.email") }}</th>
-            <th class="text-left">{{ $t("label.actions") }}</th>
-          </thead>
-          <tbody>
-            <tr v-for="user in users" :key="user.id">
-              <td class="text-truncate" style="max-width: 150px">
-                {{ user.id }}
-              </td>
-              <td>{{ user.username }}</td>
-              <td>{{ user.firstName }}</td>
-              <td>{{ user.lastName }}</td>
-              <td>{{ user.email }}</td>
-              <td class="d-flex">
-                <v-tooltip location="top">
-                  <template v-slot:activator="{ props }">
-                    <v-btn
-                      variant="plain"
-                      icon="mdi-account-edit-outline"
-                      size="small"
-                      v-bind="props"
-                      @click="
-                        resetNotification();
-                        onEditClicked(user.id);
-                      "
-                    ></v-btn>
-                  </template>
-                  <span>{{ $t("label.edit") }}</span>
-                </v-tooltip>
-                <v-tooltip>
-                  <template v-slot:activator="{ props }">
-                    <v-btn
-                      variant="plain"
-                      icon="mdi-content-copy"
-                      size="small"
-                      v-bind="props"
-                      @click="
-                        resetNotification();
-                        onCopyClicked(user.id);
-                      "
-                    ></v-btn>
-                  </template>
-                  <span>{{ $t("label.copy") }}</span>
-                </v-tooltip>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+        <UserTable v-bind:users="users" />
         <UIAlert
           v-if="hasLoadingError"
           v-bind:isSuccessful="!hasLoadingError"
@@ -121,6 +69,9 @@ export default {
     UIHeader: defineAsyncComponent(() =>
       import("@/components/UI/UIHeader.vue")
     ),
+    UserTable: defineAsyncComponent(() =>
+      import("@/components/User/UserTable.vue")
+    ),
   },
   setup() {
     const store = useStore();
@@ -134,13 +85,11 @@ export default {
       return store.state.user.users;
     });
     const user = ref(cloneObject(expUser));
-    const savedUser = ref();
     const resetUser = () => {
       user.value = cloneObject(expUser);
     };
 
     onMounted(() => {
-      resetUser();
       store
         .dispatch("user/loadUsers")
         .then()
@@ -149,41 +98,15 @@ export default {
         });
     });
     // Handle requests
-    const processType = ref("");
     const showManageUserDialog = ref(false);
-    const onCopyClicked = (id) => {
-      user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
-      savedUser.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
-      user.value.email = "";
-      user.value.username = "";
-      delete user.value.attributes.id;
-      delete user.value["id"];
-      store.commit("application/setManagedItem", user.value);
-      store.commit("application/setSavedItem", savedUser.value);
-      store.commit("application/setProcessType", "copy");
-      store.commit("application/setShowManageUserDialog", true);
-    };
-    const onEditClicked = (id) => {
-      user.value = cloneObject(users.value.filter((u) => id === u.id)[0]);
-      // Save original user data for "reset" button
-      savedUser.value = cloneObject(user.value);
-      store.commit("application/setManagedItem", user.value);
-      store.commit("application/setSavedItem", savedUser.value);
-      store.commit("application/setProcessType", "edit");
-      store.commit("application/setShowManageUserDialog", true);
-    };
 
     return {
       showManageUserDialog,
       resetNotification,
       hasLoadingError,
-      onEditClicked,
-      savedUser,
-      user,
       resetUser,
+      user,
       users,
-      processType,
-      onCopyClicked,
     };
   },
 };

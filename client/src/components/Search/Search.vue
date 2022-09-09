@@ -19,7 +19,7 @@
       </v-text-field>
     </v-row>
     <v-row>
-      <Results class="v-col v-col-6" />
+      <Results class="v-col v-col-11" />
     </v-row>
   </v-container>
 </template>

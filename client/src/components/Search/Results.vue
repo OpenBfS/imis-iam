@@ -6,7 +6,7 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-card>
+  <v-card flat>
     <v-tabs density="compact" v-model="tab" grow>
       <v-tab value="users"
         >{{ $t("main.users") }} ({{

@@ -30,10 +30,10 @@ export const application = {
       state.showManageUserDialog = data;
     },
     setSearchString: (state, data) => {
-      state.setSavedItem = data;
+      state.searchSting = data;
     },
     setSavedItem: (state, data) => {
-      state.setSavedItem = data;
+      state.savedItem = data;
     },
     setProcessType: (state, data) => {
       state.processType = data;

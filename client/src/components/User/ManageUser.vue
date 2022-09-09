@@ -251,7 +251,7 @@ export default {
     copiedItem: Object,
     processType: String,
   },
-  setup(props, { emit }) {
+  setup(props) {
     const show = true;
     const store = useStore();
     const user = ref(props.item);
@@ -302,10 +302,19 @@ export default {
     const cloneObject = (obj) => {
       return JSON.parse(JSON.stringify(obj));
     };
+    const getUsers = () => {
+      store
+        .dispatch("user/loadUsers")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     const createUser = () => {
       HTTP.post("/iamuser", user.value)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getUsers();
+          store.commit("application/setShowManageUserDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -318,7 +327,8 @@ export default {
           if (store.state.profile.userData.id === user.value.id) {
             store.dispatch("profile/loadProfile");
           }
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getUsers();
+          store.commit("application/setShowManageUserDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
