@@ -25,18 +25,16 @@ export function useForm() {
   const reqValidPhone = (reqMsg, validMsg) => {
     return [
       (v) => !!v || reqMsg,
-      (v) => /^[+]?\d{2,3}[-\s.]?\d{3,4}[-\s.]?\d{6,}/.test(v) || validMsg,
+      (v) => /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/.test(v) || validMsg
     ];
   };
   const validPhone = (validMsg) => {
-    (v) => /^[+]?\d{2,3}[-\s.]?\d{3,4}[-\s.]?\d{6,}/.test(v) || validMsg;
+    (v) => /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/.test(v) || validMsg;
   };
   const validFax = (validMsg) => {
     return [
       (v) =>
-        /^(\+?\d{1,}(\s?|-?)\d*(\s?|-?)\(?\d{2,}\)?(\s?|-?)\d{3,}\s?\d{3,})$/.test(
-          v
-        ) ||
+        /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/.test(v) ||
         v == "" ||
         validMsg,
     ];
