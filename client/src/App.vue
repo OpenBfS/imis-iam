@@ -16,16 +16,9 @@
         v-bind:message="$store.state.application.httpErrorMessage"
       />
       <ExportDialog v-if="$store.state.application.showExportDialog" />
-      <ManageUser
-        v-if="$store.state.application.showManageUserDialog"
-        v-bind:processType="$store.state.application.processType"
-        v-bind:item="$store.state.application.managedItem"
-        v-bind:copiedItem="$store.state.application.savedItem"
-      />
+      <ManageUser v-if="$store.state.application.showManageUserDialog" />
       <ManageInstitution
         v-if="$store.state.application.showManageInstitutionDialog"
-        v-bind:item="$store.state.application.managedItem"
-        v-bind:processType="$store.state.application.processType"
       />
     </v-main>
     <Appfooter />
