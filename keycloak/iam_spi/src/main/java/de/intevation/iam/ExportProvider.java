@@ -6,14 +6,19 @@
  */
 package de.intevation.iam;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -23,6 +28,9 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import de.intevation.iam.model.Institution;
 import de.intevation.iam.model.User;
 import de.intevation.iam.util.CSVExporter;
+import de.intevation.iam.util.Constants;
+import de.intevation.iam.util.I18nUtils;
+
 import javax.ws.rs.core.Response.Status;
 
 public class ExportProvider implements RealmResourceProvider {
@@ -104,8 +112,12 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("fieldSeparator") String fieldSeparator,
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
-            @QueryParam("encoding") String encoding) {
+            @QueryParam("encoding") String encoding,
+            @Context HttpHeaders headers) {
         CSVExporter<User> exporter = new CSVExporter<User>();
+        ResourceBundle i18n = I18nUtils.getI18nBundle(session,
+            headers.getHeaderString(Constants.SHIB_USER_HEADER));
+
         if (fieldSeparator != null) {
             if (!isValidFieldSeperator(fieldSeparator)) {
                 return Response.status(Status.BAD_REQUEST)
@@ -146,11 +158,23 @@ public class ExportProvider implements RealmResourceProvider {
         UserProvider userProvider = new UserProvider(session);
         Response userResponse = userProvider.getUsers();
         ArrayList<User> users = userResponse.readEntity(ArrayList.class);
-        InputStream result = exporter.export(users);
-        return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM)
-                .header("Content-Disposition",
-                        "attachment; filename=\"export.csv\"")
+        InputStream result;
+        try {
+            result = exporter.export(users);
+        } catch (IllegalAccessException | InvocationTargetException | IOException e) {
+            e.printStackTrace();
+            return Response.status(Status.INTERNAL_SERVER_ERROR)
+                .entity(i18n.getString("error_csv_generic"))
                 .build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Status.BAD_REQUEST)
+                .entity(i18n.getString("error_csv_options"))
+                .build();
+        }
+        return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM)
+        .header("Content-Disposition",
+                "attachment; filename=\"export.csv\"")
+        .build();
     }
 
     /**
@@ -168,8 +192,11 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("fieldSeparator") String fieldSeparator,
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
-            @QueryParam("encoding") String encoding) {
+            @QueryParam("encoding") String encoding,
+            @Context HttpHeaders headers) {
         CSVExporter<Institution> exporter = new CSVExporter<Institution>();
+        ResourceBundle i18n = I18nUtils.getI18nBundle(session,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER));
         if (fieldSeparator != null) {
             if (!isValidFieldSeperator(fieldSeparator)) {
                 return Response.status(Status.BAD_REQUEST)
@@ -210,7 +237,19 @@ public class ExportProvider implements RealmResourceProvider {
         InstitutionProvider instProvider = new InstitutionProvider(session);
         Response instResponse = instProvider.getInstitutions();
         ArrayList<Institution> institutions = instResponse.readEntity(ArrayList.class);
-        InputStream result = exporter.export(institutions);
+        InputStream result;
+        try {
+            result = exporter.export(institutions);
+        } catch (IllegalAccessException | InvocationTargetException | IOException e) {
+            e.printStackTrace();
+            return Response.status(Status.INTERNAL_SERVER_ERROR)
+                .entity(i18n.getString("error_csv_generic"))
+                .build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Status.BAD_REQUEST)
+                .entity(i18n.getString("error_csv_options"))
+                .build();
+        }
         return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM)
                 .header("Content-Disposition",
                         "attachment; filename=\"export.csv\"")
@@ -224,5 +263,17 @@ public class ExportProvider implements RealmResourceProvider {
     @Override
     public Object getResource() {
         return this;
+    }
+
+    public class ExporterException extends Exception {
+        private String msg;
+
+        public ExporterException(String msg) {
+            this.msg = msg;
+        }
+
+        public String getMsg() {
+            return this.msg;
+        }
     }
 }

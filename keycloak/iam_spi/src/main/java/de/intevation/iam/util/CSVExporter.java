@@ -12,6 +12,7 @@ import java.beans.PropertyDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import java.util.Arrays;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.intevation.iam.model.UserIamAttributes;
 
@@ -33,8 +36,14 @@ public class CSVExporter<T> {
      * Export objects.
      * @param objects
      * @return Export as InputStream
+     * @throws IOException Thrown if an error during csv printing occured
+     * @throws InvocationTargetException Thrown if attributes could not be read
+     * @throws IllegalArgumentException Thrown if the csv options are invalid
+     * @throws IllegalAccessException Thrown if attributes could not be read
      */
-    public InputStream export(ArrayList<T> objects) {
+    public InputStream export(ArrayList<T> objects)
+            throws IOException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
         if (objects.size() == 0) {
             return null;
         }
@@ -45,61 +54,42 @@ public class CSVExporter<T> {
             .withQuote(quoteType)
             .withRecordSeparator(rowDelimiter)
             .withHeader(header);
-        try {
             CSVPrinter printer = new CSVPrinter(result, format);
-            objects.forEach(object -> {
+            for (T object: objects) {
                 ArrayList<String> row = new ArrayList<String>();
-                try {
-                    for (PropertyDescriptor propertyDescriptor
-                            : getPropertyDescriptors(object)) {
-                        Object value = propertyDescriptor.getReadMethod()
-                            .invoke(object);
-                        if (value.getClass()
-                            == de.intevation.iam.model.UserIamAttributes.class
-                        ) {
-                            row.addAll(parseNestedModel(value));
-                        } else {
-                            row.add(value.toString());
-                        }
+                for (PropertyDescriptor propertyDescriptor
+                        : getPropertyDescriptors(object)) {
+                    Object value = propertyDescriptor.getReadMethod()
+                        .invoke(object);
+                    if (value != null && value.getClass()
+                        == de.intevation.iam.model.UserIamAttributes.class
+                    ) {
+                        row.addAll(parseNestedModel(value));
+                    } else {
+                        row.add(value != null? value.toString(): "");
                     }
-                    printer.printRecord(row);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
                 }
-            });
+                printer.printRecord(row);
+            }
             printer.close(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+
         return new ByteArrayInputStream(
             result.toString().getBytes(encoding));
     }
 
-    ArrayList<String> parseNestedModel(Object object) {
+    ArrayList<String> parseNestedModel(Object object)
+            throws IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
         ArrayList<String> row = new ArrayList<String>();
         for (PropertyDescriptor propertyDescriptor
             : getPropertyDescriptors(object)) {
             Object value;
-            try {
-                value = propertyDescriptor.getReadMethod()
-                    .invoke(object);
-                if (value != null) {
-                    row.add(value.toString());
-                } else {
-                    row.add("");
-                }
-            } catch (IllegalAccessException
-                | IllegalArgumentException
-                | InvocationTargetException e) {
-                e.printStackTrace();
-                return null;
+            value = propertyDescriptor.getReadMethod()
+                .invoke(object);
+            if (value != null) {
+                row.add(value.toString());
+            } else {
+                row.add("");
             }
         }
         return row;
@@ -133,7 +123,17 @@ public class CSVExporter<T> {
                 = new ArrayList<PropertyDescriptor>(
                     Arrays.asList(propertyDescriptorArray));
             propertyDescriptors.removeIf(entry -> {
-                return entry.getName().equals("class");
+                if (entry.getName().equals("class")) {
+                    return true;
+                }
+                Field field;
+                try {
+                    field = object.getClass().getDeclaredField(entry.getName());
+                } catch (NoSuchFieldException | SecurityException e) {
+                    e.printStackTrace();
+                    return true;
+                }
+                return field.getAnnotationsByType(JsonIgnore.class).length > 0;
             });
 
             PropertyDescriptor[] array
@@ -177,5 +177,4 @@ public class CSVExporter<T> {
     public void setEncoding(Charset encoding) {
         this.encoding = encoding;
     }
-
 }
