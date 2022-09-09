@@ -1,3 +1,10 @@
+<!--
+ Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+ Software engineering by Intevation GmbH
+
+ This file is Free Software under the GNU GPL (v>=3)
+ and comes with ABSOLUTELY NO WARRANTY!
+ -->
 <template>
   <v-table class="ma-2 pa-2">
     <thead>
@@ -19,7 +26,7 @@
                 v-bind="props"
                 @click="
                   $store.commit('application/setManagedItem', {
-                    ...item
+                    ...item,
                   });
                   $store.commit('application/setProcessType', 'edit');
                   $store.commit(
@@ -40,7 +47,7 @@
                 v-bind="props"
                 @click="
                   $store.commit('application/setManagedItem', {
-                    ...item
+                    ...item,
                   });
                   $store.commit('application/setProcessType', 'delet');
                   $store.commit(
@@ -65,8 +72,8 @@
 
 <script>
 export default {
-    props:{
-        institutions: Array,
-    }
+  props: {
+    institutions: Array,
+  },
 };
 </script>

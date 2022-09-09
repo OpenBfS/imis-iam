@@ -70,7 +70,7 @@ export default {
     InstitutionTable: defineAsyncComponent(() =>
       import("@/components/Institution/InstitutionTable.vue")
     ),
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue"))
+    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
   setup() {
     const store = useStore();
@@ -103,8 +103,8 @@ export default {
       hasLoadingError,
       showManageDialog,
       institution,
-      institutions
+      institutions,
     };
-  }
+  },
 };
 </script>
