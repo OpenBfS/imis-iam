@@ -21,7 +21,7 @@ ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
 # Deploy SPI
 ADD keycloak/iam_spi ${SPI_SRC}
 WORKDIR ${SPI_SRC}
-RUN mvn package
+RUN mvn -q package
 RUN cp target/iam-api-extension-jar-with-dependencies.jar $KEYCLOAK_HOME/providers/
 
 WORKDIR ${KEYCLOAK_HOME}
