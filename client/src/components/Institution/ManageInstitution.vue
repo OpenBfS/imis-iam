@@ -234,9 +234,7 @@
         <v-btn
           color="accent"
           @click="
-            $emit('child-object', {
-              closeDialog: true,
-            })
+            $store.commit('application/setShowManageInstitutionDialog', false)
           "
         >
           {{ $t("button.cancel") }}
@@ -258,9 +256,7 @@
         <v-btn
           color="accent"
           @click="
-            $emit('child-object', {
-              closeDialog: true,
-            })
+            $store.commit('application/setShowManageInstitutionDialog', false)
           "
         >
           {{ $t("button.cancel") }}
@@ -283,23 +279,25 @@ form > div {
 }
 </style>
 <script>
-import { onMounted, ref, defineAsyncComponent } from "vue";
+import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
+import { useStore } from "vuex";
 export default {
   components: {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
-  props: {
-    item: Object,
-    copiedItem: Object,
-    processType: String,
-  },
-  setup(props, { emit }) {
+  setup() {
     const show = true;
-    const institution = ref(props.item);
     const { hasLoadingError, hasRequestError } = useNotification();
+    const store = useStore();
+    const institution = computed(() => {
+      return store.state.application.managedItem;
+    });
+    const processType = computed(() => {
+      return store.state.application.processType;
+    });
     const {
       form,
       valid,
@@ -325,17 +323,26 @@ export default {
       getCategories();
       // This is necessary as the form value is not change to true with valid inputs.
       // TODO: Check if this is fixed by upstream with the next release.
-      if (props.processType === "edit") {
+      if (processType.value === "edit") {
         setTimeout(() => {
           form.value.validate();
         }, 100);
       }
     });
+    const getInstitutions = () => {
+      store
+        .dispatch("institution/loadInstitutions")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     const createInstitution = () => {
       let payload = { ...institution.value };
       HTTP.post("/institution", payload)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -345,7 +352,8 @@ export default {
       let payload = { ...institution.value };
       HTTP.put("/institution", payload)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -354,7 +362,8 @@ export default {
     const deleteInstitution = () => {
       HTTP.delete("institution/" + institution.value.id)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -375,6 +384,7 @@ export default {
       }
     };
     return {
+      processType,
       reqValidPostalcode,
       validPostalcode,
       validFax,

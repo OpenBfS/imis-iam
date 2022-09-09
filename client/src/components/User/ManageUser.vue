@@ -201,9 +201,10 @@
         <v-btn
           color="accent"
           @click="
+            $store.commit('application/setShowManageUserDialog', false);
             $emit('child-object', {
               closeDialog: true,
-            })
+            });
           "
         >
           {{ $t("button.cancel") }}
@@ -235,7 +236,7 @@ form > div {
 }
 </style>
 <script>
-import { computed, onMounted, defineAsyncComponent, ref } from "vue";
+import { computed, onMounted, defineAsyncComponent } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
@@ -245,18 +246,19 @@ export default {
   components: {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
-  props: {
-    item: Object,
-    copiedItem: Object,
-    processType: String,
-  },
-  setup(props, { emit }) {
+  setup() {
     const show = true;
-    const store = useStore();
-    const user = ref(props.item);
-    const originalUser = ref(props.copiedItem);
     const { hasLoadingError, hasRequestError } = useNotification();
-
+    const store = useStore();
+    const user = computed(() => {
+      return store.state.application.managedItem;
+    });
+    const originalUser = computed(() => {
+      return store.state.application.savedItem;
+    });
+    const processType = computed(() => {
+      return store.state.application.processType;
+    });
     const getUserMemberships = () => {
       HTTP.get("iamuser/membership")
         .then((response) => {
@@ -301,10 +303,19 @@ export default {
     const cloneObject = (obj) => {
       return JSON.parse(JSON.stringify(obj));
     };
+    const getUsers = () => {
+      store
+        .dispatch("user/loadUsers")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     const createUser = () => {
       HTTP.post("/iamuser", user.value)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getUsers();
+          store.commit("application/setShowManageUserDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -317,7 +328,8 @@ export default {
           if (store.state.profile.userData.id === user.value.id) {
             store.dispatch("profile/loadProfile");
           }
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getUsers();
+          store.commit("application/setShowManageUserDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -327,7 +339,7 @@ export default {
       // This is necessary as the form value is not change to true with valid inputs
       // for the first load by filling the fields (copy, edit).
       // TODO: Check if this gets fixed by upstream with the next release.
-      if (["edit", "copy"].indexOf(props.processType) !== -1) {
+      if (["edit", "copy"].indexOf(processType.value) !== -1) {
         setTimeout(() => {
           form.value.validate();
         }, 100);
@@ -347,15 +359,15 @@ export default {
     // to avoid useless requests
     const hasNoChanges = computed(() => {
       return (
-        (props.processType === "edit" &&
+        (processType.value === "edit" &&
           JSON.stringify(originalUser.value) === JSON.stringify(user.value)) ||
-        (props.processType === "copy" &&
+        (processType.value === "copy" &&
           (user.value.username === originalUser.value.username ||
             user.value.email === originalUser.value.email))
       );
     });
-
     return {
+      processType,
       reqMultipleSelect,
       reqField,
       reqValidPhone,

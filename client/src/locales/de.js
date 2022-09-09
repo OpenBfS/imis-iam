@@ -114,6 +114,7 @@ export default {
   },
   // Shared labels
   label: {
+    search: "Suche",
     no_data_text: "Keine Daten vorhanden",
     faq: "FAQ",
     report_problem: "Problem melden",
@@ -153,7 +154,7 @@ export default {
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
     valid_phone: "Telefon muss gültig sein",
-    required_phone: "Telefon is erförderlich",
+    required_phone: "Telefon ist erforderlich",
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
   },
@@ -187,5 +188,9 @@ export default {
     filter_by_sender: "Filteren nach Absender",
     filter_by_maillist: "Filter nach E-Mail-Verteiler",
     maintenance: "Wartungensmeldungen",
+  },
+  search: {
+    found_users: "Gefundene Nutzer",
+    found_institution: "Gefunden Institutionen:",
   },
 };

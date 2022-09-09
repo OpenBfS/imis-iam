@@ -10,6 +10,11 @@ export const application = {
     httpErrorMessage: "",
     showExportDialog: false,
     listToExport: "",
+    managedItem: {},
+    savedItem: {},
+    showManageUserDialog: false,
+    showManageInstitutionDialog: false,
+    processType: "",
     footerLinks: {
       contact: process.env.VUE_APP_FOOTER_CONTACT,
       help: process.env.VUE_APP_FOOTER_HELP,
@@ -18,8 +23,27 @@ export const application = {
       socialMedia: process.env.VUE_APP_FOOTER_SOCIALMEDIA,
     },
     reportMail: process.env.VUE_APP_REPORT_MAIL,
+    searchSting: "",
   }),
   mutations: {
+    setShowManageUserDialog: (state, data) => {
+      state.showManageUserDialog = data;
+    },
+    setSearchString: (state, data) => {
+      state.searchSting = data;
+    },
+    setSavedItem: (state, data) => {
+      state.savedItem = data;
+    },
+    setProcessType: (state, data) => {
+      state.processType = data;
+    },
+    setShowManageInstitutionDialog: (state, data) => {
+      state.showManageInstitutionDialog = data;
+    },
+    setManagedItem: (state, item) => {
+      state.managedItem = item;
+    },
     setHttpErrorMessage: (state, message) => {
       state.httpErrorMessage = message;
     },

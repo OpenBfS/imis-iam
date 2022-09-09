@@ -31,6 +31,7 @@ export default {
     UIHeader: defineAsyncComponent(() =>
       import("@/components/UI/UIHeader.vue")
     ),
+
     NOTIFICATION: defineAsyncComponent(() =>
       import("../components/Notification.vue")
     ),

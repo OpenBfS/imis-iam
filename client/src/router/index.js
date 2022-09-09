@@ -9,12 +9,19 @@ import Home from "@/components/Main.vue";
 import Institution from "@/components/Institution/Institutions.vue";
 import UserView from "@/components/User/Users.vue";
 import MailingList from "@/components/Mailing/MailingLists.vue";
+import Search from "@/components/Search/Search.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: Home,
+  },
+
+  {
+    path: "/search",
+    name: "Search",
+    component: Search,
   },
   {
     path: "/institutions",
