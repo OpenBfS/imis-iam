@@ -9,10 +9,11 @@
   <v-container>
     <v-row>
       <v-col cols="10">
-        <div class="text-h6">{{ $t("mailinglist.failure_maintenance") }}</div>
+        <!-- Failure Mails -->
+        <div class="text-h6">{{ $t("mailinglist.failure") }}</div>
         <div
           class="d-flex justify-start align-center"
-          v-for="mail in criticalMails"
+          v-for="mail in failureMails"
           :key="mail.id"
         >
           <v-card
@@ -46,7 +47,7 @@
                 color="#E57373"
                 class="ml-2"
                 icon="mdi-archive-arrow-up"
-                @click="archiveMail(mail.id)"
+                @click="archiveMail(mail.id, mail.type)"
               >
               </v-btn>
             </template>
@@ -55,11 +56,63 @@
         </div>
         <div
           class="ml-4 text-caption"
-          v-if="criticalMails && criticalMails.length === 0"
+          v-if="failureMails && failureMails.length === 0"
         >
           {{ $t("mailinglist.no_mails_available") }}
         </div>
-
+        <!-- maintenance Mails -->
+        <div class="text-h6 mt-4">
+          {{ $t("mailinglist.maintenance") }}
+        </div>
+        <div
+          class="d-flex justify-start align-center"
+          v-for="mail in maintenanceMails"
+          :key="mail.id"
+        >
+          <v-card
+            @click="
+              selectedMail = mail;
+              showMailContent = true;
+            "
+            max-height="150px"
+            class="my-2 v-col v-col-10"
+            color="#E0E0E0"
+            density="compact"
+          >
+            <v-card-title>
+              <div>
+                <div class="d-flex flex-row align-center">
+                  <div class="text-subtitle-2">
+                    {{ mail.subject }}
+                  </div>
+                  <div class="ml-4 text-caption">
+                    {{ new Date(mail.sendDate).toLocaleDateString() }}
+                  </div>
+                </div>
+              </div>
+            </v-card-title>
+          </v-card>
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                color="#E0E0E0"
+                class="ml-2"
+                icon="mdi-archive-arrow-up"
+                @click="archiveMail(mail.id, mail.type)"
+              >
+              </v-btn>
+            </template>
+            <span>{{ $t("mailinglist.archive") }}</span>
+          </v-tooltip>
+        </div>
+        <div
+          class="ml-4 text-caption"
+          v-if="maintenanceMails && maintenanceMails.length === 0"
+        >
+          {{ $t("mailinglist.no_mails_available") }}
+        </div>
+        <!-- Rest Mails -->
         <div class="text-h6 mt-4">
           {{ $t("mailinglist.current") }}
         </div>
@@ -98,7 +151,7 @@
                 color="#E0E0E0"
                 class="ml-2"
                 icon="mdi-archive-arrow-up"
-                @click="archiveMail(mail.id)"
+                @click="archiveMail(mail.id, mail.type)"
               >
               </v-btn>
             </template>
@@ -146,47 +199,58 @@ export default {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
   setup() {
-    const otherMails = ref([]);
-    const criticalMails = ref([]);
     const { hasRequestError, resetNotification } = useNotification();
-    const getOtherMails = () => {
-      HTTP.get("mail?count=2&type=1&type=2&type=5&type=6&type=7&type=8")
-        .then((response) => {
-          otherMails.value = response.data;
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const getCriticalMails = () => {
-      HTTP.get("mail?count=2&type=3&type=4")
-        .then((response) => {
-          criticalMails.value = response.data;
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
     const showMailContent = ref(false);
     const selectedMail = ref();
     const showMail = () => {
       showMailContent.value = true;
     };
+    // Mails
+    const otherMails = ref([]);
+    const failureMails = ref([]);
+    const maintenanceMails = ref([]);
+    const restTypes = [1, 2, 5, 6, 7, 8];
+    const getMailsbyTypes = (types) => {
+      let path = "mail?count=2";
+      types.forEach((t) => {
+        path += "&type=" + t;
+      });
+      HTTP.get(path)
+        .then((response) => {
+          switch (types[0]) {
+            case 3:
+              failureMails.value = response.data;
+              break;
+            case 4:
+              maintenanceMails.value = response.data;
+              break;
+            default:
+              otherMails.value = response.data;
+          }
+        })
+        .catch(() => {
+          hasRequestError.value = true;
+        });
+    };
     onMounted(() => {
-      getCriticalMails();
-      getOtherMails();
+      getMailsbyTypes([3]);
+      getMailsbyTypes([4]);
+      getMailsbyTypes(restTypes);
     });
     const checkChildObject = (e) => {
       if (e.closeDialog) {
         showMailContent.value = false;
       }
     };
-    const archiveMail = (id) => {
+    const archiveMail = (id, type) => {
       resetNotification();
       HTTP.get("mail/archive/" + id)
         .then(() => {
-          getCriticalMails();
-          getOtherMails();
+          if ([3, 4].indexOf(type) !== -1) {
+            getMailsbyTypes([type]);
+          } else {
+            getMailsbyTypes(restTypes);
+          }
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -198,6 +262,7 @@ export default {
     });
     return {
       isAllowedToArchive,
+      maintenanceMails,
       hasRequestError,
       archiveMail,
       checkChildObject,
@@ -205,7 +270,7 @@ export default {
       selectedMail,
       showMail,
       otherMails,
-      criticalMails,
+      failureMails,
     };
   },
 };

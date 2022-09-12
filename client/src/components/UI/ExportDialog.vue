@@ -14,6 +14,7 @@
         <v-row justify="center">
           <v-col justify="center" cols="10">
             <v-select
+              :no-data-text="$t('label.no_data_text')"
               :label="$t('label.field_seperator')"
               :items="fieldSeparators"
               v-model="csvOptions.fieldSeperator"
@@ -22,6 +23,7 @@
             >
             </v-select>
             <v-select
+              :no-data-text="$t('label.no_data_text')"
               :label="$t('label.row_delimiter')"
               :items="rowDelimiters"
               item-title="name"
@@ -31,6 +33,7 @@
             >
             </v-select>
             <v-select
+              :no-data-text="$t('label.no_data_text')"
               :label="$t('label.encoding')"
               :items="encoding"
               item-title="name"
@@ -40,6 +43,7 @@
             >
             </v-select>
             <v-select
+              :no-data-text="$t('label.no_data_text')"
               :label="$t('label.quote_type')"
               :items="quoteTypes"
               item-title="name"

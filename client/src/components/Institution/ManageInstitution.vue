@@ -27,14 +27,14 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('label.name')"
+                  :label="$t('label.name')"
                   v-model="institution.name"
                   :rules="reqField($t('institution.required_name'))"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.shortname')"
+                  :label="$t('institution.shortname')"
                   :rules="reqField($t('institution.required_shortname'))"
                   v-model="institution.shortName"
                 ></v-text-field>
@@ -48,7 +48,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.service_building_location')"
+                  :label="$t('institution.service_building_location')"
                   :rules="
                     reqField(
                       $t('institution.required_service_building_location')
@@ -59,7 +59,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.service_building_postalcode')"
+                  :label="$t('institution.service_building_postalcode')"
                   :rules="
                     reqValidPostalcode(
                       $t('institution.required_service_building_postalcode'),
@@ -71,7 +71,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.service_building_street')"
+                  :label="$t('institution.service_building_street')"
                   v-model="institution.serviceBuildingStreet"
                   :rules="
                     reqField($t('institution.required_service_building_street'))
@@ -80,7 +80,7 @@
               </div>
 
               <div class="group_class">
-                <!-- TODO: Readd this rules once the validation for
+                <!-- TODO: Read this rules once the validation for
                     optional fields gets implemented by upstream.
                 :rules="validPostalcode($t('form.valid_postalcode'))" -->
                 <v-text-field
@@ -106,7 +106,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.central_phone')"
+                  :label="$t('institution.central_phone')"
                   :rules="
                     reqValidPhone(
                       $t('institution.required_central_phone'),
@@ -118,7 +118,7 @@
                 <v-text-field
                   variant="underlined"
                   density="compact"
-                  :label="'* ' + $t('institution.central_email')"
+                  :label="$t('institution.central_email')"
                   :rules="
                     reqValidmail(
                       $t('institution.required_central_email'),
@@ -127,9 +127,9 @@
                   "
                   v-model="institution.centralMail"
                 ></v-text-field>
-                <!--TODO: Readd this rules once the validation for
+                <!--TODO: Read this rules once the validation for
                     optional fields gets implemented by upstream.
-                    :rules="validFax($t('form.valid_fax'))" -->
+                    :rules="validPhone($t('form.valid_fax'))" -->
                 <v-text-field
                   variant="underlined"
                   density="compact"
@@ -144,7 +144,7 @@
                   :label="$t('institution.imis_Id')"
                   v-model="institution.imisId"
                 ></v-text-field>
-                <!-- TODO: Readd this rules once the validation for
+                <!-- TODO: Read this rules once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validMail($t('form.valid_email'))"  -->
                 <v-text-field
@@ -156,10 +156,10 @@
               </div>
               <div class="group_class align-center">
                 <v-select
-                  return-object
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
-                  :label="'* ' + $t('institution.categories')"
+                  :label="$t('institution.categories')"
                   :items="categories"
                   v-model="institution.category"
                   item-title="name"
@@ -223,7 +223,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          :color="`${valid ? 'accent' : 'grey'}`"
+          color="accent"
           :disabled="!valid"
           @click="
             processType == 'add' ? createInstitution() : updateInstitution()
@@ -234,9 +234,7 @@
         <v-btn
           color="accent"
           @click="
-            $emit('child-object', {
-              closeDialog: true,
-            })
+            $store.commit('application/setShowManageInstitutionDialog', false)
           "
         >
           {{ $t("button.cancel") }}
@@ -258,9 +256,7 @@
         <v-btn
           color="accent"
           @click="
-            $emit('child-object', {
-              closeDialog: true,
-            })
+            $store.commit('application/setShowManageInstitutionDialog', false)
           "
         >
           {{ $t("button.cancel") }}
@@ -283,23 +279,25 @@ form > div {
 }
 </style>
 <script>
-import { onMounted, ref, defineAsyncComponent } from "vue";
+import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
+import { useStore } from "vuex";
 export default {
   components: {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
-  props: {
-    item: Object,
-    copiedItem: Object,
-    processType: String,
-  },
-  setup(props, { emit }) {
+  setup() {
     const show = true;
-    const institution = ref(props.item);
     const { hasLoadingError, hasRequestError } = useNotification();
+    const store = useStore();
+    const institution = computed(() => {
+      return store.state.application.managedItem;
+    });
+    const processType = computed(() => {
+      return store.state.application.processType;
+    });
     const {
       form,
       valid,
@@ -325,18 +323,26 @@ export default {
       getCategories();
       // This is necessary as the form value is not change to true with valid inputs.
       // TODO: Check if this is fixed by upstream with the next release.
-      if (props.processType === "edit") {
+      if (processType.value === "edit") {
         setTimeout(() => {
           form.value.validate();
         }, 100);
       }
     });
+    const getInstitutions = () => {
+      store
+        .dispatch("institution/loadInstitutions")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     const createInstitution = () => {
       let payload = { ...institution.value };
-      payload.category = payload.category.id;
       HTTP.post("/institution", payload)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -344,10 +350,10 @@ export default {
     };
     const updateInstitution = () => {
       let payload = { ...institution.value };
-      payload.category = payload.category.id;
       HTTP.put("/institution", payload)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -356,7 +362,8 @@ export default {
     const deleteInstitution = () => {
       HTTP.delete("institution/" + institution.value.id)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getInstitutions();
+          store.commit("application/setShowManageInstitutionDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -377,6 +384,7 @@ export default {
       }
     };
     return {
+      processType,
       reqValidPostalcode,
       validPostalcode,
       validFax,

@@ -10,16 +10,48 @@ export const application = {
     httpErrorMessage: "",
     showExportDialog: false,
     listToExport: "",
+
     isAllowedToManageUser: false,
+    managedItem: {},
+    savedItem: {},
+    showManageUserDialog: false,
+    showManageInstitutionDialog: false,
+    processType: "",
+    footerLinks: {
+      contact: process.env.VUE_APP_FOOTER_CONTACT,
+      help: process.env.VUE_APP_FOOTER_HELP,
+      accessibility: process.env.VUE_APP_FOOTER_ACCESSIBILITY,
+      privacy: process.env.VUE_APP_FOOTER_PRIVACY,
+      socialMedia: process.env.VUE_APP_FOOTER_SOCIALMEDIA,
+    },
+    reportMail: process.env.VUE_APP_REPORT_MAIL,
+    searchSting: "",
   }),
   mutations: {
+    setShowManageUserDialog: (state, data) => {
+      state.showManageUserDialog = data;
+    },
+    setSearchString: (state, data) => {
+      state.searchSting = data;
+    },
+    setSavedItem: (state, data) => {
+      state.savedItem = data;
+    },
+    setProcessType: (state, data) => {
+      state.processType = data;
+    },
+    setShowManageInstitutionDialog: (state, data) => {
+      state.showManageInstitutionDialog = data;
+    },
+    setManagedItem: (state, item) => {
+      state.managedItem = item;
+    },
     setHttpErrorMessage: (state, message) => {
       state.httpErrorMessage = message;
     },
     setShowExportDialog: (state, message) => {
       state.showExportDialog = message;
     },
-
     setlistToExport: (state, message) => {
       state.listToExport = message;
     },

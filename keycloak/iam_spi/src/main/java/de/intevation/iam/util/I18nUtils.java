@@ -23,6 +23,21 @@ public class I18nUtils {
     private static final String BUNDLE_FILE = "iam";
 
     /**
+     * Get the i18n bundle for the given user id.
+     * @param session Session
+     * @param userId User id
+     * @return Bundle
+     */
+    public static ResourceBundle getI18nBundle(
+        KeycloakSession session,
+        String userId
+    ) {
+        RealmModel realm = session.getContext().getRealm();
+        UserModel user = session.users().getUserById(realm, userId);
+        return getI18nBundle(session, realm, user);
+    }
+
+    /**
      * Get the i18n bundle for the given user.
      * @param session Session
      * @param realm Realm

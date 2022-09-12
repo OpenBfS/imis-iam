@@ -28,7 +28,7 @@
                       ? 'underlined'
                       : 'plain'
                   "
-                  :label="'* ' + $t('user.username')"
+                  :label="$t('user.username')"
                   v-model="user.username"
                   :rules="reqField($t('user.required_username'))"
                   :readonly="processType === 'edit'"
@@ -42,13 +42,13 @@
               <div class="two_group_class">
                 <v-text-field
                   variant="underlined"
-                  :label="'* ' + $t('user.firstname')"
+                  :label="$t('user.firstname')"
                   v-model="user.firstName"
                   :rules="reqField($t('user.required_firstname'))"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
-                  :label="'* ' + $t('user.lastname')"
+                  :label="$t('user.lastname')"
                   :rules="reqField($t('user.required_lastname'))"
                   v-model="user.lastName"
                 ></v-text-field>
@@ -56,7 +56,7 @@
               <div class="one_group_class">
                 <v-text-field
                   variant="underlined"
-                  :label="'* ' + $t('label.email')"
+                  :label="$t('label.email')"
                   v-model="user.email"
                   :rules="
                     reqValidmail(
@@ -70,7 +70,7 @@
               <div class="three_group_class">
                 <v-text-field
                   variant="underlined"
-                  :label="'* ' + $t('user.phone')"
+                  :label="$t('user.phone')"
                   :rules="
                     reqValidPhone(
                       $t('form.required_phone'),
@@ -92,6 +92,7 @@
               </div>
               <div class="two_group_class">
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
                   :label="$t('user.oe')"
@@ -103,6 +104,7 @@
                 >
                 </v-select>
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
                   :label="$t('user.bfslocation')"
@@ -116,24 +118,24 @@
               </div>
               <div class="two_group_class">
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
-                  :label="'* ' + $t('user.label_institutions')"
+                  :label="$t('user.label_institutions')"
                   :items="institutions"
                   v-model="user.institutions"
                   item-title="name"
                   item-value="id"
                   persistent-hint
                   multiple
-                  :rules="[
-                    (v) => !!(v && v.length) || $t('user.required_institution'),
-                  ]"
+                  :rules="reqMultipleSelect($t('user.required_institution'))"
                 >
                 </v-select>
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
-                  :label="'* ' + $t('user.label_memberships')"
+                  :label="$t('user.label_memberships')"
                   :items="memeberships"
                   v-model="user.groups"
                   item-title="name"
@@ -159,9 +161,10 @@
                 >
                 </v-select>
                 <v-select
+                  :no-data-text="$t('label.no_data_text')"
                   dense
                   clearable
-                  :label="'* ' + $t('user.label_positions')"
+                  :label="$t('user.label_positions')"
                   :items="positions"
                   v-model="user.attributes.position"
                   item-title="position"
@@ -182,10 +185,8 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <!-- ":color" It is necessary to handle color like this as disabled
-        does not have style effect yet. TODO: Check this if fixed by upstream -->
         <v-btn
-          :color="`${valid && !hasNoChanges ? 'accent' : 'grey'}`"
+          color="accent"
           :disabled="!valid || hasNoChanges"
           @click="
             ['add', 'copy'].indexOf(processType) !== -1
@@ -213,9 +214,10 @@
         <v-btn
           color="accent"
           @click="
+            $store.commit('application/setShowManageUserDialog', false);
             $emit('child-object', {
               closeDialog: true,
-            })
+            });
           "
         >
           {{ $t("button.cancel") }}
@@ -247,7 +249,7 @@ form > div {
 }
 </style>
 <script>
-import { computed, onMounted, defineAsyncComponent, ref } from "vue";
+import { computed, onMounted, defineAsyncComponent } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
@@ -257,18 +259,19 @@ export default {
   components: {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
-  props: {
-    item: Object,
-    copiedItem: Object,
-    processType: String,
-  },
-  setup(props, { emit }) {
+  setup() {
     const show = true;
-    const store = useStore();
-    const user = ref(props.item);
-    const originalUser = ref(props.copiedItem);
     const { hasLoadingError, hasRequestError } = useNotification();
-
+    const store = useStore();
+    const user = computed(() => {
+      return store.state.application.managedItem;
+    });
+    const originalUser = computed(() => {
+      return store.state.application.savedItem;
+    });
+    const processType = computed(() => {
+      return store.state.application.processType;
+    });
     const getUserMemberships = () => {
       HTTP.get("iamuser/membership")
         .then((response) => {
@@ -316,10 +319,19 @@ export default {
     const cloneObject = (obj) => {
       return JSON.parse(JSON.stringify(obj));
     };
+    const getUsers = () => {
+      store
+        .dispatch("user/loadUsers")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+    };
     const createUser = () => {
       HTTP.post("/iamuser", user.value)
         .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getUsers();
+          store.commit("application/setShowManageUserDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -332,7 +344,8 @@ export default {
           if (store.state.profile.userData.id === user.value.id) {
             store.dispatch("profile/loadProfile");
           }
-          emit("child-object", { closeDialog: true, hasChanges: true });
+          getUsers();
+          store.commit("application/setShowManageUserDialog", false);
         })
         .catch(() => {
           hasRequestError.value = true;
@@ -342,29 +355,37 @@ export default {
       // This is necessary as the form value is not change to true with valid inputs
       // for the first load by filling the fields (copy, edit).
       // TODO: Check if this gets fixed by upstream with the next release.
-      if (["edit", "copy"].indexOf(props.processType) !== -1) {
+      if (["edit", "copy"].indexOf(processType.value) !== -1) {
         setTimeout(() => {
           form.value.validate();
         }, 100);
       }
     });
     // Form
-    const { form, valid, reqField, reqValidPhone, reqValidmail } = useForm();
+    const {
+      form,
+      valid,
+      reqField,
+      reqValidPhone,
+      reqValidmail,
+      reqMultipleSelect,
+    } = useForm();
     // Activate button only if some values are changed for "edit"
     // and username and email are changed for "copy"
     // to avoid useless requests
     const hasNoChanges = computed(() => {
       return (
-        (props.processType === "edit" &&
+        (processType.value === "edit" &&
           JSON.stringify(originalUser.value) === JSON.stringify(user.value)) ||
-        (props.processType === "copy" &&
+        (processType.value === "copy" &&
           (user.value.username === originalUser.value.username ||
             user.value.email === originalUser.value.email))
       );
     });
-
     return {
       userRoles,
+      processType,
+      reqMultipleSelect,
       reqField,
       reqValidPhone,
       reqValidmail,

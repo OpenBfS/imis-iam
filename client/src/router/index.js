@@ -8,13 +8,20 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/components/Main.vue";
 import Institution from "@/components/Institution/Institutions.vue";
 import UserView from "@/components/User/Users.vue";
-import MailingList from "@/components/Mailing/MailingList.vue";
+import MailingList from "@/components/Mailing/MailingLists.vue";
+import Search from "@/components/Search/Search.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: Home,
+  },
+
+  {
+    path: "/search",
+    name: "Search",
+    component: Search,
   },
   {
     path: "/institutions",
@@ -27,7 +34,7 @@ const routes = [
     component: UserView,
   },
   {
-    path: "/mailinglist",
+    path: "/mailinglists",
     name: "MailingList",
     component: MailingList,
   },

@@ -6,10 +6,14 @@
  */
 package de.intevation.iam.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "user_iam_attributes", schema = "keycloak")
@@ -30,7 +34,15 @@ public class UserIamAttributes {
     private String bfsLocation;
     @Column(name = "position_id", nullable = false)
     private Integer position;
-
+    @Column(name = "expiry_date", nullable = false)
+    @JsonIgnore
+    private Timestamp expiryDate;
+    @Column(name = "inactivity_notification_sent")
+    @JsonIgnore
+    private Boolean inactivityNotificationSent;
+    @Column(name = "expired_notification_sent")
+    @JsonIgnore
+    private Boolean expiredNotificationSent;
 
     public String getId() {
         return id;
@@ -79,5 +91,24 @@ public class UserIamAttributes {
     }
     public void setPosition(Integer position) {
         this.position = position;
+    }
+    public Timestamp getExpiryDate() {
+        return expiryDate;
+    }
+    public void setExpiryDate(Timestamp expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+    public Boolean getInactivityNotificationSent() {
+        return inactivityNotificationSent;
+    }
+    public void setInactivityNotificationSent(
+            Boolean inactivityNotificationSent) {
+        this.inactivityNotificationSent = inactivityNotificationSent;
+    }
+    public Boolean getExpiredNotificationSent() {
+        return expiredNotificationSent;
+    }
+    public void setExpiredNotificationSent(Boolean expiredNotificationSent) {
+        this.expiredNotificationSent = expiredNotificationSent;
     }
 }

@@ -7,10 +7,12 @@
 package de.intevation.iam;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -49,6 +51,8 @@ import de.intevation.iam.model.Mail;
 import de.intevation.iam.model.MailList;
 import de.intevation.iam.model.MailListUser;
 import de.intevation.iam.model.MailType;
+import de.intevation.iam.util.Constants;
+import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 
 /**
@@ -61,6 +65,7 @@ public class MailProvider implements RealmResourceProvider {
     private static final String FROM_DISPLAY_NAME = "fromDisplayName";
     private static final String FROM_ADDRESS = "from";
     private static final String USER_ID_HEADER = "X-SHIB-user";
+    private static final String ERROR_EMPTY_LIST_KEY = "error_mail_list_empty";
 
     //Keycloak session
     private KeycloakSession session;
@@ -209,6 +214,7 @@ public class MailProvider implements RealmResourceProvider {
      * </code>
      * </pre>
      * @param list List model
+     * @param headers Request headers
      * @return Response containing new list as json
      */
     @POST
@@ -223,9 +229,23 @@ public class MailProvider implements RealmResourceProvider {
                 list, RequestMethod.POST, headers, MailList.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+        if (list.getUsers() == null
+                || list.getUsers().size() == 0) {
+            RealmModel realm = session.getContext().getRealm();
+            String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+            UserModel requestingUser = session.users().getUserById(realm, id);
+            ResourceBundle i18n
+                = I18nUtils.getI18nBundle(session, realm, requestingUser);
+            return Response.status(Status.BAD_REQUEST)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
+                .build();
+        }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
+        //Create list and add user entries
         em.persist(list);
+        updateMailListUsers(list, em);
         return Response.ok(list).build();
     }
 
@@ -251,6 +271,7 @@ public class MailProvider implements RealmResourceProvider {
      * </code>
      * </pre>
      * @param list List model
+     * @param headers Request headers
      * @return Response containing updated list as json
      */
     @PUT
@@ -260,16 +281,31 @@ public class MailProvider implements RealmResourceProvider {
             @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-
+        MailList originalList = em.find(MailList.class, list.getId());
         if (list == null || list.getId() == null
-                || em.find(MailList.class, list.getId()) == null) {
+                || originalList == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
         if (!auth.isAuthorizedById(
                 list, RequestMethod.PUT, headers, MailList.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+        if (list.getUsers() == null
+                || list.getUsers().size() == 0) {
+            RealmModel realm = session.getContext().getRealm();
+            String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+            UserModel requestingUser = session.users().getUserById(realm, id);
+            ResourceBundle i18n
+                = I18nUtils.getI18nBundle(session, realm, requestingUser);
+            return Response.status(Status.BAD_REQUEST)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
+                .build();
+        }
+        list.setMailListUsers(originalList.getMailListUsers());
+        updateMailListUsers(list, em);
         MailList mergedList = em.merge(list);
+        mergedList.updateUsers();
         return Response.ok(mergedList).build();
     }
 
@@ -432,7 +468,7 @@ public class MailProvider implements RealmResourceProvider {
                     listFilter.value(list.getId());
                 }
             }
-        }else {
+        } else {
             for (MailList list: mailLists) {
                 listFilter.value(list.getId());
             }
@@ -605,8 +641,48 @@ public class MailProvider implements RealmResourceProvider {
             Predicate filter = cb.equal(join.get("userId"), userId);
             critQuery.where(filter);
         }
+        critQuery.orderBy(cb.asc(root.get("name")));
         TypedQuery<MailList> query = em.createQuery(critQuery);
         List<MailList> lists = query.getResultList();
+        lists.forEach(list -> list.updateUsers());
         return lists;
+    }
+
+    /**
+     * Update mailListUser list using the users id array.
+     */
+    public void updateMailListUsers(MailList list, EntityManager em) {
+        List<String> users = list.getUsers();
+        if (users == null) {
+            return;
+        }
+        List<MailListUser> mailListUsers = list.getMailListUsers();
+        if (mailListUsers != null) {
+            List<MailListUser> itemsToRemove = new ArrayList<>();
+            //Delete removed users no longer subscribed
+            for (MailListUser mlu: mailListUsers) {
+                if (!users.contains(mlu.getUserId())) {
+                    itemsToRemove.add(mlu);
+                    em.remove(mlu);
+                }
+            }
+            mailListUsers.removeAll(itemsToRemove);
+        }
+        else {
+            mailListUsers = new ArrayList<>();
+        }
+        //Add new subscriptions
+        for(String userId: users) {
+            if (mailListUsers.stream()
+                        .filter(mlu -> userId.equals(mlu.getUserId()))
+                        .findAny()
+                        .orElse(null) == null) {
+                MailListUser newEntry = new MailListUser();
+                newEntry.setMailListId(list.getId());
+                newEntry.setUserId(userId);
+                mailListUsers.add(newEntry);
+                em.persist(newEntry);
+            }
+        }
     }
 }

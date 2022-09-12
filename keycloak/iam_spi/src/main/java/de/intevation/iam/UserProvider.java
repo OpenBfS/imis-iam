@@ -48,6 +48,7 @@ import de.intevation.iam.model.UserPosition;
 import de.intevation.iam.model.UserIamAttributes;
 import de.intevation.iam.model.UserMembership;
 import de.intevation.iam.util.Constants;
+import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 
@@ -133,7 +134,6 @@ public class UserProvider implements RealmResourceProvider {
         }
         return Response.ok(User.fromUserModel(user, em, realm)).build();
     }
-
     /**
      * Create a new user.
      * @param headers Request headers
@@ -151,6 +151,10 @@ public class UserProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(
                 rep, RequestMethod.POST, headers, User.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
+        }
+        UserIamAttributes attributes = rep.getAttributes();
+        if (attributes != null && attributes.getId() != null && !attributes.getId().isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).build();
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -199,10 +203,13 @@ public class UserProvider implements RealmResourceProvider {
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, newUserModel);
-        UserIamAttributes attributes = rep.getAttributes();
         if (attributes.getId() == null) {
             attributes.setId(newUserModel.getId());
         }
+        attributes.setExpiredNotificationSent(false);
+        attributes.setInactivityNotificationSent(false);
+        attributes.setExpiryDate(
+                DateUtils.getAccountExpiryDate());
         em.persist(attributes);
         updateInstitutions(rep.getInstitutions(), rep);
         return Response.ok(User.fromUserModel(newUserModel, em, realm)).build();
@@ -249,6 +256,14 @@ public class UserProvider implements RealmResourceProvider {
         if (attributes.getId() == null) {
             attributes.setId(rep.getId());
         }
+        //Set expiry date and notification flags
+        UserIamAttributes dbAttributes
+                = em.find(UserIamAttributes.class, attributes.getId());
+        attributes.setExpiryDate(dbAttributes.getExpiryDate());
+        attributes.setExpiredNotificationSent(
+                dbAttributes.getExpiredNotificationSent());
+        attributes.setInactivityNotificationSent(
+                dbAttributes.getInactivityNotificationSent());
         em.merge(attributes);
         return Response.ok(User.fromUserModel(user, em, realm)).build();
     }

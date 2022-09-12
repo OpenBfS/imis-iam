@@ -7,11 +7,7 @@
  -->
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="12" class="mt-10 pa-2 text-h6 bg-secondary">
-        {{ $t("mailinglist.title") }}
-      </v-col>
-    </v-row>
+    <UIHeader v-bind:title="$t('mailinglist.title')" />
     <v-row justify="end" class="mt-6">
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
@@ -47,7 +43,7 @@
                     <v-btn
                       v-if="isAllowedToManage"
                       variant="plain"
-                      icon="mdi-account-edit-outline"
+                      icon="mdi-pencil"
                       size="small"
                       v-bind="props"
                       @click="
@@ -103,7 +99,7 @@
                       icon="mdi-location-exit"
                       size="small"
                       v-bind="props"
-                      :disabled="!isUserInList(list)"
+                      :disabled="!isUserInList(list) || list.users.length <= 1"
                       @click="
                         selectedItem = list;
                         processType = 'exit';
@@ -164,6 +160,9 @@ import { useStore } from "vuex";
 
 export default {
   components: {
+    UIHeader: defineAsyncComponent(() =>
+      import("@/components/UI/UIHeader.vue")
+    ),
     UIAlert: defineAsyncComponent(() => import("../UI/UIAlert.vue")),
     ManageMailing: defineAsyncComponent(() =>
       import("@/components/Mailing/ManageMailing.vue")
@@ -192,9 +191,10 @@ export default {
     };
     onMounted(() => {
       getMailLists();
-      getMemberships();
+      getMyMailinglist();
     });
-    const getMemberships = () => {
+
+    const getMyMailinglist = () => {
       store
         .dispatch("profile/getMyMailingLists")
         .then()
@@ -215,6 +215,7 @@ export default {
       }
       if (e.hasChanges) {
         getMailLists();
+        getMyMailinglist();
       }
     };
     const showMailDialog = ref(false);

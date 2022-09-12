@@ -34,6 +34,7 @@
           <v-row>
             <v-col cols="4">
               <v-select
+                :no-data-text="$t('label.no_data_text')"
                 return-object
                 clearable
                 :label="$t('mailinglist.type')"
@@ -46,6 +47,7 @@
             </v-col>
             <v-col cols="4">
               <v-select
+                :no-data-text="$t('label.no_data_text')"
                 :items="[$store.state.profile.userData.email]"
                 :label="$t('mailinglist.sender')"
                 v-model="$store.state.profile.userData.email"
@@ -77,7 +79,7 @@
         <v-btn
           size="small"
           :disabled="!selectedList || !selectedType"
-          :color="selectedList && selectedType ? 'accent' : 'grey'"
+          color="accent"
           @click="sendMail()"
         >
           {{ $t("button.send") }}

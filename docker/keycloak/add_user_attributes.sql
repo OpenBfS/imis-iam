@@ -1,1 +1,1 @@
-INSERT INTO keycloak.user_iam_attributes (id, position_id, phone, mobile, fax, oe, bfs_location) VALUES ((SELECT id FROM keycloak.user_entity WHERE username = 'exampleuser'), 1, '0123-456', '0654-321', '0123-654', 'oe', 'location');
+INSERT INTO keycloak.user_iam_attributes (id, position_id, phone, mobile, fax, oe, bfs_location) VALUES ((SELECT id FROM keycloak.user_entity WHERE username = 'exampleuser'), 1, '01234 123456', '0654-321', '0123-654', 'oe', 'location');

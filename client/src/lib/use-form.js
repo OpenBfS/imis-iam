@@ -10,36 +10,20 @@ import { ref } from "vue";
 export function useForm() {
   const form = ref(null);
   const valid = ref(false);
+  const regExprPhone = /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/;
+  const regExprEmail = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
   // Validation rules
   const reqValidmail = (reqMsg, validMsg) => {
-    return [
-      (v) => !!v || reqMsg,
-      (v) => /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/.test(v) || validMsg,
-    ];
+    return [(v) => !!v || reqMsg, (v) => regExprEmail.test(v) || validMsg];
   };
   const validMail = (validMsg) => {
-    return [
-      (v) => /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/.test(v) || v == "" || validMsg,
-    ];
+    return [(v) => regExprEmail.test(v) || v == "" || validMsg];
   };
   const reqValidPhone = (reqMsg, validMsg) => {
-    return [
-      (v) => !!v || reqMsg,
-      (v) => /^[+]?\d{2,3}[-\s.]?\d{3,4}[-\s.]?\d{6,}/.test(v) || validMsg,
-    ];
+    return [(v) => !!v || reqMsg, (v) => regExprPhone.test(v) || validMsg];
   };
   const validPhone = (validMsg) => {
-    (v) => /^[+]?\d{2,3}[-\s.]?\d{3,4}[-\s.]?\d{6,}/.test(v) || validMsg;
-  };
-  const validFax = (validMsg) => {
-    return [
-      (v) =>
-        /^(\+?\d{1,}(\s?|-?)\d*(\s?|-?)\(?\d{2,}\)?(\s?|-?)\d{3,}\s?\d{3,})$/.test(
-          v
-        ) ||
-        v == "" ||
-        validMsg,
-    ];
+    (v) => regExprPhone.test(v) || validMsg;
   };
   const validPostalcode = (validMsg) => {
     return [(v) => /^\d{5}$/.test(v) || v == "" || validMsg];
@@ -53,6 +37,9 @@ export function useForm() {
   const reqField = (reqMsg) => {
     return [(v) => !!v || reqMsg];
   };
+  const reqMultipleSelect = (reqMsg) => {
+    return [(v) => !!(v && v.length) || reqMsg];
+  };
   return {
     form,
     valid,
@@ -61,8 +48,8 @@ export function useForm() {
     reqField,
     reqValidPhone,
     validPhone,
-    validFax,
     validPostalcode,
     reqValidPostalcode,
+    reqMultipleSelect,
   };
 }
