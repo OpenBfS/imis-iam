@@ -129,7 +129,7 @@
                 ></v-text-field>
                 <!--TODO: Read this rules once the validation for
                     optional fields gets implemented by upstream.
-                    :rules="validFax($t('form.valid_fax'))" -->
+                    :rules="validPhone($t('form.valid_fax'))" -->
                 <v-text-field
                   variant="underlined"
                   density="compact"
