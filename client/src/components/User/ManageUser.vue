@@ -240,7 +240,7 @@ form > div {
 }
 </style>
 <script>
-import { computed, onMounted, defineAsyncComponent, toRefs, ref } from "vue";
+import { computed, onMounted, defineAsyncComponent, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
