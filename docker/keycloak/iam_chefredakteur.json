@@ -1,0 +1,14 @@
+{
+    "firstName": "Example",
+    "lastName": "Chefredakteur",
+    "username": "chefredakteur",
+    "email": "example@chefredakteur.example",
+    "enabled": "true",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "secret",
+            "temporary": false
+        }
+    ]
+}

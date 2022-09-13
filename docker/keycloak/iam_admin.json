@@ -1,0 +1,14 @@
+{
+    "firstName": "Example",
+    "lastName": "techAdmin",
+    "username": "techadmin",
+    "email": "example@techadmin.example",
+    "enabled": "true",
+    "credentials": [
+        {
+            "type": "password",
+            "value": "secret",
+            "temporary": false
+        }
+    ]
+}

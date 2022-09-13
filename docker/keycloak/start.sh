@@ -31,6 +31,7 @@ KEYCLOAK_URL=http://localhost:8080
 KEYCLOAK_REALM=master
 IMIS_REALM=imis3
 IMIS_CLIENT=iam-client
+IMIS_CLIENT_ID=$(jq .id ${DIR}/iam_client.json | tr -d '"')
 
 # Get access token
 TKN=$(curl -sX POST "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" \
@@ -56,11 +57,14 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients" \
     -d @${DIR}/iam_client.json
 
 # Add inital user
-echo "Creating example user"
-curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $TKN" \
-    -d @${DIR}/iam_user.json
+echo "Creating example users"
+for user in "iam_user.json" "iam_redakteur.json" "iam_chefredakteur.json" "iam_admin.json"
+do
+    curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN" \
+        -d @${DIR}/${user}
+done
 
 # Configure and sync LDAP
 echo "Creating LDAP user federation"
@@ -72,11 +76,50 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
 echo "Creating client roles"
 for name in "Nutzer" "Redakteur" "Chefredakteur" "technischer Administrator"
 do
-    curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$(jq .id ${DIR}/iam_client.json | tr -d '"')/roles" \
+    curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$IMIS_CLIENT_ID/roles" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN" \
         -d "{\"name\": \"${name}\"}"
 done
+
+roles=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$IMIS_CLIENT_ID/roles" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN")
+users=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN")
+
+echo "Assigning client roles"
+#Assign Nutzer role
+nutzerRole=$(echo $roles | jq 'map(select(.name=="Nutzer"))')
+nutzerUser=$(echo $users | jq 'map(select(.username=="exampleuser")) | .[0]')
+
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$(echo $nutzerUser | jq .id | tr -d '"')/role-mappings/clients/$IMIS_CLIENT_ID" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN" \
+        -d "$nutzerRole"
+
+#Assign Redakteur role
+redRole=$(echo $roles | jq 'map(select(.name=="Redakteur"))')
+redUser=$(echo $users | jq 'map(select(.username=="redakteur")) | .[0]')
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$(echo $redUser | jq .id | tr -d '"')/role-mappings/clients/$IMIS_CLIENT_ID" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN" \
+        -d "$redRole"
+#Assign Chefredakteur role
+chefRedRole=$(echo $roles | jq 'map(select(.name=="Chefredakteur"))')
+chefRedUser=$(echo $users | jq 'map(select(.username=="chefredakteur")) | .[0]')
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$(echo $chefRedUser | jq .id | tr -d '"')/role-mappings/clients/$IMIS_CLIENT_ID" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN" \
+        -d "$chefRedRole"
+#Assign tech. Admin role
+adminRole=$(echo $roles | jq 'map(select(.name=="technischer Administrator"))')
+adminUser=$(echo $users | jq 'map(select(.username=="techadmin")) | .[0]')
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$(echo $adminUser | jq .id | tr -d '"')/role-mappings/clients/$IMIS_CLIENT_ID" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN" \
+        -d "$adminRole"
 
 echo "... done"
 
