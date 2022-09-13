@@ -158,23 +158,7 @@ public class ExportProvider implements RealmResourceProvider {
         UserProvider userProvider = new UserProvider(session);
         Response userResponse = userProvider.getUsers();
         ArrayList<User> users = userResponse.readEntity(ArrayList.class);
-        InputStream result;
-        try {
-            result = exporter.export(users);
-        } catch (IllegalAccessException | InvocationTargetException | IOException e) {
-            e.printStackTrace();
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                .entity(i18n.getString("error_csv_generic"))
-                .build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Status.BAD_REQUEST)
-                .entity(i18n.getString("error_csv_options"))
-                .build();
-        }
-        return Response.ok(result, MediaType.APPLICATION_OCTET_STREAM)
-        .header("Content-Disposition",
-                "attachment; filename=\"export.csv\"")
-        .build();
+        return doExport(exporter, users, i18n);
     }
 
     /**
@@ -237,9 +221,14 @@ public class ExportProvider implements RealmResourceProvider {
         InstitutionProvider instProvider = new InstitutionProvider(session);
         Response instResponse = instProvider.getInstitutions();
         ArrayList<Institution> institutions = instResponse.readEntity(ArrayList.class);
+        return doExport(exporter, institutions, i18n);
+    }
+
+    private <T> Response doExport (CSVExporter<T> exporter,
+            ArrayList<T> objects, ResourceBundle i18n) {
         InputStream result;
         try {
-            result = exporter.export(institutions);
+            result = exporter.export(objects);
         } catch (IllegalAccessException | InvocationTargetException | IOException e) {
             e.printStackTrace();
             return Response.status(Status.INTERNAL_SERVER_ERROR)
