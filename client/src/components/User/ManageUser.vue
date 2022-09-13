@@ -152,12 +152,12 @@
                 <v-select
                   dense
                   clearable
-                  :label="'* ' + $t('user.label_roles')"
+                  :label="$t('user.label_roles')"
                   :items="userRoles"
                   v-model="user.roles"
                   multiple
                   persistent-hint
-                  :rules="reqField($t('user.required_roles'))"
+                  :rules="reqMultipleSelect($t('user.required_roles'))"
                 >
                 </v-select>
                 <v-select
@@ -203,22 +203,13 @@
         <v-btn
           v-if="processType === 'edit'"
           color="accent"
-          @click="
-            () => {
-              user = cloneObject(originalUser);
-            }
-          "
+          @click="user = cloneObject(originalUser)"
         >
           {{ $t("button.reset") }}
         </v-btn>
         <v-btn
           color="accent"
-          @click="
-            $store.commit('application/setShowManageUserDialog', false);
-            $emit('child-object', {
-              closeDialog: true,
-            });
-          "
+          @click="$store.commit('application/setShowManageUserDialog', false)"
         >
           {{ $t("button.cancel") }}
         </v-btn>
@@ -249,7 +240,7 @@ form > div {
 }
 </style>
 <script>
-import { computed, onMounted, defineAsyncComponent } from "vue";
+import { computed, onMounted, defineAsyncComponent, toRefs, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
@@ -263,15 +254,10 @@ export default {
     const show = true;
     const { hasLoadingError, hasRequestError } = useNotification();
     const store = useStore();
-    const user = computed(() => {
-      return store.state.application.managedItem;
-    });
-    const originalUser = computed(() => {
-      return store.state.application.savedItem;
-    });
-    const processType = computed(() => {
-      return store.state.application.processType;
-    });
+    const user = ref(store.state.application.managedItem);
+    const originalUser = ref(store.state.application.savedItem);
+    const processType = ref(store.state.application.processType);
+
     const getUserMemberships = () => {
       HTTP.get("iamuser/membership")
         .then((response) => {
