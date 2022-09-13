@@ -13,6 +13,7 @@
         <template v-slot:activator="{ props }">
           <v-btn
             color="accent"
+            v-if="isAllowedToAdd"
             class="mr-4"
             v-bind="props"
             @click="
@@ -76,7 +77,9 @@ export default {
     const store = useStore();
     const { hasLoadingError } = useNotification();
     const showManageDialog = ref(false);
-
+    const isAllowedToAdd = computed(() => {
+      return store.state.profile.isAllowedToManage;
+    });
     // Institutions
     const institutions = computed(() => {
       return store.state.institution.institutions;
@@ -99,6 +102,7 @@ export default {
       institution.value = { ...expInstitution };
     };
     return {
+      isAllowedToAdd,
       resetInstitution,
       hasLoadingError,
       showManageDialog,

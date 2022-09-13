@@ -19,6 +19,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -27,8 +29,10 @@ import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.resource.RealmResourceProvider;
 
+import de.intevation.iam.auth.Authorization;
 import de.intevation.iam.model.Institution;
 import de.intevation.iam.model.InstitutionCategory;
+import de.intevation.iam.util.RequestMethod;
 
 /**
  * Class providing rest interfaces to create, get and delete Institutions.
@@ -39,12 +43,15 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
 
+    private Authorization auth;
+
     /**
      * Constructor.
      * @param session Keycloak session
      */
     public InstitutionProvider(KeycloakSession session) {
         this.session = session;
+        this.auth = new Authorization(session);
     }
 
     /**
@@ -78,18 +85,21 @@ public class InstitutionProvider implements RealmResourceProvider {
      * }]
      * </code>
      * </pre>
+     * @param headers Request headers
      * @return Array of institutions
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getInstitutions() {
+    public Response getInstitutions(@Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
         Root<Institution> root = query.from(Institution.class);
         query.select(root);
-        List<Institution> institutions = em.createQuery(query).getResultList();
+        List<Institution> institutions = auth.filter(
+                em.createQuery(query).getResultList(),
+                headers, Institution.class);
         return Response.ok(institutions).build();
     }
 
@@ -166,13 +176,20 @@ public class InstitutionProvider implements RealmResourceProvider {
      * </code>
      * </pre>
      * @param rep Institution representation
+     * @param headers Request headers
+
      * @return New Instituion JSON or 400 if no institution is present
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createInstitution(final Institution rep) {
+    public Response createInstitution(final Institution rep,
+            @Context HttpHeaders headers) {
         if (rep == null) {
             return Response.status(Status.BAD_REQUEST).build();
+        }
+        if (!auth.isAuthorizedById(
+                rep, RequestMethod.POST, headers, Institution.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -211,17 +228,23 @@ public class InstitutionProvider implements RealmResourceProvider {
      * </code>
      * </pre>
      * @param rep Institution representation
+     * @param headers Request headers
      * @return New Instituion JSON, 404 if institution is not found
      *         or 400 if no institution is present
      */
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateInstitution(final Institution rep) {
+    public Response updateInstitution(
+            final Institution rep, @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         if (rep == null || rep.getId() == null
                || em.find(Institution.class, rep.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
+        }
+        if (!auth.isAuthorizedById(
+                rep, RequestMethod.PUT, headers, Institution.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         Institution merged = em.merge(rep);
         return Response.ok(merged).build();
@@ -230,16 +253,22 @@ public class InstitutionProvider implements RealmResourceProvider {
     /**
      * Delete the institution with the given id.
      * @param id Institution id
+     * @param headers Request headers
      * @return 200 if successful or 404 if not found
      */
     @DELETE
     @Path("/{id}")
-    public Response removeInstitution(@PathParam("id") Integer id) {
+    public Response removeInstitution(
+            @PathParam("id") Integer id, @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         Institution institution = em.find(Institution.class, id);
         if (institution == null) {
             return Response.status(Status.NOT_FOUND).build();
+        }
+        if (!auth.isAuthorizedById(
+            institution, RequestMethod.DELETE, headers, Institution.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         em.remove(institution);
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
@@ -314,20 +343,28 @@ public class InstitutionProvider implements RealmResourceProvider {
      * </code>
      * </pre>
      * @param intCategory Institution category representation
+     * @param headers Request headers
      * @return InstitutionCategory JSON or 404 if not found
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/category")
-    public Response createInstitutionCategory(final InstitutionCategory intCategory){
-    if(intCategory == null){
-        return Response.status(Status.BAD_REQUEST).build();
+    public Response createInstitutionCategory(
+            final InstitutionCategory intCategory,
+            @Context HttpHeaders headers) {
+        if (!auth.isAuthorizedById(
+                intCategory, RequestMethod.POST,
+                headers, InstitutionCategory.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+        if (intCategory == null) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        em.persist(intCategory);
+        return Response.ok(intCategory).build();
     }
-    EntityManager em = session.getProvider(
-        JpaConnectionProvider.class).getEntityManager();
-    em.persist(intCategory);
-    return Response.ok(intCategory).build();
-}
 
     @Override
     public void close() { }

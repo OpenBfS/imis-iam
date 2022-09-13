@@ -116,7 +116,7 @@
                 >
                 </v-select>
               </div>
-              <div class="three_group_class">
+              <div class="two_group_class">
                 <v-select
                   :no-data-text="$t('label.no_data_text')"
                   dense
@@ -145,6 +145,19 @@
                   :rules="[
                     (v) => !!(v && v.length) || $t('user.required_membership'),
                   ]"
+                >
+                </v-select>
+              </div>
+              <div class="two_group_class">
+                <v-select
+                  dense
+                  clearable
+                  :label="$t('user.label_roles')"
+                  :items="userRoles"
+                  v-model="user.roles"
+                  multiple
+                  persistent-hint
+                  :rules="reqMultipleSelect($t('user.required_roles'))"
                 >
                 </v-select>
                 <v-select
@@ -190,22 +203,13 @@
         <v-btn
           v-if="processType === 'edit'"
           color="accent"
-          @click="
-            () => {
-              user = cloneObject(originalUser);
-            }
-          "
+          @click="user = cloneObject(originalUser)"
         >
           {{ $t("button.reset") }}
         </v-btn>
         <v-btn
           color="accent"
-          @click="
-            $store.commit('application/setShowManageUserDialog', false);
-            $emit('child-object', {
-              closeDialog: true,
-            });
-          "
+          @click="$store.commit('application/setShowManageUserDialog', false)"
         >
           {{ $t("button.cancel") }}
         </v-btn>
@@ -236,7 +240,7 @@ form > div {
 }
 </style>
 <script>
-import { computed, onMounted, defineAsyncComponent } from "vue";
+import { computed, onMounted, defineAsyncComponent, toRefs, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
@@ -250,15 +254,10 @@ export default {
     const show = true;
     const { hasLoadingError, hasRequestError } = useNotification();
     const store = useStore();
-    const user = computed(() => {
-      return store.state.application.managedItem;
-    });
-    const originalUser = computed(() => {
-      return store.state.application.savedItem;
-    });
-    const processType = computed(() => {
-      return store.state.application.processType;
-    });
+    const user = ref(store.state.application.managedItem);
+    const originalUser = ref(store.state.application.savedItem);
+    const processType = ref(store.state.application.processType);
+
     const getUserMemberships = () => {
       HTTP.get("iamuser/membership")
         .then((response) => {
@@ -298,6 +297,9 @@ export default {
     });
     const institutions = computed(() => {
       return store.state.institution.institutions;
+    });
+    const userRoles = computed(() => {
+      return store.state.user.roles;
     });
     // Deep Copy for objects
     const cloneObject = (obj) => {
@@ -367,6 +369,7 @@ export default {
       );
     });
     return {
+      userRoles,
       processType,
       reqMultipleSelect,
       reqField,

@@ -21,5 +21,6 @@ const expUser = {
   groups: [],
   institutions: [],
   attributes: attributes,
+  roles: [],
 };
 export { expUser };

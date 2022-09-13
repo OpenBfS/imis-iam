@@ -10,6 +10,7 @@ export const profile = {
   state: () => ({
     userData: {},
     myMailingLists: [],
+    isAllowedToManage: true,
   }),
   mutations: {
     setUserData: (state, data) => {
@@ -18,6 +19,9 @@ export const profile = {
     setMyMailingLists: (state, data) => {
       state.myMailingLists = data;
     },
+    setIsAllowedToManage: (state, data) => {
+      state.isAllowedToManage = data;
+    },
   },
   actions: {
     loadProfile({ commit }) {
@@ -25,6 +29,12 @@ export const profile = {
         HTTP.get("/iamuser/profile")
           .then((response) => {
             commit("setUserData", response.data);
+            const roles = response.data.roles;
+            if (roles.length === 1 && ["Nutzer"].indexOf(roles[0]) !== -1) {
+              commit("setIsAllowedToManage", false);
+            } else {
+              commit("setIsAllowedToManage", true);
+            }
             resolve(response);
           })
           .catch((error) => reject(error));

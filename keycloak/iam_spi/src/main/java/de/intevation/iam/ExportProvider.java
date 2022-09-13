@@ -101,9 +101,10 @@ public class ExportProvider implements RealmResourceProvider {
      * Export users to csv.
      *
      * @param fieldSeparator Char used as field separator
-     * @param quoteType      Char used for quotes
-     * @param rowDelimiter   Char used as row delimiter
-     * @param encoding       Encoding to use
+     * @param quoteType Char used for quotes
+     * @param rowDelimiter Char used as row delimiter
+     * @param encoding Encoding to use
+     * @param headers Request headers
      * @return Resulting csv data
      */
     @GET
@@ -156,7 +157,7 @@ public class ExportProvider implements RealmResourceProvider {
         }
 
         UserProvider userProvider = new UserProvider(session);
-        Response userResponse = userProvider.getUsers();
+        Response userResponse = userProvider.getUsers(headers);
         ArrayList<User> users = userResponse.readEntity(ArrayList.class);
         return doExport(exporter, users, i18n);
     }
@@ -165,9 +166,10 @@ public class ExportProvider implements RealmResourceProvider {
      * Export institutions as csv.
      *
      * @param fieldSeparator Char used as field separator
-     * @param quoteType      Char used for quotes
-     * @param rowDelimiter   Char used as row delimiter
-     * @param encoding       Encoding to use
+     * @param quoteType Char used for quotes
+     * @param rowDelimiter Char used as row delimiter
+     * @param encoding Encoding to use
+     * @param headers Request headers
      * @return Institutions as CSV
      */
     @GET
@@ -219,7 +221,7 @@ public class ExportProvider implements RealmResourceProvider {
         }
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
-        Response instResponse = instProvider.getInstitutions();
+        Response instResponse = instProvider.getInstitutions(headers);
         ArrayList<Institution> institutions = instResponse.readEntity(ArrayList.class);
         return doExport(exporter, institutions, i18n);
     }

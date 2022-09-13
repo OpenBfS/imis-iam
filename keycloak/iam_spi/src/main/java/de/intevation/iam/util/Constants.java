@@ -4,10 +4,13 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
+
+
 package de.intevation.iam.util;
 
 public class Constants {
     private Constants() { }
+    public static final String IAM_CLIENT_ID = "iam-client";
 
     /**
      * Time in months after which an account will be considered inactive.

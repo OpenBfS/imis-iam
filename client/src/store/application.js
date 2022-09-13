@@ -10,6 +10,8 @@ export const application = {
     httpErrorMessage: "",
     showExportDialog: false,
     listToExport: "",
+
+    isAllowedToManageUser: false,
     managedItem: {},
     savedItem: {},
     showManageUserDialog: false,

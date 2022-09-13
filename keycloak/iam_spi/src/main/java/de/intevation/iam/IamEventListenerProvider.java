@@ -17,6 +17,7 @@ import org.keycloak.events.EventType;
 import org.keycloak.events.admin.AdminEvent;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.RealmModel;
 
 import de.intevation.iam.mail.MailScheduler;
 import de.intevation.iam.model.User;
@@ -33,6 +34,7 @@ public class IamEventListenerProvider implements EventListenerProvider {
 
     /**
      * Constructor.
+     *
      * @param session Keycloak session
      */
     public IamEventListenerProvider(KeycloakSession session) {
@@ -47,13 +49,14 @@ public class IamEventListenerProvider implements EventListenerProvider {
 
     @Override
     public void onEvent(Event event) {
-        //Update user account expiry date after login
+        // Update user account expiry date after login
         if (event.getType() == EventType.LOGIN) {
+            RealmModel realm = session.getContext().getRealm();
             UserModel userModel = session.users().getUserById(
-                    session.getContext().getRealm(), event.getUserId());
+                    realm, event.getUserId());
             EntityManager em = session.getProvider(
-                JpaConnectionProvider.class).getEntityManager();
-            User user = User.fromUserModel(userModel, em);
+                    JpaConnectionProvider.class).getEntityManager();
+            User user = User.fromUserModel(userModel, em, realm);
             UserIamAttributes attributes = user.getAttributes();
             attributes.setExpiryDate(
                     DateUtils.getAccountExpiryDate());
@@ -64,5 +67,6 @@ public class IamEventListenerProvider implements EventListenerProvider {
     }
 
     @Override
-    public void onEvent(AdminEvent event, boolean includeRepresentation) { }
+    public void onEvent(AdminEvent event, boolean includeRepresentation) {
+    }
 }

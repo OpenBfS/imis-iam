@@ -12,6 +12,7 @@
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
+            v-if="$store.state.profile.isAllowedToManage"
             color="accent"
             class="mr-4"
             v-bind="props"
@@ -92,6 +93,12 @@ export default {
     onMounted(() => {
       store
         .dispatch("user/loadUsers")
+        .then()
+        .catch(() => {
+          hasLoadingError.value = true;
+        });
+      store
+        .dispatch("user/loadRoles")
         .then()
         .catch(() => {
           hasLoadingError.value = true;

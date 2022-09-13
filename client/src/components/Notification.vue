@@ -42,6 +42,7 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
+                v-if="isAllowedToArchive"
                 v-bind="props"
                 color="#E57373"
                 class="ml-2"
@@ -188,7 +189,8 @@ p {
 <script>
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
-import { ref, onMounted, defineAsyncComponent } from "vue";
+import { ref, onMounted, defineAsyncComponent, computed } from "vue";
+import { useStore } from "vuex";
 export default {
   components: {
     MailContent: defineAsyncComponent(() =>
@@ -254,7 +256,12 @@ export default {
           hasRequestError.value = true;
         });
     };
+    const store = useStore();
+    const isAllowedToArchive = computed(() => {
+      return store.state.profile.isAllowedToManage;
+    });
     return {
+      isAllowedToArchive,
       maintenanceMails,
       hasRequestError,
       archiveMail,

@@ -33,12 +33,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
+import org.keycloak.models.ClientModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
+import de.intevation.iam.auth.Authorization;
 import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.User;
 import de.intevation.iam.model.UserPosition;
@@ -47,6 +50,7 @@ import de.intevation.iam.model.UserMembership;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;
+import de.intevation.iam.util.RequestMethod;
 
 public class UserProvider implements RealmResourceProvider {
 
@@ -55,12 +59,15 @@ public class UserProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
 
+    private Authorization auth;
+
     /**
      * Constructor.
      * @param session Session
      */
     public UserProvider(KeycloakSession session) {
         this.session = session;
+        this.auth = new Authorization(session);
     }
 
     /**
@@ -80,43 +87,52 @@ public class UserProvider implements RealmResourceProvider {
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(User.fromUserModel(user, em, realm)).build();
     }
 
     /**
-     * Gett all users.
+     * Get all users.
+     * @param headers Request headers
      * @return List of user json objects
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsers() {
+    public Response getUsers(@Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         Stream<UserModel> users = session.users().getUsersStream(realm);
-        ArrayList<User> userList = new ArrayList<User>();
-        users.forEach(user -> {
-            userList.add(User.fromUserModel(user, em));
-        });
+        List<User> userList = new ArrayList<User>();
+        for (UserModel user: users.collect(Collectors.toList())) {
+            userList.add(User.fromUserModel(user, em, realm));
+        }
+        userList = auth.filter(userList, headers, User.class);
         return Response.ok(userList).build();
     }
 
     /**
      * Get user by id.
      * @param id User id
+     * @param headers Request headers
      * @return User as json
      */
     @GET
     @Path("/{id}")
-    public Response getUserById(@PathParam("id") String id) {
+    public Response getUserById(
+            @PathParam("id") String id,
+            @Context HttpHeaders headers) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
+        if (!auth.isAuthorizedById(
+                user, RequestMethod.GET, headers, User.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(User.fromUserModel(user, em, realm)).build();
     }
     /**
      * Create a new user.
@@ -131,6 +147,10 @@ public class UserProvider implements RealmResourceProvider {
     public Response createUser(@Context HttpHeaders headers, final User rep) {
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
+        }
+        if (!auth.isAuthorizedById(
+                rep, RequestMethod.POST, headers, User.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
         }
         UserIamAttributes attributes = rep.getAttributes();
         if (attributes != null && attributes.getId() != null && !attributes.getId().isEmpty()) {
@@ -158,12 +178,22 @@ public class UserProvider implements RealmResourceProvider {
                 .build();
         }
 
-        UserModel newUser = session.users().addUser(realm, rep.getUsername());
+        UserModel newUserModel
+                = session.users().addUser(realm, rep.getUsername());
 
-        newUser.setFirstName(rep.getFirstName());
-        newUser.setLastName(rep.getLastName());
-        newUser.setEmail(rep.getEmail());
-        rep.setId(newUser.getId());
+        newUserModel.setFirstName(rep.getFirstName());
+        newUserModel.setLastName(rep.getLastName());
+        newUserModel.setEmail(rep.getEmail());
+        rep.setId(newUserModel.getId());
+
+        //Update roles
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        Stream<RoleModel> roleStream = client.getRolesStream().filter(item -> {
+            return rep.getRoles().contains(item.getName());
+        });
+        Map<String, RoleModel> roleMap = roleStream.collect(
+            Collectors.toMap(RoleModel::getId, Function.identity()));
+        updateRoles(roleMap, newUserModel, client);
 
         //Update groups
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
@@ -172,9 +202,9 @@ public class UserProvider implements RealmResourceProvider {
             });
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
-        updateGroups(groupMap, newUser);
+        updateGroups(groupMap, newUserModel);
         if (attributes.getId() == null) {
-            attributes.setId(newUser.getId());
+            attributes.setId(newUserModel.getId());
         }
         attributes.setExpiredNotificationSent(false);
         attributes.setInactivityNotificationSent(false);
@@ -182,7 +212,7 @@ public class UserProvider implements RealmResourceProvider {
                 DateUtils.getAccountExpiryDate());
         em.persist(attributes);
         updateInstitutions(rep.getInstitutions(), rep);
-        return Response.ok(User.fromUserModel(newUser, em)).build();
+        return Response.ok(User.fromUserModel(newUserModel, em, realm)).build();
     }
 
     /**
@@ -199,6 +229,10 @@ public class UserProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final User rep
     ) {
+        if (!auth.isAuthorizedById(
+                rep, RequestMethod.PUT, headers, User.class)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
@@ -231,7 +265,7 @@ public class UserProvider implements RealmResourceProvider {
         attributes.setInactivityNotificationSent(
                 dbAttributes.getInactivityNotificationSent());
         em.merge(attributes);
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(User.fromUserModel(user, em, realm)).build();
     }
 
     /**
@@ -272,6 +306,24 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
+     * Get all available iam roles.
+     * @return Roles as JSON array
+     */
+    @GET
+    @Path("/roles")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRoles() {
+        RealmModel realm = session.getContext().getRealm();
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        Stream<RoleModel> roles = client.getRolesStream();
+        List<String> roleNames = new ArrayList<String>();
+        roles.forEach(role -> {
+            roleNames.add(role.getName());
+        });
+        return Response.ok(roleNames).build();
+    }
+
+    /**
      * Update groups of the given user.
      * @param newGroups Map of new groups: Map<{id},{Group}>
      * @param user User to modifiy
@@ -290,6 +342,25 @@ public class UserProvider implements RealmResourceProvider {
         user.getGroupsStream().forEach(group -> {
             if (!newGroups.containsKey(group.getId())) {
                 user.leaveGroup(group);
+            }
+        });
+    }
+
+    private void updateRoles(
+        Map<String, RoleModel> newRoles,
+        UserModel user,
+        ClientModel client
+    ) {
+        //Grant new roles
+        newRoles.forEach((id, role) -> {
+            if (!user.hasRole(role)) {
+                user.grantRole(role);
+            }
+        });
+        //Remove roles if necessary
+        user.getClientRoleMappingsStream(client).forEach(role -> {
+            if (!newRoles.containsKey(role.getId())) {
+                user.deleteRoleMapping(role);
             }
         });
     }
@@ -370,6 +441,15 @@ public class UserProvider implements RealmResourceProvider {
         Map<String, GroupModel> groupMap = groupsStream.collect(
             Collectors.toMap(GroupModel::getId, Function.identity()));
         updateGroups(groupMap, oldUser);
+
+        //Update roles
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        Stream<RoleModel> roleStream = client.getRolesStream().filter(item -> {
+            return newUser.getRoles().contains(item.getName());
+        });
+        Map<String, RoleModel> roleMap = roleStream.collect(
+            Collectors.toMap(RoleModel::getId, Function.identity()));
+        updateRoles(roleMap, oldUser, client);
 
         updateInstitutions(newUser.getInstitutions(), newUser);
         return oldUser;
