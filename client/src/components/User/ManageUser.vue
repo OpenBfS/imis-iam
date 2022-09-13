@@ -186,11 +186,19 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
+          v-if="processType == 'add'"
+          @click="createAndPrepare"
+          color="accent"
+          :disabled="!valid"
+        >
+          {{ $t("label.create_and_prepare") }}
+        </v-btn>
+        <v-btn
           color="accent"
           :disabled="!valid || hasNoChanges"
           @click="
             ['add', 'copy'].indexOf(processType) !== -1
-              ? createUser()
+              ? createUser(true)
               : updateUser()
           "
         >
@@ -240,11 +248,12 @@ form > div {
 }
 </style>
 <script>
-import { computed, onMounted, defineAsyncComponent, ref } from "vue";
+import { computed, onMounted, defineAsyncComponent, ref, nextTick } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
 import { useForm } from "@/lib/use-form";
+import { expUser } from "@/components/User/user";
 
 export default {
   components: {
@@ -252,7 +261,8 @@ export default {
   },
   setup() {
     const show = true;
-    const { hasLoadingError, hasRequestError } = useNotification();
+    const { hasLoadingError, hasRequestError, resetNotification } =
+      useNotification();
     const store = useStore();
     const user = ref(store.state.application.managedItem);
     const originalUser = ref(store.state.application.savedItem);
@@ -313,17 +323,28 @@ export default {
           hasLoadingError.value = true;
         });
     };
-    const createUser = () => {
+    const createUser = (shouldClose) => {
       HTTP.post("/iamuser", user.value)
         .then(() => {
           getUsers();
-          store.commit("application/setShowManageUserDialog", false);
+          if (shouldClose) {
+            store.commit("application/setShowManageUserDialog", false);
+          } else {
+            // Use the same roles of the last created user.
+            const usedRoles = user.value.roles;
+            user.value = cloneObject(expUser);
+            user.value.roles = usedRoles;
+            nextTick(() => {
+              form.value.resetValidation();
+            });
+          }
         })
         .catch(() => {
           hasRequestError.value = true;
         });
     };
     const updateUser = () => {
+      resetNotification();
       HTTP.put("/iamuser", user.value)
         .then(() => {
           // Update current user Profile and thus the data in App bar.
@@ -336,6 +357,10 @@ export default {
         .catch(() => {
           hasRequestError.value = true;
         });
+    };
+    const createAndPrepare = () => {
+      resetNotification();
+      createUser(false);
     };
     onMounted(() => {
       // This is necessary as the form value is not change to true with valid inputs
@@ -369,6 +394,7 @@ export default {
       );
     });
     return {
+      createAndPrepare,
       userRoles,
       processType,
       reqMultipleSelect,

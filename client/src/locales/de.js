@@ -116,6 +116,7 @@ export default {
   },
   // Shared labels
   label: {
+    create_and_prepare: "Erstellen und weitern Nutzer anlegen",
     search: "Suche",
     no_data_text: "Keine Daten vorhanden",
     faq: "FAQ",
