@@ -158,7 +158,6 @@
                 <v-select
                   :no-data-text="$t('label.no_data_text')"
                   dense
-                  clearable
                   :label="$t('institution.categories')"
                   :items="categories"
                   v-model="institution.category"

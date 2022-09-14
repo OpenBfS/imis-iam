@@ -163,7 +163,6 @@
                 <v-select
                   :no-data-text="$t('label.no_data_text')"
                   dense
-                  clearable
                   :label="$t('user.label_positions')"
                   :items="positions"
                   v-model="user.attributes.position"
