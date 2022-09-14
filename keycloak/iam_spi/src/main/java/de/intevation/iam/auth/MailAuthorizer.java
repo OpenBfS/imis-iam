@@ -46,21 +46,21 @@ public class MailAuthorizer implements Authorizer<Mail> {
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
-        return AuthUtils.isUserAtLeastNutzer(requestingUser, client);
+        return AuthUtils.hasUserAnyRole(requestingUser, client);
     }
 
     private boolean authorizeSendMail(
             Mail mail,
             KeycloakSession session,
             String userId) {
-        //Only allow users with other roles than "Nutzer" to send mails
+        //Only allow users that are at least editors to send mails
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
     }
 
     @Override

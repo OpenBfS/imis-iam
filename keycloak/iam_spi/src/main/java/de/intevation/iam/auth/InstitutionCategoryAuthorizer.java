@@ -49,7 +49,7 @@ public class InstitutionCategoryAuthorizer
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
-        return AuthUtils.isUserAtLeastNutzer(requestingUser, client);
+        return AuthUtils.hasUserAnyRole(requestingUser, client);
     }
 
     private boolean authorizeCreate(
@@ -57,14 +57,14 @@ public class InstitutionCategoryAuthorizer
         KeycloakSession session,
         String userId
     ) {
-        //Only allow users with other roles than "Nutzer" to create
+        //Only allow users that are at least editors to create
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
     }
 
     @Override

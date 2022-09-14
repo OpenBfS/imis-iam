@@ -62,14 +62,14 @@ public class InstitutionAuthorizer implements Authorizer<Institution> {
         KeycloakSession session,
         String userId
     ) {
-        //Only allow users with other roles than "Nutzer" to create
+        //Only allow users that are at least editors to create
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
     }
 
     private boolean authorizeUpdate(
@@ -77,14 +77,14 @@ public class InstitutionAuthorizer implements Authorizer<Institution> {
         KeycloakSession session,
         String userId
     ) {
-        //Only allow users with other roles than "Nutzer" to edit
+        //Only allow users that are at least editors to edit
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
     }
 
     private boolean authorizeDelete(
@@ -92,14 +92,14 @@ public class InstitutionAuthorizer implements Authorizer<Institution> {
         KeycloakSession session,
         String userId
     ) {
-        //Only allow users with other roles than "Nutzer" to edit
+        //Only allow users that are at least editors to delete
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
     }
 
 }

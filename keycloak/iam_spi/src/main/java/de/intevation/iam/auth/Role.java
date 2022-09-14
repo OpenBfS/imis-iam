@@ -9,9 +9,9 @@ package de.intevation.iam.auth;
 import java.util.Arrays;
 
 public enum Role {
-    NUTZER("Nutzer"),
-    REDAKTEUR("Redakteur"),
-    CHEFREDAKTEUR("Chefredakteur"),
+    USER("Nutzer"),
+    EDITOR("Redakteur"),
+    CHIEF_EDITOR("Chefredakteur"),
     TECHADMIN("technischer Administrator");
 
     private String role;

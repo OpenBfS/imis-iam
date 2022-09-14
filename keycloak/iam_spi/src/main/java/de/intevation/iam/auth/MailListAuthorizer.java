@@ -49,31 +49,31 @@ public class MailListAuthorizer implements Authorizer<MailList> {
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
-        return AuthUtils.isUserAtLeastNutzer(requestingUser, client);
+        return AuthUtils.hasUserAnyRole(requestingUser, client);
     }
 
     private boolean authorizeCreate(
             MailList mailList,
             KeycloakSession session,
             String userId) {
-        return isUserAtLeastRedakteur(session, userId);
+        return isUserAtLeastEditor(session, userId);
     }
 
     private boolean authorizeUpdate(
             MailList mailList,
             KeycloakSession session,
             String userId) {
-        return isUserAtLeastRedakteur(session, userId);
+        return isUserAtLeastEditor(session, userId);
     }
 
     private boolean authorizeDelete(
             MailList mailList,
             KeycloakSession session,
             String userId) {
-        return isUserAtLeastRedakteur(session, userId);
+        return isUserAtLeastEditor(session, userId);
     }
 
-    private boolean isUserAtLeastRedakteur(
+    private boolean isUserAtLeastEditor(
         KeycloakSession session,
         String userId
     ) {
@@ -83,7 +83,7 @@ public class MailListAuthorizer implements Authorizer<MailList> {
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
     }
 
     @Override

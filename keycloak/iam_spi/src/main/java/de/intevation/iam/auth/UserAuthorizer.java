@@ -62,7 +62,7 @@ public class UserAuthorizer implements Authorizer<User> {
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
-        return AuthUtils.isUserAtLeastNutzer(requestingUser, client);
+        return AuthUtils.hasUserAnyRole(requestingUser, client);
     }
 
     private boolean authorizeCreate(
@@ -70,19 +70,19 @@ public class UserAuthorizer implements Authorizer<User> {
         KeycloakSession session,
         String userId
     ) {
-        //Only allow users with other roles than "Nutzer" to create
+        //Only allow users that are at least editor create
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
         if (requestingUser == null) {
             return false;
         }
-        //If no roles are set, check if user is "Redakteur"
-        //Else check if user is "Chefredakteur"
+        //If no roles are set, check if user is editor
+        //Else check if user is chief editor
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            return AuthUtils.isUserAtLeastRedakteur(requestingUser, client);
+            return AuthUtils.isUserAtLeastEditor(requestingUser, client);
         } else {
-            return AuthUtils.isUserAtLeastChefredakteur(
+            return AuthUtils.isUserAtLeastChiefEditor(
                     requestingUser, client);
         }
     }
@@ -99,7 +99,7 @@ public class UserAuthorizer implements Authorizer<User> {
             return false;
         }
         //If roles shall be changed:
-        //Check if user is "Chefredakteur" or "tech. Admin"
+        //Check if user is chief editor or admin
         UserModel oldUserModel
             = session.users().getUserById(realm, user.getId());
         List<String> oldRoles = new ArrayList<String>();
@@ -107,19 +107,19 @@ public class UserAuthorizer implements Authorizer<User> {
                 .forEach(role -> oldRoles.add(role.getName()));
         List<String> newRoles = user.getRoles();
         if (oldRoles.size() != newRoles.size()) {
-            return AuthUtils.isUserAtLeastChefredakteur(
+            return AuthUtils.isUserAtLeastChiefEditor(
                     requestingUser, client);
         }
         for (int i = 0; i < newRoles.size(); i++) {
             if (!oldRoles.contains(newRoles.get(i))
                 || !newRoles.contains(oldRoles.get(i))) {
-                return AuthUtils.isUserAtLeastChefredakteur(
+                return AuthUtils.isUserAtLeastChiefEditor(
                         requestingUser, client);
             }
         }
-        // Else only allow users with other roles than "Nutzer" to edit
+        // Else only allow users with other roles than user to edit
         // or allow users to edit their own profile
-        return AuthUtils.isUserAtLeastRedakteur(requestingUser, client)
+        return AuthUtils.isUserAtLeastEditor(requestingUser, client)
                 || user.getId().equals(userId);
     }
 }

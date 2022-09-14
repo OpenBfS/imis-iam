@@ -21,12 +21,12 @@ public class AuthUtils {
     private AuthUtils() { };
 
     /**
-     * Checks if a user has at least the "Nutzer" role.
-     * @param requestingUser User to check.
+     * Checks if a user has any role.
+     * @param requestingUser User to check
      * @param client Client to check in
-     * @return True if user has at least "Nutzer" role.
+     * @return True if user has any role
      */
-    public static boolean isUserAtLeastNutzer(
+    public static boolean hasUserAnyRole(
         UserModel requestingUser,
         ClientModel client
     ) {
@@ -34,9 +34,9 @@ public class AuthUtils {
             = requestingUser.getClientRoleMappingsStream(client);
         Stream<RoleModel> filteredRoles = roles.filter(role -> {
             String roleName = role.getName();
-            if (roleName.equals(Role.NUTZER.getRole())
-                    || roleName.equals(Role.REDAKTEUR.getRole())
-                    || roleName.equals(Role.CHEFREDAKTEUR.getRole())
+            if (roleName.equals(Role.USER.getRole())
+                    || roleName.equals(Role.EDITOR.getRole())
+                    || roleName.equals(Role.CHIEF_EDITOR.getRole())
                     || roleName.equals(Role.TECHADMIN.getRole())) {
                 return true;
             }
@@ -46,20 +46,20 @@ public class AuthUtils {
     }
 
     /**
-     * Checks if the given user has at least the "Readakteur" role.
+     * Checks if the given user has at least the editor role.
      * @param requestingUser User to check
      * @param client Client to check in
-     * @return True if user has only "Nutzer" role
+     * @return True if user has at least the editor role
      */
-    public static boolean isUserAtLeastRedakteur(
+    public static boolean isUserAtLeastEditor(
             UserModel requestingUser,
             ClientModel client) {
         Stream<RoleModel> roles
             = requestingUser.getClientRoleMappingsStream(client);
         Stream<RoleModel> filteredRoles = roles.filter(role -> {
             String roleName = role.getName();
-            if (roleName.equals(Role.REDAKTEUR.getRole())
-                    || roleName.equals(Role.CHEFREDAKTEUR.getRole())
+            if (roleName.equals(Role.EDITOR.getRole())
+                    || roleName.equals(Role.CHIEF_EDITOR.getRole())
                     || roleName.equals(Role.TECHADMIN.getRole())) {
                 return true;
             }
@@ -70,19 +70,19 @@ public class AuthUtils {
 
 
     /**
-     * Checks if the given user has at least the "Chefredakteur" role.
+     * Checks if the given user has at least the chief editor role.
      * @param requestingUser User to check
      * @param client Client to check in
-     * @return True if user has only "Nutzer" role
+     * @return True if user has at least chief editor role
      */
-    public static boolean isUserAtLeastChefredakteur(
+    public static boolean isUserAtLeastChiefEditor(
             UserModel requestingUser,
             ClientModel client) {
         Stream<RoleModel> roles
             = requestingUser.getClientRoleMappingsStream(client);
         Stream<RoleModel> filteredRoles = roles.filter(role -> {
             String roleName = role.getName();
-            if (roleName.equals(Role.CHEFREDAKTEUR.getRole())
+            if (roleName.equals(Role.CHIEF_EDITOR.getRole())
                     || roleName.equals(Role.TECHADMIN.getRole())) {
                 return true;
             }
