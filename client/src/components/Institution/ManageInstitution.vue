@@ -22,7 +22,11 @@
           <v-col jsutify="start" cols="11">
             <!-- For now a '*' is prepended to the label value to indicate the required ones.
                 TODO: Use "Label" slot when this gets implemented by upstream -->
-            <v-form v-model="valid" ref="form">
+            <v-form
+              v-model="valid"
+              ref="form"
+              :readonly="!$store.state.profile.isAllowedToManage"
+            >
               <div class="group_class">
                 <v-text-field
                   variant="underlined"
@@ -156,6 +160,7 @@
               </div>
               <div class="group_class align-center">
                 <v-select
+                  :readonly="!$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
                   :label="$t('institution.categories')"
@@ -170,7 +175,9 @@
                 </v-select>
                 <v-btn
                   variant="plain"
-                  v-if="!showAddCategory"
+                  v-if="
+                    !showAddCategory && $store.state.profile.isAllowedToManage
+                  "
                   @click="showAddCategory = true"
                 >
                   {{ $t("institution.new_category") }}
@@ -222,6 +229,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
+          v-if="$store.state.profile.isAllowedToManage"
           color="accent"
           :disabled="!valid"
           @click="

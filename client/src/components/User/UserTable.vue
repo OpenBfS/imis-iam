@@ -29,16 +29,27 @@
             <template v-slot:activator="{ props }">
               <v-btn
                 variant="plain"
-                icon="mdi-account-edit-outline"
+                :icon="`${
+                  $store.state.profile.isAllowedToManage
+                    ? 'mdi-account-edit-outline'
+                    : 'mdi-information-outline'
+                }`"
                 size="small"
                 v-bind="props"
                 @click="onEditClicked(user.id)"
               ></v-btn>
             </template>
-            <span>{{ $t("label.edit") }}</span>
+            <span>{{
+              $store.state.profile.isAllowedToManage
+                ? $t("label.edit")
+                : $t("label.show_info")
+            }}</span>
           </v-tooltip>
           <v-tooltip>
-            <template v-slot:activator="{ props }">
+            <template
+              v-slot:activator="{ props }"
+              v-if="$store.state.profile.isAllowedToManage"
+            >
               <v-btn
                 variant="plain"
                 icon="mdi-content-copy"

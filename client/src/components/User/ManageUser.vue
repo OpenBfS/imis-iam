@@ -20,7 +20,11 @@
       <v-container class="pa-1 mt-4">
         <v-row justify="center">
           <v-col jsutify="start" cols="11">
-            <v-form v-model="valid" ref="form">
+            <v-form
+              v-model="valid"
+              ref="form"
+              :readonly="!$store.state.profile.isAllowedToManage"
+            >
               <div class="two_group_class">
                 <v-text-field
                   :variant="
@@ -92,9 +96,10 @@
               </div>
               <div class="two_group_class">
                 <v-select
+                  :readonly="!$store.state.profile.isAllowedToManage"
+                  :clearable="$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
-                  clearable
                   :label="$t('user.oe')"
                   :items="[]"
                   v-model="user.attributes.oe"
@@ -104,9 +109,10 @@
                 >
                 </v-select>
                 <v-select
+                  :readonly="!$store.state.profile.isAllowedToManage"
+                  :clearable="$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
-                  clearable
                   :label="$t('user.bfslocation')"
                   :items="[]"
                   v-model="user.attributes.bfslocation"
@@ -117,10 +123,15 @@
                 </v-select>
               </div>
               <div class="two_group_class">
+                <!-- readonly attribute is set here explicitly, which
+                 should inherit this value from the <v-form> element.
+                TODO: Check if this gets fixed by upstream
+                 -->
                 <v-select
+                  :readonly="!$store.state.profile.isAllowedToManage"
+                  :clearable="$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
-                  clearable
                   :label="$t('user.label_institutions')"
                   :items="institutions"
                   v-model="user.institutions"
@@ -132,9 +143,10 @@
                 >
                 </v-select>
                 <v-select
+                  :readonly="!$store.state.profile.isAllowedToManage"
+                  :clearable="$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
-                  clearable
                   :label="$t('user.label_memberships')"
                   :items="memeberships"
                   v-model="user.groups"
@@ -150,8 +162,9 @@
               </div>
               <div class="two_group_class">
                 <v-select
+                  :readonly="!$store.state.profile.isAllowedToManage"
+                  :clearable="$store.state.profile.isAllowedToManage"
                   dense
-                  clearable
                   :label="$t('user.label_roles')"
                   :items="userRoles"
                   v-model="user.roles"
@@ -161,6 +174,7 @@
                 >
                 </v-select>
                 <v-select
+                  :readonly="!$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
                   :label="$t('user.label_positions')"
@@ -193,6 +207,7 @@
           {{ $t("label.create_and_prepare") }}
         </v-btn>
         <v-btn
+          v-if="$store.state.profile.isAllowedToManage"
           color="accent"
           :disabled="!valid || hasNoChanges"
           @click="
@@ -208,9 +223,12 @@
           }}
         </v-btn>
         <v-btn
-          v-if="processType === 'edit'"
+          v-if="
+            processType === 'edit' && $store.state.profile.isAllowedToManage
+          "
           color="accent"
           @click="user = cloneObject(originalUser)"
+          :disabled="!$store.state.profile.isAllowedToManage"
         >
           {{ $t("button.reset") }}
         </v-btn>

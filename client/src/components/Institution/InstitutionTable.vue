@@ -21,7 +21,11 @@
             <template v-slot:activator="{ props }">
               <v-btn
                 variant="plain"
-                icon="mdi-pencil"
+                :icon="`${
+                  $store.state.profile.isAllowedToManage
+                    ? 'mdi-pencil'
+                    : 'mdi-information-outline'
+                }`"
                 size="small"
                 v-bind="props"
                 @click="
@@ -41,6 +45,7 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
+                v-if="$store.state.profile.isAllowedToManage"
                 variant="plain"
                 icon="mdi-delete"
                 size="small"
