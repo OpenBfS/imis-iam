@@ -40,10 +40,12 @@ public class CSVExporter<T> {
      * @throws InvocationTargetException Thrown if attributes could not be read
      * @throws IllegalArgumentException Thrown if the csv options are invalid
      * @throws IllegalAccessException Thrown if attributes could not be read
+     * @throws IntrospectionException
      */
     public InputStream export(ArrayList<T> objects)
             throws IOException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
+            IllegalArgumentException, InvocationTargetException,
+            IntrospectionException {
         if (objects.size() == 0) {
             return null;
         }
@@ -79,10 +81,13 @@ public class CSVExporter<T> {
 
     ArrayList<String> parseNestedModel(Object object)
             throws IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException {
+            InvocationTargetException, IntrospectionException {
         ArrayList<String> row = new ArrayList<String>();
         for (PropertyDescriptor propertyDescriptor
             : getPropertyDescriptors(object)) {
+            if (propertyDescriptor.getName().equals("id")) {
+                continue;
+            }
             Object value;
             value = propertyDescriptor.getReadMethod()
                 .invoke(object);
@@ -95,55 +100,57 @@ public class CSVExporter<T> {
         return row;
     }
 
-    private String[] getHeader(Object object) {
+    private String[] getHeader(Object object) throws IntrospectionException {
+        return getHeader(object, false);
+    }
+
+    private String[] getHeader(Object object, boolean skipId) throws IntrospectionException {
         ArrayList<String> fields = new ArrayList<String>();
 
         for (
             PropertyDescriptor propertyDescriptor
             : getPropertyDescriptors(object)) {
+            if (skipId && propertyDescriptor.getName().equals("id")) {
+                continue;
+            }
             //Check for nested models
             if (propertyDescriptor.getPropertyType()
                 == de.intevation.iam.model.UserIamAttributes.class) {
-                String[] nestedHeader = getHeader(new UserIamAttributes());
+                String[] nestedHeader = getHeader(new UserIamAttributes(), true);
                 fields.addAll(Arrays.asList(nestedHeader));
             } else {
                 fields.add(propertyDescriptor.getName());
             }
         }
-        System.out.println(fields.toString());
         return fields.toArray(new String[0]);
     }
 
-    private PropertyDescriptor[] getPropertyDescriptors(Object object) {
-        try {
-            PropertyDescriptor[] propertyDescriptorArray
-                = Introspector.getBeanInfo(
-                    object.getClass()).getPropertyDescriptors();
-            ArrayList<PropertyDescriptor> propertyDescriptors
-                = new ArrayList<PropertyDescriptor>(
-                    Arrays.asList(propertyDescriptorArray));
-            propertyDescriptors.removeIf(entry -> {
-                if (entry.getName().equals("class")) {
-                    return true;
-                }
-                Field field;
-                try {
-                    field = object.getClass().getDeclaredField(entry.getName());
-                } catch (NoSuchFieldException | SecurityException e) {
-                    e.printStackTrace();
-                    return true;
-                }
-                return field.getAnnotationsByType(JsonIgnore.class).length > 0;
-            });
+    private PropertyDescriptor[] getPropertyDescriptors(Object object)
+            throws IntrospectionException {
+        PropertyDescriptor[] propertyDescriptorArray
+            = Introspector.getBeanInfo(
+                object.getClass()).getPropertyDescriptors();
+        ArrayList<PropertyDescriptor> propertyDescriptors
+            = new ArrayList<PropertyDescriptor>(
+                Arrays.asList(propertyDescriptorArray));
+        propertyDescriptors.removeIf(entry -> {
+            if (entry.getName().equals("class")) {
+                return true;
+            }
+            Field field;
+            try {
+                field = object.getClass().getDeclaredField(entry.getName());
+            } catch (NoSuchFieldException | SecurityException e) {
+                e.printStackTrace();
+                return true;
+            }
+            return field.getAnnotationsByType(JsonIgnore.class).length > 0;
+        });
 
-            PropertyDescriptor[] array
-                = new PropertyDescriptor[propertyDescriptors.size()];
-            array = propertyDescriptors.toArray(array);
-            return array;
-        } catch (IntrospectionException e) {
-            e.printStackTrace();
-            return null;
-        }
+        PropertyDescriptor[] array
+            = new PropertyDescriptor[propertyDescriptors.size()];
+        array = propertyDescriptors.toArray(array);
+        return array;
     }
 
     public char getFieldSeparator() {

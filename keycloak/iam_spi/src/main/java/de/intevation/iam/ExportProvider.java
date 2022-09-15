@@ -6,6 +6,7 @@
  */
 package de.intevation.iam;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -231,7 +232,8 @@ public class ExportProvider implements RealmResourceProvider {
         InputStream result;
         try {
             result = exporter.export(objects);
-        } catch (IllegalAccessException | InvocationTargetException | IOException e) {
+        } catch (IllegalAccessException | InvocationTargetException
+                | IOException | IntrospectionException e) {
             e.printStackTrace();
             return Response.status(Status.INTERNAL_SERVER_ERROR)
                 .entity(i18n.getString("error_csv_generic"))
