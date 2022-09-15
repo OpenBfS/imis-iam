@@ -6,10 +6,6 @@
  */
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "@/components/Main.vue";
-import Institution from "@/components/Institution/Institutions.vue";
-import UserView from "@/components/User/Users.vue";
-import MailingList from "@/components/Mailing/MailingLists.vue";
-import Search from "@/components/Search/Search.vue";
 
 const routes = [
   {
@@ -21,22 +17,22 @@ const routes = [
   {
     path: "/search",
     name: "Search",
-    component: Search,
+    component: () => import("@/components/Search/Search.vue"),
   },
   {
     path: "/institutions",
     name: "Institution",
-    component: Institution,
+    component: () => import("@/components/Institution/Institutions.vue"),
   },
   {
     path: "/users",
     name: "User",
-    component: UserView,
+    component: () => import("@/components/User/Users.vue"),
   },
   {
     path: "/mailinglists",
     name: "MailingList",
-    component: MailingList,
+    component: () => import("@/components/Mailing/MailingLists.vue"),
   },
   {
     path: "/archive/:year",
