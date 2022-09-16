@@ -7,7 +7,9 @@
  -->
 <template>
   <v-container>
-    <UIHeader v-bind:title="$t('user.user_title')" />
+    <UIHeader>
+      {{ $t("user.user_title") }}
+    </UIHeader>
     <v-row justify="end" class="mt-6">
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
@@ -67,9 +69,6 @@ import { expUser } from "@/components/User/user";
 export default {
   components: {
     UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
-    UIHeader: defineAsyncComponent(() =>
-      import("@/components/UI/UIHeader.vue")
-    ),
     UserTable: defineAsyncComponent(() =>
       import("@/components/User/UserTable.vue")
     ),

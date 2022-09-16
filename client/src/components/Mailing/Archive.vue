@@ -7,7 +7,9 @@
  -->
 <template>
   <v-container>
-    <UIHeader v-bind:title="$t('archive.title')" />
+    <UIHeader>
+      {{ $t("archive.title") }}
+    </UIHeader>
     <v-row class="mt-6" align="center">
       <!--TODO: Use @change event when this gets implemented by upstream -->
       <v-select
@@ -124,9 +126,6 @@ import { debounce } from "debounce";
 
 export default {
   components: {
-    UIHeader: defineAsyncComponent(() =>
-      import("@/components/UI/UIHeader.vue")
-    ),
     UIAlert: defineAsyncComponent(() => import("../UI/UIAlert.vue")),
     MailContent: defineAsyncComponent(() =>
       import("@/components/Mailing/MailContent.vue")

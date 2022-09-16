@@ -7,7 +7,9 @@
  -->
 <template>
   <v-container>
-    <UIHeader v-bind:title="$t('mailinglist.title')" />
+    <UIHeader>
+      {{ $t("mailinglist.title") }}
+    </UIHeader>
     <v-row justify="end" class="mt-6">
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
@@ -114,7 +116,6 @@
             </tr>
           </tbody>
         </v-table>
-
         <div v-if="!hasLoadingError && mailingLists.length == 0">
           No mailing lists are available
         </div>
@@ -160,9 +161,6 @@ import { useStore } from "vuex";
 
 export default {
   components: {
-    UIHeader: defineAsyncComponent(() =>
-      import("@/components/UI/UIHeader.vue")
-    ),
     UIAlert: defineAsyncComponent(() => import("../UI/UIAlert.vue")),
     ManageMailing: defineAsyncComponent(() =>
       import("@/components/Mailing/ManageMailing.vue")

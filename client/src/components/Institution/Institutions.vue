@@ -7,7 +7,9 @@
  -->
 <template>
   <v-container>
-    <UIHeader v-bind:title="$t('institution.title')" />
+    <UIHeader>
+      {{ $t("institution.title") }}
+    </UIHeader>
     <v-row justify="end" class="mt-6">
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
@@ -65,9 +67,6 @@ import { expInstitution } from "@/components/Institution/institution";
 
 export default {
   components: {
-    UIHeader: defineAsyncComponent(() =>
-      import("@/components/UI/UIHeader.vue")
-    ),
     InstitutionTable: defineAsyncComponent(() =>
       import("@/components/Institution/InstitutionTable.vue")
     ),

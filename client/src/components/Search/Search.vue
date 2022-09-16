@@ -7,7 +7,9 @@
  -->
 <template>
   <v-container>
-    <UIHeader v-bind:title="$t('label.search')" />
+    <UIHeader>
+      {{ $t("label.search") }}
+    </UIHeader>
     <v-row justify="start" class="mt-6">
       <v-text-field
         prepend-inner-icon="mdi-magnify"
@@ -31,9 +33,6 @@ import { useStore } from "vuex";
 
 export default {
   components: {
-    UIHeader: defineAsyncComponent(() =>
-      import("@/components/UI/UIHeader.vue")
-    ),
     Results: defineAsyncComponent(() =>
       import("@/components/Search/Results.vue")
     ),

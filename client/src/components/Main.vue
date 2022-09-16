@@ -7,7 +7,9 @@
  -->
 <template>
   <v-container>
-    <UIHeader v-bind:title="$t('main.title')" />
+    <UIHeader>
+      {{ $t("main.title") }}
+    </UIHeader>
     <v-row class="mt-4">
       <v-col cols="8">
         <NOTIFICATION />
@@ -28,10 +30,6 @@ export default {
   name: "Home",
   components: {
     Applications,
-    UIHeader: defineAsyncComponent(() =>
-      import("@/components/UI/UIHeader.vue")
-    ),
-
     NOTIFICATION: defineAsyncComponent(() =>
       import("../components/Notification.vue")
     ),

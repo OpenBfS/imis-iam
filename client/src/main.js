@@ -7,6 +7,7 @@
 import { createApp } from "vue";
 import { createI18n, useI18n } from "vue-i18n";
 import { createVueI18nAdapter } from "vuetify/locale/adapters/vue-i18n";
+import UIHeader from "@/components/UI/UIHeader.vue";
 
 import vuetify from "./plugins/vuetify";
 
@@ -27,4 +28,10 @@ const i18n = createI18n({
 
 vuetify.locale = createVueI18nAdapter({ i18n, useI18n });
 
-createApp(App).use(router).use(store).use(i18n).use(vuetify).mount("#app");
+createApp(App)
+  .use(router)
+  .use(store)
+  .use(i18n)
+  .use(vuetify)
+  .component("UIHeader", UIHeader)
+  .mount("#app");
