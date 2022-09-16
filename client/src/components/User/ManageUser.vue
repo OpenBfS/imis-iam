@@ -265,7 +265,7 @@ form > div {
 }
 </style>
 <script>
-import { computed, onMounted, defineAsyncComponent, ref, nextTick } from "vue";
+import { computed, onMounted, ref, nextTick } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
@@ -273,9 +273,6 @@ import { useForm } from "@/lib/use-form";
 import { expUser } from "@/components/User/user";
 
 export default {
-  components: {
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
-  },
   setup() {
     const show = true;
     const { hasLoadingError, hasRequestError, resetNotification } =

@@ -68,7 +68,6 @@ import { expUser } from "@/components/User/user";
 
 export default {
   components: {
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
     UserTable: defineAsyncComponent(() =>
       import("@/components/User/UserTable.vue")
     ),

@@ -197,7 +197,6 @@ export default {
     MailContent: defineAsyncComponent(() =>
       import("@/components/Mailing/MailContent.vue")
     ),
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
   setup() {
     const { hasRequestError, resetNotification } = useNotification();

@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import { ref, defineAsyncComponent, onMounted, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useI18n } from "vue-i18n";
@@ -136,9 +136,6 @@ export default {
     processType: String,
   },
   emits: ["child-object"],
-  components: {
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
-  },
   setup(props, { emit }) {
     const store = useStore();
     const show = true;

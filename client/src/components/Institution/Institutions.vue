@@ -70,7 +70,6 @@ export default {
     InstitutionTable: defineAsyncComponent(() =>
       import("@/components/Institution/InstitutionTable.vue")
     ),
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
   },
   setup() {
     const store = useStore();

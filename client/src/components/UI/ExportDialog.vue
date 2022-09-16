@@ -78,16 +78,13 @@
 </template>
 
 <script>
-import { ref, defineAsyncComponent } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 
 export default {
-  components: {
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
-  },
   setup() {
     const show = true;
     const store = useStore();

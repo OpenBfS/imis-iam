@@ -161,7 +161,6 @@ import { useStore } from "vuex";
 
 export default {
   components: {
-    UIAlert: defineAsyncComponent(() => import("../UI/UIAlert.vue")),
     ManageMailing: defineAsyncComponent(() =>
       import("@/components/Mailing/ManageMailing.vue")
     ),

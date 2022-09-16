@@ -101,16 +101,13 @@
 </template>
 
 <script>
-import { onMounted, ref, defineAsyncComponent, computed } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
 
 export default {
   props: ["mailingLists"],
-  components: {
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
-  },
   setup(_, { emit }) {
     const show = true;
     const store = useStore();

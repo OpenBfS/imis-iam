@@ -43,7 +43,6 @@ export default {
     Appfooter: defineAsyncComponent(() =>
       import("@/components/UI/Appfooter.vue")
     ),
-    UIAlert: defineAsyncComponent(() => import("@/components/UI/UIAlert.vue")),
     ExportDialog: defineAsyncComponent(() =>
       import("@/components/UI/ExportDialog.vue")
     ),

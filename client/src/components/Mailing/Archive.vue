@@ -126,7 +126,6 @@ import { debounce } from "debounce";
 
 export default {
   components: {
-    UIAlert: defineAsyncComponent(() => import("../UI/UIAlert.vue")),
     MailContent: defineAsyncComponent(() =>
       import("@/components/Mailing/MailContent.vue")
     ),
