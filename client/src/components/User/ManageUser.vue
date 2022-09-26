@@ -40,7 +40,7 @@
                 <v-text-field
                   variant="underlined"
                   :label="$t('user.title')"
-                  v-model="user.attributes.title"
+                  v-model="user.title"
                 ></v-text-field>
               </div>
               <div class="two_group_class">
@@ -81,17 +81,17 @@
                       $t('form.valid_phone')
                     )
                   "
-                  v-model="user.attributes.phone"
+                  v-model="user.phone"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   :label="$t('user.mobile')"
-                  v-model="user.attributes.mobile"
+                  v-model="user.mobile"
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
                   :label="$t('user.fax')"
-                  v-model="user.attributes.fax"
+                  v-model="user.fax"
                 ></v-text-field>
               </div>
               <div class="two_group_class">
@@ -102,7 +102,7 @@
                   dense
                   :label="$t('user.oe')"
                   :items="[]"
-                  v-model="user.attributes.oe"
+                  v-model="user.oe"
                   item-title="name"
                   item-value="id"
                   persistent-hint
@@ -115,7 +115,7 @@
                   dense
                   :label="$t('user.bfslocation')"
                   :items="[]"
-                  v-model="user.attributes.bfslocation"
+                  v-model="user.bfslocation"
                   item-title="name"
                   item-value="id"
                   persistent-hint
@@ -179,7 +179,7 @@
                   dense
                   :label="$t('user.label_positions')"
                   :items="positions"
-                  v-model="user.attributes.position"
+                  v-model="user.position"
                   item-title="position"
                   item-value="id"
                   persistent-hint
