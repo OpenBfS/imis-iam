@@ -17,7 +17,7 @@ import de.intevation.iam.model.Institution;
 import de.intevation.iam.model.InstitutionCategory;
 import de.intevation.iam.model.Mail;
 import de.intevation.iam.model.MailList;
-import de.intevation.iam.model.User;
+import de.intevation.iam.representation.User;
 import de.intevation.iam.util.RequestMethod;
 
 public class Authorization {

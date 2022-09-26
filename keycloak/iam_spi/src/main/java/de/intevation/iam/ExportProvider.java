@@ -27,7 +27,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.model.Institution;
-import de.intevation.iam.model.User;
+import de.intevation.iam.representation.User;
 import de.intevation.iam.util.CSVExporter;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;

@@ -11,7 +11,11 @@ import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.keycloak.models.jpa.entities.UserEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -43,6 +47,10 @@ public class UserIamAttributes {
     @Column(name = "expired_notification_sent")
     @JsonIgnore
     private Boolean expiredNotificationSent;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "id")
+    @JsonIgnore
+    private UserEntity userEntity;
 
     public String getId() {
         return id;
@@ -110,5 +118,11 @@ public class UserIamAttributes {
     }
     public void setExpiredNotificationSent(Boolean expiredNotificationSent) {
         this.expiredNotificationSent = expiredNotificationSent;
+    }
+    public UserEntity getUserEntity() {
+        return userEntity;
+    }
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
     }
 }

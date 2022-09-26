@@ -43,8 +43,8 @@ import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorization;
 import de.intevation.iam.model.InstitutionUser;
-import de.intevation.iam.model.User;
 import de.intevation.iam.model.UserPosition;
+import de.intevation.iam.representation.User;
 import de.intevation.iam.model.UserIamAttributes;
 import de.intevation.iam.model.UserMembership;
 import de.intevation.iam.util.Constants;
