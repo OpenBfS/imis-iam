@@ -13,7 +13,6 @@ import org.keycloak.connections.jpa.entityprovider.JpaEntityProvider;
 
 import de.intevation.iam.model.Institution;
 import de.intevation.iam.model.InstitutionCategory;
-import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.Mail;
 import de.intevation.iam.model.MailList;
 import de.intevation.iam.model.MailListUser;
@@ -41,7 +40,6 @@ public class IamJpaEntityProvider implements JpaEntityProvider {
         entities.add(UserPosition.class);
         entities.add(Institution.class);
         entities.add(InstitutionCategory.class);
-        entities.add(InstitutionUser.class);
         return entities;
     }
 
