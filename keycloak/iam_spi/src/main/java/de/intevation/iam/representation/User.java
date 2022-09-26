@@ -39,6 +39,7 @@ public class User {
     //IAM specific attributes
     private String title;
     private String phone;
+    private String mobile;
     private String fax;
     private String oe;
     private String bfsLocation;
@@ -97,6 +98,12 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+    public String getMobile() {
+        return mobile;
+    }
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
     public String getFax() {
         return fax;
     }
@@ -149,6 +156,7 @@ public class User {
         attributes.setId(getId());
         attributes.setTitle(getTitle());
         attributes.setPhone(getPhone());
+        attributes.setMobile(getMobile());
         attributes.setFax(getFax());
         attributes.setOe(getOe());
         attributes.setBfsLocation(getBfsLocation());
@@ -172,6 +180,7 @@ public class User {
 
         user.setTitle(jpaModel.getTitle());
         user.setPhone(jpaModel.getPhone());
+        user.setMobile(jpaModel.getMobile());
         user.setFax(jpaModel.getFax());
         user.setOe(jpaModel.getOe());
         user.setBfsLocation(jpaModel.getOe());
@@ -218,7 +227,7 @@ public class User {
         groupQuery.where(groupIdFilter);
         List<GroupEntity> groupEntities = em.createQuery(groupQuery).getResultList();
         List<String> groups = new ArrayList<String>();
-        groupEntities.forEach(groupEnt -> groups.add(groupEnt.getName()));
+        groupEntities.forEach(groupEnt -> groups.add(groupEnt.getId()));
         user.setGroups(groups);
         return user;
     }
