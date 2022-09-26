@@ -23,6 +23,7 @@ import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 import org.keycloak.models.jpa.entities.UserRoleMappingEntity;
 
 import de.intevation.iam.auth.Role;
+import de.intevation.iam.model.Institution;
 import de.intevation.iam.model.UserIamAttributes;
 
 /**
@@ -186,6 +187,13 @@ public class User {
         user.setBfsLocation(jpaModel.getOe());
         user.setPosition(jpaModel.getPosition());
 
+        List<Institution> institutions = jpaModel.getInstitutions();
+        if (institutions != null) {
+            List<Integer> institutionIds = new ArrayList<Integer>();
+            institutions.forEach(inst -> institutionIds.add(inst.getId()));
+            user.setInstitutions(institutionIds);
+        }
+
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
 
@@ -229,6 +237,7 @@ public class User {
         List<String> groups = new ArrayList<String>();
         groupEntities.forEach(groupEnt -> groups.add(groupEnt.getId()));
         user.setGroups(groups);
+
         return user;
     }
 

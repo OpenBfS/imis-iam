@@ -7,11 +7,14 @@
 package de.intevation.iam.model;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -51,6 +54,13 @@ public class UserIamAttributes {
     @JoinColumn(name = "id", referencedColumnName = "id")
     @JsonIgnore
     private UserEntity userEntity;
+    @ManyToMany
+    @JoinTable(
+        name = "institution_user",
+        joinColumns = {@JoinColumn(name = "user_id")},
+        inverseJoinColumns = {@JoinColumn(name = "institution_id")}
+    )
+    private List<Institution> institutions;
 
     public String getId() {
         return id;
@@ -124,5 +134,11 @@ public class UserIamAttributes {
     }
     public void setUserEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
+    }
+    public List<Institution> getInstitutions() {
+        return institutions;
+    }
+    public void setInstitutions(List<Institution> institutions) {
+        this.institutions = institutions;
     }
 }
