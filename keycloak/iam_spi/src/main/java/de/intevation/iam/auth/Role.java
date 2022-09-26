@@ -7,6 +7,7 @@
 package de.intevation.iam.auth;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public enum Role {
     USER("Nutzer"),
@@ -27,11 +28,16 @@ public enum Role {
     /**
      * Get enum by role string.
      * @param role Role string
-     * @return Enum
+     * @return Enum or null if not found
      */
     public static Role get(String role) {
-        return Arrays.stream(Role.values())
-        .filter(env -> env.role.equals(role))
-        .findFirst().get();
+        try {
+            return Arrays.stream(Role.values())
+            .filter(env -> env.role.equals(role))
+            .findFirst().get();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
+
     }
 }

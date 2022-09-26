@@ -8,20 +8,14 @@ package de.intevation.iam.representation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.CriteriaBuilder.In;
 
-import org.keycloak.models.ClientModel;
-import org.keycloak.models.GroupModel;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.jpa.entities.GroupEntity;
 import org.keycloak.models.jpa.entities.RoleEntity;
@@ -29,9 +23,7 @@ import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 import org.keycloak.models.jpa.entities.UserRoleMappingEntity;
 
 import de.intevation.iam.auth.Role;
-import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.UserIamAttributes;
-import de.intevation.iam.util.Constants;
 
 /**
  * User representation
@@ -53,7 +45,6 @@ public class User {
     private Integer position;
 
     private List<String> groups;
-    private UserIamAttributes attributes;
     private List<Integer> institutions;
     private List<String> roles;
     private Boolean readonly;
@@ -142,17 +133,27 @@ public class User {
     public void setInstitutions(List<Integer> institutions) {
         this.institutions = institutions;
     }
-    public UserIamAttributes getAttributes() {
-        return attributes;
-    }
-    public void setAttributes(UserIamAttributes attributes) {
-        this.attributes = attributes;
-    }
     public List<String> getRoles() {
         return roles;
     }
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    /**
+     * Create a user attributes jpa model from this representation.
+     * @return New model
+     */
+    public UserIamAttributes createJpaModel() {
+        UserIamAttributes attributes = new UserIamAttributes();
+        attributes.setId(getId());
+        attributes.setTitle(getTitle());
+        attributes.setPhone(getPhone());
+        attributes.setFax(getFax());
+        attributes.setOe(getOe());
+        attributes.setBfsLocation(getBfsLocation());
+        attributes.setPosition(getPosition());
+        return attributes;
     }
 
     /**
@@ -181,7 +182,7 @@ public class User {
 
         //Get user roles
         TypedQuery<UserRoleMappingEntity> roleMappingQuery =
-            em.createNamedQuery("UserRoleMappingEntity.userRoleMappings",
+            em.createNamedQuery("userRoleMappings",
             UserRoleMappingEntity.class);
         roleMappingQuery.setParameter("user", jpaModel.getUserEntity());
         List<UserRoleMappingEntity> roleMappings = roleMappingQuery.getResultList();
@@ -204,7 +205,7 @@ public class User {
 
         //Get user groups
         TypedQuery<UserGroupMembershipEntity> groupMappingQuery =
-            em.createNamedQuery("UserGroupMembershipEntity.userGroupMembership",
+            em.createNamedQuery("userGroupMembership",
             UserGroupMembershipEntity.class);
         groupMappingQuery.setParameter("user", jpaModel.getUserEntity());
         List<UserGroupMembershipEntity> groupMappings = groupMappingQuery.getResultList();
@@ -226,53 +227,12 @@ public class User {
      * Generate user from given usermodel.
      * @param userModel Keycloak usermodel
      * @param em EntityManager
-     * @param realm Realm
      * @return Generated user
      */
     public static User fromUserModel(UserModel userModel,
-            EntityManager em, RealmModel realm) {
-        User user = new User();
-        user.setId(userModel.getId());
-        user.setUsername(userModel.getUsername());
-        user.setFirstName(userModel.getFirstName());
-        user.setLastName(userModel.getLastName());
-        user.setEmail(userModel.getEmail());
-        //Get user groups
-        Stream<GroupModel> groups = userModel.getGroupsStream();
-        List<String> groupIds = new ArrayList<String>();
-        groups.forEach(group -> {
-            groupIds.add(group.getId());
-        });
-        user.setGroups(groupIds);
-
-        //Set iam specific attributes
-        user.setAttributes(em.find(UserIamAttributes.class, userModel.getId()));
-
-        //Get user iam roles
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        Stream<RoleModel> roles
-                = userModel.getClientRoleMappingsStream(client);
-        List<String> roleNames = new ArrayList<String>();
-        roles.forEach(roleModel -> {
-            roleNames.add(roleModel.getName());
-        });
-        user.setRoles(roleNames);
-
-        //Get institutions the user has already joined
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<InstitutionUser> query
-            = cb.createQuery(InstitutionUser.class);
-        Root<InstitutionUser> root = query.from(InstitutionUser.class);
-        query.select(root);
-        Predicate userFilter = cb.equal(root.get("userId"), user.getId());
-        query.where(userFilter);
-        List<InstitutionUser> joinedInstitutions
-            = em.createQuery(query).getResultList();
-        List<Integer> institutionIds = new ArrayList<Integer>();
-        joinedInstitutions.forEach(inst -> {
-            institutionIds.add(inst.getInstitutionId());
-        });
-        user.setInstitutions(institutionIds);
-        return user;
+            EntityManager em) {
+        UserIamAttributes userAttributes = em.find(
+                UserIamAttributes.class, userModel.getId());
+        return fromJpaModel(userAttributes, em);
     }
 }

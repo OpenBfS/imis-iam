@@ -87,7 +87,7 @@ public class UserProvider implements RealmResourceProvider {
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
-        return Response.ok(User.fromUserModel(user, em, realm)).build();
+        return Response.ok(User.fromUserModel(user, em)).build();
     }
 
     /**
@@ -104,7 +104,7 @@ public class UserProvider implements RealmResourceProvider {
         Stream<UserModel> users = session.users().getUsersStream(realm);
         List<User> userList = new ArrayList<User>();
         for (UserModel user: users.collect(Collectors.toList())) {
-            userList.add(User.fromUserModel(user, em, realm));
+            userList.add(User.fromUserModel(user, em));
         }
         userList = auth.filter(userList, headers, User.class);
         return Response.ok(userList).build();
@@ -132,7 +132,7 @@ public class UserProvider implements RealmResourceProvider {
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        return Response.ok(User.fromUserModel(user, em, realm)).build();
+        return Response.ok(User.fromUserModel(user, em)).build();
     }
     /**
      * Create a new user.
@@ -152,7 +152,7 @@ public class UserProvider implements RealmResourceProvider {
                 rep, RequestMethod.POST, headers, User.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        UserIamAttributes attributes = rep.getAttributes();
+        UserIamAttributes attributes = rep.createJpaModel();
         if (attributes != null && attributes.getId() != null && !attributes.getId().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -212,7 +212,7 @@ public class UserProvider implements RealmResourceProvider {
                 DateUtils.getAccountExpiryDate());
         em.persist(attributes);
         updateInstitutions(rep.getInstitutions(), rep);
-        return Response.ok(User.fromUserModel(newUserModel, em, realm)).build();
+        return Response.ok(User.fromUserModel(newUserModel, em)).build();
     }
 
     /**
@@ -252,7 +252,7 @@ public class UserProvider implements RealmResourceProvider {
                     .build();
         }
 
-        UserIamAttributes attributes = rep.getAttributes();
+        UserIamAttributes attributes = rep.createJpaModel();
         if (attributes.getId() == null) {
             attributes.setId(rep.getId());
         }
@@ -265,7 +265,7 @@ public class UserProvider implements RealmResourceProvider {
         attributes.setInactivityNotificationSent(
                 dbAttributes.getInactivityNotificationSent());
         em.merge(attributes);
-        return Response.ok(User.fromUserModel(user, em, realm)).build();
+        return Response.ok(User.fromUserModel(user, em)).build();
     }
 
     /**
