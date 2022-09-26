@@ -11,13 +11,16 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.keycloak.models.jpa.entities.UserEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,9 +37,14 @@ public class MailList {
     @Transient
     private List<String> users;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "mailListId")
     @JsonIgnore
-    private List<MailListUser> mailListUsers;
+    @ManyToMany
+    @JoinTable(
+        name = "mail_list_user",
+        joinColumns = {@JoinColumn(name = "mail_list_id")},
+        inverseJoinColumns = {@JoinColumn(name = "user_id")}
+    )
+    private List<UserEntity> userEntities;
 
     public Integer getId() {
         return id;
@@ -62,22 +70,22 @@ public class MailList {
         this.users = users;
     }
 
-    public List<MailListUser> getMailListUsers() {
-        return mailListUsers;
+    public List<UserEntity> getUserEntities() {
+        return userEntities;
     }
 
-    public void setMailListUsers(List<MailListUser> mailListUsers) {
-        this.mailListUsers = mailListUsers;
+    public void setUserEntities(List<UserEntity> userEntities) {
+        this.userEntities = userEntities;
     }
 
     /**
      * Update the users subscribed to this list.
      */
     public void updateUsers() {
-        if (getMailListUsers() == null) {
+        if (getUserEntities() == null) {
             return;
         }
         users = new ArrayList<String>();
-        mailListUsers.forEach(mlu -> users.add(mlu.getUserId()));
+        userEntities.forEach(userEntity -> users.add(userEntity.getId()));
     }
 }

@@ -8,6 +8,9 @@ package de.intevation.iam.representation;
 
 import org.keycloak.models.GroupModel;
 
+/**
+ * Class representing a user membership.
+ */
 public class UserMembership {
     private String id;
     private String name;

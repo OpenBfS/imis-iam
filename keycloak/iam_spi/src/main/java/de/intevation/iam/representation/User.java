@@ -204,11 +204,13 @@ public class User {
         User user = new User();
         UserEntity userEntity = jpaModel.getUserEntity();
         user.setId(jpaModel.getId());
+        //Get attributes from user entity model
         user.setFirstName(userEntity.getFirstName());
         user.setLastName(userEntity.getLastName());
         user.setUsername(userEntity.getUsername());
         user.setEmail(userEntity.getEmail());
 
+        //Get attributes from iam attributes model
         user.setTitle(jpaModel.getTitle());
         user.setPhone(jpaModel.getPhone());
         user.setMobile(jpaModel.getMobile());
@@ -217,13 +219,13 @@ public class User {
         user.setBfsLocation(jpaModel.getOe());
         user.setPosition(jpaModel.getPosition());
 
+        //Set institutions
         List<Institution> institutions = jpaModel.getInstitutions();
         if (institutions != null) {
             List<Integer> institutionIds = new ArrayList<Integer>();
             institutions.forEach(inst -> institutionIds.add(inst.getId()));
             user.setInstitutions(institutionIds);
         }
-
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
 

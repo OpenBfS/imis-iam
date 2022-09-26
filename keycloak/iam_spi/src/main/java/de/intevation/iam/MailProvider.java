@@ -7,7 +7,6 @@
 package de.intevation.iam;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,12 +43,12 @@ import org.keycloak.email.EmailException;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorization;
 import de.intevation.iam.model.Mail;
 import de.intevation.iam.model.MailList;
-import de.intevation.iam.model.MailListUser;
 import de.intevation.iam.model.MailType;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
@@ -244,8 +243,8 @@ public class MailProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         //Create list and add user entries
-        em.persist(list);
         updateMailListUsers(list, em);
+        em.persist(list);
         return Response.ok(list).build();
     }
 
@@ -302,7 +301,6 @@ public class MailProvider implements RealmResourceProvider {
                 .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
                 .build();
         }
-        list.setMailListUsers(originalList.getMailListUsers());
         updateMailListUsers(list, em);
         MailList mergedList = em.merge(list);
         mergedList.updateUsers();
@@ -359,10 +357,9 @@ public class MailProvider implements RealmResourceProvider {
         if (list == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        MailListUser entry = new MailListUser();
-        entry.setMailListId(id);
-        entry.setUserId(userId);
-        em.persist(entry);
+        UserEntity user = em.find(UserEntity.class, userId);
+        list.getUserEntities().add(user);
+        em.merge(list);
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 
@@ -386,21 +383,14 @@ public class MailProvider implements RealmResourceProvider {
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MailListUser> critQuery = cb.createQuery(
-            MailListUser.class);
-        Root<MailListUser> root = critQuery.from(MailListUser.class);
-        Predicate filter = cb.and(
-            cb.equal(root.get("userId"), userId),
-            cb.equal(root.get("mailListId"), mailListId)
-        );
-        critQuery.select(root).where(filter);
-        TypedQuery<MailListUser> query = em.createQuery(critQuery);
-        List<MailListUser> entries = query.getResultList();
-        if (entries == null || entries.size() == 0) {
+        MailList list = em.find(MailList.class, mailListId);
+        if (list == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        em.remove(entries.get(0));
+        UserEntity user = em.find(UserEntity.class, userId);
+        list.getUserEntities().remove(user);
+        em.merge(list);
+
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 
@@ -576,21 +566,12 @@ public class MailProvider implements RealmResourceProvider {
         //Set smtp Config
         smtpConfig.put(FROM_ADDRESS, mail.getSender());
 
-        //Get receipient users
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MailListUser> critQuery = cb.createQuery(
-            MailListUser.class);
-        Root<MailListUser> root = critQuery.from(
-            MailListUser.class);
-        Predicate filter = cb.equal(root.get(
-            "mailListId"), mail.getReceipient());
-        critQuery.select(root).where(filter);
-        TypedQuery<MailListUser> query = em.createQuery(critQuery);
-        List<MailListUser> entries = query.getResultList();
+        //Get mail list
+        MailList list = em.find(MailList.class, mail.getReceipient());
 
-        for (MailListUser mlu: entries) {
+        for (UserEntity entity: list.getUserEntities()) {
             UserModel user = session.users()
-                .getUserById(realm, mlu.getUserId());
+                .getUserById(realm, entity.getId());
             try {
                 senderProvider.send(
                     smtpConfig, user, mail.getSubject(),
@@ -636,9 +617,9 @@ public class MailProvider implements RealmResourceProvider {
         Root<MailList> root = critQuery.from(MailList.class);
         critQuery.select(root);
         if (subscribed) {
-            Join<MailList, MailListUser> join =
-                root.join("mailListUsers", JoinType.LEFT);
-            Predicate filter = cb.equal(join.get("userId"), userId);
+            Join<MailList, UserEntity> join =
+                root.join("userEntities", JoinType.LEFT);
+            Predicate filter = cb.equal(join.get("id"), userId);
             critQuery.where(filter);
         }
         critQuery.orderBy(cb.asc(root.get("name")));
@@ -652,37 +633,20 @@ public class MailProvider implements RealmResourceProvider {
      * Update mailListUser list using the users id array.
      */
     public void updateMailListUsers(MailList list, EntityManager em) {
-        List<String> users = list.getUsers();
-        if (users == null) {
+        if (list.getUsers() == null) {
             return;
         }
-        List<MailListUser> mailListUsers = list.getMailListUsers();
-        if (mailListUsers != null) {
-            List<MailListUser> itemsToRemove = new ArrayList<>();
-            //Delete removed users no longer subscribed
-            for (MailListUser mlu: mailListUsers) {
-                if (!users.contains(mlu.getUserId())) {
-                    itemsToRemove.add(mlu);
-                    em.remove(mlu);
-                }
-            }
-            mailListUsers.removeAll(itemsToRemove);
-        }
-        else {
-            mailListUsers = new ArrayList<>();
-        }
-        //Add new subscriptions
-        for(String userId: users) {
-            if (mailListUsers.stream()
-                        .filter(mlu -> userId.equals(mlu.getUserId()))
-                        .findAny()
-                        .orElse(null) == null) {
-                MailListUser newEntry = new MailListUser();
-                newEntry.setMailListId(list.getId());
-                newEntry.setUserId(userId);
-                mailListUsers.add(newEntry);
-                em.persist(newEntry);
-            }
-        }
+
+        //Get user entities
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<UserEntity> query = cb.createQuery(UserEntity.class);
+        Root<UserEntity> root = query.from(UserEntity.class);
+        query.select(root);
+        In<String> idFilter = cb.in(root.get("id"));
+        list.getUsers().forEach(id -> idFilter.value(id));
+        query.where(idFilter);
+        List<UserEntity> result = em.createQuery(query).getResultList();
+
+        list.setUserEntities(result);
     }
 }
