@@ -18,7 +18,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -42,7 +41,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorization;
-import de.intevation.iam.model.InstitutionUser;
 import de.intevation.iam.model.UserPosition;
 import de.intevation.iam.representation.User;
 import de.intevation.iam.model.UserIamAttributes;
@@ -152,12 +150,12 @@ public class UserProvider implements RealmResourceProvider {
                 rep, RequestMethod.POST, headers, User.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        UserIamAttributes attributes = rep.createJpaModel();
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        UserIamAttributes attributes = rep.createJpaModel(em);
         if (attributes != null && attributes.getId() != null && !attributes.getId().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
@@ -211,7 +209,6 @@ public class UserProvider implements RealmResourceProvider {
         attributes.setExpiryDate(
                 DateUtils.getAccountExpiryDate());
         em.persist(attributes);
-        updateInstitutions(rep.getInstitutions(), rep);
         return Response.ok(User.fromUserModel(newUserModel, em)).build();
     }
 
@@ -252,7 +249,7 @@ public class UserProvider implements RealmResourceProvider {
                     .build();
         }
 
-        UserIamAttributes attributes = rep.createJpaModel();
+        UserIamAttributes attributes = rep.createJpaModel(em);
         if (attributes.getId() == null) {
             attributes.setId(rep.getId());
         }
@@ -366,52 +363,6 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Update groups of the given user.
-     * @param newInstitutionIds List of new institution ids
-     * @param user User to modifiy
-     */
-    private void updateInstitutions(
-        List<Integer> newInstitutionIds,
-        User user
-    ) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-
-        //Get institutions the user has already joined
-        CriteriaQuery<InstitutionUser> query
-            = cb.createQuery(InstitutionUser.class);
-        Root<InstitutionUser> root = query.from(InstitutionUser.class);
-        query.select(root);
-        Predicate userFilter = cb.equal(root.get("userId"), user.getId());
-        query.where(userFilter);
-        List<InstitutionUser> joinedInstitutions
-            = em.createQuery(query).getResultList();
-
-        //Join new institutions
-        newInstitutionIds.forEach(institutionId -> {
-            if (joinedInstitutions.stream()
-                .filter(inst -> institutionId.equals(inst.getInstitutionId()))
-                .findAny()
-                .orElse(null) == null
-            ) {
-                InstitutionUser iu = new InstitutionUser();
-                iu.setInstitutionId(institutionId);
-                iu.setUserId(user.getId());
-                em.persist(iu);
-            }
-        });
-
-        joinedInstitutions.forEach(institutionUser -> {
-            if (!newInstitutionIds.contains(
-                    institutionUser.getInstitutionId())) {
-                em.remove(institutionUser);
-            }
-        });
-
-    }
-
-    /**
      * Update the given Keycloak usermodel with the data from the new one.
      * @param realm Realm
      * @param newUser User containing new data
@@ -451,7 +402,6 @@ public class UserProvider implements RealmResourceProvider {
             Collectors.toMap(RoleModel::getId, Function.identity()));
         updateRoles(roleMap, oldUser, client);
 
-        updateInstitutions(newUser.getInstitutions(), newUser);
         return oldUser;
     }
 

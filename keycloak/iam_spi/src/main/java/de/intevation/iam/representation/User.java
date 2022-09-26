@@ -19,6 +19,7 @@ import javax.persistence.criteria.CriteriaBuilder.In;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.jpa.entities.GroupEntity;
 import org.keycloak.models.jpa.entities.RoleEntity;
+import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 import org.keycloak.models.jpa.entities.UserRoleMappingEntity;
 
@@ -148,12 +149,38 @@ public class User {
         this.roles = roles;
     }
 
+
+    /**
+     * Update groups of the given user.
+     * @param institutionIds List of new institution ids
+     * @param em Entity manager
+     */
+    private List<Institution> getInstitutionsByIds(
+        List<Integer> institutionIds,
+        EntityManager em
+    ) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Institution> query
+            = cb.createQuery(Institution.class);
+        Root<Institution> root = query.from(Institution.class);
+        query.select(root);
+        In<Integer> idFilter = cb.in(root.get("id"));
+        institutionIds.forEach(id -> idFilter.value(id));
+        query.where(idFilter);
+        List<Institution> newInstitutions = em.createQuery(query).getResultList();
+        return newInstitutions;
+    }
+
     /**
      * Create a user attributes jpa model from this representation.
      * @return New model
      */
-    public UserIamAttributes createJpaModel() {
-        UserIamAttributes attributes = new UserIamAttributes();
+    public UserIamAttributes createJpaModel(EntityManager em) {
+        UserIamAttributes attributes = em.find(
+                UserIamAttributes.class, getId());
+        if (attributes == null) {
+            attributes = new UserIamAttributes();
+        }
         attributes.setId(getId());
         attributes.setTitle(getTitle());
         attributes.setPhone(getPhone());
@@ -162,6 +189,8 @@ public class User {
         attributes.setOe(getOe());
         attributes.setBfsLocation(getBfsLocation());
         attributes.setPosition(getPosition());
+        attributes.setInstitutions(
+                getInstitutionsByIds(getInstitutions(), em));
         return attributes;
     }
 
@@ -173,11 +202,12 @@ public class User {
      */
     public static User fromJpaModel(UserIamAttributes jpaModel, EntityManager em) {
         User user = new User();
+        UserEntity userEntity = jpaModel.getUserEntity();
         user.setId(jpaModel.getId());
-        user.setFirstName(jpaModel.getUserEntity().getFirstName());
-        user.setLastName(jpaModel.getUserEntity().getLastName());
-        user.setUsername(jpaModel.getUserEntity().getUsername());
-        user.setEmail(jpaModel.getUserEntity().getEmail());
+        user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
+        user.setUsername(userEntity.getUsername());
+        user.setEmail(userEntity.getEmail());
 
         user.setTitle(jpaModel.getTitle());
         user.setPhone(jpaModel.getPhone());
