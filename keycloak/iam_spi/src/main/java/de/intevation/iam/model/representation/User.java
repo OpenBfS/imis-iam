@@ -29,6 +29,9 @@ import de.intevation.iam.model.jpa.UserIamAttributes;
 
 /**
  * User representation.
+ *
+ * This representation combines fields from the keycloak user entity,
+ * iam attributes, groups and roles tables.
  */
 public class User {
 
@@ -51,6 +54,9 @@ public class User {
     private List<Integer> institutions;
     private List<String> roles;
     private Boolean readonly;
+
+    private static final String ID_PARAM = "id";
+    private static final String USER_PARAM = "user";
 
     public Boolean getReadonly() {
         return readonly;
@@ -154,6 +160,7 @@ public class User {
      * Update groups of the given user.
      * @param institutionIds List of new institution ids
      * @param em Entity manager
+     * @return List of institutions
      */
     private List<Institution> getInstitutionsByIds(
         List<Integer> institutionIds,
@@ -164,15 +171,17 @@ public class User {
             = cb.createQuery(Institution.class);
         Root<Institution> root = query.from(Institution.class);
         query.select(root);
-        In<Integer> idFilter = cb.in(root.get("id"));
-        institutionIds.forEach(id -> idFilter.value(id));
+        In<Integer> idFilter = cb.in(root.get(ID_PARAM));
+        institutionIds.forEach(instId -> idFilter.value(instId));
         query.where(idFilter);
-        List<Institution> newInstitutions = em.createQuery(query).getResultList();
+        List<Institution> newInstitutions
+            = em.createQuery(query).getResultList();
         return newInstitutions;
     }
 
     /**
      * Create a user attributes jpa model from this representation.
+     * @param em Entity manager used for queries
      * @return New model
      */
     public UserIamAttributes createJpaModel(EntityManager em) {
@@ -200,7 +209,8 @@ public class User {
      * @param em EntityManager
      * @return User representation
      */
-    public static User fromJpaModel(UserIamAttributes jpaModel, EntityManager em) {
+    public static User fromJpaModel(
+            UserIamAttributes jpaModel, EntityManager em) {
         User user = new User();
         UserEntity userEntity = jpaModel.getUserEntity();
         user.setId(jpaModel.getId());
@@ -233,16 +243,19 @@ public class User {
         TypedQuery<UserRoleMappingEntity> roleMappingQuery =
             em.createNamedQuery("userRoleMappings",
             UserRoleMappingEntity.class);
-        roleMappingQuery.setParameter("user", jpaModel.getUserEntity());
-        List<UserRoleMappingEntity> roleMappings = roleMappingQuery.getResultList();
+        roleMappingQuery.setParameter(USER_PARAM, jpaModel.getUserEntity());
+        List<UserRoleMappingEntity> roleMappings
+            = roleMappingQuery.getResultList();
         //Query role entities as mapping models only contain role ids
         CriteriaQuery<RoleEntity> roleQuery = cb.createQuery(RoleEntity.class);
         Root<RoleEntity> root = roleQuery.from(RoleEntity.class);
         roleQuery.select(root);
-        In<String> idFilter = cb.in(root.get("id"));
-        roleMappings.forEach(roleMapping -> idFilter.value(roleMapping.getRoleId()));
+        In<String> idFilter = cb.in(root.get(ID_PARAM));
+        roleMappings.forEach(
+                roleMapping -> idFilter.value(roleMapping.getRoleId()));
         roleQuery.where(idFilter);
-        List<RoleEntity> roleEntities = em.createQuery(roleQuery).getResultList();
+        List<RoleEntity> roleEntities
+            = em.createQuery(roleQuery).getResultList();
         //Get role names if role is iam client role
         List<String> roleNames = new ArrayList<String>();
         roleEntities.forEach(entity -> {
@@ -256,16 +269,20 @@ public class User {
         TypedQuery<UserGroupMembershipEntity> groupMappingQuery =
             em.createNamedQuery("userGroupMembership",
             UserGroupMembershipEntity.class);
-        groupMappingQuery.setParameter("user", jpaModel.getUserEntity());
-        List<UserGroupMembershipEntity> groupMappings = groupMappingQuery.getResultList();
+        groupMappingQuery.setParameter(USER_PARAM, jpaModel.getUserEntity());
+        List<UserGroupMembershipEntity> groupMappings
+            = groupMappingQuery.getResultList();
         //Query group entities as mapping entities only contain group ids
-        CriteriaQuery<GroupEntity> groupQuery = cb.createQuery(GroupEntity.class);
+        CriteriaQuery<GroupEntity> groupQuery
+            = cb.createQuery(GroupEntity.class);
         Root<GroupEntity> groupRoot = groupQuery.from(GroupEntity.class);
         groupQuery.select(groupRoot);
-        In<String> groupIdFilter = cb.in(root.get("id"));
-        groupMappings.forEach(mapping -> groupIdFilter.value(mapping.getGroupId()));
+        In<String> groupIdFilter = cb.in(root.get(ID_PARAM));
+        groupMappings.forEach(
+                mapping -> groupIdFilter.value(mapping.getGroupId()));
         groupQuery.where(groupIdFilter);
-        List<GroupEntity> groupEntities = em.createQuery(groupQuery).getResultList();
+        List<GroupEntity> groupEntities
+            = em.createQuery(groupQuery).getResultList();
         List<String> groups = new ArrayList<String>();
         groupEntities.forEach(groupEnt -> groups.add(groupEnt.getId()));
         user.setGroups(groups);
