@@ -23,7 +23,7 @@ import org.apache.commons.csv.CSVPrinter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserIamAttributes;
 
 public class CSVExporter<T> {
 
@@ -64,7 +64,7 @@ public class CSVExporter<T> {
                     Object value = propertyDescriptor.getReadMethod()
                         .invoke(object);
                     if (value != null && value.getClass()
-                        == de.intevation.iam.model.UserIamAttributes.class
+                        == de.intevation.iam.model.jpa.UserIamAttributes.class
                     ) {
                         row.addAll(parseNestedModel(value));
                     } else {
@@ -115,7 +115,7 @@ public class CSVExporter<T> {
             }
             //Check for nested models
             if (propertyDescriptor.getPropertyType()
-                == de.intevation.iam.model.UserIamAttributes.class) {
+                == de.intevation.iam.model.jpa.UserIamAttributes.class) {
                 String[] nestedHeader = getHeader(new UserIamAttributes(), true);
                 fields.addAll(Arrays.asList(nestedHeader));
             } else {

@@ -20,8 +20,8 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.RealmModel;
 
 import de.intevation.iam.mail.MailScheduler;
-import de.intevation.iam.model.UserIamAttributes;
-import de.intevation.iam.representation.User;
+import de.intevation.iam.model.jpa.UserIamAttributes;
+import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.DateUtils;
 
 public class IamEventListenerProvider implements EventListenerProvider {

@@ -47,9 +47,9 @@ import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorization;
-import de.intevation.iam.model.Mail;
-import de.intevation.iam.model.MailList;
-import de.intevation.iam.model.MailType;
+import de.intevation.iam.model.jpa.Mail;
+import de.intevation.iam.model.jpa.MailList;
+import de.intevation.iam.model.jpa.MailType;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;

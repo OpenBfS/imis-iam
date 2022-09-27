@@ -4,7 +4,7 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
-package de.intevation.iam.representation;
+package de.intevation.iam.model.representation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +24,11 @@ import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 import org.keycloak.models.jpa.entities.UserRoleMappingEntity;
 
 import de.intevation.iam.auth.Role;
-import de.intevation.iam.model.Institution;
-import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.UserIamAttributes;
 
 /**
- * User representation
+ * User representation.
  */
 public class User {
 

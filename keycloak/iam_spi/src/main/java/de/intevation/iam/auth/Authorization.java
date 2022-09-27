@@ -13,11 +13,11 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.keycloak.models.KeycloakSession;
 
-import de.intevation.iam.model.Institution;
-import de.intevation.iam.model.InstitutionCategory;
-import de.intevation.iam.model.Mail;
-import de.intevation.iam.model.MailList;
-import de.intevation.iam.representation.User;
+import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.InstitutionCategory;
+import de.intevation.iam.model.jpa.Mail;
+import de.intevation.iam.model.jpa.MailList;
+import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.RequestMethod;
 
 public class Authorization {

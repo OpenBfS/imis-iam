@@ -4,22 +4,21 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
-package de.intevation.iam.model;
+package de.intevation.iam.model.jpa;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "mail_type", schema = "keycloak")
-public class MailType {
+@Table(name = "user_position", schema = "keycloak")
+public class UserPosition {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String name;
+    @Column(name = "position", nullable = false)
+    private String position;
 
     public Integer getId() {
         return id;
@@ -29,11 +28,11 @@ public class MailType {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getPosition() {
+        return position;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPosition(String position) {
+        this.position = position;
     }
 }

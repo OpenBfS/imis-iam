@@ -4,7 +4,7 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
-package de.intevation.iam.model;
+package de.intevation.iam.model.jpa;
 
 import java.util.List;
 import java.util.Map;

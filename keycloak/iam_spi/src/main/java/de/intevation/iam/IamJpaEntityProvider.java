@@ -11,12 +11,12 @@ import java.util.List;
 
 import org.keycloak.connections.jpa.entityprovider.JpaEntityProvider;
 
-import de.intevation.iam.model.Institution;
-import de.intevation.iam.model.InstitutionCategory;
-import de.intevation.iam.model.Mail;
-import de.intevation.iam.model.MailList;
-import de.intevation.iam.model.UserIamAttributes;
-import de.intevation.iam.model.UserPosition;
+import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.InstitutionCategory;
+import de.intevation.iam.model.jpa.Mail;
+import de.intevation.iam.model.jpa.MailList;
+import de.intevation.iam.model.jpa.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserPosition;
 
 
 public class IamJpaEntityProvider implements JpaEntityProvider {

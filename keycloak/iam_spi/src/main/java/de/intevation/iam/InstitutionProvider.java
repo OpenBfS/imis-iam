@@ -30,8 +30,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorization;
-import de.intevation.iam.model.Institution;
-import de.intevation.iam.model.InstitutionCategory;
+import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.InstitutionCategory;
 import de.intevation.iam.util.RequestMethod;
 
 /**

@@ -15,7 +15,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
-import de.intevation.iam.model.InstitutionCategory;
+import de.intevation.iam.model.jpa.InstitutionCategory;
 import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;

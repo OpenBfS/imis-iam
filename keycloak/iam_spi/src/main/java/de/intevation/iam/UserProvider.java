@@ -41,10 +41,10 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorization;
-import de.intevation.iam.model.UserPosition;
-import de.intevation.iam.representation.User;
-import de.intevation.iam.representation.UserMembership;
-import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserPosition;
+import de.intevation.iam.model.representation.User;
+import de.intevation.iam.model.representation.UserMembership;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;

@@ -27,7 +27,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 
-import de.intevation.iam.model.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserIamAttributes;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 
