@@ -235,19 +235,19 @@ public class Institution {
         this.imisMail = imisMail;
     }
 
-    public Float getxCoordinate() {
+    public Float getXCoordinate() {
         return xCoordinate;
     }
 
-    public void setxCoordinate(Float xCoordinate) {
+    public void setXCoordinate(Float xCoordinate) {
         this.xCoordinate = xCoordinate;
     }
 
-    public Float getyCoordinate() {
+    public Float getYCoordinate() {
         return yCoordinate;
     }
 
-    public void setyCoordinate(Float yCoordinate) {
+    public void setYCoordinate(Float yCoordinate) {
         this.yCoordinate = yCoordinate;
     }
 
