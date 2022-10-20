@@ -7,7 +7,6 @@
 package de.intevation.iam.model.jpa;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,7 +19,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.keycloak.models.GroupModel;
 import org.keycloak.models.jpa.entities.UserEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -100,9 +98,6 @@ public class Institution {
     public void setUserEntities(List<UserEntity> userEntities) {
         this.userEntities = userEntities;
     }
-
-    @Transient
-    private Map<String, List<String>> attributes;
 
     @Transient
     private Boolean readonly;
@@ -257,25 +252,5 @@ public class Institution {
 
     public void setActive(Boolean active) {
         this.active = active;
-    }
-
-    public Map<String, List<String>> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(Map<String, List<String>> attributes) {
-        this.attributes = attributes;
-    }
-
-    /**
-     * Create an Institution from a GroupModel.
-     * @param group GroupModel to convert
-     * @return Institution instance
-     */
-    public static Institution fromGroupModel(GroupModel group) {
-        Institution institution = new Institution();
-        institution.setName(group.getName());
-        institution.setAttributes(group.getAttributes());
-        return institution;
     }
 }
