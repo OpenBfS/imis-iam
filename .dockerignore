@@ -1,0 +1,2 @@
+# Ensure a clean build even if target directory exists
+keycloak/iam_spi/target
