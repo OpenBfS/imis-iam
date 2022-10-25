@@ -157,7 +157,7 @@ public class User {
 
 
     /**
-     * Update groups of the given user.
+     * Get institutions by a list of ids.
      * @param institutionIds List of new institution ids
      * @param em Entity manager
      * @return List of institutions
@@ -180,11 +180,11 @@ public class User {
     }
 
     /**
-     * Create a user attributes jpa model from this representation.
+     * Create or update the user attributes jpa model for this representation.
      * @param em Entity manager used for queries
-     * @return New model
+     * @return Jpa model
      */
-    public UserAttributes createJpaModel(EntityManager em) {
+    public UserAttributes createOrUpdateJpaModel(EntityManager em) {
         UserAttributes attributes = em.find(
                 UserAttributes.class, getId());
         if (attributes == null) {

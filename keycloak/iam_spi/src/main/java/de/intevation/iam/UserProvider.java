@@ -152,7 +152,7 @@ public class UserProvider implements RealmResourceProvider {
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-        UserAttributes attributes = rep.createJpaModel(em);
+        UserAttributes attributes = rep.createOrUpdateJpaModel(em);
         if (attributes != null && attributes.getId() != null && !attributes.getId().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -249,7 +249,7 @@ public class UserProvider implements RealmResourceProvider {
                     .build();
         }
 
-        UserAttributes attributes = rep.createJpaModel(em);
+        UserAttributes attributes = rep.createOrUpdateJpaModel(em);
         if (attributes.getId() == null) {
             attributes.setId(rep.getId());
         }
