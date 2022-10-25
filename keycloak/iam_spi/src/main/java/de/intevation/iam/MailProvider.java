@@ -303,7 +303,6 @@ public class MailProvider implements RealmResourceProvider {
         }
         updateMailListUsers(list, em);
         MailList mergedList = em.merge(list);
-        mergedList.updateUsers();
         return Response.ok(mergedList).build();
     }
 
@@ -625,7 +624,6 @@ public class MailProvider implements RealmResourceProvider {
         critQuery.orderBy(cb.asc(root.get("name")));
         TypedQuery<MailList> query = em.createQuery(critQuery);
         List<MailList> lists = query.getResultList();
-        lists.forEach(list -> list.updateUsers());
         return lists;
     }
 

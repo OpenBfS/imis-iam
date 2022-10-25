@@ -62,7 +62,12 @@ public class MailList {
         this.id = id;
     }
 
+    /**
+     * Get ids of users subscribed to this list.
+     * @return Ids as list
+     */
     public List<String> getUsers() {
+        updateUsers();
         return users;
     }
 
@@ -81,7 +86,7 @@ public class MailList {
     /**
      * Update the users subscribed to this list.
      */
-    public void updateUsers() {
+    private void updateUsers() {
         if (getUserEntities() == null) {
             return;
         }
