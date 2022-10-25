@@ -2,7 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
     <changeSet author="awoestmann@intevation.de" id="v0.1">
         <!--Create tables-->
-        <createTable tableName="mail_list">
+        <createTable tableName="iam_mail_list">
             <column name="id" type="SERIAL">
                 <constraints primaryKey="true" />
             </column>
@@ -10,18 +10,18 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <createTable tableName="mail_list_user">
+        <createTable tableName="iam_mail_list_user">
             <column name="id" type="SERIAL">
                 <constraints primaryKey="true" />
             </column>
             <column name="mail_list_id" type="INT">
-                <constraints foreignKeyName="fk_mail_list_user_list" references="mail_list(id)" />
+                <constraints foreignKeyName="fk_mail_list_user_list" references="iam_mail_list(id)" />
             </column>
             <column name="user_id" type="VARCHAR(36)">
                 <constraints foreignKeyName="fk_mail_list_user_user" references="user_entity(id)" />
             </column>
         </createTable>
-        <createTable tableName="mail_type">
+        <createTable tableName="iam_mail_type">
             <column name="id" type="INT">
                 <constraints primaryKey="true" />
             </column>
@@ -29,7 +29,7 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <createTable tableName="mail">
+        <createTable tableName="iam_mail">
             <column name="id" type="SERIAL">
                 <constraints primaryKey="true" />
             </column>
@@ -54,14 +54,14 @@
                 <constraints
                     nullable="false"
                     foreignKeyName="fk_mail_mail_type"
-                    references="mail_type(id)"
+                    references="iam_mail_type(id)"
                 />
             </column>
             <column name="receipient" type="INT">
                 <constraints
                     nullable="false"
                     foreignKeyName="fk_mail_mail_list"
-                    references="mail_list(id)"
+                    references="iam_mail_list(id)"
                 />
             </column>
             <column name="user_id" type="VARCHAR(36)">
@@ -75,41 +75,41 @@
 
         <!--Add Constraints-->
         <addUniqueConstraint
-            tableName="mail_list_user"
+            tableName="iam_mail_list_user"
             columnNames="mail_list_id, user_id"
             constraintName="mail_list_user_unique"
         />
 
         <!--Insert mail type data-->
-        <insert tableName="mail_type">
+        <insert tableName="iam_mail_type">
             <column name="id" value="1" />
             <column name="name" value="Einladung" />
         </insert>
-        <insert tableName="mail_type">
+        <insert tableName="iam_mail_type">
             <column name="id" value="2" />
             <column name="name" value="Umfrage" />
         </insert>
-        <insert tableName="mail_type">
+        <insert tableName="iam_mail_type">
             <column name="id" value="3" />
             <column name="name" value="Störung" />
         </insert>
-        <insert tableName="mail_type">
+        <insert tableName="iam_mail_type">
             <column name="id" value="4" />
             <column name="name" value="Wartung" />
         </insert>
-        <insert tableName="mail_type">
+        <insert tableName="iam_mail_type">
             <column name="id" value="5" />
             <column name="name" value="Sprechstunde" />
         </insert>
-        <insert tableName="mail_type">
+        <insert tableName="iam_mail_type">
             <column name="id" value="6" />
             <column name="name" value="Release Note" />
         </insert>
-        <insert tableName="mail_type">
+        <insert tableName="iam_mail_type">
             <column name="id" value="7" />
             <column name="name" value="Soll/Ist-Vergleich" />
         </insert>
-        <insert tableName="mail_type">
+        <insert tableName="iam_mail_type">
             <column name="id" value="8" />
             <column name="name" value="Hinweis" />
         </insert>
@@ -117,17 +117,17 @@
     <changeSet author="awoestmann@intevation.de" id="v0.2">
         <renameColumn
             columnDataType="BOOLEAN"
-            tableName="mail"
+            tableName="iam_mail"
             oldColumnName="publish"
             newColumnName="archived"
         />
-        <update tableName = "mail">
+        <update tableName = "iam_mail">
             <column name="archived" value="false" />
             <where>archived='true'</where>
         </update>
     </changeSet>
     <changeSet author="awoestmann@intevation.de" id="v0.3">
-        <createTable tableName="institution_category">
+        <createTable tableName="iam_institution_category">
             <column name="id" type="SERIAL">
                 <constraints primaryKey="true" />
             </column>
@@ -135,7 +135,7 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <createTable tableName="institution">
+        <createTable tableName="iam_institution">
             <column name="id" type="serial">
                 <constraints primaryKey="true" />
             </column>
@@ -146,7 +146,7 @@
                 <constraints nullable="false" />
             </column>
             <column name="category_id" type="INT">
-                <constraints foreignKeyName="fk_institution_institution_category" references="institution_category(id)" />
+                <constraints foreignKeyName="fk_institution_institution_category" references="iam_institution_category(id)" />
             </column>
             <column name="service_building_street" type="VARCHAR">
                 <constraints nullable="false" />
@@ -182,54 +182,54 @@
             <column name="active" type="BOOLEAN" defaultValue="true">
             </column>
         </createTable>
-        <createTable tableName="institution_user">
+        <createTable tableName="iam_institution_user">
             <column name="id" type="SERIAL">
                 <constraints primaryKey="true" />
             </column>
             <column name="institution_id" type="INT">
-                <constraints foreignKeyName="fk_institution_user_institution" references="institution(id)" />
+                <constraints foreignKeyName="fk_institution_user_institution" references="iam_institution(id)" />
             </column>
             <column name="user_id" type="VARCHAR(36)">
                 <constraints foreignKeyName="fk_institution_user_user" references="user_entity(id)" />
             </column>
         </createTable>
 
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Bundesministerium" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Leitstelle" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Bundesbehörde" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Landesministerium" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Landesdatenzentrale" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Landesmessstelle" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Landesmessstelle REI" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Betreiber KTA" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Aufsichtsbehörde" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Sonstige" />
         </insert>
-        <insert tableName="institution_category">
+        <insert tableName="iam_institution_category">
             <column name="name" value="Alle" />
         </insert>
     </changeSet>
     <changeSet author="awoestmann@intevation.de" id="v0.4">
-        <createTable tableName="user_position">
+        <createTable tableName="iam_user_position">
             <column name="id" type="SERIAL">
                 <constraints primaryKey="true"/>
             </column>
@@ -237,7 +237,7 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <createTable tableName="user_iam_attributes">
+        <createTable tableName="iam_user_attributes">
             <column name="id" type="VARCHAR">
                 <constraints
                     primaryKey="true"
@@ -249,7 +249,7 @@
                 <constraints
                     nullable="false"
                     foreignKeyName="fk_user_attributes_position"
-                    references="user_position(id)"
+                    references="iam_user_position(id)"
                 />
             </column>
             <column name="title" type="VARCHAR">
@@ -269,29 +269,29 @@
         </createTable>
 
         <!--Insert positions-->
-        <insert tableName="user_position">
+        <insert tableName="iam_user_position">
             <column name="position" value="Leiter" />
         </insert>
-        <insert tableName="user_position">
+        <insert tableName="iam_user_position">
             <column name="position" value="Vertreter" />
         </insert>
-        <insert tableName="user_position">
+        <insert tableName="iam_user_position">
             <column name="position" value="Radiologischer Ansprechpartner" />
         </insert>
-        <insert tableName="user_position">
+        <insert tableName="iam_user_position">
             <column name="position" value="Mitarbeiter" />
         </insert>
-        <insert tableName="user_position">
+        <insert tableName="iam_user_position">
             <column name="position" value="IT-Ansprechperson" />
         </insert>
-        <insert tableName="user_position">
+        <insert tableName="iam_user_position">
             <column name="position" value="Störplatz" />
         </insert>
     </changeSet>
     <changeSet author="awoestmann@intevation.de" id="v0.5">
         <!--Add expiryDate column to user attributes-->
         <addColumn
-            tableName="user_iam_attributes">
+            tableName="iam_user_attributes">
             <column name="expiry_date"
                 type="TIMESTAMP WITHOUT TIMEZONE"
                 defaultValueComputed = "current_date + interval '12 month'"/>
@@ -306,26 +306,26 @@
     <changeSet author="awoestmann@intevation.de" id="v0.6">
         <!--Add "ON DELETE CASCADE" to mail list and institution mapping tables-->
         <dropForeignKeyConstraint
-            baseTableName="mail_list_user"
+            baseTableName="iam_mail_list_user"
             constraintName="fk_mail_list_user_list"
         />
         <addForeignKeyConstraint
             constraintName="fk_mail_list_user_list"
-            baseTableName="mail_list_user"
+            baseTableName="iam_mail_list_user"
             baseColumnNames="mail_list_id"
-            referencedTableName="mail_list"
+            referencedTableName="iam_mail_list"
             referencedColumnNames="id"
             onDelete="CASCADE"
         />
         <dropForeignKeyConstraint
-            baseTableName="institution_user"
+            baseTableName="iam_institution_user"
             constraintName="fk_institution_user_institution"
         />
         <addForeignKeyConstraint
             constraintName="fk_institution_user_institution"
-            baseTableName="institution_user"
+            baseTableName="iam_institution_user"
             baseColumnNames="institution_id"
-            referencedTableName="institution"
+            referencedTableName="iam_institution"
             referencedColumnNames="id"
             onDelete="CASCADE"
         />

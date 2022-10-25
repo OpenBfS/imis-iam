@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "mail_type", schema = "keycloak")
+@Table(name = "iam_mail_type", schema = "keycloak")
 public class MailType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

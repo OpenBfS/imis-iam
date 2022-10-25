@@ -15,7 +15,7 @@ import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionCategory;
 import de.intevation.iam.model.jpa.Mail;
 import de.intevation.iam.model.jpa.MailList;
-import de.intevation.iam.model.jpa.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.model.jpa.UserPosition;
 
 
@@ -34,7 +34,7 @@ public class IamJpaEntityProvider implements JpaEntityProvider {
         List<Class<?>> entities =  Collections.<Class<?>>emptyList();
         entities.add(Mail.class);
         entities.add(MailList.class);
-        entities.add(UserIamAttributes.class);
+        entities.add(UserAttributes.class);
         entities.add(UserPosition.class);
         entities.add(Institution.class);
         entities.add(InstitutionCategory.class);

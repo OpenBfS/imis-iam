@@ -20,7 +20,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.RealmModel;
 
 import de.intevation.iam.mail.MailScheduler;
-import de.intevation.iam.model.jpa.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.DateUtils;
 
@@ -57,7 +57,7 @@ public class IamEventListenerProvider implements EventListenerProvider {
             EntityManager em = session.getProvider(
                     JpaConnectionProvider.class).getEntityManager();
             User user = User.fromUserModel(userModel, em);
-            UserIamAttributes attributes = user.createJpaModel(em);
+            UserAttributes attributes = user.createJpaModel(em);
             attributes.setExpiryDate(
                     DateUtils.getAccountExpiryDate());
             attributes.setExpiredNotificationSent(false);

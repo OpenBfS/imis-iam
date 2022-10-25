@@ -27,7 +27,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 
-import de.intevation.iam.model.jpa.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 
@@ -52,9 +52,9 @@ public class MailTask implements KeycloakSessionTask {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<UserIamAttributes> query
-                = cb.createQuery(UserIamAttributes.class);
-        Root<UserIamAttributes> root = query.from(UserIamAttributes.class);
+        CriteriaQuery<UserAttributes> query
+                = cb.createQuery(UserAttributes.class);
+        Root<UserAttributes> root = query.from(UserAttributes.class);
         query.select(root);
         Predicate filter;
         Predicate sentFilter = cb.equal(
@@ -63,7 +63,7 @@ public class MailTask implements KeycloakSessionTask {
         new Timestamp(System.currentTimeMillis()));
         filter = cb.and(sentFilter, inactivityFilter);
         query.where(filter);
-        List<UserIamAttributes> userAttributes
+        List<UserAttributes> userAttributes
                 = em.createQuery(query).getResultList();
         List<UserModel> users = new ArrayList<>();
         userAttributes.forEach(user -> {
@@ -86,9 +86,9 @@ public class MailTask implements KeycloakSessionTask {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<UserIamAttributes> query
-                = cb.createQuery(UserIamAttributes.class);
-        Root<UserIamAttributes> root = query.from(UserIamAttributes.class);
+        CriteriaQuery<UserAttributes> query
+                = cb.createQuery(UserAttributes.class);
+        Root<UserAttributes> root = query.from(UserAttributes.class);
         query.select(root);
         Predicate filter;
         Predicate sentFilter = cb.equal(
@@ -97,7 +97,7 @@ public class MailTask implements KeycloakSessionTask {
         DateUtils.getAccountInactivityDate());
         filter = cb.and(sentFilter, inactivityFilter);
         query.where(filter);
-        List<UserIamAttributes> userAttributes
+        List<UserAttributes> userAttributes
                 = em.createQuery(query).getResultList();
         if (userAttributes.size() == 0) {
             return;

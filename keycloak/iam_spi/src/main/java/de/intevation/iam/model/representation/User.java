@@ -25,7 +25,7 @@ import org.keycloak.models.jpa.entities.UserRoleMappingEntity;
 
 import de.intevation.iam.auth.Role;
 import de.intevation.iam.model.jpa.Institution;
-import de.intevation.iam.model.jpa.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserAttributes;
 
 /**
  * User representation.
@@ -184,11 +184,11 @@ public class User {
      * @param em Entity manager used for queries
      * @return New model
      */
-    public UserIamAttributes createJpaModel(EntityManager em) {
-        UserIamAttributes attributes = em.find(
-                UserIamAttributes.class, getId());
+    public UserAttributes createJpaModel(EntityManager em) {
+        UserAttributes attributes = em.find(
+                UserAttributes.class, getId());
         if (attributes == null) {
-            attributes = new UserIamAttributes();
+            attributes = new UserAttributes();
         }
         attributes.setId(getId());
         attributes.setTitle(getTitle());
@@ -210,7 +210,7 @@ public class User {
      * @return User representation
      */
     public static User fromJpaModel(
-            UserIamAttributes jpaModel, EntityManager em) {
+            UserAttributes jpaModel, EntityManager em) {
         User user = new User();
         UserEntity userEntity = jpaModel.getUserEntity();
         user.setId(jpaModel.getId());
@@ -298,8 +298,8 @@ public class User {
      */
     public static User fromUserModel(UserModel userModel,
             EntityManager em) {
-        UserIamAttributes userAttributes = em.find(
-                UserIamAttributes.class, userModel.getId());
+        UserAttributes userAttributes = em.find(
+                UserAttributes.class, userModel.getId());
         return fromJpaModel(userAttributes, em);
     }
 }

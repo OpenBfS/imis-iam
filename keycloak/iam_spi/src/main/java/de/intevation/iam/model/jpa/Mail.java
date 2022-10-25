@@ -18,7 +18,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "mail", schema = "keycloak")
+@Table(name = "iam_mail", schema = "keycloak")
 public class Mail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

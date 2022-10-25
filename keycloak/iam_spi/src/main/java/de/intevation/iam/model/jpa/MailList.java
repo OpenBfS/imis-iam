@@ -25,7 +25,7 @@ import org.keycloak.models.jpa.entities.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "mail_list", schema = "keycloak")
+@Table(name = "iam_mail_list", schema = "keycloak")
 public class MailList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,7 @@ public class MailList {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-        name = "mail_list_user",
+        name = "iam_mail_list_user",
         joinColumns = {@JoinColumn(name = "mail_list_id")},
         inverseJoinColumns = {@JoinColumn(name = "user_id")}
     )

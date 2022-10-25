@@ -14,7 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
 @Entity
-@Table(name = "institution_category", schema = "keycloak")
+@Table(name = "iam_institution_category", schema = "keycloak")
 public class InstitutionCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -24,7 +24,7 @@ import org.keycloak.models.jpa.entities.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name = "institution", schema = "keycloak")
+@Table(name = "iam_institution", schema = "keycloak")
 public class Institution {
 
     @Id
@@ -84,7 +84,7 @@ public class Institution {
 
     @ManyToMany
     @JoinTable(
-        name = "institution_user",
+        name = "iam_institution_user",
         joinColumns = { @JoinColumn(name = "institution_id")},
         inverseJoinColumns = {@JoinColumn(name = "user_id")}
     )

@@ -41,7 +41,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorization;
-import de.intevation.iam.model.jpa.UserIamAttributes;
+import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.model.jpa.UserPosition;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.model.representation.UserMembership;
@@ -152,7 +152,7 @@ public class UserProvider implements RealmResourceProvider {
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-        UserIamAttributes attributes = rep.createJpaModel(em);
+        UserAttributes attributes = rep.createJpaModel(em);
         if (attributes != null && attributes.getId() != null && !attributes.getId().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -249,13 +249,13 @@ public class UserProvider implements RealmResourceProvider {
                     .build();
         }
 
-        UserIamAttributes attributes = rep.createJpaModel(em);
+        UserAttributes attributes = rep.createJpaModel(em);
         if (attributes.getId() == null) {
             attributes.setId(rep.getId());
         }
         //Set expiry date and notification flags
-        UserIamAttributes dbAttributes
-                = em.find(UserIamAttributes.class, attributes.getId());
+        UserAttributes dbAttributes
+                = em.find(UserAttributes.class, attributes.getId());
         attributes.setExpiryDate(dbAttributes.getExpiryDate());
         attributes.setExpiredNotificationSent(
                 dbAttributes.getExpiredNotificationSent());
