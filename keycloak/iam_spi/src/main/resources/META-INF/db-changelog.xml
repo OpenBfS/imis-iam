@@ -2,6 +2,53 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
     <changeSet author="awoestmann@intevation.de" id="v0.1">
         <!--Create tables-->
+        <createTable tableName="iam_user_position">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="position" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createTable tableName="iam_user_attributes">
+            <column name="id" type="VARCHAR">
+                <constraints
+                    primaryKey="true"
+                    foreignKeyName="fk_user_entity_attributes"
+                    references="user_entity(id)"
+                />
+            </column>
+            <column name="position_id" type="INT">
+                <constraints
+                    nullable="false"
+                    foreignKeyName="fk_user_attributes_position"
+                    references="iam_user_position(id)"
+                />
+            </column>
+            <column name="title" type="VARCHAR">
+            </column>
+            <column name="phone" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="mobile" type="VARCHAR">
+            </column>
+            <column name="fax" type="VARCHAR">
+            </column>
+            <column name="oe" type="VARCHAR">
+            </column>
+            <column name="bfs_location" type="VARCHAR">
+                <constraints nullable="false" />
+            </column>
+            <column name="expiry_date"
+                type="TIMESTAMP WITHOUT TIMEZONE"
+                defaultValueComputed = "current_date + interval '12 month'"/>
+            <column name="inactivity_notification_sent"
+                type="BOOLEAN"
+                defaultValue="false" />
+            <column name="expired_notification_sent"
+                type="BOOLEAN"
+                defaultValue="false" />
+        </createTable>
         <createTable tableName="iam_mail_list">
             <column name="id" type="SERIAL">
                 <constraints primaryKey="true" />
@@ -77,53 +124,6 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <createTable tableName="iam_user_position">
-            <column name="id" type="SERIAL">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="position" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-        </createTable>
-        <createTable tableName="iam_user_attributes">
-            <column name="id" type="VARCHAR">
-                <constraints
-                    primaryKey="true"
-                    foreignKeyName="fk_user_entity_attributes"
-                    references="user_entity(id)"
-                />
-            </column>
-            <column name="position_id" type="INT">
-                <constraints
-                    nullable="false"
-                    foreignKeyName="fk_user_attributes_position"
-                    references="iam_user_position(id)"
-                />
-            </column>
-            <column name="title" type="VARCHAR">
-            </column>
-            <column name="phone" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="mobile" type="VARCHAR">
-            </column>
-            <column name="fax" type="VARCHAR">
-            </column>
-            <column name="oe" type="VARCHAR">
-            </column>
-            <column name="bfs_location" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="expiry_date"
-                type="TIMESTAMP WITHOUT TIMEZONE"
-                defaultValueComputed = "current_date + interval '12 month'"/>
-            <column name="inactivity_notification_sent"
-                type="BOOLEAN"
-                defaultValue="false" />
-            <column name="expired_notification_sent"
-                type="BOOLEAN"
-                defaultValue="false" />
-        </createTable>
         <createTable tableName="iam_institution">
             <column name="id" type="serial">
                 <constraints primaryKey="true" />
@@ -176,7 +176,7 @@
                 <constraints foreignKeyName="fk_institution_user_institution" references="iam_institution(id)" onDelete="CASCADE"/>
             </column>
             <column name="user_id" type="VARCHAR(36)">
-                <constraints foreignKeyName="fk_institution_user_user" references="user_entity(id)" />
+                <constraints foreignKeyName="fk_institution_user_user" references="iam_user_attributes(id)" />
             </column>
         </createTable>
 
