@@ -11,9 +11,6 @@
             </column>
         </createTable>
         <createTable tableName="iam_mail_list_user">
-            <column name="id" type="SERIAL">
-                <constraints primaryKey="true" />
-            </column>
             <column name="mail_list_id" type="INT">
                 <constraints foreignKeyName="fk_mail_list_user_list" references="iam_mail_list(id)" onDelete="CASCADE"/>
             </column>
@@ -175,9 +172,6 @@
             </column>
         </createTable>
         <createTable tableName="iam_institution_user">
-            <column name="id" type="SERIAL">
-                <constraints primaryKey="true" />
-            </column>
             <column name="institution_id" type="INT">
                 <constraints foreignKeyName="fk_institution_user_institution" references="iam_institution(id)" onDelete="CASCADE"/>
             </column>
@@ -187,6 +181,12 @@
         </createTable>
 
         <!--Add Constraints-->
+        <addPrimaryKey columnNames="mail_list_id, user_id"
+                       constraintName="pk_mail_list_user"
+                       tableName="iam_mail_list_user"/>
+        <addPrimaryKey columnNames="institution_id, user_id"
+                       constraintName="pk_institution_user"
+                       tableName="iam_institution_user"/>
         <addUniqueConstraint
             tableName="iam_mail_list_user"
             columnNames="mail_list_id, user_id"
