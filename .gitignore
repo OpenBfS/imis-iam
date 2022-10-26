@@ -1,4 +1,5 @@
 client/node_modules
 client/dist
-
+keycloak/keycloak-*/
+keycloak/keycloak-*.tar.gz
 .vscode
