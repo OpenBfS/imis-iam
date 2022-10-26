@@ -23,8 +23,6 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dear
 && apt-get update \
 && apt-get -y install nodejs
 
-## fix npm ERR! UNABLE_TO_GET_ISSUER_CERT_LOCALLY
-RUN npm config set registry http://registry.npmjs.org/
 RUN npm install --global yarn
 
 #
