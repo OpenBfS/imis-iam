@@ -12,8 +12,20 @@ import org.keycloak.models.GroupModel;
  * Class representing a user membership.
  */
 public class UserMembership {
+
     private String id;
+
     private String name;
+
+    /**
+     * Create a membership instance from the given group model
+     * @param group Group model to use
+     */
+    public UserMembership(GroupModel group) {
+        this.id = group.getId();
+        this.name = group.getName();
+    }
+
     public String getId() {
         return id;
     }
@@ -25,17 +37,5 @@ public class UserMembership {
     }
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * Create a membership object from a given keycloak group model.
-     * @param model Keycloak group model
-     * @return New membership object
-     */
-    public static UserMembership fromGroupModel(GroupModel model) {
-        UserMembership um = new UserMembership();
-        um.setId(model.getId());
-        um.setName(model.getName());
-        return um;
     }
 }

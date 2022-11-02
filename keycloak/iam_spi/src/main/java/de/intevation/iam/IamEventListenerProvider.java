@@ -56,7 +56,7 @@ public class IamEventListenerProvider implements EventListenerProvider {
                     realm, event.getUserId());
             EntityManager em = session.getProvider(
                     JpaConnectionProvider.class).getEntityManager();
-            User user = User.fromUserModel(userModel, em);
+            User user = new User(userModel, em);
             UserAttributes attributes = user.createOrUpdateJpaModel(em);
             attributes.setExpiryDate(
                     DateUtils.getAccountExpiryDate());

@@ -85,7 +85,7 @@ public class UserProvider implements RealmResourceProvider {
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(new User(user, em)).build();
     }
 
     /**
@@ -102,7 +102,7 @@ public class UserProvider implements RealmResourceProvider {
         Stream<UserModel> users = session.users().getUsersStream(realm);
         List<User> userList = new ArrayList<User>();
         for (UserModel user: users.collect(Collectors.toList())) {
-            userList.add(User.fromUserModel(user, em));
+            userList.add(new User(user, em));
         }
         userList = auth.filter(userList, headers, User.class);
         return Response.ok(userList).build();
@@ -130,7 +130,7 @@ public class UserProvider implements RealmResourceProvider {
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(new User(user, em)).build();
     }
     /**
      * Create a new user.
@@ -209,7 +209,7 @@ public class UserProvider implements RealmResourceProvider {
         attributes.setExpiryDate(
                 DateUtils.getAccountExpiryDate());
         em.persist(attributes);
-        return Response.ok(User.fromUserModel(newUserModel, em)).build();
+        return Response.ok(new User(newUserModel, em)).build();
     }
 
     /**
@@ -262,7 +262,7 @@ public class UserProvider implements RealmResourceProvider {
         attributes.setInactivityNotificationSent(
                 dbAttributes.getInactivityNotificationSent());
         em.merge(attributes);
-        return Response.ok(User.fromUserModel(user, em)).build();
+        return Response.ok(new User(user, em)).build();
     }
 
     /**
@@ -297,7 +297,7 @@ public class UserProvider implements RealmResourceProvider {
         Stream<GroupModel> groups = realm.getGroupsStream();
         ArrayList<UserMembership> memberships = new ArrayList<UserMembership>();
         groups.forEach(group -> {
-            memberships.add(UserMembership.fromGroupModel(group));
+            memberships.add(new UserMembership(group));
         });
         return Response.ok(memberships.toArray()).build();
     }

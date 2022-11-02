@@ -58,6 +58,102 @@ public class User {
     private static final String ID_PARAM = "id";
     private static final String USER_PARAM = "user";
 
+
+    /**
+     * Generate user from given usermodel.
+     * @param userModel Keycloak usermodel
+     * @param em EntityManager
+     * @return Generated user
+     */
+    public User(UserModel userModel, EntityManager em) {
+        this(
+            em.find(UserAttributes.class, userModel.getId()),
+            em);
+    }
+
+    /**
+     * Create a user representation from the given jpa model.
+     * @param jpaModel Model to use
+     * @param em EntityManager
+     * @return User representation
+     */
+    public User(UserAttributes jpaModel, EntityManager em) {
+        UserEntity userEntity = jpaModel.getUserEntity();
+        setId(jpaModel.getId());
+        //Get attributes from user entity model
+        setFirstName(userEntity.getFirstName());
+        setLastName(userEntity.getLastName());
+        setUsername(userEntity.getUsername());
+        setEmail(userEntity.getEmail());
+
+        //Get attributes from iam attributes model
+        setTitle(jpaModel.getTitle());
+        setPhone(jpaModel.getPhone());
+        setMobile(jpaModel.getMobile());
+        setFax(jpaModel.getFax());
+        setOe(jpaModel.getOe());
+        setBfsLocation(jpaModel.getOe());
+        setPosition(jpaModel.getPosition());
+
+        //Set institutions
+        List<Institution> institutions = jpaModel.getInstitutions();
+        if (institutions != null) {
+            List<Integer> institutionIds = new ArrayList<Integer>();
+            institutions.forEach(inst -> institutionIds.add(inst.getId()));
+            setInstitutions(institutionIds);
+        }
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+
+        //Get user roles
+        TypedQuery<UserRoleMappingEntity> roleMappingQuery =
+            em.createNamedQuery("userRoleMappings",
+            UserRoleMappingEntity.class);
+        roleMappingQuery.setParameter(USER_PARAM, jpaModel.getUserEntity());
+        List<UserRoleMappingEntity> roleMappings
+            = roleMappingQuery.getResultList();
+        //Query role entities as mapping models only contain role ids
+        CriteriaQuery<RoleEntity> roleQuery = cb.createQuery(RoleEntity.class);
+        Root<RoleEntity> root = roleQuery.from(RoleEntity.class);
+        roleQuery.select(root);
+        In<String> idFilter = cb.in(root.get(ID_PARAM));
+        roleMappings.forEach(
+                roleMapping -> idFilter.value(roleMapping.getRoleId()));
+        roleQuery.where(idFilter);
+        List<RoleEntity> roleEntities
+            = em.createQuery(roleQuery).getResultList();
+        //Get role names if role is iam client role
+        List<String> roleNames = new ArrayList<String>();
+        roleEntities.forEach(entity -> {
+            if (Role.get(entity.getName()) != null) {
+                roleNames.add(entity.getName());
+            }
+        });
+        setRoles(roleNames);
+
+        //Get user groups
+        TypedQuery<UserGroupMembershipEntity> groupMappingQuery =
+            em.createNamedQuery("userGroupMembership",
+            UserGroupMembershipEntity.class);
+        groupMappingQuery.setParameter(USER_PARAM, jpaModel.getUserEntity());
+        List<UserGroupMembershipEntity> groupMappings
+            = groupMappingQuery.getResultList();
+        //Query group entities as mapping entities only contain group ids
+        CriteriaQuery<GroupEntity> groupQuery
+            = cb.createQuery(GroupEntity.class);
+        Root<GroupEntity> groupRoot = groupQuery.from(GroupEntity.class);
+        groupQuery.select(groupRoot);
+        In<String> groupIdFilter = cb.in(root.get(ID_PARAM));
+        groupMappings.forEach(
+                mapping -> groupIdFilter.value(mapping.getGroupId()));
+        groupQuery.where(groupIdFilter);
+        List<GroupEntity> groupEntities
+            = em.createQuery(groupQuery).getResultList();
+        List<String> groups = new ArrayList<String>();
+        groupEntities.forEach(groupEnt -> groups.add(groupEnt.getId()));
+        setGroups(groups);
+    }
+
     public Boolean getReadonly() {
         return readonly;
     }
@@ -201,105 +297,5 @@ public class User {
         attributes.setInstitutions(
                 getInstitutionsByIds(getInstitutions(), em));
         return attributes;
-    }
-
-    /**
-     * Create a user representation from the given jpa model.
-     * @param jpaModel Model to use
-     * @param em EntityManager
-     * @return User representation
-     */
-    public static User fromJpaModel(
-            UserAttributes jpaModel, EntityManager em) {
-        User user = new User();
-        UserEntity userEntity = jpaModel.getUserEntity();
-        user.setId(jpaModel.getId());
-        //Get attributes from user entity model
-        user.setFirstName(userEntity.getFirstName());
-        user.setLastName(userEntity.getLastName());
-        user.setUsername(userEntity.getUsername());
-        user.setEmail(userEntity.getEmail());
-
-        //Get attributes from iam attributes model
-        user.setTitle(jpaModel.getTitle());
-        user.setPhone(jpaModel.getPhone());
-        user.setMobile(jpaModel.getMobile());
-        user.setFax(jpaModel.getFax());
-        user.setOe(jpaModel.getOe());
-        user.setBfsLocation(jpaModel.getOe());
-        user.setPosition(jpaModel.getPosition());
-
-        //Set institutions
-        List<Institution> institutions = jpaModel.getInstitutions();
-        if (institutions != null) {
-            List<Integer> institutionIds = new ArrayList<Integer>();
-            institutions.forEach(inst -> institutionIds.add(inst.getId()));
-            user.setInstitutions(institutionIds);
-        }
-
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-
-        //Get user roles
-        TypedQuery<UserRoleMappingEntity> roleMappingQuery =
-            em.createNamedQuery("userRoleMappings",
-            UserRoleMappingEntity.class);
-        roleMappingQuery.setParameter(USER_PARAM, jpaModel.getUserEntity());
-        List<UserRoleMappingEntity> roleMappings
-            = roleMappingQuery.getResultList();
-        //Query role entities as mapping models only contain role ids
-        CriteriaQuery<RoleEntity> roleQuery = cb.createQuery(RoleEntity.class);
-        Root<RoleEntity> root = roleQuery.from(RoleEntity.class);
-        roleQuery.select(root);
-        In<String> idFilter = cb.in(root.get(ID_PARAM));
-        roleMappings.forEach(
-                roleMapping -> idFilter.value(roleMapping.getRoleId()));
-        roleQuery.where(idFilter);
-        List<RoleEntity> roleEntities
-            = em.createQuery(roleQuery).getResultList();
-        //Get role names if role is iam client role
-        List<String> roleNames = new ArrayList<String>();
-        roleEntities.forEach(entity -> {
-            if (Role.get(entity.getName()) != null) {
-                roleNames.add(entity.getName());
-            }
-        });
-        user.setRoles(roleNames);
-
-        //Get user groups
-        TypedQuery<UserGroupMembershipEntity> groupMappingQuery =
-            em.createNamedQuery("userGroupMembership",
-            UserGroupMembershipEntity.class);
-        groupMappingQuery.setParameter(USER_PARAM, jpaModel.getUserEntity());
-        List<UserGroupMembershipEntity> groupMappings
-            = groupMappingQuery.getResultList();
-        //Query group entities as mapping entities only contain group ids
-        CriteriaQuery<GroupEntity> groupQuery
-            = cb.createQuery(GroupEntity.class);
-        Root<GroupEntity> groupRoot = groupQuery.from(GroupEntity.class);
-        groupQuery.select(groupRoot);
-        In<String> groupIdFilter = cb.in(root.get(ID_PARAM));
-        groupMappings.forEach(
-                mapping -> groupIdFilter.value(mapping.getGroupId()));
-        groupQuery.where(groupIdFilter);
-        List<GroupEntity> groupEntities
-            = em.createQuery(groupQuery).getResultList();
-        List<String> groups = new ArrayList<String>();
-        groupEntities.forEach(groupEnt -> groups.add(groupEnt.getId()));
-        user.setGroups(groups);
-
-        return user;
-    }
-
-    /**
-     * Generate user from given usermodel.
-     * @param userModel Keycloak usermodel
-     * @param em EntityManager
-     * @return Generated user
-     */
-    public static User fromUserModel(UserModel userModel,
-            EntityManager em) {
-        UserAttributes userAttributes = em.find(
-                UserAttributes.class, userModel.getId());
-        return fromJpaModel(userAttributes, em);
     }
 }
