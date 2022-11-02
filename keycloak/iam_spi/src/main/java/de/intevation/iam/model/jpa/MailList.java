@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,6 +20,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.CriteriaBuilder.In;
 
 import org.keycloak.models.jpa.entities.UserEntity;
 
@@ -67,7 +72,11 @@ public class MailList {
      * @return Ids as list
      */
     public List<String> getUsers() {
-        updateUsers();
+        if (getUserEntities() == null) {
+            return null;
+        }
+        users = new ArrayList<String>();
+        userEntities.forEach(userEntity -> users.add(userEntity.getId()));
         return users;
     }
 
@@ -84,13 +93,24 @@ public class MailList {
     }
 
     /**
-     * Update the users subscribed to this list.
+     * Update userEntities using the current user ids list.
+     * @param em Entity manager to use
      */
-    private void updateUsers() {
-        if (getUserEntities() == null) {
+    public void updateUserEntities(EntityManager em) {
+        if (this.users == null) {
             return;
         }
-        users = new ArrayList<String>();
-        userEntities.forEach(userEntity -> users.add(userEntity.getId()));
+
+        //Get user entities
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<UserEntity> query = cb.createQuery(UserEntity.class);
+        Root<UserEntity> root = query.from(UserEntity.class);
+        query.select(root);
+        In<String> idFilter = cb.in(root.get("id"));
+        this.users.forEach(id -> idFilter.value(id));
+        query.where(idFilter);
+        List<UserEntity> result = em.createQuery(query).getResultList();
+
+        setUserEntities(result);
     }
 }
