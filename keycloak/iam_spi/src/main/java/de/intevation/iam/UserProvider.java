@@ -150,18 +150,14 @@ public class UserProvider implements RealmResourceProvider {
                 rep, RequestMethod.POST, headers, User.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        UserAttributes attributes = rep.createOrUpdateJpaModel(em);
-        if (attributes != null && attributes.getId() != null && !attributes.getId().isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
-        RealmModel realm = session.getContext().getRealm();
+
         String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
-
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
 
         if (isEmailAlreadyUsed(realm, rep)) {
             return Response.status(Status.CONFLICT)
@@ -176,6 +172,7 @@ public class UserProvider implements RealmResourceProvider {
                 .build();
         }
 
+        //Add keycloak user
         UserModel newUserModel
                 = session.users().addUser(realm, rep.getUsername());
 
@@ -183,6 +180,9 @@ public class UserProvider implements RealmResourceProvider {
         newUserModel.setLastName(rep.getLastName());
         newUserModel.setEmail(rep.getEmail());
         rep.setId(newUserModel.getId());
+
+        //Create attributes
+        UserAttributes attributes = rep.createOrUpdateJpaModel(em);
 
         //Update roles
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
@@ -209,6 +209,9 @@ public class UserProvider implements RealmResourceProvider {
         attributes.setExpiryDate(
                 DateUtils.getAccountExpiryDate());
         em.persist(attributes);
+        //Force flush and update to ensure attributes are persisted
+        em.flush();
+        em.refresh(attributes);
         return Response.ok(new User(newUserModel, em)).build();
     }
 
