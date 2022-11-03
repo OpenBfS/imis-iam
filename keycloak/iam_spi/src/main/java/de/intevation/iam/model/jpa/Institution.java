@@ -22,6 +22,7 @@ import javax.persistence.Transient;
 import org.keycloak.models.jpa.entities.UserEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
@@ -74,9 +75,11 @@ public class Institution {
     private String imisMail;
 
     @Column(name = "x_coordinate")
+    @JsonProperty("xCoordinate")
     private Float xCoordinate;
 
     @Column(name = "y_coordinate")
+    @JsonProperty("yCoordinate")
     private Float yCoordinate;
 
     @Column(name = "active")
