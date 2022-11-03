@@ -58,6 +58,7 @@ public class User {
     private static final String ID_PARAM = "id";
     private static final String USER_PARAM = "user";
 
+    public User() { }
 
     /**
      * Generate user from given usermodel.
