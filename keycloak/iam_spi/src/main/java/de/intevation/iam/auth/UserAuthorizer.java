@@ -105,7 +105,9 @@ public class UserAuthorizer implements Authorizer<User> {
         List<String> oldRoles = new ArrayList<String>();
         oldUserModel.getClientRoleMappingsStream(client)
                 .forEach(role -> oldRoles.add(role.getName()));
-        List<String> newRoles = user.getRoles();
+        List<String> newRoles = user.getRoles() != null
+            ? user.getRoles()
+            : new ArrayList<>();
         if (oldRoles.size() != newRoles.size()) {
             return AuthUtils.isUserAtLeastChiefEditor(
                     requestingUser, client);
