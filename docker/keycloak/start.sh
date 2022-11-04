@@ -88,43 +88,66 @@ roles=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$IMIS_CLI
 users=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN")
+groups=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/groups" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN")
+defaultGroupId=$(echo $groups | jq 'map(select(.name=="Landesadmin")) | .[0]' | jq .id | tr -d '"')
 
-echo "Assigning client roles"
-#Assign Nutzer role
-nutzerRole=$(echo $roles | jq 'map(select(.name=="Nutzer"))')
-nutzerUser=$(echo $users | jq 'map(select(.username=="exampleuser")) | .[0]')
+echo "Assigning groups and client roles"
 
-curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$(echo $nutzerUser | jq .id | tr -d '"')/role-mappings/clients/$IMIS_CLIENT_ID" \
+#Assign user role
+userRole=$(echo $roles | jq 'map(select(.name=="Nutzer"))')
+userId=$(echo $users | jq 'map(select(.username=="exampleuser")) | .[0]' | jq .id | tr -d '"')
+
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$userId/role-mappings/clients/$IMIS_CLIENT_ID" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN" \
-        -d "$nutzerRole"
+        -d "$userRole"
+curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$userId/groups/$defaultGroupId" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN"
 
 #Assign Redakteur role
-redRole=$(echo $roles | jq 'map(select(.name=="Redakteur"))')
-redUser=$(echo $users | jq 'map(select(.username=="redakteur")) | .[0]')
-curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$(echo $redUser | jq .id | tr -d '"')/role-mappings/clients/$IMIS_CLIENT_ID" \
+editorRole=$(echo $roles | jq 'map(select(.name=="Redakteur"))')
+editorUserId=$(echo $users | jq 'map(select(.username=="redakteur")) | .[0]' | jq .id | tr -d '"')
+
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$editorUserId/role-mappings/clients/$IMIS_CLIENT_ID" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN" \
-        -d "$redRole"
+        -d "$editorRole"
+curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$editorUserId/groups/$defaultGroupId" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN"
+
 #Assign Chefredakteur role
-chefRedRole=$(echo $roles | jq 'map(select(.name=="Chefredakteur"))')
-chefRedUser=$(echo $users | jq 'map(select(.username=="chefredakteur")) | .[0]')
-curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$(echo $chefRedUser | jq .id | tr -d '"')/role-mappings/clients/$IMIS_CLIENT_ID" \
+chiefEditorRole=$(echo $roles | jq 'map(select(.name=="Chefredakteur"))')
+chiefEditorUserId=$(echo $users | jq 'map(select(.username=="chefredakteur")) | .[0]' | jq .id | tr -d '"')
+
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId/role-mappings/clients/$IMIS_CLIENT_ID" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN" \
-        -d "$chefRedRole"
+        -d "$chiefEditorRole"
+curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId/groups/$defaultGroupId" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN"
+
 #Assign tech. Admin role
 adminRole=$(echo $roles | jq 'map(select(.name=="technischer Administrator"))')
-adminUser=$(echo $users | jq 'map(select(.username=="techadmin")) | .[0]')
-curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$(echo $adminUser | jq .id | tr -d '"')/role-mappings/clients/$IMIS_CLIENT_ID" \
+adminUserId=$(echo $users | jq 'map(select(.username=="techadmin")) | .[0]' | jq .id | tr -d '"')
+
+curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$adminUserId/role-mappings/clients/$IMIS_CLIENT_ID" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN" \
         -d "$adminRole"
-
-echo "... done"
+curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$adminUserId/groups/$defaultGroupId" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN"
 
 #Insert attributes for exampleuser
 psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_user_attributes.sql -w
-#Insert example institutions
+#Insert and assign example institutions
 psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_example_institutions.sql -w
+
+echo "... done"
+
 wait $!
