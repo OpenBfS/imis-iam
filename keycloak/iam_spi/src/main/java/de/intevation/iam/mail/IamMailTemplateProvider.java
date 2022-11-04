@@ -22,7 +22,6 @@ import org.keycloak.email.freemarker.FreeMarkerEmailTemplateProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.theme.FreeMarkerException;
-import org.keycloak.theme.FreeMarkerUtil;
 import org.keycloak.theme.Theme;
 import org.keycloak.theme.beans.MessageFormatterMethod;
 
@@ -43,9 +42,8 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
      * @param session Keycloak session
      * @param freeMarker FreeMarker util
      */
-    public IamMailTemplateProvider(
-            KeycloakSession session, FreeMarkerUtil freeMarker) {
-        super(session, freeMarker);
+    public IamMailTemplateProvider(KeycloakSession session) {
+        super(session);
         sender = new DefaultEmailSenderProvider(session);
     }
 
