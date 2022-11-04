@@ -125,5 +125,6 @@ echo "... done"
 
 #Insert attributes for exampleuser
 psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_user_attributes.sql -w
-
+#Insert example institutions
+psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_example_institutions.sql -w
 wait $!
