@@ -20,8 +20,12 @@ import javax.persistence.Table;
 
 import org.keycloak.models.jpa.entities.UserEntity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+/**
+ * Persistence class holding user attributes not available in
+ * org.keycloak.models.jpa.entities.UserEntity.
+ * de.intevation.iam.model.representation.User provides a flat view on
+ * attributes from both classes to be used for de-/serialization.
+ */
 @Entity
 @Table(name = "iam_user_attributes", schema = "keycloak")
 public class UserAttributes {
@@ -50,20 +54,16 @@ public class UserAttributes {
     private Integer position;
 
     @Column(name = "expiry_date", nullable = false)
-    @JsonIgnore
     private Timestamp expiryDate;
 
     @Column(name = "inactivity_notification_sent")
-    @JsonIgnore
     private Boolean inactivityNotificationSent;
 
     @Column(name = "expired_notification_sent")
-    @JsonIgnore
     private Boolean expiredNotificationSent;
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "id")
-    @JsonIgnore
     private UserEntity userEntity;
 
     @ManyToMany
