@@ -7,7 +7,11 @@
  -->
 <template>
   <v-dialog v-model="show">
-    <v-card width="60vw" max-height="80vh" class="overflow-y-auto">
+    <v-card
+      width="60vw"
+      max-height="80vh"
+      class="overflow-y-auto align-self-center"
+    >
       <v-layout row class="pa-2">
         <div
           class="d-flex flex-column mr-auto text-medium-emphasis text-body-2 ml-2"

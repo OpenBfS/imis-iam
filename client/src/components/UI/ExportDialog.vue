@@ -7,7 +7,7 @@
  -->
 <template>
   <v-dialog v-model="show">
-    <v-card min-width="460px">
+    <v-card min-width="460px" class="align-self-center">
       <v-card-title>{{ $t("label.csv_options") }}</v-card-title>
       <v-divider></v-divider>
       <v-container class="mt-4">

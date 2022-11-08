@@ -7,7 +7,7 @@
  -->
 <template>
   <v-dialog v-model="show">
-    <v-card min-width="50vw">
+    <v-card min-width="50vw" class="align-self-center">
       <v-card-title>{{ $t("mailinglist.write_new_email") }}</v-card-title>
       <v-divider></v-divider>
       <v-container>

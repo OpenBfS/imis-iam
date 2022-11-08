@@ -14,15 +14,17 @@
     :clipped="true"
   >
     <v-list style="margin-top: 90px" nav>
-      <v-list-item @click="$route.path == '/' ? '' : $router.push('/')">
+      <v-list-item link @click="$route.path == '/' ? '' : $router.push('/')">
         <v-list-item-title> Home</v-list-item-title>
       </v-list-item>
       <v-list-item
+        link
         @click="$route.path == '/search' ? '' : $router.push('/search')"
       >
         <v-list-item-title> {{ $t("label.search") }}</v-list-item-title>
       </v-list-item>
       <v-list-item
+        link
         @click="
           $route.path == '/mailinglist' ? '' : $router.push('/mailinglists')
         "
@@ -30,22 +32,26 @@
         <v-list-item-title> {{ $t("mailinglist.title") }}</v-list-item-title>
       </v-list-item>
       <v-list-item
+        link
         @click="$route.path == '/users' ? '' : $router.push('/users')"
         :title="$t('main.users')"
       ></v-list-item>
       <v-list-item
+        link
         @click="
           $route.path == '/institutions' ? '' : $router.push('/institutions')
         "
         :title="$t('main.institutions')"
       ></v-list-item>
       <v-list-item
+        link
         :title="$t('archive.title')"
         @click="
           $route.path == '/archive/all' ? '' : $router.push('/archive/all')
         "
       ></v-list-item>
       <v-list-item
+        link
         @click="
           $route.path == `/archive/${currentYear}`
             ? ''
@@ -55,6 +61,7 @@
         :title="currentYear"
       ></v-list-item>
       <v-list-item
+        link
         @click="
           $route.path == `/archive/${currentYear - 1}`
             ? ''
@@ -64,6 +71,7 @@
         :title="currentYear - 1"
       ></v-list-item>
       <v-list-item
+        link
         @click="
           $route.path == `/archive/${currentYear - 2}`
             ? ''
@@ -73,6 +81,7 @@
         :title="currentYear - 2"
       ></v-list-item>
       <v-list-item
+        link
         disabled
         class="ml-2 mt-16"
         :title="$t('label.faq')"

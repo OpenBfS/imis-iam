@@ -248,7 +248,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-    <v-card v-else>
+    <v-card v-else width="50vw">
       <v-card-text>
         <span class="text-h5">{{
           $t("label.confirm_deletion", { name: institution.name })
@@ -283,6 +283,9 @@ form > div {
 }
 .group_class > div:nth-child(2) {
   padding: 0 10px;
+}
+::v-deep(.v-card) {
+  align-self: center;
 }
 </style>
 <script>

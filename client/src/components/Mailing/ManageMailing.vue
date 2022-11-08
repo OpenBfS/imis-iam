@@ -122,7 +122,11 @@
     </v-card>
   </v-dialog>
 </template>
-
+<style lang="scss" scoped>
+::v-deep .v-card {
+  align-self: center;
+}
+</style>
 <script>
 import { ref, onMounted, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";

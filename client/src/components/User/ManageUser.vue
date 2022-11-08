@@ -263,6 +263,9 @@ form > div {
 .two_group_class > div:nth-child(2) {
   padding: 0 10px;
 }
+::v-deep(.v-card) {
+  align-self: center;
+}
 </style>
 <script>
 import { computed, onMounted, ref, nextTick } from "vue";
