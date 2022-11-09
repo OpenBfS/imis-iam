@@ -54,7 +54,7 @@ public class ExportProvider implements RealmResourceProvider {
         }
     }
 
-    private Boolean isAccepted(String name, CsvOptions options[]) {
+    private Boolean isAccepted(String name, CsvOptions[] options) {
         for (CsvOptions opt : options) {
             try {
                 if (opt.equals(CsvOptions.valueOf(name))) {
@@ -68,19 +68,19 @@ public class ExportProvider implements RealmResourceProvider {
     }
 
     private Boolean isValidFieldSeperator(String fieldSeparator) {
-        CsvOptions[] fieldSperators = { CsvOptions.comma,
+        CsvOptions[] fieldSperators = {CsvOptions.comma,
                 CsvOptions.period, CsvOptions.semicolon, CsvOptions.space };
         return isAccepted(fieldSeparator, fieldSperators);
     }
 
     private Boolean isValidQuoteType(String quoteType) {
-        CsvOptions[] quoteTypes = { CsvOptions.singlequote,
+        CsvOptions[] quoteTypes = {CsvOptions.singlequote,
                 CsvOptions.doublequote };
         return isAccepted(quoteType, quoteTypes);
     }
 
     private Boolean isValidRowDelimiter(String rowDelimiter) {
-        CsvOptions[] rowFelimiters = { CsvOptions.windows,
+        CsvOptions[] rowFelimiters = {CsvOptions.windows,
                 CsvOptions.linux };
         return isAccepted(rowDelimiter, rowFelimiters);
     }
@@ -159,6 +159,7 @@ public class ExportProvider implements RealmResourceProvider {
 
         UserProvider userProvider = new UserProvider(session);
         Response userResponse = userProvider.getUsers(headers);
+        @SuppressWarnings("unchecked")
         ArrayList<User> users = userResponse.readEntity(ArrayList.class);
         return doExport(exporter, users, i18n);
     }
@@ -223,11 +224,13 @@ public class ExportProvider implements RealmResourceProvider {
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
         Response instResponse = instProvider.getInstitutions(headers);
-        ArrayList<Institution> institutions = instResponse.readEntity(ArrayList.class);
+        @SuppressWarnings("unchecked")
+        ArrayList<Institution> institutions
+            = instResponse.readEntity(ArrayList.class);
         return doExport(exporter, institutions, i18n);
     }
 
-    private <T> Response doExport (CSVExporter<T> exporter,
+    private <T> Response doExport(CSVExporter<T> exporter,
             ArrayList<T> objects, ResourceBundle i18n) {
         InputStream result;
         try {
