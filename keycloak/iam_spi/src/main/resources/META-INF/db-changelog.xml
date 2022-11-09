@@ -1,285 +1,120 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
     <changeSet author="awoestmann@intevation.de" id="v0.1">
-        <!--Create tables-->
-        <createTable tableName="iam_user_position">
-            <column name="id" type="SERIAL">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="position" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-        </createTable>
-        <createTable tableName="iam_user_attributes">
-            <column name="id" type="VARCHAR">
-                <constraints
-                    primaryKey="true"
-                    foreignKeyName="fk_user_entity_attributes"
-                    references="user_entity(id)"
-                />
-            </column>
-            <column name="position_id" type="INT">
-                <constraints
-                    nullable="false"
-                    foreignKeyName="fk_user_attributes_position"
-                    references="iam_user_position(id)"
-                />
-            </column>
-            <column name="title" type="VARCHAR">
-            </column>
-            <column name="phone" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="mobile" type="VARCHAR">
-            </column>
-            <column name="fax" type="VARCHAR">
-            </column>
-            <column name="oe" type="VARCHAR">
-            </column>
-            <column name="bfs_location" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="expiry_date"
-                type="TIMESTAMP WITHOUT TIMEZONE"
-                defaultValueComputed = "current_date + interval '12 month'"/>
-            <column name="inactivity_notification_sent"
-                type="BOOLEAN"
-                defaultValue="false" />
-            <column name="expired_notification_sent"
-                type="BOOLEAN"
-                defaultValue="false" />
-        </createTable>
-        <createTable tableName="iam_mail_list">
-            <column name="id" type="SERIAL">
-                <constraints primaryKey="true" />
-            </column>
-            <column name="name" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-        </createTable>
-        <createTable tableName="iam_mail_list_user">
-            <column name="mail_list_id" type="INT">
-                <constraints foreignKeyName="fk_mail_list_user_list" references="iam_mail_list(id)" onDelete="CASCADE"/>
-            </column>
-            <column name="user_id" type="VARCHAR(36)">
-                <constraints foreignKeyName="fk_mail_list_user_user" references="user_entity(id)" />
-            </column>
-        </createTable>
-        <createTable tableName="iam_mail_type">
-            <column name="id" type="INT">
-                <constraints primaryKey="true" />
-            </column>
-            <column name="name" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-        </createTable>
-        <createTable tableName="iam_mail">
-            <column name="id" type="SERIAL">
-                <constraints primaryKey="true" />
-            </column>
-            <column name="send_date" type="timestamp with time zone" defaultValue="now()">
-                <constraints nullable="false" />
-            </column>
-            <column name="expiry_date" type="timestamp with time zone">
-            </column>
-            <column name="sender" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="text" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="subject" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="archived" type="BOOLEAN">
-                <constraints nullable="false" />
-            </column>
-            <column name="type" type="INT">
-                <constraints
-                    nullable="false"
-                    foreignKeyName="fk_mail_mail_type"
-                    references="iam_mail_type(id)"
-                />
-            </column>
-            <column name="receipient" type="INT">
-                <constraints
-                    nullable="false"
-                    foreignKeyName="fk_mail_mail_list"
-                    references="iam_mail_list(id)"
-                />
-            </column>
-            <column name="user_id" type="VARCHAR(36)">
-                <constraints
-                    nullable="false"
-                    foreignKeyName="fk_mail_user_entity"
-                    references="user_entity(id)"
-                />
-            </column>
-        </createTable>
-        <createTable tableName="iam_institution_category">
-            <column name="id" type="SERIAL">
-                <constraints primaryKey="true" />
-            </column>
-            <column name="name" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-        </createTable>
-        <createTable tableName="iam_institution">
-            <column name="id" type="serial">
-                <constraints primaryKey="true" />
-            </column>
-            <column name="name" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="short_name" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="category_id" type="INT">
-                <constraints foreignKeyName="fk_institution_institution_category" references="iam_institution_category(id)" />
-            </column>
-            <column name="service_building_street" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="service_building_postal_code" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="service_building_location" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="address_street" type="VARCHAR">
-            </column>
-            <column name="address_postal_code" type="VARCHAR">
-            </column>
-            <column name="address_location" type="VARCHAR">
-            </column>
-            <column name="central_phone" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="central_fax" type="VARCHAR">
-            </column>
-            <column name="central_mail" type="VARCHAR">
-                <constraints nullable="false" />
-            </column>
-            <column name="imis_id" type="VARCHAR">
-            </column>
-            <column name="imis_mail" type="VARCHAR">
-            </column>
-            <column name="x_coordinate" type="FLOAT">
-            </column>
-            <column name="y_coordinate" type="FLOAT">
-            </column>
-            <column name="active" type="BOOLEAN" defaultValue="true">
-            </column>
-        </createTable>
-        <createTable tableName="iam_institution_user">
-            <column name="institution_id" type="INT">
-                <constraints foreignKeyName="fk_institution_user_institution" references="iam_institution(id)" onDelete="CASCADE"/>
-            </column>
-            <column name="user_id" type="VARCHAR(36)">
-                <constraints foreignKeyName="fk_institution_user_user" references="iam_user_attributes(id)" />
-            </column>
-        </createTable>
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            CREATE TABLE iam_user_position (
+                id SERIAL PRIMARY KEY,
+                position VARCHAR NOT NULL
+            );
 
-        <!--Add Constraints-->
-        <addPrimaryKey columnNames="mail_list_id, user_id"
-                       constraintName="pk_mail_list_user"
-                       tableName="iam_mail_list_user"/>
-        <addPrimaryKey columnNames="institution_id, user_id"
-                       constraintName="pk_institution_user"
-                       tableName="iam_institution_user"/>
-        <addUniqueConstraint
-            tableName="iam_mail_list_user"
-            columnNames="mail_list_id, user_id"
-            constraintName="mail_list_user_unique"
-        />
+            CREATE TABLE iam_user_attributes (
+                id VARCHAR(36) PRIMARY KEY REFERENCES user_entity(id),
+                position_id INTEGER NOT NULL REFERENCES iam_user_position(id),
+                title VARCHAR,
+                phone VARCHAR NOT NULL,
+                mobile VARCHAR,
+                fax VARCHAR,
+                oe VARCHAR,
+                bfs_location VARCHAR NOT NULL,
+                expiry_date TIMESTAMP WITHOUT TIME ZONE DEFAULT current_date + interval '12 month',
+                inactivity_notification_sent BOOLEAN DEFAULT false,
+                expired_notification_sent BOOLEAN DEFAULT false
+            );
 
-        <!--Insert positions-->
-        <insert tableName="iam_user_position">
-            <column name="position" value="Leiter" />
-        </insert>
-        <insert tableName="iam_user_position">
-            <column name="position" value="Vertreter" />
-        </insert>
-        <insert tableName="iam_user_position">
-            <column name="position" value="Radiologischer Ansprechpartner" />
-        </insert>
-        <insert tableName="iam_user_position">
-            <column name="position" value="Mitarbeiter" />
-        </insert>
-        <insert tableName="iam_user_position">
-            <column name="position" value="IT-Ansprechperson" />
-        </insert>
-        <insert tableName="iam_user_position">
-            <column name="position" value="Störplatz" />
-        </insert>
+            CREATE TABLE iam_mail_list (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR NOT NULL
+            );
 
-        <!--Insert mail type data-->
-        <insert tableName="iam_mail_type">
-            <column name="id" value="1" />
-            <column name="name" value="Einladung" />
-        </insert>
-        <insert tableName="iam_mail_type">
-            <column name="id" value="2" />
-            <column name="name" value="Umfrage" />
-        </insert>
-        <insert tableName="iam_mail_type">
-            <column name="id" value="3" />
-            <column name="name" value="Störung" />
-        </insert>
-        <insert tableName="iam_mail_type">
-            <column name="id" value="4" />
-            <column name="name" value="Wartung" />
-        </insert>
-        <insert tableName="iam_mail_type">
-            <column name="id" value="5" />
-            <column name="name" value="Sprechstunde" />
-        </insert>
-        <insert tableName="iam_mail_type">
-            <column name="id" value="6" />
-            <column name="name" value="Release Note" />
-        </insert>
-        <insert tableName="iam_mail_type">
-            <column name="id" value="7" />
-            <column name="name" value="Soll/Ist-Vergleich" />
-        </insert>
-        <insert tableName="iam_mail_type">
-            <column name="id" value="8" />
-            <column name="name" value="Hinweis" />
-        </insert>
+            CREATE TABLE iam_mail_list_user (
+                mail_list_id INTEGER REFERENCES iam_mail_list(id) ON DELETE CASCADE,
+                user_id VARCHAR(36) REFERENCES iam_user_attributes(id),
+                PRIMARY KEY (mail_list_id, user_id)
+            );
 
-        <!--Add institution categories-->
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Bundesministerium" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Leitstelle" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Bundesbehörde" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Landesministerium" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Landesdatenzentrale" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Landesmessstelle" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Landesmessstelle REI" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Betreiber KTA" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Aufsichtsbehörde" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Sonstige" />
-        </insert>
-        <insert tableName="iam_institution_category">
-            <column name="name" value="Alle" />
-        </insert>
+            CREATE TABLE iam_mail_type (
+                id INTEGER PRIMARY KEY,
+                name VARCHAR NOT NULL
+            );
+
+            CREATE TABLE iam_mail (
+                id SERIAL PRIMARY KEY,
+                send_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                expiry_date TIMESTAMP WITH TIME ZONE,
+                sender VARCHAR NOT NULL,
+                text VARCHAR NOT NULL,
+                subject VARCHAR NOT NULL,
+                archived BOOLEAN NOT NULL,
+                type INTEGER NOT NULL REFERENCES iam_mail_type(id),
+                receipient INTEGER NOT NULL REFERENCES iam_mail_list(id),
+                user_id VARCHAR(36) NOT NULL REFERENCES iam_user_attributes(id)
+            );
+
+            CREATE TABLE iam_institution_category (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR NOT NULL
+            );
+
+            CREATE TABLE iam_institution (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR NOT NULL,
+                short_name VARCHAR NOT NULL,
+                category_id INTEGER REFERENCES iam_institution_category(id),
+                service_building_street VARCHAR NOT NULL,
+                service_building_postal_code VARCHAR NOT NULL,
+                service_building_location VARCHAR NOT NULL,
+                address_street VARCHAR,
+                address_postal_code VARCHAR,
+                address_location VARCHAR,
+                central_phone VARCHAR NOT NULL,
+                central_fax VARCHAR,
+                central_mail VARCHAR NOT NULL,
+                imis_id VARCHAR,
+                imis_mail VARCHAR,
+                x_coordinate FLOAT,
+                y_coordinate FLOAT,
+                active BOOLEAN DEFAULT true
+            );
+
+            CREATE TABLE iam_institution_user (
+                institution_id INTEGER REFERENCES iam_institution(id) ON DELETE CASCADE,
+                user_id VARCHAR(36) REFERENCES iam_user_attributes(id),
+                PRIMARY KEY(institution_id, user_id)
+            );
+
+            INSERT INTO iam_institution_category (name) VALUES
+                ('Bundesministerium'),
+                ('Leitstelle'),
+                ('Bundesbehörde'),
+                ('Landesministerium'),
+                ('Landesdatenzentrale'),
+                ('Landesmessstelle'),
+                ('Landesmessstelle REI'),
+                ('Betreiber KTA'),
+                ('Aufsichtsbehörde'),
+                ('Sonstige'),
+                ('Alle');
+
+            INSERT INTO iam_mail_type (id, name) VALUES
+                (1, 'Einladung'),
+                (2, 'Umfrage'),
+                (3, 'Störung'),
+                (4, 'Wartung'),
+                (5, 'Sprechstunde'),
+                (6, 'Release Note'),
+                (7, 'Soll/Ist-Vergleich'),
+                (8, 'Hinweis');
+
+            INSERT INTO iam_user_position (position) VALUES
+                ('Leiter'),
+                ('Vertreter'),
+                ('Radiologischer Ansprechpartner'),
+                ('Mitarbeiter'),
+                ('IT-Ansprechperson'),
+                ('Störplatz');
+
+        </sql>
     </changeSet>
 </databaseChangeLog>
