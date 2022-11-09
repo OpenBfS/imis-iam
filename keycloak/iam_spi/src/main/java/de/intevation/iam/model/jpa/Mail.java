@@ -45,8 +45,8 @@ public class Mail {
     @Column(name = "type", nullable = false)
     private Integer type;
 
-    @Column(name = "receipient", nullable = false)
-    private Integer receipient;
+    @Column(name = "recipient", nullable = false)
+    private Integer recipient;
 
     @JsonIgnore
     @Column(name = "user_id")
@@ -116,12 +116,12 @@ public class Mail {
         this.type = type;
     }
 
-    public Integer getReceipient() {
-        return receipient;
+    public Integer getRecipient() {
+        return recipient;
     }
 
-    public void setReceipient(Integer receipient) {
-        this.receipient = receipient;
+    public void setRecipient(Integer recipient) {
+        this.recipient = recipient;
     }
 
     public String getUserId() {

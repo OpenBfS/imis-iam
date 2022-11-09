@@ -411,7 +411,7 @@ public class MailProvider implements RealmResourceProvider {
      *   subject: [String], //Mail subject
      *   publish: [Boolean], //True if mail should be published
      *   type: [Integer], //Mail type id
-     *   receipient: [Integer], //Receipient mailing list id
+     *   recipient: [Integer], //Recipient mailing list id
      * }]
      * </code>
      * </pre>
@@ -450,7 +450,7 @@ public class MailProvider implements RealmResourceProvider {
 
         //Filter by mailing lists the user is subscribed to
         List<MailList> mailLists = getMailLists(userId, true);
-        In<Integer> listFilter = cb.in(root.get("receipient"));
+        In<Integer> listFilter = cb.in(root.get("recipient"));
         if (flists != null && !flists.isEmpty()){
             for (MailList list: mailLists) {
                 if (flists.contains(list.getId())){
@@ -527,7 +527,7 @@ public class MailProvider implements RealmResourceProvider {
      *   subject: [String], //Mail subject
      *   publish: [Boolean], //True if mail should be published
      *   type: [Integer], //Mail type id
-     *   receipient: [Integer], //Receipient mailing list id
+     *   recipient: [Integer], //Recipient mailing list id
      * }
      * </code>
      * </pre>
@@ -566,7 +566,7 @@ public class MailProvider implements RealmResourceProvider {
         smtpConfig.put(FROM_ADDRESS, mail.getSender());
 
         //Get mail list
-        MailList list = em.find(MailList.class, mail.getReceipient());
+        MailList list = em.find(MailList.class, mail.getRecipient());
 
         for (UserEntity entity: list.getUserEntities()) {
             UserModel user = session.users()

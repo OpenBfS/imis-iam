@@ -48,7 +48,7 @@
                 subject VARCHAR NOT NULL,
                 archived BOOLEAN NOT NULL,
                 type INTEGER NOT NULL REFERENCES iam_mail_type(id),
-                receipient INTEGER NOT NULL REFERENCES iam_mail_list(id),
+                recipient INTEGER NOT NULL REFERENCES iam_mail_list(id),
                 user_id VARCHAR(36) NOT NULL REFERENCES iam_user_attributes(id)
             );
 

@@ -78,7 +78,7 @@ public class MailTask implements KeycloakSessionTask {
         });
         if (users != null && users.size() > 0) {
             mailTemplateProvider.sendAccountExpiredNotification(
-                getNotificationReceipient(session), users);
+                getNotificationRecipient(session), users);
         }
     }
 
@@ -111,7 +111,7 @@ public class MailTask implements KeycloakSessionTask {
             em.merge(user);
         });
         mailTemplateProvider.sendAccountInactivityNotification(
-                    getNotificationReceipient(session), users);
+                    getNotificationRecipient(session), users);
     }
 
     private void sendReminders(KeycloakSession session) {
@@ -131,18 +131,18 @@ public class MailTask implements KeycloakSessionTask {
         });
     }
 
-    private UserModel getNotificationReceipient(KeycloakSession session) {
+    private UserModel getNotificationRecipient(KeycloakSession session) {
         UserProvider userProvider = session.users();
-        UserModel receipient = userProvider.getUserByEmail(
-                realm, Constants.NOTIFICATION_RECEIPIENT);
-        if (receipient == null) {
-            receipient = userProvider
+        UserModel recipient = userProvider.getUserByEmail(
+                realm, Constants.NOTIFICATION_RECIPIENT);
+        if (recipient == null) {
+            recipient = userProvider
                 .addUser(realm, Constants.NOTIFICATION_USERNAME);
-            receipient.setEmail(Constants.NOTIFICATION_RECEIPIENT);
-            receipient.setEnabled(false);
-            receipient.setSingleAttribute("locale", "de");
+            recipient.setEmail(Constants.NOTIFICATION_RECIPIENT);
+            recipient.setEnabled(false);
+            recipient.setSingleAttribute("locale", "de");
         }
-        return receipient;
+        return recipient;
     }
 
     @Override

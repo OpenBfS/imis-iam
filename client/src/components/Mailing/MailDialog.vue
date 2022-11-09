@@ -127,7 +127,7 @@ export default {
         subject: subject.value,
         archived: archived.value,
         type: selectedType.value.id,
-        receipient: selectedList.value.id,
+        recipient: selectedList.value.id,
       })
         .then(() => {
           emit("mail-dialog-object", {

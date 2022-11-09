@@ -48,13 +48,13 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
     }
 
     /**
-     * Send a notifcation about inactive accounts to the given receipient.
-     * @param receipient Receipient
+     * Send a notifcation about inactive accounts to the given recipient.
+     * @param recipient Recipient
      * @param inactiveAccounts List of inactive accounts
      * @throws EmailException
      */
     public void sendAccountInactivityNotification(
-        UserModel receipient,
+        UserModel recipient,
         List<UserModel> inactiveAccounts
     ) throws EmailException {
         StringBuilder usernamesBuilder = new StringBuilder();
@@ -68,23 +68,23 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
         bodyAttributes.put("users", usernamesBuilder.toString());
         Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
 
-        this.setUser(receipient);
+        this.setUser(recipient);
         EmailTemplate template = processTemplate(
             "accountInactiveSubject", Collections.emptyList(),
             "accountInactive.ftl", bodyAttributes);
-        sender.send(realmSmtpConfig, receipient,
+        sender.send(realmSmtpConfig, recipient,
                 template.getSubject(),
                 template.getTextBody(), template.getHtmlBody());
     }
 
     /**
      * Send notfications for expired accounts.
-     * @param receipient Receipient
+     * @param recipient Recipient
      * @param expiredUsers Expired account
      * @throws EmailException
      */
     public void sendAccountExpiredNotification(
-            UserModel receipient,
+            UserModel recipient,
             List<UserModel> expiredUsers) throws EmailException {
         StringBuilder usernamesBuilder = new StringBuilder();
         expiredUsers.forEach(acc -> {
@@ -97,11 +97,11 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
         Map<String, Object> bodyAttributes = new HashMap<>();
         bodyAttributes.put("username", usernamesBuilder.toString());
         Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
-        this.setUser(receipient);
+        this.setUser(recipient);
         EmailTemplate template = processTemplate(
             "accountExpiredSubject", Collections.emptyList(),
             "accountExpired.ftl", bodyAttributes);
-        sender.send(realmSmtpConfig, receipient,
+        sender.send(realmSmtpConfig, recipient,
                 template.getSubject(),
                 template.getTextBody(), template.getHtmlBody());
     }

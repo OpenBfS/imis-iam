@@ -30,7 +30,7 @@ public class Constants {
     /**
      * Email address to send notifications to.
      */
-    public static final String NOTIFICATION_RECEIPIENT = "notifications@receipient.example";
+    public static final String NOTIFICATION_RECIPIENT = "notifications@recipient.example";
 
     public static final String NOTIFICATION_USERNAME = "imis3Notifications";
 }
