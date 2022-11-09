@@ -231,7 +231,7 @@
         <v-btn
           v-if="$store.state.profile.isAllowedToManage"
           color="accent"
-          :disabled="!valid"
+          :disabled="!valid || hasNoChange"
           @click="
             processType == 'add' ? createInstitution() : updateInstitution()
           "
@@ -244,7 +244,6 @@
           "
           color="accent"
           @click="institution = { ...originalInstitution }"
-          :disabled="!$store.state.profile.isAllowedToManage"
         >
           {{ $t("button.reset") }}
         </v-btn>
@@ -298,129 +297,104 @@ form > div {
   align-self: center;
 }
 </style>
-<script>
+<script setup>
 import { onMounted, ref } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useStore } from "vuex";
-export default {
-  setup() {
-    const show = true;
-    const { hasLoadingError, hasRequestError } = useNotification();
-    const store = useStore();
-    const institution = ref(store.state.application.managedItem);
-    const originalInstitution = { ...institution.value };
-    const processType = ref(store.state.application.processType);
-    const {
-      form,
-      valid,
-      reqValidmail,
-      validMail,
-      reqField,
-      reqValidPhone,
-      validFax,
-      validPostalcode,
-      reqValidPostalcode,
-    } = useForm();
-    const categories = ref([]);
-    const getCategories = () => {
-      HTTP.get("institution/category")
-        .then((response) => {
-          categories.value = response.data;
-        })
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    onMounted(() => {
-      getCategories();
-      // This is necessary as the form value is not change to true with valid inputs.
-      // TODO: Check if this is fixed by upstream with the next release.
-      if (processType.value === "edit") {
-        setTimeout(() => {
-          form.value.validate();
-        }, 100);
-      }
+import { computed } from "@vue/reactivity";
+const show = true;
+const { hasLoadingError, hasRequestError } = useNotification();
+const store = useStore();
+const institution = ref(store.state.application.managedItem);
+const originalInstitution = { ...institution.value };
+const processType = ref(store.state.application.processType);
+const {
+  form,
+  valid,
+  reqValidmail,
+  reqField,
+  reqValidPhone,
+  reqValidPostalcode,
+} = useForm();
+const categories = ref([]);
+const getCategories = () => {
+  HTTP.get("institution/category")
+    .then((response) => {
+      categories.value = response.data;
+    })
+    .catch(() => {
+      hasLoadingError.value = true;
     });
-    const getInstitutions = () => {
-      store
-        .dispatch("institution/loadInstitutions")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    const createInstitution = () => {
-      let payload = { ...institution.value };
-      HTTP.post("/institution", payload)
-        .then(() => {
-          getInstitutions();
-          store.commit("application/setShowManageInstitutionDialog", false);
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const updateInstitution = () => {
-      let payload = { ...institution.value };
-      HTTP.put("/institution", payload)
-        .then(() => {
-          getInstitutions();
-          store.commit("application/setShowManageInstitutionDialog", false);
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const deleteInstitution = () => {
-      HTTP.delete("institution/" + institution.value.id)
-        .then(() => {
-          getInstitutions();
-          store.commit("application/setShowManageInstitutionDialog", false);
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const showAddCategory = ref(false);
-    const newCategory = ref("");
-    const addCategory = () => {
-      if (newCategory.value && newCategory.value !== "") {
-        HTTP.post("institution/category", { name: newCategory.value })
-          .then(() => {
-            newCategory.value = "";
-            getCategories();
-          })
-          .catch(() => {
-            hasLoadingError.value = true;
-          });
-      }
-    };
-    return {
-      processType,
-      originalInstitution,
-      reqValidPostalcode,
-      validPostalcode,
-      validFax,
-      reqValidPhone,
-      reqField,
-      reqValidmail,
-      validMail,
-      addCategory,
-      showAddCategory,
-      newCategory,
-      form,
-      updateInstitution,
-      deleteInstitution,
-      hasLoadingError,
-      hasRequestError,
-      createInstitution,
-      valid,
-      show,
-      institution,
-      categories,
-    };
-  },
 };
+onMounted(() => {
+  getCategories();
+  // This is necessary as the form value is not change to true with valid inputs.
+  // TODO: Check if this is fixed by upstream with the next release.
+  if (processType.value === "edit") {
+    setTimeout(() => {
+      form.value.validate();
+    }, 100);
+  }
+});
+const getInstitutions = () => {
+  store
+    .dispatch("institution/loadInstitutions")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+};
+const createInstitution = () => {
+  let payload = { ...institution.value };
+  HTTP.post("/institution", payload)
+    .then(() => {
+      getInstitutions();
+      store.commit("application/setShowManageInstitutionDialog", false);
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const updateInstitution = () => {
+  let payload = { ...institution.value };
+  HTTP.put("/institution", payload)
+    .then(() => {
+      getInstitutions();
+      store.commit("application/setShowManageInstitutionDialog", false);
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const deleteInstitution = () => {
+  HTTP.delete("institution/" + institution.value.id)
+    .then(() => {
+      getInstitutions();
+      store.commit("application/setShowManageInstitutionDialog", false);
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const showAddCategory = ref(false);
+const newCategory = ref("");
+const addCategory = () => {
+  if (newCategory.value && newCategory.value !== "") {
+    HTTP.post("institution/category", { name: newCategory.value })
+      .then(() => {
+        newCategory.value = "";
+        getCategories();
+      })
+      .catch(() => {
+        hasLoadingError.value = true;
+      });
+  }
+};
+const hasNoChange = computed(() => {
+  return (
+    JSON.stringify(originalInstitution) === JSON.stringify(institution.value)
+  );
+});
 </script>

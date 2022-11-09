@@ -228,7 +228,6 @@
           "
           color="accent"
           @click="user = cloneObject(originalUser)"
-          :disabled="!$store.state.profile.isAllowedToManage"
         >
           {{ $t("button.reset") }}
         </v-btn>
