@@ -239,6 +239,16 @@
           {{ processType == "add" ? $t("button.create") : $t("button.save") }}
         </v-btn>
         <v-btn
+          v-if="
+            processType === 'edit' && $store.state.profile.isAllowedToManage
+          "
+          color="accent"
+          @click="institution = { ...originalInstitution }"
+          :disabled="!$store.state.profile.isAllowedToManage"
+        >
+          {{ $t("button.reset") }}
+        </v-btn>
+        <v-btn
           color="accent"
           @click="
             $store.commit('application/setShowManageInstitutionDialog', false)
@@ -289,7 +299,7 @@ form > div {
 }
 </style>
 <script>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
@@ -299,12 +309,9 @@ export default {
     const show = true;
     const { hasLoadingError, hasRequestError } = useNotification();
     const store = useStore();
-    const institution = computed(() => {
-      return store.state.application.managedItem;
-    });
-    const processType = computed(() => {
-      return store.state.application.processType;
-    });
+    const institution = ref(store.state.application.managedItem);
+    const originalInstitution = { ...institution.value };
+    const processType = ref(store.state.application.processType);
     const {
       form,
       valid,
@@ -392,6 +399,7 @@ export default {
     };
     return {
       processType,
+      originalInstitution,
       reqValidPostalcode,
       validPostalcode,
       validFax,
