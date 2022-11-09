@@ -22,7 +22,7 @@ import de.intevation.iam.util.RequestMethod;
 
 public class Authorization {
 
-    private Map<Class<?>, Authorizer> authorizers;
+    private Map<Class<?>, Authorizer<?>> authorizers;
     private UserAuthorizer userAuthorizer;
     private InstitutionAuthorizer institutionAuthorizer;
     private InstitutionCategoryAuthorizer institutionCategoryAuthorizer;
@@ -53,18 +53,20 @@ public class Authorization {
 
     /**
      * Check if user is authorized for the given data and request method.
+     * @param <T> Authorizer type
      * @param data Data
      * @param requestMethod Request method used
      * @param headers Request headers
      * @param clazz Class to be authorized
      * @return True if authorized, else false
      */
-    public boolean isAuthorizedById(
+    public <T> boolean isAuthorizedById(
         Object data,
         RequestMethod requestMethod,
         HttpHeaders headers,
-        Class clazz) {
-        Authorizer authorizer = authorizers.get(clazz);
+        Class<T> clazz) {
+        @SuppressWarnings("unchecked")
+        Authorizer<T> authorizer = (Authorizer<T>) authorizers.get(clazz);
         return authorizer.isAuthorizedById(
             data, requestMethod, headers, this.session);
     }
@@ -81,7 +83,8 @@ public class Authorization {
         List<T> data,
         HttpHeaders headers,
         Class<T> clazz) {
-        Authorizer authorizer = authorizers.get(clazz);
+        @SuppressWarnings("unchecked")
+        Authorizer<T> authorizer = (Authorizer<T>) authorizers.get(clazz);
         return authorizer.filter(data, headers, session);
     }
 }
