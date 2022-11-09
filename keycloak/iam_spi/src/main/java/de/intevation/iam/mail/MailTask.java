@@ -8,6 +8,7 @@ package de.intevation.iam.mail;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -119,7 +120,7 @@ public class MailTask implements KeycloakSessionTask {
         LOG.info(String.format("Sending reminders for realm %s",
                 realm.getName()));
         Stream<UserModel> users = session.users()
-                .getUsersStream(realm);
+                .searchForUserStream(realm, Collections.emptyMap());
         List<UserModel> userList = users.collect(Collectors.toList());
         LOG.info("Users: " + userList.size());
         userList.forEach(user -> {
@@ -135,7 +136,8 @@ public class MailTask implements KeycloakSessionTask {
         UserModel receipient = userProvider.getUserByEmail(
                 realm, Constants.NOTIFICATION_RECEIPIENT);
         if (receipient == null) {
-            receipient = userProvider.addUser(realm, Constants.NOTIFICATION_USERNAME);
+            receipient = userProvider
+                .addUser(realm, Constants.NOTIFICATION_USERNAME);
             receipient.setEmail(Constants.NOTIFICATION_RECEIPIENT);
             receipient.setEnabled(false);
             receipient.setSingleAttribute("locale", "de");

@@ -7,6 +7,7 @@
 package de.intevation.iam;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -99,7 +100,8 @@ public class UserProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
-        Stream<UserModel> users = session.users().getUsersStream(realm);
+        Stream<UserModel> users = session.users()
+            .searchForUserStream(realm, Collections.emptyMap());
         List<User> userList = new ArrayList<User>();
         for (UserModel user: users.collect(Collectors.toList())) {
             userList.add(new User(user, em));
