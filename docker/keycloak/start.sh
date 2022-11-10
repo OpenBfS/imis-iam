@@ -33,13 +33,22 @@ IMIS_REALM=imis3
 IMIS_CLIENT=iam-client
 IMIS_CLIENT_ID=$(jq .id ${DIR}/iam_client.json | tr -d '"')
 
-# Get access token
-TKN=$(curl -sX POST "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" \
- -H "Content-Type: application/x-www-form-urlencoded" \
- -d "username=${KEYCLOAK_ADMIN}" \
- -d "password=${KEYCLOAK_ADMIN_PASSWORD}" \
- -d 'grant_type=password' \
- -d 'client_id=admin-cli' | jq -r '.access_token')
+# Try to get access token or wait until the initial admin user was added
+counter=1
+max_retry=10
+TKN="null"
+while [ "$TKN" = "null" -a "$counter" != "$max_retry" ]
+do
+    echo "Trying to get acess token..."
+    TKN=$(curl -sX POST "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "username=${KEYCLOAK_ADMIN}" \
+    -d "password=${KEYCLOAK_ADMIN_PASSWORD}" \
+    -d 'grant_type=password' \
+    -d 'client_id=admin-cli' | jq -r '.access_token')
+    counter=$((counter+1))
+    sleep 2
+done
 
 # Import imis3 realm
 REALM_CONFIG=$(sed "s/%IMIS_REALM/${IMIS_REALM}/g" ${DIR}/realm_config.json)
