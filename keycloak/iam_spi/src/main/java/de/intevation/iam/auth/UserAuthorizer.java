@@ -29,15 +29,26 @@ public class UserAuthorizer implements Authorizer<User> {
             Object data,
             RequestMethod requestMethod,
             HttpHeaders headers,
-            KeycloakSession session) {
+            KeycloakSession session
+    ) {
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
             return false;
         }
+
+        RealmModel realm = session.getContext().getRealm();
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        UserModel requestingUser = session.users().getUserById(realm, userId);
+        if (requestingUser == null) {
+            return false;
+        }
+
         switch (requestMethod) {
-            case GET: return authorizeGet(session, userId);
-            case PUT: return authorizeUpdate((User) data, session, userId);
-            case POST: return authorizeCreate((User) data, session, userId);
+            case GET: return authorizeGet(requestingUser, client);
+            case PUT: return authorizeUpdate(
+                (User) data, session, requestingUser, client);
+            case POST: return authorizeCreate(
+                (User) data, requestingUser, client);
             default: return false;
         }
     }
@@ -46,37 +57,33 @@ public class UserAuthorizer implements Authorizer<User> {
     public List<User> filter(
             List<User> data,
             HttpHeaders headers,
-            KeycloakSession session) {
+            KeycloakSession session
+    ) {
+        RealmModel realm = session.getContext().getRealm();
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        UserModel requestingUser = session.users().getUserById(realm, userId);
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         data.forEach(user -> {
             user.setReadonly(
-                !authorizeUpdate(user, session, userId));
+                !authorizeUpdate(
+                    user, session, requestingUser, client));
         });
         return data;
     }
 
     private boolean authorizeGet(
-        KeycloakSession session,
-        String userId
+        UserModel requestingUser,
+        ClientModel client
     ) {
-        RealmModel realm = session.getContext().getRealm();
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
         return AuthUtils.hasUserAnyRole(requestingUser, client);
     }
 
     private boolean authorizeCreate(
         User user,
-        KeycloakSession session,
-        String userId
+        UserModel requestingUser,
+        ClientModel client
     ) {
         //Only allow users that are at least editor create
-        RealmModel realm = session.getContext().getRealm();
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-        if (requestingUser == null) {
-            return false;
-        }
         //If no roles are set, check if user is editor
         //Else check if user is chief editor
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
@@ -90,14 +97,10 @@ public class UserAuthorizer implements Authorizer<User> {
     private boolean authorizeUpdate(
         User user,
         KeycloakSession session,
-        String userId
+        UserModel requestingUser,
+        ClientModel client
     ) {
         RealmModel realm = session.getContext().getRealm();
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-        if (requestingUser == null) {
-            return false;
-        }
         //If roles shall be changed:
         //Check if user is chief editor or admin
         UserModel oldUserModel
@@ -122,6 +125,6 @@ public class UserAuthorizer implements Authorizer<User> {
         // Else only allow users with other roles than user to edit
         // or allow users to edit their own profile
         return AuthUtils.isUserAtLeastEditor(requestingUser, client)
-                || user.getId().equals(userId);
+            || user.getId().equals(requestingUser.getId());
     }
 }
