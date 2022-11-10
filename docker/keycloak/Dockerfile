@@ -1,9 +1,9 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 LABEL maintainer awoestmann@intevation.de
 
 RUN apt-get update && apt-get install -y \
-            default-jre-headless maven jq curl \
+            openjdk-17-jre-headless maven jq curl \
             postgresql-client wait-for-it
 
 ENV KEYCLOAK_VERSION 20.0.1
