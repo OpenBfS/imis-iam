@@ -7,8 +7,11 @@
 package de.intevation.iam;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -27,11 +30,15 @@ import javax.ws.rs.core.Response.Status;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorization;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionCategory;
+import de.intevation.iam.util.Constants;
+import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 
 /**
@@ -45,6 +52,10 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     private Authorization auth;
 
+    private static final String NAME_ALREADY_USED_KEY
+        = "error_name_already_used";
+    private static final String SHORT_NAME_ALREADY_USED_KEY
+        = "error_short_name_already_used";
     /**
      * Constructor.
      * @param session Keycloak session
@@ -191,8 +202,26 @@ public class InstitutionProvider implements RealmResourceProvider {
                 rep, RequestMethod.POST, headers, Institution.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        RealmModel realm = session.getContext().getRealm();
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
+        UserModel requestingUser = session.users().getUserById(realm, id);
+        ResourceBundle i18n
+            = I18nUtils.getI18nBundle(session, realm, requestingUser);
+        if (isNameAlreadyUsed(rep, em)) {
+            return Response.status(Status.CONFLICT)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(NAME_ALREADY_USED_KEY))
+                .build();
+        }
+        if (isShortNameAlreadyUsed(rep, em)) {
+            return Response.status(Status.CONFLICT)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(SHORT_NAME_ALREADY_USED_KEY))
+                .build();
+        }
         em.persist(rep);
         return Response.ok(rep).build();
     }
@@ -246,6 +275,24 @@ public class InstitutionProvider implements RealmResourceProvider {
                 rep, RequestMethod.PUT, headers, Institution.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        RealmModel realm = session.getContext().getRealm();
+        UserModel requestingUser = session.users().getUserById(realm, id);
+        ResourceBundle i18n
+            = I18nUtils.getI18nBundle(session, realm, requestingUser);
+        if (isNameAlreadyUsed(rep, em)) {
+            return Response.status(Status.CONFLICT)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(NAME_ALREADY_USED_KEY))
+                .build();
+        }
+        if (isShortNameAlreadyUsed(rep, em)) {
+            return Response.status(Status.CONFLICT)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(SHORT_NAME_ALREADY_USED_KEY))
+                .build();
+        }
+
         Institution merged = em.merge(rep);
         return Response.ok(merged).build();
     }
@@ -364,6 +411,38 @@ public class InstitutionProvider implements RealmResourceProvider {
             JpaConnectionProvider.class).getEntityManager();
         em.persist(intCategory);
         return Response.ok(intCategory).build();
+    }
+
+    private boolean isShortNameAlreadyUsed(Institution inst, EntityManager em) {
+        try {
+            TypedQuery<Institution> query = em.createQuery(
+                "SELECT i FROM Institution i WHERE i.shortName=:shortName",
+                Institution.class)
+                .setParameter("shortName", inst.getShortName());
+            Institution found = query.getSingleResult();
+            if (inst.getId() == null) {
+                return true;
+            }
+            return !inst.getId().equals(found.getId());
+        } catch (NoResultException nre) {
+            return false;
+        }
+    }
+
+    private boolean isNameAlreadyUsed(Institution inst, EntityManager em) {
+        try {
+        TypedQuery<Institution> query = em.createQuery(
+            "SELECT i FROM Institution i WHERE i.name=:name",
+            Institution.class)
+            .setParameter("name", inst.getName());
+            Institution found = query.getSingleResult();
+            if (inst.getId() == null) {
+                return true;
+            }
+            return !inst.getId().equals(found.getId());
+        } catch (NoResultException nre) {
+            return false;
+        }
     }
 
     @Override
