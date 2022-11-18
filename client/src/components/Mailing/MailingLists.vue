@@ -117,7 +117,7 @@
           </tbody>
         </v-table>
         <div v-if="!hasLoadingError && mailingLists.length == 0">
-          No mailing lists are available
+          {{ $t("mailinglist.no_mailing_list") }}
         </div>
       </v-col>
       <v-col cols="4">

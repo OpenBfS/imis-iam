@@ -20,7 +20,7 @@
               :items="mailingLists"
               item-title="name"
               item-value="id"
-              :no-data-text="$t('mailinglist.no_Mailing_list')"
+              :no-data-text="$t('mailinglist.no_mailing_list')"
               v-model="selectedList"
             >
             </v-select>
