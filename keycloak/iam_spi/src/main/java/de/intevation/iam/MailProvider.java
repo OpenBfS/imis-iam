@@ -394,30 +394,16 @@ public class MailProvider implements RealmResourceProvider {
     }
 
     /**
-     * Get all archived mails.
-     * <pre>
-     * Request:
-     * GET to mail?type={typeId}&type={typeId},...
-     * Query params:
-     *   type: [List<Integer>] Filter by mail type(s), optional
-     * Response:
-     * <code>
-     * [{
-     *   id: [Integer], //Mail id
-     *   sendDate: [Integer], //Time sent as timestamp
-     *   expiryDate: [Integer], //Expiry date as timestamp
-     *   sender: [String], //Sender email address
-     *   text: [String], //Mail text
-     *   subject: [String], //Mail subject
-     *   publish: [Boolean], //True if mail should be published
-     *   type: [Integer], //Mail type id
-     *   recipient: [Integer], //Recipient mailing list id
-     * }]
-     * </code>
-     * </pre>
+     * Get mails.
+     *
      * @param headers Request headers
-     * @param types Mail type ids
+     * @param types Filter by type IDs given with URL parameter "type"
+     * @param count Restrict number of returned mails
      * @param archived if true only archived mails returned
+     * @param start Return only mails send after given timestamp
+     * @param end Return only mails send before given timestamp
+     * @param sender Return only mails from given sender
+     * @param lists Filter by mailing list IDs given with URL parameter "list"
      * @return Response containing mails as json array
      */
     @GET
@@ -427,10 +413,10 @@ public class MailProvider implements RealmResourceProvider {
         @QueryParam("type") List<Integer> types,
         @QueryParam("count") Integer count,
         @QueryParam("archived") boolean archived,
-        @QueryParam("start") String start,
-        @QueryParam("end") String end,
+        @QueryParam("start") Timestamp start,
+        @QueryParam("end") Timestamp end,
         @QueryParam("sender") String sender,
-        @QueryParam("list") List<Integer> flists
+        @QueryParam("list") List<Integer> lists
     ) {
         String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
@@ -451,9 +437,9 @@ public class MailProvider implements RealmResourceProvider {
         //Filter by mailing lists the user is subscribed to
         List<MailList> mailLists = getMailLists(userId, true);
         In<Integer> listFilter = cb.in(root.get("recipient"));
-        if (flists != null && !flists.isEmpty()){
+        if (lists != null && !lists.isEmpty()) {
             for (MailList list: mailLists) {
-                if (flists.contains(list.getId())){
+                if (lists.contains(list.getId())) {
                     listFilter.value(list.getId());
                 }
             }
@@ -472,25 +458,29 @@ public class MailProvider implements RealmResourceProvider {
         Predicate expiredFilter = cb.greaterThan(
                 root.<Timestamp>get("expiryDate"), now);
         Predicate noDateFilter = cb.isNull(root.get("expiryDate"));
-        Predicate dateExpiredOrNoDateFilter = cb.or(expiredFilter, noDateFilter);
-
+        Predicate dateExpiredOrNoDateFilter = cb.or(
+            expiredFilter, noDateFilter);
 
         filter = cb.and(listFilter, archiveFilter);
         filter = cb.and(filter, dateExpiredOrNoDateFilter);
 
         //Filter mails by start and end date
-        if (start != null &&  end != null){
-            Timestamp startDate = new Timestamp(Long.parseLong(start));
-            Timestamp endDate = new Timestamp(Long.parseLong(end));
-            Predicate dateFilter = cb.between(
-                root.<Timestamp>get("sendDate"), startDate, endDate);
+        if (start != null) {
+            Predicate dateFilter = cb.greaterThanOrEqualTo(
+                root.<Timestamp>get("sendDate"), start);
+            filter = cb.and(filter, dateFilter);
+        }
+        if (end != null) {
+            Predicate dateFilter = cb.lessThanOrEqualTo(
+                root.<Timestamp>get("sendDate"), end);
             filter = cb.and(filter, dateFilter);
         }
 
-        if (sender != null && !sender.equals("")){
+        if (sender != null && !sender.equals("")) {
             Predicate senderFilter = cb.equal(root.get("sender"), sender);
-            filter= cb.and(filter, senderFilter);
+            filter = cb.and(filter, senderFilter);
         }
+
         //Filter by mail type
         In<Integer> typeFilter;
         if (types != null && !types.isEmpty()) {
