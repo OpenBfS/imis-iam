@@ -210,8 +210,11 @@ export default {
     const failureMails = ref([]);
     const maintenanceMails = ref([]);
     const restTypes = [1, 2, 5, 6, 7, 8];
-    const getMailsbyTypes = (types) => {
-      let path = "mail?count=2";
+    const getMailsbyTypes = (types, count) => {
+      let path = "mail?";
+      if (count) {
+        path += "count=" + count;
+      }
       types.forEach((t) => {
         path += "&type=" + t;
       });
@@ -235,7 +238,7 @@ export default {
     onMounted(() => {
       getMailsbyTypes([3]);
       getMailsbyTypes([4]);
-      getMailsbyTypes(restTypes);
+      getMailsbyTypes(restTypes, 2);
     });
     const checkChildObject = (e) => {
       if (e.closeDialog) {
