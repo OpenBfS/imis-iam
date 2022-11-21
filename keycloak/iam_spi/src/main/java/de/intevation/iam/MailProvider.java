@@ -514,23 +514,7 @@ public class MailProvider implements RealmResourceProvider {
 
     /**
      * Send a mail to a mailing list.
-     * <pre>
-     * Request:
-     * POST to mail
-     * Body:
-     * <code>
-     * {
-     *   sendDate: [Integer], //Time sent as timestamp
-     *   expiryDate: [Integer], //Expiry date as timestamp
-     *   sender: [String], //Sender email address
-     *   text: [String], //Mail text
-     *   subject: [String], //Mail subject
-     *   publish: [Boolean], //True if mail should be published
-     *   type: [Integer], //Mail type id
-     *   recipient: [Integer], //Recipient mailing list id
-     * }
-     * </code>
-     * </pre>
+     *
      * @param headers Request headers
      * @param mail Mail Model
      * @return 200 if send successfully
@@ -538,7 +522,8 @@ public class MailProvider implements RealmResourceProvider {
     @POST
     public Response sendMail(
         @Context HttpHeaders headers,
-        final Mail mail) {
+        final Mail mail
+    ) {
         String userId = headers.getHeaderString(USER_ID_HEADER);
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();
@@ -553,9 +538,8 @@ public class MailProvider implements RealmResourceProvider {
         RealmModel realm = session.getContext().getRealm();
         DefaultEmailSenderProvider senderProvider
             = new DefaultEmailSenderProvider(session);
-        Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
         Map<String, String> smtpConfig = new HashMap<String, String>();
-        smtpConfig.putAll(realmSmtpConfig);
+        smtpConfig.putAll(realm.getSmtpConfig());
 
         //Update mail object
         Timestamp now = new Timestamp(System.currentTimeMillis());
