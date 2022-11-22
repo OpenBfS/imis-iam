@@ -12,41 +12,11 @@
       <v-divider></v-divider>
       <v-container>
         <v-row class="px-2 py-2" no-gutters="">
-          <v-col cols="7">
-            <v-select
-              return-object
-              clearable
-              :label="$t('mailinglist.select_mailing_list')"
-              :items="mailingLists"
-              item-title="name"
-              item-value="id"
-              :no-data-text="$t('mailinglist.no_mailing_list')"
-              v-model="selectedList"
-            >
-            </v-select>
-          </v-col>
-          <v-col cols="7">
-            <v-text-field
-              :label="$t('mailinglist.subject')"
-              v-model="subject"
-            ></v-text-field>
-          </v-col>
-          <v-row>
-            <v-col cols="4">
+          <v-col cols="10">
+            <v-row>
               <v-select
-                :no-data-text="$t('label.no_data_text')"
-                return-object
-                clearable
-                :label="$t('mailinglist.type')"
-                :items="types"
-                item-title="name"
-                item-value="id"
-                v-model="selectedType"
-              >
-              </v-select>
-            </v-col>
-            <v-col cols="4">
-              <v-select
+                density="compact"
+                class="v-col-6"
                 :no-data-text="$t('label.no_data_text')"
                 :items="[$store.state.profile.userData.email]"
                 :label="$t('mailinglist.sender')"
@@ -55,15 +25,67 @@
                 item-value="id"
               >
               </v-select>
+              <v-select
+                density="compact"
+                class="v-col-6"
+                return-object
+                clearable
+                :label="$t('mailinglist.select_mailing_list')"
+                :items="props.mailingLists"
+                item-title="name"
+                item-value="id"
+                :no-data-text="$t('mailinglist.no_mailing_list')"
+                v-model="selectedList"
+              >
+              </v-select>
+            </v-row>
+          </v-col>
+          <v-row>
+            <v-col cols="10"> </v-col>
+            <v-col cols="10">
+              <v-row align="center">
+                <!-- TODO: Use the v-date-picker from vuetify when this gets implemented -->
+                <div class="d-flex v-col-6" style="opacity: 0.6">
+                  <label class="" for="from"
+                    >{{ $t("label.expiry_date") }}:</label
+                  ><input
+                    class="ml-2"
+                    type="date"
+                    name="startDate"
+                    v-model="expiryDate"
+                  />
+                </div>
+                <v-checkbox
+                  density="compact"
+                  class="v-col-6"
+                  :label="$t('mailinglist.publish')"
+                  v-model="archived"
+                ></v-checkbox>
+              </v-row>
             </v-col>
-            <v-col cols="4">
-              <v-checkbox
-                :label="$t('mailinglist.publish')"
-                v-model="archived"
-              ></v-checkbox>
+            <v-col cols="10">
+              <v-row>
+                <v-text-field
+                  :label="$t('mailinglist.subject')"
+                  density="compact"
+                  v-model="subject"
+                ></v-text-field>
+                <v-select
+                  density="compact"
+                  class="v-col-6"
+                  :no-data-text="$t('label.no_data_text')"
+                  return-object
+                  clearable
+                  :label="$t('mailinglist.type')"
+                  :items="types"
+                  item-title="name"
+                  item-value="id"
+                  v-model="selectedType"
+                >
+                </v-select>
+              </v-row>
             </v-col>
           </v-row>
-
           <v-col cols="12">
             <v-textarea name="input-7-1" v-model="mailText"></v-textarea>
           </v-col>
@@ -100,74 +122,63 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup>
 import { onMounted, ref, computed } from "vue";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
 
-export default {
-  props: ["mailingLists"],
-  setup(_, { emit }) {
-    const show = true;
-    const store = useStore();
-    const { hasRequestError, hasLoadingError, resetNotification } =
-      useNotification();
-    // Mail
-    const selectedList = ref(null);
-    const mailText = ref("");
-    const subject = ref("");
-    const archived = ref(false);
-    const selectedSender = ref("");
-    const sendMail = () => {
-      resetNotification();
-      HTTP.post("mail", {
-        sender: selectedSender.value,
-        text: mailText.value,
-        subject: subject.value,
-        archived: archived.value,
-        type: selectedType.value.id,
-        recipient: selectedList.value.id,
-      })
-        .then(() => {
-          emit("mail-dialog-object", {
-            closeDialog: true,
-          });
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    // type
-    const selectedType = ref();
-    const types = computed(() => {
-      return store.state.mail.mailTypes;
+const props = defineProps({
+  mailingLists: Array,
+});
+const emit = defineEmits(["mail-dialog-object"]);
+
+const show = true;
+const store = useStore();
+const { hasRequestError, hasLoadingError, resetNotification } =
+  useNotification();
+// Mail
+const selectedList = ref(null);
+const mailText = ref("");
+const subject = ref("");
+const archived = ref(false);
+const expiryDate = ref("");
+const selectedSender = ref("");
+const sendMail = () => {
+  resetNotification();
+  HTTP.post("mail", {
+    sender: selectedSender.value,
+    text: mailText.value,
+    subject: subject.value,
+    archived: archived.value,
+    type: selectedType.value.id,
+    recipient: selectedList.value.id,
+    expiryDate: expiryDate.value ? expiryDate.value : "",
+  })
+    .then(() => {
+      emit("mail-dialog-object", {
+        closeDialog: true,
+      });
+    })
+    .catch(() => {
+      hasRequestError.value = true;
     });
-    const getTypes = () => {
-      store
-        .dispatch("mail/loadMailTypes")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    onMounted(() => {
-      getTypes();
-      selectedSender.value = store.state.profile.userData.email || "";
-    });
-    return {
-      hasRequestError,
-      hasLoadingError,
-      selectedSender,
-      selectedType,
-      types,
-      archived,
-      subject,
-      mailText,
-      sendMail,
-      selectedList,
-      show,
-    };
-  },
 };
+// type
+const selectedType = ref();
+const types = computed(() => {
+  return store.state.mail.mailTypes;
+});
+const getTypes = () => {
+  store
+    .dispatch("mail/loadMailTypes")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+};
+onMounted(() => {
+  getTypes();
+  selectedSender.value = store.state.profile.userData.email || "";
+});
 </script>

@@ -152,6 +152,7 @@ export default {
     csv_options: "Zusätzliche CSV-Optionen",
     encoding: "Encoding",
     quote_type: "Textbegrenzung",
+    expiry_date: "Ablaufdatum",
   },
   // Form labels
   form: {

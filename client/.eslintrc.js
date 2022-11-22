@@ -7,6 +7,7 @@
 module.exports = {
   root: true,
   env: {
+    "vue/setup-compiler-macros": true,
     node: true,
   },
   extends: [
@@ -19,6 +20,7 @@ module.exports = {
   },
   plugins: ["notice"],
   rules: {
+    "vue/script-setup-uses-vars": "error",
     "vue/multi-word-component-names": "off",
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
