@@ -7,88 +7,91 @@
  -->
 <template>
   <v-dialog v-model="show">
-    <v-card min-width="50vw" class="align-self-center">
+    <v-card min-width="60vw" class="align-self-center">
       <v-card-title>{{ $t("mailinglist.write_new_email") }}</v-card-title>
       <v-divider></v-divider>
       <v-container>
-        <v-row class="px-2 py-2" no-gutters="">
-          <v-col cols="10">
+        <v-row class="px-2 py-2" no-gutters>
+          <v-form ref="form" class="v-col v-col-12">
             <v-row>
-              <v-select
-                density="compact"
-                class="v-col-6"
-                :no-data-text="$t('label.no_data_text')"
-                :items="[$store.state.profile.userData.email]"
-                :label="$t('mailinglist.sender')"
-                v-model="$store.state.profile.userData.email"
-                item-title="name"
-                item-value="id"
-              >
-              </v-select>
-              <v-select
-                density="compact"
-                class="v-col-6"
-                return-object
-                clearable
-                :label="$t('mailinglist.select_mailing_list')"
-                :items="props.mailingLists"
-                item-title="name"
-                item-value="id"
-                :no-data-text="$t('mailinglist.no_mailing_list')"
-                v-model="selectedList"
-              >
-              </v-select>
+              <v-col cols="10">
+                <v-row>
+                  <v-select
+                    density="compact"
+                    class="v-col-6"
+                    :no-data-text="$t('label.no_data_text')"
+                    :items="[$store.state.profile.userData.email]"
+                    :label="$t('mailinglist.sender')"
+                    v-model="$store.state.profile.userData.email"
+                    item-title="name"
+                    item-value="id"
+                  >
+                  </v-select>
+                  <v-select
+                    density="compact"
+                    class="v-col-6"
+                    return-object
+                    clearable
+                    :label="$t('mailinglist.select_mailing_list')"
+                    :items="props.mailingLists"
+                    item-title="name"
+                    item-value="id"
+                    :no-data-text="$t('mailinglist.no_mailing_list')"
+                    v-model="selectedList"
+                    multiple
+                    :rules="
+                      reqMultipleSelect($t('mailinglist.required_mailing_list'))
+                    "
+                  >
+                  </v-select>
+                </v-row>
+              </v-col>
             </v-row>
-          </v-col>
-          <v-row>
-            <v-col cols="10"> </v-col>
-            <v-col cols="10">
-              <v-row align="center">
-                <!-- TODO: Use the v-date-picker from vuetify when this gets implemented -->
-                <div class="d-flex v-col-6" style="opacity: 0.6">
-                  <label class="" for="from"
-                    >{{ $t("label.expiry_date") }}:</label
-                  ><input
-                    class="ml-2"
-                    type="date"
-                    name="startDate"
-                    v-model="expiryDate"
-                  />
-                </div>
-                <v-checkbox
-                  density="compact"
-                  class="v-col-6"
-                  :label="$t('mailinglist.publish')"
-                  v-model="archived"
-                ></v-checkbox>
-              </v-row>
-            </v-col>
-            <v-col cols="10">
-              <v-row>
-                <v-text-field
-                  :label="$t('mailinglist.subject')"
-                  density="compact"
-                  v-model="subject"
-                ></v-text-field>
-                <v-select
-                  density="compact"
-                  class="v-col-6"
-                  :no-data-text="$t('label.no_data_text')"
-                  return-object
-                  clearable
-                  :label="$t('mailinglist.type')"
-                  :items="types"
-                  item-title="name"
-                  item-value="id"
-                  v-model="selectedType"
-                >
-                </v-select>
-              </v-row>
-            </v-col>
-          </v-row>
-          <v-col cols="12">
-            <v-textarea name="input-7-1" v-model="mailText"></v-textarea>
-          </v-col>
+            <v-row>
+              <v-col cols="10">
+                <v-row align="center">
+                  <!-- TODO: Use the v-date-picker from vuetify when this gets implemented -->
+                  <div class="d-flex v-col-6" style="opacity: 0.6">
+                    <label class="" for="from"
+                      >{{ $t("mailinglist.expiry_date") }}:</label
+                    ><input
+                      class="ml-2"
+                      type="date"
+                      name="startDate"
+                      v-model="expiryDate"
+                    />
+                  </div>
+                  <v-checkbox
+                    density="compact"
+                    class="v-col-6"
+                    :label="$t('mailinglist.publish')"
+                    v-model="archived"
+                  ></v-checkbox>
+                </v-row>
+              </v-col>
+              <v-col cols="10">
+                <v-row>
+                  <v-text-field
+                    :label="$t('mailinglist.subject')"
+                    density="compact"
+                    v-model="subject"
+                    :rules="reqField($t('mailinglist.required_subject'))"
+                  ></v-text-field>
+                </v-row>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" class="mt-4">
+                <v-textarea
+                  :label="$t('mailinglist.message')"
+                  variant="outlined"
+                  name="input-7-1"
+                  v-model="mailText"
+                  :rules="reqField($t('mailinglist.required_content'))"
+                ></v-textarea>
+              </v-col>
+            </v-row>
+          </v-form>
         </v-row>
         <UIAlert
           v-if="hasRequestError || hasLoadingError"
@@ -127,6 +130,7 @@ import { onMounted, ref, computed } from "vue";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
+import { useForm } from "@/lib/use-form";
 
 const props = defineProps({
   mailingLists: Array,
@@ -138,6 +142,7 @@ const store = useStore();
 const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
 // Mail
+const { form, reqField, reqMultipleSelect } = useForm();
 const selectedList = ref(null);
 const mailText = ref("");
 const subject = ref("");

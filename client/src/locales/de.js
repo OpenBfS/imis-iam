@@ -152,7 +152,6 @@ export default {
     csv_options: "Zusätzliche CSV-Optionen",
     encoding: "Encoding",
     quote_type: "Textbegrenzung",
-    expiry_date: "Ablaufdatum",
   },
   // Form labels
   form: {
@@ -193,6 +192,11 @@ export default {
     filter_by_sender: "Filtern nach Absender",
     filter_by_maillist: "Filtern nach E-Mail-Verteiler",
     maintenance: "Wartungsmeldungen",
+    expiry_date: "Ablaufdatum",
+    required_subject: "Betreff ist erforderlich",
+    required_content: "Nachricht muss nicht leer sein",
+    required_mailing_list: "E-Mail-Verteiler ist erforderlich",
+    message: "Nachricht",
   },
   search: {
     found_users: "Gefundene Nutzer",
