@@ -8,11 +8,8 @@ package de.intevation.iam.mail;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -112,23 +109,6 @@ public class MailTask implements KeycloakSessionTask {
         });
         mailTemplateProvider.sendAccountInactivityNotification(
                     getNotificationRecipient(session), users);
-    }
-
-    private void sendReminders(KeycloakSession session) {
-        //TODO: Replace example reminders
-        mailTemplateProvider.setRealm(realm);
-        LOG.info(String.format("Sending reminders for realm %s",
-                realm.getName()));
-        Stream<UserModel> users = session.users()
-                .searchForUserStream(realm, Collections.emptyMap());
-        List<UserModel> userList = users.collect(Collectors.toList());
-        LOG.info("Users: " + userList.size());
-        userList.forEach(user -> {
-            LOG.info("Sending reminder to: " + user.getUsername());
-            mailTemplateProvider.setUser(user);
-            mailTemplateProvider.sendReminder(
-                    userList, "exampleReminder Topic");
-        });
     }
 
     private UserModel getNotificationRecipient(KeycloakSession session) {
