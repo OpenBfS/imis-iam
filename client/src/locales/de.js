@@ -194,7 +194,7 @@ export default {
     maintenance: "Wartungsmeldungen",
     expiry_date: "Ablaufdatum",
     required_subject: "Betreff ist erforderlich",
-    required_content: "Nachricht muss nicht leer sein",
+    required_content: "Nachricht ist erforderlich",
     required_mailing_list: "E-Mail-Verteiler ist erforderlich",
     message: "Nachricht",
   },
