@@ -61,8 +61,7 @@ import de.intevation.iam.util.RequestMethod;
  */
 @Produces(MediaType.APPLICATION_JSON)
 public class MailProvider implements RealmResourceProvider {
-    //Constants
-    private static final String FROM_DISPLAY_NAME = "fromDisplayName";
+
     private static final String FROM_ADDRESS = "from";
     private static final String USER_ID_HEADER = "X-SHIB-user";
     private static final String ERROR_EMPTY_LIST_KEY = "error_mail_list_empty";
