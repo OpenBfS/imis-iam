@@ -200,7 +200,4 @@ const getTypes = () => {
 onMounted(() => {
   getTypes();
 });
-const getMail = (str) => {
-  return str.slice(str.lastIndexOf("<") + 1, str.lastIndexOf(">"));
-};
 </script>
