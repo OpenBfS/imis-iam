@@ -31,7 +31,7 @@
 
             CREATE TABLE iam_mail_list_user (
                 mail_list_id INTEGER REFERENCES iam_mail_list(id) ON DELETE CASCADE,
-                user_id VARCHAR(36) REFERENCES iam_user_attributes(id),
+                user_id VARCHAR(36) REFERENCES user_entity(id),
                 PRIMARY KEY (mail_list_id, user_id)
             );
 
