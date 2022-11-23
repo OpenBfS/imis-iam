@@ -12,7 +12,7 @@
       <v-divider></v-divider>
       <v-container>
         <v-row class="px-2 py-2" no-gutters>
-          <v-form ref="form" class="v-col v-col-12">
+          <v-form ref="form" v-model="valid" class="v-col v-col-12">
             <v-row>
               <v-col cols="10">
                 <v-row>
@@ -42,6 +42,20 @@
                     :rules="
                       reqMultipleSelect($t('mailinglist.required_mailing_list'))
                     "
+                  >
+                  </v-select>
+                  <v-select
+                    density="compact"
+                    class="v-col-6"
+                    :no-data-text="$t('label.no_data_text')"
+                    return-object
+                    clearable
+                    :label="$t('mailinglist.type')"
+                    :items="types"
+                    item-title="name"
+                    item-value="id"
+                    v-model="selectedType"
+                    :rules="reqField($t('mailinglist.required_type'))"
                   >
                   </v-select>
                 </v-row>
@@ -103,7 +117,7 @@
         <v-spacer></v-spacer>
         <v-btn
           size="small"
-          :disabled="!selectedList || !selectedType"
+          :disabled="!valid"
           color="accent"
           @click="sendMail()"
         >
@@ -142,7 +156,7 @@ const store = useStore();
 const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
 // Mail
-const { form, reqField, reqMultipleSelect } = useForm();
+const { form, valid, reqField, reqMultipleSelect } = useForm();
 const selectedList = ref(null);
 const mailText = ref("");
 const subject = ref("");
