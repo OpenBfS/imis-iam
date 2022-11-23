@@ -17,6 +17,8 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.KeycloakSessionTask;
 import org.keycloak.models.utils.KeycloakModelUtils;
 
+import de.intevation.iam.util.DateUtils;
+
 /**
  * Class running a MailTask at a given interval.
  */
@@ -25,9 +27,6 @@ public class MailScheduler {
     private KeycloakSessionFactory sessionFactory;
 
     private static MailScheduler instance;
-
-    private static final long INTERVAL_LENGTH = 10;
-    private static final TimeUnit INTERVAL_UNIT = TimeUnit.MINUTES;
 
     private static final Logger LOG = Logger.getLogger("MailScheduler");
 
@@ -92,7 +91,14 @@ public class MailScheduler {
                 }
             }
         };
+        long schedulerInterval = DateUtils.getSecondsFromDurationEnv(
+            "IAM_MAIL_SCHEDULER_INTERVAL");
+        LOG.info(
+            String.format("Running mail scheduler at %s",
+            schedulerInterval));
         schedulerHandle = scheduler.scheduleAtFixedRate(
-                mailRunnable, 0, INTERVAL_LENGTH, INTERVAL_UNIT);
+            mailRunnable, 0,
+            schedulerInterval,
+            TimeUnit.SECONDS);
     }
 }
