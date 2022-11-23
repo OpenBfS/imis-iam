@@ -35,6 +35,8 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
      */
     private static final String IAM_THEME = "iam_theme";
 
+    private static final String DEFAULT_LOCALE = "de";
+
     DefaultEmailSenderProvider sender;
 
     /**
@@ -49,12 +51,12 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
 
     /**
      * Send a notifcation about inactive accounts to the given recipient.
-     * @param recipient Recipient
+     * @param recipient Recipient email address
      * @param inactiveAccounts List of inactive accounts
      * @throws EmailException
      */
     public void sendAccountInactivityNotification(
-        UserModel recipient,
+        String recipient,
         List<UserModel> inactiveAccounts
     ) throws EmailException {
         StringBuilder usernamesBuilder = new StringBuilder();
@@ -68,7 +70,6 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
         bodyAttributes.put("users", usernamesBuilder.toString());
         Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
 
-        this.setUser(recipient);
         EmailTemplate template = processTemplate(
             "accountInactiveSubject", Collections.emptyList(),
             "accountInactive.ftl", bodyAttributes);
@@ -79,12 +80,12 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
 
     /**
      * Send notfications for expired accounts.
-     * @param recipient Recipient
+     * @param recipient Recipient email address
      * @param expiredUsers Expired account
      * @throws EmailException
      */
     public void sendAccountExpiredNotification(
-            UserModel recipient,
+            String recipient,
             List<UserModel> expiredUsers) throws EmailException {
         StringBuilder usernamesBuilder = new StringBuilder();
         expiredUsers.forEach(acc -> {
@@ -97,7 +98,6 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
         Map<String, Object> bodyAttributes = new HashMap<>();
         bodyAttributes.put("username", usernamesBuilder.toString());
         Map<String, String> realmSmtpConfig = realm.getSmtpConfig();
-        this.setUser(recipient);
         EmailTemplate template = processTemplate(
             "accountExpiredSubject", Collections.emptyList(),
             "accountExpired.ftl", bodyAttributes);
@@ -160,7 +160,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
             Map<String, Object> attributes) throws EmailException {
         try {
             Theme theme = getTheme();
-            Locale locale = getUserLocale(user);
+            Locale locale = Locale.forLanguageTag(DEFAULT_LOCALE);
             attributes.put("locale", locale);
             Properties rb = new Properties();
             rb.putAll(theme.getMessages(locale));
@@ -198,18 +198,5 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
     @Override
     protected Theme getTheme() throws IOException {
         return session.theme().getTheme(IAM_THEME, Theme.Type.EMAIL);
-    }
-
-    /**
-     * Get locale user attribute.
-     * @param user User
-     * @return Locale as String, defaults to "de" if not set
-     */
-    private Locale getUserLocale(UserModel user) {
-        String localeString = user.getFirstAttribute(UserModel.LOCALE);
-        if (localeString == null || localeString.isEmpty()) {
-            localeString = "de";
-        }
-        return Locale.forLanguageTag(localeString);
     }
 }

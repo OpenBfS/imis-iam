@@ -23,10 +23,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionTask;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.UserProvider;
 
 import de.intevation.iam.model.jpa.UserAttributes;
-import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 
 /**
@@ -35,6 +33,8 @@ import de.intevation.iam.util.DateUtils;
 public class MailTask implements KeycloakSessionTask {
 
     private static final String IMIS_REALM = "imis3";
+    private static final String IAM_NOTIFICATION_RECIPIENT_ENV
+        = "IAM_NOTIFICATION_RECIPIENT";
 
     private static final Logger LOG = Logger.getLogger("MailTask");
     private IamMailTemplateProvider mailTemplateProvider;
@@ -75,7 +75,7 @@ public class MailTask implements KeycloakSessionTask {
         });
         if (users != null && users.size() > 0) {
             mailTemplateProvider.sendAccountExpiredNotification(
-                getNotificationRecipient(session), users);
+                getNotificationRecipient(), users);
         }
     }
 
@@ -108,21 +108,17 @@ public class MailTask implements KeycloakSessionTask {
             em.merge(user);
         });
         mailTemplateProvider.sendAccountInactivityNotification(
-                    getNotificationRecipient(session), users);
+                    getNotificationRecipient(), users);
     }
 
-    private UserModel getNotificationRecipient(KeycloakSession session) {
-        UserProvider userProvider = session.users();
-        UserModel recipient = userProvider.getUserByEmail(
-                realm, Constants.NOTIFICATION_RECIPIENT);
-        if (recipient == null) {
-            recipient = userProvider
-                .addUser(realm, Constants.NOTIFICATION_USERNAME);
-            recipient.setEmail(Constants.NOTIFICATION_RECIPIENT);
-            recipient.setEnabled(false);
-            recipient.setSingleAttribute("locale", "de");
+    private String getNotificationRecipient() {
+        String rec = System.getenv(IAM_NOTIFICATION_RECIPIENT_ENV);
+        if (rec == null || rec.isEmpty()) {
+            throw new RuntimeException(
+                String.format("Env %s is not set",
+                IAM_NOTIFICATION_RECIPIENT_ENV));
         }
-        return recipient;
+        return rec;
     }
 
     @Override
