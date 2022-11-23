@@ -137,34 +137,20 @@ export default {
     const { hasLoadingError } = useNotification();
     const getMails = () => {
       let date = "";
-      if (startDate.value != "" && endDate.value != "") {
-        date += `start=${new Date(startDate.value).getTime()}&end=${new Date(
-          endDate.value
-        ).getTime()}`;
-      } else {
-        switch (route.params.year) {
-          case "2022":
-            date += `start=${new Date(
-              "2022-1-1"
-            ).getTime()}&end=${new Date().getTime()}`;
-            break;
-          case "2021":
-            date += `start=${new Date("2021-1-1").getTime()}&end=${new Date(
-              "2021-12-31"
-            ).getTime()}`;
-            break;
-          case "2020":
-            date += `start=${new Date("2020-1-1").getTime()}&end=${new Date(
-              "2020-12-31"
-            ).getTime()}`;
-            break;
-        }
+      if (startDate.value != "") {
+        date += `start=${new Date(startDate.value).getTime()}`;
+      }
+      if (endDate.value != "") {
+        date = date != "" ? date + "&" : date;
+        date += `end=${new Date(endDate.value).getTime()}`;
       }
       date = date === "" ? date : "&" + date;
 
       let payload =
         date === "" ? "mail?archived=true" : "mail?archived=true" + date;
-      payload += "&sender=" + sender.value;
+      if (sender.value) {
+        payload += "&sender=" + sender.value;
+      }
       if (selectedMailinglist.value && selectedMailinglist.value.length) {
         selectedMailinglist.value.forEach((l) => {
           payload += "&list=" + l.id;
@@ -184,6 +170,7 @@ export default {
         });
     };
     onMounted(() => {
+      setStartAndEndDate();
       getMails();
       store
         .dispatch("mail/loadMailTypes")
@@ -216,12 +203,47 @@ export default {
         getMails();
       }
     );
+    const currentYear = new Date().getFullYear();
+    // Format date yyyy-mm-dd for the date picker
+    const formatDateToDisplay = (date) => {
+      const year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      month = month < 10 ? "0" + month : month;
+      let day = date.getDate();
+      day = day < 10 ? "0" + day : day;
+      return year + "-" + month + "-" + day;
+    };
+    const setStartAndEndDate = () => {
+      switch (Number(route.params.year)) {
+        case currentYear:
+          startDate.value = formatDateToDisplay(
+            new Date(currentYear + "-01-01")
+          );
+          endDate.value = formatDateToDisplay(new Date(currentYear + "-12-31"));
+          break;
+        case currentYear - 1:
+          startDate.value = formatDateToDisplay(
+            new Date(currentYear - 1 + "-01-01")
+          );
+          endDate.value = formatDateToDisplay(
+            new Date(currentYear - 1 + "-12-31")
+          );
+          break;
+        case currentYear - 2:
+          startDate.value = formatDateToDisplay(
+            new Date(currentYear - 2 + "-01-01")
+          );
+          endDate.value = formatDateToDisplay(
+            new Date(currentYear - 2 + "-12-31")
+          );
+          break;
+      }
+    };
     watch(
       () => route.params,
       (previousParams, toParams) => {
         if (toParams.year !== previousParams.year) {
-          startDate.value = "";
-          endDate.value = "";
+          setStartAndEndDate(route.params.year);
           getMails();
         }
       }
@@ -256,8 +278,8 @@ export default {
         }
       }
     );
-
     return {
+      currentYear,
       mailinglists,
       selectedMailinglist,
       sender,
