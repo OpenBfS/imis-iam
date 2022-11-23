@@ -39,10 +39,7 @@
                     item-value="id"
                     :no-data-text="$t('mailinglist.no_mailing_list')"
                     v-model="selectedList"
-                    multiple
-                    :rules="
-                      reqMultipleSelect($t('mailinglist.required_mailing_list'))
-                    "
+                    :rules="reqField($t('mailinglist.required_mailing_list'))"
                   >
                   </v-select>
                   <v-select
