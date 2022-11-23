@@ -162,7 +162,7 @@ const archived = ref(false);
 const expiryDate = ref("");
 const userData = store.state.profile.userData;
 const senderList = ref([
-  userData.firstName + userData.lastName + "<" + userData.email + ">",
+  [userData.firstName, userData.lastName, "<" + userData.email + ">"].join(" "),
   store.state.application.reportMail,
 ]);
 const selectedSender = ref(senderList.value[0] || senderList.value[0] || "");
