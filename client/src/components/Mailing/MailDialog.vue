@@ -154,7 +154,7 @@ const store = useStore();
 const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
 // Mail
-const { form, valid, reqField, reqMultipleSelect } = useForm();
+const { form, valid, reqField } = useForm();
 const selectedList = ref(null);
 const mailText = ref("");
 const subject = ref("");
