@@ -305,7 +305,9 @@ public class MailProvider implements RealmResourceProvider {
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
-        if (getMailListByName(list.getName(), em) != null) {
+        MailList foundList = getMailListByName(list.getName(), em);
+        if (foundList != null
+            && !foundList.getId().equals(list.getId())) {
             return Response.status(Status.CONFLICT)
             .type(MediaType.APPLICATION_JSON)
             .entity(i18n.getString(ERROR_LIST_NAME_ALREADY_USED_KEY))
