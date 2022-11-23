@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -65,6 +66,8 @@ public class MailProvider implements RealmResourceProvider {
     private static final String FROM_ADDRESS = "from";
     private static final String USER_ID_HEADER = "X-SHIB-user";
     private static final String ERROR_EMPTY_LIST_KEY = "error_mail_list_empty";
+    private static final String ERROR_LIST_NAME_ALREADY_USED_KEY
+        = "error_mail_list_name_already_used";
 
     //Keycloak session
     private KeycloakSession session;
@@ -230,15 +233,22 @@ public class MailProvider implements RealmResourceProvider {
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
+        RealmModel realm = session.getContext().getRealm();
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        UserModel requestingUser = session.users().getUserById(realm, id);
+        ResourceBundle i18n
+            = I18nUtils.getI18nBundle(session, realm, requestingUser);
+
+        if (getMailListByName(list.getName(), em) != null) {
+            return Response.status(Status.CONFLICT)
+            .type(MediaType.APPLICATION_JSON)
+            .entity(i18n.getString(ERROR_LIST_NAME_ALREADY_USED_KEY))
+            .build();
+        }
         //Update user entities
         list.updateUserEntities(em);
         if (list.getUsers() == null
                 || list.getUsers().size() == 0) {
-            RealmModel realm = session.getContext().getRealm();
-            String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
-            UserModel requestingUser = session.users().getUserById(realm, id);
-            ResourceBundle i18n
-                = I18nUtils.getI18nBundle(session, realm, requestingUser);
             return Response.status(Status.BAD_REQUEST)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
@@ -290,13 +300,20 @@ public class MailProvider implements RealmResourceProvider {
                 list, RequestMethod.PUT, headers, MailList.class)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+        RealmModel realm = session.getContext().getRealm();
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        UserModel requestingUser = session.users().getUserById(realm, id);
+        ResourceBundle i18n
+            = I18nUtils.getI18nBundle(session, realm, requestingUser);
+        if (getMailListByName(list.getName(), em) != null) {
+            return Response.status(Status.CONFLICT)
+            .type(MediaType.APPLICATION_JSON)
+            .entity(i18n.getString(ERROR_LIST_NAME_ALREADY_USED_KEY))
+            .build();
+        }
+
         if (list.getUsers() == null
                 || list.getUsers().size() == 0) {
-            RealmModel realm = session.getContext().getRealm();
-            String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
-            UserModel requestingUser = session.users().getUserById(realm, id);
-            ResourceBundle i18n
-                = I18nUtils.getI18nBundle(session, realm, requestingUser);
             return Response.status(Status.BAD_REQUEST)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
@@ -599,5 +616,17 @@ public class MailProvider implements RealmResourceProvider {
         TypedQuery<MailList> query = em.createQuery(critQuery);
         List<MailList> lists = query.getResultList();
         return lists;
+    }
+
+    private MailList getMailListByName(String name, EntityManager em) {
+        String queryString = "from MailList m where m.name = :name";
+        TypedQuery<MailList> query
+            = em.createQuery(queryString, MailList.class);
+        query.setParameter("name", name);
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
     }
 }
