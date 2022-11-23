@@ -24,9 +24,6 @@
                     :label="$t('mailinglist.sender')"
                     v-model="selectedSender"
                   >
-                    <template v-slot:selection="{ item }">
-                      {{ getMail(item.value) }}
-                    </template>
                   </v-select>
                   <v-select
                     density="compact"
