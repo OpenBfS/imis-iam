@@ -32,6 +32,9 @@ is already run during build respectively startup
 to create a new realm for the IMIS3 IAM application
 and the necessary clients.
 
+Some aspects of the application can be configured via environment variables
+in keycloak/.env.
+
 
 ## Client application
 

@@ -43,11 +43,8 @@ services:
     ports:
       - 48080:8080
       - 49990:9990
-    environment:
-      - IAM_NOTIFICATION_RECIPIENT=${NOTIFICATION_RECIPIENT}
-      - IAM_MAIL_SCHEDULER_INTERVAL=${MAIL_SCHEDULER_INTERVAL}
-      - IAM_ACCOUNT_INACITIVITY_WARNING_TIME=${ACCOUNT_INACITIVITY_WARNING_TIME}
-      - IAM_ACCOUNT_EXPIRY_TIME=${ACCOUNT_EXPIRY_TIME}
+    env_file:
+      - keycloak/.env
   client:
     build:
       context: ../
