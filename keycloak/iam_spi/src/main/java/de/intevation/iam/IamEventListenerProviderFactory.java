@@ -12,7 +12,7 @@ import org.keycloak.events.EventListenerProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
-public class IamEventlistenerProviderFactory
+public class IamEventListenerProviderFactory
     implements EventListenerProviderFactory {
 
     private static final String ID = "iam-event-listener";
