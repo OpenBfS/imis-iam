@@ -137,10 +137,10 @@ export default {
     const { hasLoadingError } = useNotification();
     const getMails = () => {
       let date = "";
-      if (startDate.value != "") {
+      if (startDate.value) {
         date += `start=${new Date(startDate.value).getTime()}`;
       }
-      if (endDate.value != "") {
+      if (endDate.value) {
         date = date != "" ? date + "&" : date;
         date += `end=${new Date(endDate.value).getTime()}`;
       }
@@ -214,29 +214,36 @@ export default {
       return year + "-" + month + "-" + day;
     };
     const setStartAndEndDate = () => {
-      switch (Number(route.params.year)) {
-        case currentYear:
-          startDate.value = formatDateToDisplay(
-            new Date(currentYear + "-01-01")
-          );
-          endDate.value = formatDateToDisplay(new Date(currentYear + "-12-31"));
-          break;
-        case currentYear - 1:
-          startDate.value = formatDateToDisplay(
-            new Date(currentYear - 1 + "-01-01")
-          );
-          endDate.value = formatDateToDisplay(
-            new Date(currentYear - 1 + "-12-31")
-          );
-          break;
-        case currentYear - 2:
-          startDate.value = formatDateToDisplay(
-            new Date(currentYear - 2 + "-01-01")
-          );
-          endDate.value = formatDateToDisplay(
-            new Date(currentYear - 2 + "-12-31")
-          );
-          break;
+      if (route.params.year !== "all") {
+        switch (Number(route.params.year)) {
+          case currentYear:
+            startDate.value = formatDateToDisplay(
+              new Date(currentYear + "-01-01")
+            );
+            endDate.value = formatDateToDisplay(
+              new Date(currentYear + "-12-31")
+            );
+            break;
+          case currentYear - 1:
+            startDate.value = formatDateToDisplay(
+              new Date(currentYear - 1 + "-01-01")
+            );
+            endDate.value = formatDateToDisplay(
+              new Date(currentYear - 1 + "-12-31")
+            );
+            break;
+          case currentYear - 2:
+            startDate.value = formatDateToDisplay(
+              new Date(currentYear - 2 + "-01-01")
+            );
+            endDate.value = formatDateToDisplay(
+              new Date(currentYear - 2 + "-12-31")
+            );
+            break;
+        }
+      } else {
+        startDate.value = undefined;
+        endDate.value = undefined;
       }
     };
     watch(
