@@ -18,7 +18,7 @@
                 fax VARCHAR,
                 oe VARCHAR,
                 bfs_location VARCHAR NOT NULL,
-                expiry_date TIMESTAMP WITHOUT TIME ZONE DEFAULT current_date + interval '12 month',
+                expiry_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
                 inactivity_notification_sent BOOLEAN DEFAULT false,
                 expired_notification_sent BOOLEAN DEFAULT false
             );
