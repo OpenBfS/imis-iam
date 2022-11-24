@@ -6,6 +6,7 @@
  */
 package de.intevation.iam.mail;
 
+import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -79,10 +80,13 @@ public class MailScheduler {
 
 
     private void run() {
+        Duration inactivityWarningTerm = DateUtils.getDurationFromEnv(
+            "IAM_ACCOUNT_INACITIVITY_WARNING_TIME");
         final Runnable mailRunnable = new Runnable() {
             public void run() {
                 try {
-                    KeycloakSessionTask mailTask = new MailTask();
+                    KeycloakSessionTask mailTask = new MailTask(
+                        inactivityWarningTerm);
                     KeycloakModelUtils.runJobInTransaction(
                             sessionFactory, mailTask);
                 } catch (Exception e) {
@@ -91,14 +95,13 @@ public class MailScheduler {
                 }
             }
         };
-        long schedulerInterval = DateUtils.getSecondsFromDurationEnv(
+
+        Duration schedulerInterval = DateUtils.getDurationFromEnv(
             "IAM_MAIL_SCHEDULER_INTERVAL");
-        LOG.info(
-            String.format("Running mail scheduler at %s",
-            schedulerInterval));
+        final TimeUnit rateUnit = TimeUnit.SECONDS;
         schedulerHandle = scheduler.scheduleAtFixedRate(
             mailRunnable, 0,
-            schedulerInterval,
-            TimeUnit.SECONDS);
+            rateUnit.convert(schedulerInterval),
+            rateUnit);
     }
 }

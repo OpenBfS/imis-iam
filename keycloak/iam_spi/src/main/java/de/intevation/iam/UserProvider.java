@@ -134,6 +134,7 @@ public class UserProvider implements RealmResourceProvider {
         }
         return Response.ok(new User(user, em)).build();
     }
+
     /**
      * Create a new user.
      * @param headers Request headers

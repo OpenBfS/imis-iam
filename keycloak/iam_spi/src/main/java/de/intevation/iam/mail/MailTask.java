@@ -7,6 +7,8 @@
 package de.intevation.iam.mail;
 
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,7 +27,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.UserAttributes;
-import de.intevation.iam.util.DateUtils;
+
 
 /**
  * Task sending email reminders or notfications if run.
@@ -39,6 +41,12 @@ public class MailTask implements KeycloakSessionTask {
     private static final Logger LOG = Logger.getLogger("MailTask");
     private IamMailTemplateProvider mailTemplateProvider;
     private RealmModel realm;
+
+    private Duration inactivityWarningTerm;
+
+    MailTask(Duration inactivityWarningTerm) {
+        this.inactivityWarningTerm = inactivityWarningTerm;
+    }
 
     /**
      * Check for expired user accounts, disable them and send email notfication.
@@ -92,7 +100,7 @@ public class MailTask implements KeycloakSessionTask {
         Predicate sentFilter = cb.equal(
                 root.get("inactivityNotificationSent"), false);
         Predicate inactivityFilter = cb.lessThan(root.get("expiryDate"),
-        DateUtils.getAccountInactivityDate());
+            Timestamp.from(Instant.now().plus(inactivityWarningTerm)));
         filter = cb.and(sentFilter, inactivityFilter);
         query.where(filter);
         List<UserAttributes> userAttributes
