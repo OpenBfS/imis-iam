@@ -138,11 +138,11 @@ export default {
     const getMails = () => {
       let date = "";
       if (startDate.value) {
-        date += `start=${new Date(startDate.value).getTime()}`;
+        date += `start=${new Date(startDate.value + "T00:00").getTime()}`;
       }
       if (endDate.value) {
         date = date != "" ? date + "&" : date;
-        date += `end=${new Date(endDate.value).getTime()}`;
+        date += `end=${new Date(endDate.value + "T24:00").getTime()}`;
       }
       date = date === "" ? date : "&" + date;
 
