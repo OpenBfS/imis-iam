@@ -77,134 +77,120 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 
-export default {
-  setup() {
-    const show = true;
-    const store = useStore();
-    const { t } = useI18n();
-    const { hasRequestError } = useNotification();
-    // Use objects to enable translation of the itemes in <v-select> element
-    // TODO: Use slots to change the appearance of the items in the element
-    // when this gets implemented by Vuetify upstream.
-    const fieldSeparators = [
-      {
-        name: t("label.comma"),
-        value: "comma",
-      },
-      {
-        name: t("label.semicolon"),
-        value: "semicolon",
-      },
-      {
-        name: t("label.space"),
-        value: "space",
-      },
-      {
-        name: t("label.period"),
-        value: "period",
-      },
-    ];
-    const quoteTypes = [
-      {
-        name: t("label.doublequote"),
-        value: "doublequote",
-      },
-      {
-        name: t("label.singlequote"),
-        value: "singlequote",
-      },
-    ];
-    const rowDelimiters = [
-      {
-        name: t("label.linux"),
-        value: "linux",
-      },
-      {
-        name: t("label.windows"),
-        value: "windows",
-      },
-    ];
-    const encoding = [
-      {
-        name: "utf-8",
-        value: "utf-8",
-      },
-      {
-        name: "utf-16",
-        value: "utf-16",
-      },
-      {
-        name: "ascii",
-        value: "ascii",
-      },
-    ];
-    const csvOptions = ref({
-      fieldSeperator: fieldSeparators[0].value,
-      rowDelimiter: rowDelimiters[0].value,
-      encoding: encoding[0].value,
-      quoteType: quoteTypes[0].value,
-    });
-
-    const exportRequest = (itemsName) => {
-      let payload = "";
-      if (csvOptions.value && csvOptions.value.fieldSeperator !== "") {
-        payload += "fieldSeparator=" + csvOptions.value.fieldSeperator;
-      }
-      if (csvOptions.value && csvOptions.value.rowDelimiter !== "") {
-        const row = "rowDelimiter=" + csvOptions.value.rowDelimiter;
-        payload += payload === "" ? row : "&" + row;
-      }
-      if (csvOptions.value && csvOptions.value.encoding !== "") {
-        const encoding = "encoding=" + csvOptions.value.encoding;
-        payload += payload === "" ? encoding : "&" + encoding;
-      }
-      if (csvOptions.value && csvOptions.value.quoteType !== "") {
-        const quoteType = "quoteType=" + csvOptions.value.quoteType;
-        payload += payload === "" ? quoteType : "&" + quoteType;
-      }
-      HTTP.get("export/" + itemsName + (payload !== "" ? "?" + payload : ""))
-        .then((response) => {
-          const blob = new Blob([response.data], {
-            type: "application/octet-stream",
-          });
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = "export.csv";
-          link.click();
-          URL.revokeObjectURL(link.href);
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const exportFile = () => {
-      switch (store.state.application.listToExport) {
-        case "users":
-          exportRequest("user");
-          break;
-        case "institutions":
-          exportRequest("institution");
-          break;
-      }
-    };
-
-    return {
-      encoding,
-      rowDelimiters,
-      fieldSeparators,
-      quoteTypes,
-      csvOptions,
-      exportFile,
-      show,
-      hasRequestError,
-    };
+const show = true;
+const store = useStore();
+const { t } = useI18n();
+const { hasRequestError } = useNotification();
+// Use objects to enable translation of the itemes in <v-select> element
+// TODO: Use slots to change the appearance of the items in the element
+// when this gets implemented by Vuetify upstream.
+const fieldSeparators = [
+  {
+    name: t("label.comma"),
+    value: "comma",
   },
+  {
+    name: t("label.semicolon"),
+    value: "semicolon",
+  },
+  {
+    name: t("label.space"),
+    value: "space",
+  },
+  {
+    name: t("label.period"),
+    value: "period",
+  },
+];
+const quoteTypes = [
+  {
+    name: t("label.doublequote"),
+    value: "doublequote",
+  },
+  {
+    name: t("label.singlequote"),
+    value: "singlequote",
+  },
+];
+const rowDelimiters = [
+  {
+    name: t("label.linux"),
+    value: "linux",
+  },
+  {
+    name: t("label.windows"),
+    value: "windows",
+  },
+];
+const encoding = [
+  {
+    name: "utf-8",
+    value: "utf-8",
+  },
+  {
+    name: "utf-16",
+    value: "utf-16",
+  },
+  {
+    name: "ascii",
+    value: "ascii",
+  },
+];
+const csvOptions = ref({
+  fieldSeperator: fieldSeparators[0].value,
+  rowDelimiter: rowDelimiters[0].value,
+  encoding: encoding[0].value,
+  quoteType: quoteTypes[0].value,
+});
+
+const exportRequest = (itemsName) => {
+  let payload = "";
+  if (csvOptions.value && csvOptions.value.fieldSeperator !== "") {
+    payload += "fieldSeparator=" + csvOptions.value.fieldSeperator;
+  }
+  if (csvOptions.value && csvOptions.value.rowDelimiter !== "") {
+    const row = "rowDelimiter=" + csvOptions.value.rowDelimiter;
+    payload += payload === "" ? row : "&" + row;
+  }
+  if (csvOptions.value && csvOptions.value.encoding !== "") {
+    const encoding = "encoding=" + csvOptions.value.encoding;
+    payload += payload === "" ? encoding : "&" + encoding;
+  }
+  if (csvOptions.value && csvOptions.value.quoteType !== "") {
+    const quoteType = "quoteType=" + csvOptions.value.quoteType;
+    payload += payload === "" ? quoteType : "&" + quoteType;
+  }
+  HTTP.get("export/" + itemsName + (payload !== "" ? "?" + payload : ""))
+    .then((response) => {
+      const blob = new Blob([response.data], {
+        type: "application/octet-stream",
+      });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "export.csv";
+      link.click();
+      URL.revokeObjectURL(link.href);
+      store.state.application.showExportDialog = false;
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const exportFile = () => {
+  switch (store.state.application.listToExport) {
+    case "users":
+      exportRequest("user");
+      break;
+    case "institutions":
+      exportRequest("institution");
+      break;
+  }
 };
 </script>
