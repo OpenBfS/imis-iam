@@ -15,8 +15,8 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <div>
-      {{ $t("appbar.text_login") }} {{ userData.firstName }}
-      {{ userData.lastName }} ({{ userData.username }})
+      {{ $t("appbar.text_login") }} {{ savedUser.firstName }}
+      {{ savedUser.lastName }} ({{ savedUser.username }})
     </div>
     <v-menu left>
       <template v-slot:activator="{ props }">
@@ -25,7 +25,7 @@
         </v-btn>
       </template>
       <v-list dense>
-        <v-list-item link @click="showManageUserDialog = true">
+        <v-list-item link @click="editProfile">
           {{ $t("appbar.button_profile") }}
         </v-list-item>
         <v-list-item link @click="logout">
@@ -34,57 +34,34 @@
       </v-list>
     </v-menu>
   </v-app-bar>
-  <ManageUser
-    v-if="showManageUserDialog"
-    v-bind:processType="'edit'"
-    v-bind:copiedItem="{ ...userData }"
-    v-bind:item="{ ...user }"
-    @child-object="checkChildObject"
-  />
 </template>
 <style scoped></style>
-<script>
-import { computed, defineAsyncComponent, ref } from "vue";
+<script setup>
 import { ShibHTTP } from "../../lib/http";
 import { useStore } from "vuex";
+import { computed } from "@vue/reactivity";
 
-export default {
-  components: {
-    ManageUser: defineAsyncComponent(() =>
-      import("@/components/User/ManageUser.vue")
-    ),
-  },
-  setup() {
-    const store = useStore();
-    const userData = computed(() => {
-      return store.state.profile.userData;
-    });
-    const user = computed(() => {
-      return { ...userData.value };
-    });
-    const checkChildObject = (e) => {
-      if (e.closeDialog) {
-        showManageUserDialog.value = false;
-      }
-      if (e.hasChanges) {
-        store.dispatch("user/loadProfile");
-      }
-    };
-    const showManageUserDialog = ref(false);
-    const logout = () => {
-      console.log("logout");
-      ShibHTTP.get("Shibboleth.sso/Logout").then((response) => {
-        console.log(response);
-        window.location.reload();
-      });
-    };
-    return {
-      showManageUserDialog,
-      user,
-      userData,
-      logout,
-      checkChildObject,
-    };
-  },
+const cloneObject = (obj) => {
+  return JSON.parse(JSON.stringify(obj));
+};
+const store = useStore();
+const savedUser = computed(() => {
+  return store.state.profile.userData;
+});
+
+const logout = () => {
+  console.log("logout");
+  ShibHTTP.get("Shibboleth.sso/Logout").then((response) => {
+    console.log(response);
+    window.location.reload();
+  });
+};
+
+const editProfile = () => {
+  const user = cloneObject(savedUser.value);
+  store.commit("application/setManagedItem", user);
+  store.commit("application/setSavedItem", savedUser.value);
+  store.commit("application/setProcessType", "edit");
+  store.commit("application/setShowManageUserDialog", true);
 };
 </script>
