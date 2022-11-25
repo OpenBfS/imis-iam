@@ -97,13 +97,14 @@ public class User {
 
             CriteriaBuilder cb = em.getCriteriaBuilder();
 
-            //Get user roles
+            // Get user-role mappings
             TypedQuery<UserRoleMappingEntity> roleMappingQuery =
                 em.createNamedQuery("userRoleMappings",
                     UserRoleMappingEntity.class);
             roleMappingQuery.setParameter(USER_PARAM, jpaModel.getUserEntity());
             List<UserRoleMappingEntity> roleMappings
                 = roleMappingQuery.getResultList();
+
             //Query role entities as mapping models only contain role ids
             CriteriaQuery<RoleEntity> roleQuery = cb.createQuery(
                 RoleEntity.class);
@@ -112,16 +113,19 @@ public class User {
             In<String> idFilter = cb.in(root.get(ID_PARAM));
             roleMappings.forEach(
                 roleMapping -> idFilter.value(roleMapping.getRoleId()));
-            roleQuery.where(idFilter);
+
+            // Query only roles known in this application
+            In<String> nameFilter = cb.in(root.get("name"));
+            for (Role role: Role.values()) {
+                nameFilter.value(role.toString());
+            }
+
+            roleQuery.where(idFilter, nameFilter);
             List<RoleEntity> roleEntities
                 = em.createQuery(roleQuery).getResultList();
             //Get role names if role is iam client role
             List<String> roleNames = new ArrayList<String>();
-            roleEntities.forEach(entity -> {
-                    if (Role.get(entity.getName()) != null) {
-                        roleNames.add(entity.getName());
-                    }
-                });
+            roleEntities.forEach(entity -> roleNames.add(entity.getName()));
             setRoles(roleNames);
 
             //Get user groups

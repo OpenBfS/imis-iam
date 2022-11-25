@@ -4,7 +4,7 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
-package de.intevation.iam.util;
+package de.intevation.iam.auth;
 
 import java.util.stream.Stream;
 
@@ -12,13 +12,12 @@ import org.keycloak.models.ClientModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 
-import de.intevation.iam.auth.Role;
 
 /**
  * Utility methods used by the authorizers.
  */
-public class AuthUtils {
-    private AuthUtils() { };
+public class Utils {
+    private Utils() { };
 
     /**
      * Checks if a user has any role.
@@ -34,10 +33,10 @@ public class AuthUtils {
             = requestingUser.getClientRoleMappingsStream(client);
         Stream<RoleModel> filteredRoles = roles.filter(role -> {
             String roleName = role.getName();
-            if (roleName.equals(Role.USER.getRole())
-                    || roleName.equals(Role.EDITOR.getRole())
-                    || roleName.equals(Role.CHIEF_EDITOR.getRole())
-                    || roleName.equals(Role.TECHADMIN.getRole())) {
+            if (roleName.equals(Role.USER.toString())
+                    || roleName.equals(Role.EDITOR.toString())
+                    || roleName.equals(Role.CHIEF_EDITOR.toString())
+                    || roleName.equals(Role.TECHADMIN.toString())) {
                 return true;
             }
             return false;
@@ -58,9 +57,9 @@ public class AuthUtils {
             = requestingUser.getClientRoleMappingsStream(client);
         Stream<RoleModel> filteredRoles = roles.filter(role -> {
             String roleName = role.getName();
-            if (roleName.equals(Role.EDITOR.getRole())
-                    || roleName.equals(Role.CHIEF_EDITOR.getRole())
-                    || roleName.equals(Role.TECHADMIN.getRole())) {
+            if (roleName.equals(Role.EDITOR.toString())
+                    || roleName.equals(Role.CHIEF_EDITOR.toString())
+                    || roleName.equals(Role.TECHADMIN.toString())) {
                 return true;
             }
             return false;
@@ -82,8 +81,8 @@ public class AuthUtils {
             = requestingUser.getClientRoleMappingsStream(client);
         Stream<RoleModel> filteredRoles = roles.filter(role -> {
             String roleName = role.getName();
-            if (roleName.equals(Role.CHIEF_EDITOR.getRole())
-                    || roleName.equals(Role.TECHADMIN.getRole())) {
+            if (roleName.equals(Role.CHIEF_EDITOR.toString())
+                    || roleName.equals(Role.TECHADMIN.toString())) {
                 return true;
             }
             return false;

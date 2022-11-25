@@ -6,38 +6,17 @@
  */
 package de.intevation.iam.auth;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-
+/**
+ * The user roles known to this application.
+ */
 public enum Role {
-    USER("Nutzer"),
-    EDITOR("Redakteur"),
-    CHIEF_EDITOR("Chefredakteur"),
-    TECHADMIN("technischer Administrator");
+    USER,
+    EDITOR,
+    CHIEF_EDITOR,
+    TECHADMIN;
 
-    private String role;
-
-    Role(String role) {
-        this.role = role;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    /**
-     * Get enum by role string.
-     * @param role Role string
-     * @return Enum or null if not found
-     */
-    public static Role get(String role) {
-        try {
-            return Arrays.stream(Role.values())
-            .filter(env -> env.role.equals(role))
-            .findFirst().get();
-        } catch (NoSuchElementException e) {
-            return null;
-        }
-
+    @Override
+    public String toString() {
+        return this.name().toLowerCase();
     }
 }

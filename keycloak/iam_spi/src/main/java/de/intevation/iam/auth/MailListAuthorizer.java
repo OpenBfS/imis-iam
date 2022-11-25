@@ -16,7 +16,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.MailList;
-import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
@@ -49,7 +48,7 @@ public class MailListAuthorizer implements Authorizer<MailList> {
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.users().getUserById(realm, userId);
-        return AuthUtils.hasUserAnyRole(requestingUser, client);
+        return Utils.hasUserAnyRole(requestingUser, client);
     }
 
     private boolean authorizeCreate(
@@ -83,7 +82,7 @@ public class MailListAuthorizer implements Authorizer<MailList> {
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
+        return Utils.isUserAtLeastEditor(requestingUser, client);
     }
 
     @Override

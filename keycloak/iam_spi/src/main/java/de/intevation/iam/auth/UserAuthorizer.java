@@ -18,7 +18,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.representation.User;
-import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
@@ -75,7 +74,7 @@ public class UserAuthorizer implements Authorizer<User> {
         UserModel requestingUser,
         ClientModel client
     ) {
-        return AuthUtils.hasUserAnyRole(requestingUser, client);
+        return Utils.hasUserAnyRole(requestingUser, client);
     }
 
     private boolean authorizeCreate(
@@ -87,9 +86,9 @@ public class UserAuthorizer implements Authorizer<User> {
         //If no roles are set, check if user is editor
         //Else check if user is chief editor
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            return AuthUtils.isUserAtLeastEditor(requestingUser, client);
+            return Utils.isUserAtLeastEditor(requestingUser, client);
         } else {
-            return AuthUtils.isUserAtLeastChiefEditor(
+            return Utils.isUserAtLeastChiefEditor(
                     requestingUser, client);
         }
     }
@@ -112,19 +111,19 @@ public class UserAuthorizer implements Authorizer<User> {
             ? user.getRoles()
             : new ArrayList<>();
         if (oldRoles.size() != newRoles.size()) {
-            return AuthUtils.isUserAtLeastChiefEditor(
+            return Utils.isUserAtLeastChiefEditor(
                     requestingUser, client);
         }
         for (int i = 0; i < newRoles.size(); i++) {
             if (!oldRoles.contains(newRoles.get(i))
                 || !newRoles.contains(oldRoles.get(i))) {
-                return AuthUtils.isUserAtLeastChiefEditor(
+                return Utils.isUserAtLeastChiefEditor(
                         requestingUser, client);
             }
         }
         // Else only allow users with other roles than user to edit
         // or allow users to edit their own profile
-        return AuthUtils.isUserAtLeastEditor(requestingUser, client)
+        return Utils.isUserAtLeastEditor(requestingUser, client)
             || user.getId().equals(requestingUser.getId());
     }
 }

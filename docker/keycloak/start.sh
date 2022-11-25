@@ -83,7 +83,7 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
      -d @${DIR}/ldap_provider.json
 
 echo "Creating client roles"
-for name in "Nutzer" "Redakteur" "Chefredakteur" "technischer Administrator"
+for name in "user" "editor" "chief_editor" "techadmin"
 do
     curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$IMIS_CLIENT_ID/roles" \
         -H "Content-Type: application/json" \
@@ -105,7 +105,7 @@ defaultGroupId=$(echo $groups | jq 'map(select(.name=="Landesadmin")) | .[0]' | 
 echo "Assigning groups and client roles"
 
 #Assign user role
-userRole=$(echo $roles | jq 'map(select(.name=="Nutzer"))')
+userRole=$(echo $roles | jq 'map(select(.name=="user"))')
 userId=$(echo $users | jq 'map(select(.username=="exampleuser")) | .[0]' | jq .id | tr -d '"')
 
 curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$userId/role-mappings/clients/$IMIS_CLIENT_ID" \
@@ -116,8 +116,8 @@ curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$userId/groups/$def
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN"
 
-#Assign Redakteur role
-editorRole=$(echo $roles | jq 'map(select(.name=="Redakteur"))')
+#Assign editor role
+editorRole=$(echo $roles | jq 'map(select(.name=="editor"))')
 editorUserId=$(echo $users | jq 'map(select(.username=="redakteur")) | .[0]' | jq .id | tr -d '"')
 
 curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$editorUserId/role-mappings/clients/$IMIS_CLIENT_ID" \
@@ -128,8 +128,8 @@ curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$editorUserId/group
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN"
 
-#Assign Chefredakteur role
-chiefEditorRole=$(echo $roles | jq 'map(select(.name=="Chefredakteur"))')
+#Assign chief_editor role
+chiefEditorRole=$(echo $roles | jq 'map(select(.name=="chief_editor"))')
 chiefEditorUserId=$(echo $users | jq 'map(select(.username=="chefredakteur")) | .[0]' | jq .id | tr -d '"')
 
 curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId/role-mappings/clients/$IMIS_CLIENT_ID" \
@@ -140,8 +140,8 @@ curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId/
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN"
 
-#Assign tech. Admin role
-adminRole=$(echo $roles | jq 'map(select(.name=="technischer Administrator"))')
+#Assign techadmin role
+adminRole=$(echo $roles | jq 'map(select(.name=="techadmin"))')
 adminUserId=$(echo $users | jq 'map(select(.username=="techadmin")) | .[0]' | jq .id | tr -d '"')
 
 curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$adminUserId/role-mappings/clients/$IMIS_CLIENT_ID" \

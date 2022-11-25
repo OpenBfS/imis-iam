@@ -16,7 +16,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.Institution;
-import de.intevation.iam.util.AuthUtils;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
@@ -69,7 +68,7 @@ public class InstitutionAuthorizer implements Authorizer<Institution> {
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
+        return Utils.isUserAtLeastEditor(requestingUser, client);
     }
 
     private boolean authorizeUpdate(
@@ -84,7 +83,7 @@ public class InstitutionAuthorizer implements Authorizer<Institution> {
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
+        return Utils.isUserAtLeastEditor(requestingUser, client);
     }
 
     private boolean authorizeDelete(
@@ -99,7 +98,7 @@ public class InstitutionAuthorizer implements Authorizer<Institution> {
         if (requestingUser == null) {
             return false;
         }
-        return AuthUtils.isUserAtLeastEditor(requestingUser, client);
+        return Utils.isUserAtLeastEditor(requestingUser, client);
     }
 
 }
