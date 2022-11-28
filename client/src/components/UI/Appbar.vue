@@ -59,6 +59,7 @@ const logout = () => {
 
 const editProfile = () => {
   const user = cloneObject(savedUser.value);
+  store.commit("application/setOwnAccount", true);
   store.commit("application/setManagedItem", user);
   store.commit("application/setSavedItem", savedUser.value);
   store.commit("application/setProcessType", "edit");

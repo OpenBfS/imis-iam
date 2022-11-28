@@ -20,11 +20,7 @@
       <v-container class="pa-1 mt-4">
         <v-row justify="center">
           <v-col jsutify="start" cols="11">
-            <v-form
-              v-model="valid"
-              ref="form"
-              :readonly="!$store.state.profile.isAllowedToManage"
-            >
+            <v-form v-model="valid" ref="form" :readonly="isReadOnly">
               <div class="two_group_class">
                 <v-text-field
                   :variant="
@@ -207,7 +203,7 @@
           {{ $t("label.create_and_prepare") }}
         </v-btn>
         <v-btn
-          v-if="$store.state.profile.isAllowedToManage"
+          v-if="!isReadOnly"
           color="accent"
           :disabled="!valid || hasNoChanges"
           @click="
@@ -223,9 +219,7 @@
           }}
         </v-btn>
         <v-btn
-          v-if="
-            processType === 'edit' && $store.state.profile.isAllowedToManage
-          "
+          v-if="processType === 'edit' && !isReadOnly"
           color="accent"
           @click="user = cloneObject(originalUser)"
         >
@@ -233,7 +227,10 @@
         </v-btn>
         <v-btn
           color="accent"
-          @click="$store.commit('application/setShowManageUserDialog', false)"
+          @click="
+            $store.commit('application/setOwnAccount', false);
+            $store.commit('application/setShowManageUserDialog', false);
+          "
         >
           {{ $t("button.cancel") }}
         </v-btn>
@@ -266,7 +263,7 @@ form > div {
   align-self: center;
 }
 </style>
-<script>
+<script setup>
 import { computed, onMounted, ref, nextTick } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
@@ -274,164 +271,145 @@ import { useStore } from "vuex";
 import { useForm } from "@/lib/use-form";
 import { expUser } from "@/components/User/user";
 
-export default {
-  setup() {
-    const show = true;
-    const { hasLoadingError, hasRequestError, resetNotification } =
-      useNotification();
-    const store = useStore();
-    const user = ref(store.state.application.managedItem);
-    const originalUser = ref(store.state.application.savedItem);
-    const processType = ref(store.state.application.processType);
+const show = true;
+const { hasLoadingError, hasRequestError, resetNotification } =
+  useNotification();
+const store = useStore();
+const user = ref(store.state.application.managedItem);
+const originalUser = ref(store.state.application.savedItem);
+const processType = ref(store.state.application.processType);
 
-    const getUserMemberships = () => {
-      HTTP.get("iamuser/membership")
-        .then((response) => {
-          store.commit("user/setMemberships", response.data);
-        })
-        .catch(() => {
-          hasLoadingError.value = false;
-        });
-    };
-    const getUserPsositions = () => {
-      HTTP.get("iamuser/position")
-        .then((response) => {
-          store.commit("user/setPositions", response.data);
-        })
-        .catch(() => {
-          hasLoadingError.value = false;
-        });
-    };
-    const getInstitutions = () => {
-      store
-        .dispatch("institution/loadInstitutions")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    onMounted(() => {
-      getUserMemberships();
-      getUserPsositions();
-      getInstitutions();
+const getUserMemberships = () => {
+  HTTP.get("iamuser/membership")
+    .then((response) => {
+      store.commit("user/setMemberships", response.data);
+    })
+    .catch(() => {
+      hasLoadingError.value = false;
     });
-    const positions = computed(() => {
-      return store.state.user.positions;
-    });
-    const memeberships = computed(() => {
-      return store.state.user.memberships;
-    });
-    const institutions = computed(() => {
-      return store.state.institution.institutions;
-    });
-    const userRoles = computed(() => {
-      return store.state.user.roles;
-    });
-    // Deep Copy for objects
-    const cloneObject = (obj) => {
-      return JSON.parse(JSON.stringify(obj));
-    };
-    const getUsers = () => {
-      store
-        .dispatch("user/loadUsers")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    const createUser = (shouldClose) => {
-      HTTP.post("/iamuser", user.value)
-        .then(() => {
-          getUsers();
-          if (shouldClose) {
-            store.commit("application/setShowManageUserDialog", false);
-          } else {
-            // Use the same roles of the last created user.
-            const usedRoles = user.value.roles;
-            user.value = cloneObject(expUser);
-            user.value.roles = usedRoles;
-            nextTick(() => {
-              form.value.resetValidation();
-            });
-          }
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const updateUser = () => {
-      resetNotification();
-      HTTP.put("/iamuser", user.value)
-        .then(() => {
-          // Update current user Profile and thus the data in App bar.
-          if (store.state.profile.userData.id === user.value.id) {
-            store.dispatch("profile/loadProfile");
-          }
-          getUsers();
-          store.commit("application/setShowManageUserDialog", false);
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const createAndPrepare = () => {
-      resetNotification();
-      createUser(false);
-    };
-    onMounted(() => {
-      // This is necessary as the form value is not change to true with valid inputs
-      // for the first load by filling the fields (copy, edit).
-      // TODO: Check if this gets fixed by upstream with the next release.
-      if (["edit", "copy"].indexOf(processType.value) !== -1) {
-        setTimeout(() => {
-          form.value.validate();
-        }, 100);
-      }
-    });
-    // Form
-    const {
-      form,
-      valid,
-      reqField,
-      reqValidPhone,
-      reqValidmail,
-      reqMultipleSelect,
-    } = useForm();
-    // Activate button only if some values are changed for "edit"
-    // and username and email are changed for "copy"
-    // to avoid useless requests
-    const hasNoChanges = computed(() => {
-      return (
-        (processType.value === "edit" &&
-          JSON.stringify(originalUser.value) === JSON.stringify(user.value)) ||
-        (processType.value === "copy" &&
-          (user.value.username === originalUser.value.username ||
-            user.value.email === originalUser.value.email))
-      );
-    });
-    return {
-      createAndPrepare,
-      userRoles,
-      processType,
-      reqMultipleSelect,
-      reqField,
-      reqValidPhone,
-      reqValidmail,
-      cloneObject,
-      positions,
-      memeberships,
-      hasNoChanges,
-      hasRequestError,
-      hasLoadingError,
-      valid,
-      institutions,
-      show,
-      createUser,
-      updateUser,
-      user,
-      originalUser,
-      form,
-    };
-  },
 };
+const getUserPsositions = () => {
+  HTTP.get("iamuser/position")
+    .then((response) => {
+      store.commit("user/setPositions", response.data);
+    })
+    .catch(() => {
+      hasLoadingError.value = false;
+    });
+};
+const getInstitutions = () => {
+  store
+    .dispatch("institution/loadInstitutions")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+};
+onMounted(() => {
+  getUserMemberships();
+  getUserPsositions();
+  getInstitutions();
+});
+const positions = computed(() => {
+  return store.state.user.positions;
+});
+const memeberships = computed(() => {
+  return store.state.user.memberships;
+});
+const institutions = computed(() => {
+  return store.state.institution.institutions;
+});
+const userRoles = computed(() => {
+  return store.state.user.roles;
+});
+// Deep Copy for objects
+const cloneObject = (obj) => {
+  return JSON.parse(JSON.stringify(obj));
+};
+const getUsers = () => {
+  store
+    .dispatch("user/loadUsers")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+};
+const createUser = (shouldClose) => {
+  HTTP.post("/iamuser", user.value)
+    .then(() => {
+      getUsers();
+      if (shouldClose) {
+        store.commit("application/setOwnAccount", true);
+        store.commit("application/setShowManageUserDialog", false);
+      } else {
+        // Use the same roles of the last created user.
+        const usedRoles = user.value.roles;
+        user.value = cloneObject(expUser);
+        user.value.roles = usedRoles;
+        nextTick(() => {
+          form.value.resetValidation();
+        });
+      }
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const updateUser = () => {
+  resetNotification();
+  HTTP.put("/iamuser", user.value)
+    .then(() => {
+      // Update current user Profile and thus the data in App bar.
+      if (store.state.profile.userData.id === user.value.id) {
+        store.dispatch("profile/loadProfile");
+      }
+      getUsers();
+      store.commit("application/setOwnAccount", false);
+      store.commit("application/setShowManageUserDialog", false);
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const createAndPrepare = () => {
+  resetNotification();
+  createUser(false);
+};
+onMounted(() => {
+  // This is necessary as the form value is not change to true with valid inputs
+  // for the first load by filling the fields (copy, edit).
+  // TODO: Check if this gets fixed by upstream with the next release.
+  if (["edit", "copy"].indexOf(processType.value) !== -1) {
+    setTimeout(() => {
+      form.value.validate();
+    }, 100);
+  }
+});
+// Form
+const {
+  form,
+  valid,
+  reqField,
+  reqValidPhone,
+  reqValidmail,
+  reqMultipleSelect,
+} = useForm();
+// Activate button only if some values are changed for "edit"
+// and username and email are changed for "copy"
+// to avoid useless requests
+const hasNoChanges = computed(() => {
+  return (
+    (processType.value === "edit" &&
+      JSON.stringify(originalUser.value) === JSON.stringify(user.value)) ||
+    (processType.value === "copy" &&
+      (user.value.username === originalUser.value.username ||
+        user.value.email === originalUser.value.email))
+  );
+});
+const isReadOnly = computed(() => {
+  if (store.state.application.ownAccount) {
+    return false;
+  }
+  return !store.state.profile.isAllowedToManage;
+});
 </script>

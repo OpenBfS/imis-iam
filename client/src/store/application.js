@@ -25,8 +25,12 @@ export const application = {
     },
     reportMail: process.env.VUE_APP_REPORT_MAIL,
     searchSting: "",
+    ownAccount: false,
   }),
   mutations: {
+    setOwnAccount: (state, data) => {
+      state.ownAccount = data;
+    },
     setShowManageUserDialog: (state, data) => {
       state.showManageUserDialog = data;
     },
