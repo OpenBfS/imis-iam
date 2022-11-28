@@ -25,6 +25,9 @@ HTTP.interceptors.response.use(
         case 409:
           store.commit("application/setHttpErrorMessage", error.response.data);
           break;
+        case 400:
+          store.commit("application/setHttpErrorMessage", error.response.data);
+          break;
         default:
           store.commit(
             "application/setHttpErrorMessage",
