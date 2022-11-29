@@ -32,7 +32,7 @@
               persistent-hint
             >
             </v-select>
-            <v-select
+            <v-combobox
               :no-data-text="$t('label.no_data_text')"
               :label="$t('label.encoding')"
               :items="encoding"
@@ -41,7 +41,7 @@
               v-model="csvOptions.encoding"
               persistent-hint
             >
-            </v-select>
+            </v-combobox>
             <v-select
               :no-data-text="$t('label.no_data_text')"
               :label="$t('label.quote_type')"
@@ -129,24 +129,11 @@ const rowDelimiters = [
     value: "windows",
   },
 ];
-const encoding = [
-  {
-    name: "utf-8",
-    value: "utf-8",
-  },
-  {
-    name: "utf-16",
-    value: "utf-16",
-  },
-  {
-    name: "ascii",
-    value: "ascii",
-  },
-];
+const encoding = ["utf-8", "utf-16", "ascii"];
 const csvOptions = ref({
   fieldSeperator: fieldSeparators[0].value,
   rowDelimiter: rowDelimiters[0].value,
-  encoding: encoding[0].value,
+  encoding: encoding[0],
   quoteType: quoteTypes[0].value,
 });
 

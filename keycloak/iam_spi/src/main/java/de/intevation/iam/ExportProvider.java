@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import javax.ws.rs.GET;
@@ -79,10 +78,6 @@ public class ExportProvider implements RealmResourceProvider {
         CsvOptions[] rowFelimiters = {CsvOptions.windows,
                 CsvOptions.linux };
         return isAccepted(rowDelimiter, rowFelimiters);
-    }
-
-    private Boolean isValidEncoding(String encoding) {
-        return Arrays.asList("utf-8", "utf-16", "ascii").contains(encoding);
     }
 
     /**
@@ -179,7 +174,6 @@ public class ExportProvider implements RealmResourceProvider {
         if (fieldSeparator == null || !isValidFieldSeperator(fieldSeparator)
             || quoteType == null || !isValidQuoteType(quoteType)
             || rowDelimiter == null || !isValidRowDelimiter(rowDelimiter)
-            || encoding == null || !isValidEncoding(encoding)
         ) {
             throw new IllegalArgumentException();
         }
