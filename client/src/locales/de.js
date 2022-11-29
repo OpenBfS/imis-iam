@@ -198,6 +198,7 @@ export default {
     required_mailing_list: "E-Mail-Verteiler ist erforderlich",
     message: "Nachricht",
     required_type: "Art der E-Mail ist erforderlich",
+    required_mailinglist_name: "E-Mail-Verteiler Name ist erforderlich",
   },
   search: {
     found_users: "Gefundene Nutzer",

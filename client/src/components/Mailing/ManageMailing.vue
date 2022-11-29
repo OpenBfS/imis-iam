@@ -22,6 +22,7 @@
               variant="underlined"
               :label="$t('mailinglist.name')"
               v-model="listName"
+              :rules="reqField($t('mailinglist.required_mailinglist_name'))"
             ></v-text-field>
             <v-select
               :no-data-text="$t('label.no_data_text')"
@@ -52,8 +53,8 @@
           v-if="processType == 'add'"
           size="small"
           @click="createMailList()"
-          :color="listName === '' ? 'grey' : 'accent'"
-          :disabled="listName === ''"
+          :disabled="!valid"
+          color="accent"
         >
           {{ $t("button.create") }}
         </v-btn>
@@ -61,8 +62,8 @@
           v-else
           size="small"
           @click="editMailList()"
-          :color="listName === '' ? 'grey' : 'accent'"
-          :disabled="listName === ''"
+          :disabled="!valid"
+          color="accent"
         >
           {{ $t("button.save") }}
         </v-btn>
