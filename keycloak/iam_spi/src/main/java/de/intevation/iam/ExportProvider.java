@@ -56,12 +56,8 @@ public class ExportProvider implements RealmResourceProvider {
 
     private Boolean isAccepted(String name, CsvOptions[] options) {
         for (CsvOptions opt : options) {
-            try {
-                if (opt.equals(CsvOptions.valueOf(name))) {
-                    return true;
-                }
-            } catch (IllegalArgumentException iae) {
-                return false;
+            if (opt.equals(CsvOptions.valueOf(name))) {
+                return true;
             }
         }
         return false;
@@ -115,47 +111,18 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
             @QueryParam("encoding") String encoding,
-            @Context HttpHeaders headers) {
+            @Context HttpHeaders headers
+    ) {
         CSVExporter<User> exporter = new CSVExporter<User>();
+        try {
+            setCsvOptions(
+                exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
+        } catch (IllegalArgumentException iae) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+
         ResourceBundle i18n = I18nUtils.getI18nBundle(session,
             headers.getHeaderString(Constants.SHIB_USER_HEADER));
-
-        if (fieldSeparator != null) {
-            if (!isValidFieldSeperator(fieldSeparator)) {
-                return Response.status(Status.BAD_REQUEST)
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-            }
-            exporter.setFieldSeparator(
-                    CsvOptions.valueOf(fieldSeparator).getChar());
-        }
-        if (quoteType != null) {
-            if (!isValidQuoteType(quoteType)) {
-                return Response.status(Status.BAD_REQUEST)
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-            }
-            exporter.setQuoteType(
-                    CsvOptions.valueOf(quoteType).getChar());
-        }
-        if (rowDelimiter != null) {
-            if (!isValidRowDelimiter(rowDelimiter)) {
-                return Response.status(Status.BAD_REQUEST)
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-            }
-            exporter.setRowDelimiter(
-                    CsvOptions.valueOf(rowDelimiter).getChar());
-        }
-        if (encoding != null) {
-            if (!isValidEncoding(encoding)) {
-                return Response.status(Status.BAD_REQUEST)
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-            }
-            Charset charset = Charset.forName(encoding);
-            exporter.setEncoding(charset);
-        }
 
         UserProvider userProvider = new UserProvider(session);
         Response userResponse = userProvider.getUsers(headers);
@@ -181,46 +148,18 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
             @QueryParam("encoding") String encoding,
-            @Context HttpHeaders headers) {
+            @Context HttpHeaders headers
+    ) {
         CSVExporter<Institution> exporter = new CSVExporter<Institution>();
+        try {
+            setCsvOptions(
+                exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
+        } catch (IllegalArgumentException iae) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+
         ResourceBundle i18n = I18nUtils.getI18nBundle(session,
                 headers.getHeaderString(Constants.SHIB_USER_HEADER));
-        if (fieldSeparator != null) {
-            if (!isValidFieldSeperator(fieldSeparator)) {
-                return Response.status(Status.BAD_REQUEST)
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-            }
-            exporter.setFieldSeparator(
-                    CsvOptions.valueOf(fieldSeparator).getChar());
-        }
-        if (quoteType != null) {
-            if (!isValidQuoteType(quoteType)) {
-                return Response.status(Status.BAD_REQUEST)
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-            }
-            exporter.setQuoteType(
-                    CsvOptions.valueOf(quoteType).getChar());
-        }
-        if (rowDelimiter != null) {
-            if (!isValidRowDelimiter(rowDelimiter)) {
-                return Response.status(Status.BAD_REQUEST)
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-            }
-            exporter.setRowDelimiter(
-                    CsvOptions.valueOf(rowDelimiter).getChar());
-        }
-        if (encoding != null) {
-            if (!isValidEncoding(encoding)) {
-                return Response.status(Status.BAD_REQUEST)
-                        .type(MediaType.APPLICATION_JSON)
-                        .build();
-            }
-            Charset charset = Charset.forName(encoding);
-            exporter.setEncoding(charset);
-        }
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
         Response instResponse = instProvider.getInstitutions(headers);
@@ -228,6 +167,27 @@ public class ExportProvider implements RealmResourceProvider {
         ArrayList<Institution> institutions
             = instResponse.readEntity(ArrayList.class);
         return doExport(exporter, institutions, i18n);
+    }
+
+    private <T> void setCsvOptions(
+        CSVExporter<T> exporter,
+        String fieldSeparator,
+        String quoteType,
+        String rowDelimiter,
+        String encoding
+    ) {
+        if (fieldSeparator == null || !isValidFieldSeperator(fieldSeparator)
+            || quoteType == null || !isValidQuoteType(quoteType)
+            || rowDelimiter == null || !isValidRowDelimiter(rowDelimiter)
+            || encoding == null || !isValidEncoding(encoding)
+        ) {
+            throw new IllegalArgumentException();
+        }
+        exporter.setFieldSeparator(
+            CsvOptions.valueOf(fieldSeparator).getChar());
+        exporter.setQuoteType(CsvOptions.valueOf(quoteType).getChar());
+        exporter.setRowDelimiter(CsvOptions.valueOf(rowDelimiter).getChar());
+        exporter.setEncoding(Charset.forName(encoding));
     }
 
     private <T> Response doExport(CSVExporter<T> exporter,
