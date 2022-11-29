@@ -49,8 +49,7 @@ public class UserAuthorizer extends Authorizer<User> {
             case GET: return Role.USER.isRoleOf(requestingUser, session);
             case PUT: return authorizeUpdate(
                 data, session, requestingUser, client);
-            case POST: return authorizeCreate(
-                data, requestingUser, session);
+            case POST: return Role.EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
     }
@@ -70,21 +69,6 @@ public class UserAuthorizer extends Authorizer<User> {
                     user, session, requestingUser, client));
         });
         return data;
-    }
-
-    private boolean authorizeCreate(
-        User user,
-        UserModel requestingUser,
-        KeycloakSession session
-    ) {
-        //Only allow users that are at least editor create
-        //If no roles are set, check if user is editor
-        //Else check if user is chief editor
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            return Role.EDITOR.isRoleOf(requestingUser, session);
-        } else {
-            return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
-        }
     }
 
     private boolean authorizeUpdate(
