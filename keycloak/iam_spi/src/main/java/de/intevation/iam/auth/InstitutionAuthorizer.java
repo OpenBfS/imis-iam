@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.ws.rs.core.HttpHeaders;
 
-import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -35,16 +34,16 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
         if (userId == null) {
             return false;
         }
+        RealmModel realm = session.getContext().getRealm();
+        UserModel requestingUser = session.users().getUserById(realm, userId);
+
         switch (requestMethod) {
-            case GET: return true;
+            case GET: return Role.USER.isRoleOf(requestingUser, session);
             case PUT:
-                return authorizeUpdate(data, session, userId);
             case POST:
-                return authorizeCreate(data, session, userId);
-            case DELETE:
-                return authorizeDelete(data, session, userId);
+            case DELETE: return Role.EDITOR.isRoleOf(requestingUser, session);
             default: return false;
-                }
+        }
     }
 
     @Override
@@ -52,57 +51,19 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
         List<Institution> data,
         HttpHeaders headers
     ) {
+        boolean readonly;
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (userId == null) {
+            readonly = true;
+        } else {
+            RealmModel realm = session.getContext().getRealm();
+            UserModel requestingUser = session.users().getUserById(
+                realm, userId);
+            readonly = !Role.EDITOR.isRoleOf(requestingUser, session);
+        }
         data.forEach(institution -> {
-            institution.setReadonly(
-                !authorizeUpdate(institution, session, userId));
-        });
+                institution.setReadonly(readonly);
+            });
         return data;
     }
-
-    private boolean authorizeCreate(
-        Institution institution,
-        KeycloakSession session,
-        String userId
-    ) {
-        //Only allow users that are at least editors to create
-        RealmModel realm = session.getContext().getRealm();
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-        if (requestingUser == null) {
-            return false;
-        }
-        return Utils.isUserAtLeastEditor(requestingUser, client);
-    }
-
-    private boolean authorizeUpdate(
-        Institution institution,
-        KeycloakSession session,
-        String userId
-    ) {
-        //Only allow users that are at least editors to edit
-        RealmModel realm = session.getContext().getRealm();
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-        if (requestingUser == null) {
-            return false;
-        }
-        return Utils.isUserAtLeastEditor(requestingUser, client);
-    }
-
-    private boolean authorizeDelete(
-        Institution institution,
-        KeycloakSession session,
-        String userId
-    ) {
-        //Only allow users that are at least editors to delete
-        RealmModel realm = session.getContext().getRealm();
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-        if (requestingUser == null) {
-            return false;
-        }
-        return Utils.isUserAtLeastEditor(requestingUser, client);
-    }
-
 }

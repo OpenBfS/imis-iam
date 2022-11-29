@@ -46,11 +46,11 @@ public class UserAuthorizer extends Authorizer<User> {
         }
 
         switch (requestMethod) {
-            case GET: return authorizeGet(requestingUser, client);
+            case GET: return Role.USER.isRoleOf(requestingUser, session);
             case PUT: return authorizeUpdate(
                 data, session, requestingUser, client);
             case POST: return authorizeCreate(
-                data, requestingUser, client);
+                data, requestingUser, session);
             default: return false;
         }
     }
@@ -72,26 +72,18 @@ public class UserAuthorizer extends Authorizer<User> {
         return data;
     }
 
-    private boolean authorizeGet(
-        UserModel requestingUser,
-        ClientModel client
-    ) {
-        return Utils.hasUserAnyRole(requestingUser, client);
-    }
-
     private boolean authorizeCreate(
         User user,
         UserModel requestingUser,
-        ClientModel client
+        KeycloakSession session
     ) {
         //Only allow users that are at least editor create
         //If no roles are set, check if user is editor
         //Else check if user is chief editor
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            return Utils.isUserAtLeastEditor(requestingUser, client);
+            return Role.EDITOR.isRoleOf(requestingUser, session);
         } else {
-            return Utils.isUserAtLeastChiefEditor(
-                    requestingUser, client);
+            return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
         }
     }
 
@@ -113,19 +105,17 @@ public class UserAuthorizer extends Authorizer<User> {
             ? user.getRoles()
             : new ArrayList<>();
         if (oldRoles.size() != newRoles.size()) {
-            return Utils.isUserAtLeastChiefEditor(
-                    requestingUser, client);
+            return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
         }
         for (int i = 0; i < newRoles.size(); i++) {
             if (!oldRoles.contains(newRoles.get(i))
                 || !newRoles.contains(oldRoles.get(i))) {
-                return Utils.isUserAtLeastChiefEditor(
-                        requestingUser, client);
+                return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             }
         }
         // Else only allow users with other roles than user to edit
         // or allow users to edit their own profile
-        return Utils.isUserAtLeastEditor(requestingUser, client)
+        return Role.EDITOR.isRoleOf(requestingUser, session)
             || user.getId().equals(requestingUser.getId());
     }
 }

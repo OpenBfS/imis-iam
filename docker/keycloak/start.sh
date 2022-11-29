@@ -83,12 +83,24 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
      -d @${DIR}/ldap_provider.json
 
 echo "Creating client roles"
-for name in "user" "editor" "chief_editor" "techadmin"
+${KEYCLOAK_HOME}/bin/kcadm.sh config credentials \
+    --server http://localhost:8080 --realm master \
+    --user $KEYCLOAK_ADMIN --password $KEYCLOAK_ADMIN_PASSWORD
+
+for name in "techadmin" "chief_editor" "editor" "user"
 do
-    curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$IMIS_CLIENT_ID/roles" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN" \
-        -d "{\"name\": \"${name}\"}"
+    echo "$name"
+    role_id=$(${KEYCLOAK_HOME}/bin/kcadm.sh create \
+        clients/$IMIS_CLIENT_ID/roles -r "$IMIS_REALM" -s name="$name" -o | \
+        jq ".id" | tr -d '"')
+    if [ "$comp_role_id" ]; then
+        # Make previously created role a composite role by adding the new one
+        ${KEYCLOAK_HOME}/bin/kcadm.sh add-roles \
+            -r "$IMIS_REALM" --cclientid "$IMIS_CLIENT" \
+            --rid "$comp_role_id" \
+            --rolename "$name"
+    fi
+    comp_role_id="$role_id"
 done
 
 roles=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$IMIS_CLIENT_ID/roles" \

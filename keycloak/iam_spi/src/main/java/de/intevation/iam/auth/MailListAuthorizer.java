@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.ws.rs.core.HttpHeaders;
 
-import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -35,57 +34,16 @@ public class MailListAuthorizer extends Authorizer<MailList> {
         if (userId == null) {
             return false;
         }
+        RealmModel realm = session.getContext().getRealm();
+        UserModel requestingUser = session.users().getUserById(realm, userId);
+
         switch (requestMethod) {
-            case GET: return authorizeGet(session, userId);
-            case PUT: return authorizeUpdate(data, session, userId);
-            case POST: return authorizeCreate(data, session, userId);
-            case DELETE: return authorizeDelete(data, session, userId);
+            case GET: return Role.USER.isRoleOf(requestingUser, session);
+            case PUT:
+            case POST:
+            case DELETE: return Role.EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
-    }
-
-    private boolean authorizeGet(
-        KeycloakSession session,
-        String userId
-    ) {
-        RealmModel realm = session.getContext().getRealm();
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-        return Utils.hasUserAnyRole(requestingUser, client);
-    }
-
-    private boolean authorizeCreate(
-            MailList mailList,
-            KeycloakSession session,
-            String userId) {
-        return isUserAtLeastEditor(session, userId);
-    }
-
-    private boolean authorizeUpdate(
-            MailList mailList,
-            KeycloakSession session,
-            String userId) {
-        return isUserAtLeastEditor(session, userId);
-    }
-
-    private boolean authorizeDelete(
-            MailList mailList,
-            KeycloakSession session,
-            String userId) {
-        return isUserAtLeastEditor(session, userId);
-    }
-
-    private boolean isUserAtLeastEditor(
-        KeycloakSession session,
-        String userId
-    ) {
-        RealmModel realm = session.getContext().getRealm();
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-        if (requestingUser == null) {
-            return false;
-        }
-        return Utils.isUserAtLeastEditor(requestingUser, client);
     }
 
     @Override
