@@ -30,7 +30,7 @@ export const profile = {
           .then((response) => {
             commit("setUserData", response.data);
             const roles = response.data.roles;
-            if (roles.length === 1 && ["Nutzer"].indexOf(roles[0]) !== -1) {
+            if (roles.length === 1 && ["user"].indexOf(roles[0]) !== -1) {
               commit("setIsAllowedToManage", false);
             } else {
               commit("setIsAllowedToManage", true);
