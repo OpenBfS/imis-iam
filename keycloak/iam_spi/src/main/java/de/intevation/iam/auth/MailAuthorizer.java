@@ -6,8 +6,6 @@
  */
 package de.intevation.iam.auth;
 
-import java.util.List;
-
 import javax.ws.rs.core.HttpHeaders;
 
 import org.keycloak.models.KeycloakSession;
@@ -42,13 +40,5 @@ public class MailAuthorizer extends Authorizer<Mail> {
             case POST: return Role.EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
-    }
-
-    @Override
-    public List<Mail> filter(
-        List<Mail> data,
-        HttpHeaders headers
-    ) {
-        return data;
     }
 }

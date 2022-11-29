@@ -33,13 +33,17 @@ public abstract class Authorizer<T> {
     );
 
     /**
-     * Filter the given list of objects.
+     * Filter or modify the given list of objects.
+     * The default implementation returns data unchanged.
+     *
      * @param data List of objects
      * @param headers Request headers
      * @return Filtered list
      */
-    public abstract List<T> filter(
+    public List<T> filter(
         List<T> data,
         HttpHeaders headers
-    );
+    ) {
+        return data;
+    }
 }

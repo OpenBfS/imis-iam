@@ -6,8 +6,6 @@
  */
 package de.intevation.iam.auth;
 
-import java.util.List;
-
 import javax.ws.rs.core.HttpHeaders;
 
 import org.keycloak.models.KeycloakSession;
@@ -44,13 +42,4 @@ public class InstitutionCategoryAuthorizer
             default: return false;
         }
     }
-
-    @Override
-    public List<InstitutionCategory> filter(
-        List<InstitutionCategory> data,
-        HttpHeaders headers
-    ) {
-        return data;
-    }
-
 }
