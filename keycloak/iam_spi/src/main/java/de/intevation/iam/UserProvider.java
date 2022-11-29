@@ -41,7 +41,8 @@ import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
-import de.intevation.iam.auth.Authorization;
+import de.intevation.iam.auth.Authorizer;
+import de.intevation.iam.auth.UserAuthorizer;
 import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.model.jpa.UserPosition;
 import de.intevation.iam.model.representation.User;
@@ -58,7 +59,7 @@ public class UserProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
 
-    private Authorization auth;
+    private Authorizer<User> auth;
 
     /**
      * Constructor.
@@ -66,7 +67,7 @@ public class UserProvider implements RealmResourceProvider {
      */
     public UserProvider(KeycloakSession session) {
         this.session = session;
-        this.auth = new Authorization(session);
+        this.auth = new UserAuthorizer(session);
     }
 
     /**
@@ -106,7 +107,7 @@ public class UserProvider implements RealmResourceProvider {
         for (UserModel user: users.collect(Collectors.toList())) {
             userList.add(new User(user, em));
         }
-        userList = auth.filter(userList, headers, User.class);
+        userList = auth.filter(userList, headers);
         return Response.ok(userList).build();
     }
 
@@ -119,20 +120,22 @@ public class UserProvider implements RealmResourceProvider {
     @GET
     @Path("/{id}")
     public Response getUserById(
-            @PathParam("id") String id,
-            @Context HttpHeaders headers) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
+        @PathParam("id") String id,
+        @Context HttpHeaders headers
+    ) {
         RealmModel realm = session.getContext().getRealm();
-        UserModel user = session.users().getUserById(realm, id);
-        if (!auth.isAuthorizedById(
-                user, RequestMethod.GET, headers, User.class)) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
-        if (user == null) {
+        UserModel userModel = session.users().getUserById(realm, id);
+        if (userModel == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        return Response.ok(new User(user, em)).build();
+
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        User user = new User(userModel, em);
+        if (!auth.isAuthorizedById(user, RequestMethod.GET, headers)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+        return Response.ok(user).build();
     }
 
     /**
@@ -149,8 +152,7 @@ public class UserProvider implements RealmResourceProvider {
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!auth.isAuthorizedById(
-                rep, RequestMethod.POST, headers, User.class)) {
+        if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -232,8 +234,7 @@ public class UserProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final User rep
     ) {
-        if (!auth.isAuthorizedById(
-                rep, RequestMethod.PUT, headers, User.class)) {
+        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         EntityManager em = session.getProvider(

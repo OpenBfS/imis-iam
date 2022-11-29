@@ -19,14 +19,18 @@ import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class InstitutionAuthorizer implements Authorizer<Institution> {
+public class InstitutionAuthorizer extends Authorizer<Institution> {
+
+    public InstitutionAuthorizer(KeycloakSession session) {
+        this.session = session;
+    }
 
     @Override
     public boolean isAuthorizedById(
-            Object data,
-            RequestMethod requestMethod,
-            HttpHeaders headers,
-            KeycloakSession session) {
+        Institution data,
+        RequestMethod requestMethod,
+        HttpHeaders headers
+    ) {
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
             return false;
@@ -34,20 +38,20 @@ public class InstitutionAuthorizer implements Authorizer<Institution> {
         switch (requestMethod) {
             case GET: return true;
             case PUT:
-                return authorizeUpdate((Institution) data, session, userId);
+                return authorizeUpdate(data, session, userId);
             case POST:
-                return authorizeCreate((Institution) data, session, userId);
+                return authorizeCreate(data, session, userId);
             case DELETE:
-                return authorizeDelete((Institution) data, session, userId);
+                return authorizeDelete(data, session, userId);
             default: return false;
                 }
     }
 
     @Override
     public List<Institution> filter(
-            List<Institution> data,
-            HttpHeaders headers,
-            KeycloakSession session) {
+        List<Institution> data,
+        HttpHeaders headers
+    ) {
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         data.forEach(institution -> {
             institution.setReadonly(

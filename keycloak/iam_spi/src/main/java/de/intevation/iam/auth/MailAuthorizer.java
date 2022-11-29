@@ -19,21 +19,25 @@ import de.intevation.iam.model.jpa.Mail;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class MailAuthorizer implements Authorizer<Mail> {
+public class MailAuthorizer extends Authorizer<Mail> {
+
+    public MailAuthorizer(KeycloakSession session) {
+        this.session = session;
+    }
 
     @Override
     public boolean isAuthorizedById(
-            Object data,
-            RequestMethod requestMethod,
-            HttpHeaders headers,
-            KeycloakSession session) {
+        Mail data,
+        RequestMethod requestMethod,
+        HttpHeaders headers
+    ) {
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
             return false;
         }
         switch (requestMethod) {
             case GET: return authorizeGet(session, userId);
-            case POST: return authorizeSendMail((Mail) data, session, userId);
+            case POST: return authorizeSendMail(data, session, userId);
             default: return false;
         }
     }
@@ -64,9 +68,9 @@ public class MailAuthorizer implements Authorizer<Mail> {
 
     @Override
     public List<Mail> filter(
-            List<Mail> data,
-            HttpHeaders headers,
-            KeycloakSession session) {
+        List<Mail> data,
+        HttpHeaders headers
+    ) {
         return data;
     }
 }

@@ -15,31 +15,31 @@ import org.keycloak.models.KeycloakSession;
 
 import de.intevation.iam.util.RequestMethod;
 
-public interface Authorizer <T> {
+public abstract class Authorizer<T> {
+
+    protected KeycloakSession session;
 
     /**
      * Check if user is authorized for the given data and request method.
      * @param data Data
      * @param requestMethod Request method used
      * @param headers Request headers
-     * @param session Keycloak session
      * @return True if authorized, else false
      */
-    boolean isAuthorizedById(
-        Object data,
+    public abstract boolean isAuthorizedById(
+        T data,
         RequestMethod requestMethod,
-        HttpHeaders headers,
-        KeycloakSession session);
+        HttpHeaders headers
+    );
 
     /**
      * Filter the given list of objects.
      * @param data List of objects
      * @param headers Request headers
-     * @param session Keycloak session
      * @return Filtered list
      */
-    List<T> filter(
+    public abstract List<T> filter(
         List<T> data,
-        HttpHeaders headers,
-        KeycloakSession session);
+        HttpHeaders headers
+    );
 }

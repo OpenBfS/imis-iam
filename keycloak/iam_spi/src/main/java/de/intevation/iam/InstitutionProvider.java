@@ -34,7 +34,9 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.resource.RealmResourceProvider;
 
-import de.intevation.iam.auth.Authorization;
+import de.intevation.iam.auth.Authorizer;
+import de.intevation.iam.auth.InstitutionAuthorizer;
+import de.intevation.iam.auth.InstitutionCategoryAuthorizer;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionCategory;
 import de.intevation.iam.util.Constants;
@@ -50,19 +52,22 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
 
-    private Authorization auth;
+    private Authorizer<Institution> auth;
+    private Authorizer<InstitutionCategory> authCat;
 
     private static final String NAME_ALREADY_USED_KEY
         = "error_name_already_used";
     private static final String SHORT_NAME_ALREADY_USED_KEY
         = "error_short_name_already_used";
+
     /**
      * Constructor.
      * @param session Keycloak session
      */
     public InstitutionProvider(KeycloakSession session) {
         this.session = session;
-        this.auth = new Authorization(session);
+        this.auth = new InstitutionAuthorizer(session);
+        this.authCat = new InstitutionCategoryAuthorizer(session);
     }
 
     /**
@@ -109,8 +114,7 @@ public class InstitutionProvider implements RealmResourceProvider {
         Root<Institution> root = query.from(Institution.class);
         query.select(root);
         List<Institution> institutions = auth.filter(
-                em.createQuery(query).getResultList(),
-                headers, Institution.class);
+            em.createQuery(query).getResultList(), headers);
         return Response.ok(institutions).build();
     }
 
@@ -198,8 +202,7 @@ public class InstitutionProvider implements RealmResourceProvider {
         if (rep == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!auth.isAuthorizedById(
-                rep, RequestMethod.POST, headers, Institution.class)) {
+        if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -271,8 +274,7 @@ public class InstitutionProvider implements RealmResourceProvider {
                || em.find(Institution.class, rep.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!auth.isAuthorizedById(
-                rep, RequestMethod.PUT, headers, Institution.class)) {
+        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
@@ -313,8 +315,9 @@ public class InstitutionProvider implements RealmResourceProvider {
         if (institution == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (!auth.isAuthorizedById(
-            institution, RequestMethod.DELETE, headers, Institution.class)) {
+        if (
+            !auth.isAuthorizedById(institution, RequestMethod.DELETE, headers)
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         em.remove(institution);
@@ -399,9 +402,9 @@ public class InstitutionProvider implements RealmResourceProvider {
     public Response createInstitutionCategory(
             final InstitutionCategory intCategory,
             @Context HttpHeaders headers) {
-        if (!auth.isAuthorizedById(
-                intCategory, RequestMethod.POST,
-                headers, InstitutionCategory.class)) {
+        if (
+            !authCat.isAuthorizedById(intCategory, RequestMethod.POST, headers)
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         if (intCategory == null) {

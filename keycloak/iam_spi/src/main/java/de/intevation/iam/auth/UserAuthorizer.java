@@ -21,14 +21,17 @@ import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class UserAuthorizer implements Authorizer<User> {
+public class UserAuthorizer extends Authorizer<User> {
+
+    public UserAuthorizer(KeycloakSession session) {
+        this.session = session;
+    }
 
     @Override
     public boolean isAuthorizedById(
-            Object data,
-            RequestMethod requestMethod,
-            HttpHeaders headers,
-            KeycloakSession session
+        User data,
+        RequestMethod requestMethod,
+        HttpHeaders headers
     ) {
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
@@ -45,9 +48,9 @@ public class UserAuthorizer implements Authorizer<User> {
         switch (requestMethod) {
             case GET: return authorizeGet(requestingUser, client);
             case PUT: return authorizeUpdate(
-                (User) data, session, requestingUser, client);
+                data, session, requestingUser, client);
             case POST: return authorizeCreate(
-                (User) data, requestingUser, client);
+                data, requestingUser, client);
             default: return false;
         }
     }
@@ -55,8 +58,7 @@ public class UserAuthorizer implements Authorizer<User> {
     @Override
     public List<User> filter(
             List<User> data,
-            HttpHeaders headers,
-            KeycloakSession session
+            HttpHeaders headers
     ) {
         RealmModel realm = session.getContext().getRealm();
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);

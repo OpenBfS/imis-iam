@@ -19,24 +19,27 @@ import de.intevation.iam.model.jpa.MailList;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
-public class MailListAuthorizer implements Authorizer<MailList> {
+public class MailListAuthorizer extends Authorizer<MailList> {
+
+    public MailListAuthorizer(KeycloakSession session) {
+        this.session = session;
+    }
 
     @Override
     public boolean isAuthorizedById(
-            Object data,
-            RequestMethod requestMethod,
-            HttpHeaders headers,
-            KeycloakSession session) {
+        MailList data,
+        RequestMethod requestMethod,
+        HttpHeaders headers
+    ) {
         String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
             return false;
         }
         switch (requestMethod) {
             case GET: return authorizeGet(session, userId);
-            case PUT: return authorizeUpdate((MailList) data, session, userId);
-            case POST: return authorizeCreate((MailList) data, session, userId);
-            case DELETE:
-                return authorizeDelete((MailList) data, session, userId);
+            case PUT: return authorizeUpdate(data, session, userId);
+            case POST: return authorizeCreate(data, session, userId);
+            case DELETE: return authorizeDelete(data, session, userId);
             default: return false;
         }
     }
@@ -87,9 +90,9 @@ public class MailListAuthorizer implements Authorizer<MailList> {
 
     @Override
     public List<MailList> filter(
-            List<MailList> data,
-            HttpHeaders headers,
-            KeycloakSession session) {
+        List<MailList> data,
+        HttpHeaders headers
+    ) {
         return data;
     }
 }
