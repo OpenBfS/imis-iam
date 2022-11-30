@@ -75,9 +75,8 @@ public class CSVExporter<T> {
             }
             printer.close(true);
         }
-
         return new ByteArrayInputStream(
-            result.toString().getBytes(encoding));
+            encoding.encode(result.toString()).array());
     }
 
     ArrayList<String> parseNestedModel(Object object)
