@@ -56,7 +56,7 @@ public class CSVExporter<T> {
             .withQuote(quoteType)
             .withRecordSeparator(rowDelimiter)
             .withHeader(header);
-            CSVPrinter printer = new CSVPrinter(result, format);
+        try(CSVPrinter printer = new CSVPrinter(result, format)) {
             for (T object: objects) {
                 ArrayList<String> row = new ArrayList<String>();
                 for (PropertyDescriptor propertyDescriptor
@@ -74,6 +74,7 @@ public class CSVExporter<T> {
                 printer.printRecord(row);
             }
             printer.close(true);
+        }
 
         return new ByteArrayInputStream(
             result.toString().getBytes(encoding));
