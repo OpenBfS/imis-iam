@@ -98,7 +98,7 @@ export default {
     required_position: "Position ist erforderlich",
     required_institution: "Insititution ist erforderlich",
     label_roles: "Rollen",
-    required_roles: "Role ist erforderlich",
+    required_roles: "Rolle ist erforderlich",
   },
   // Shared button texts
   button: {
