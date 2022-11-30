@@ -200,9 +200,9 @@ public class ExportProvider implements RealmResourceProvider {
                 .entity(i18n.getString("error_csv_options"))
                 .build();
         }
-        MediaType type = new MediaType("text", "csv", encoding);
-        return Response.ok(result, type.toString())
-                .header("Content-Disposition",
+
+        return Response.ok(result, new MediaType("text", "csv", encoding))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"export.csv\"")
                 .build();
     }
