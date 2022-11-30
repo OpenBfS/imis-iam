@@ -123,7 +123,7 @@ public class ExportProvider implements RealmResourceProvider {
         Response userResponse = userProvider.getUsers(headers);
         @SuppressWarnings("unchecked")
         ArrayList<User> users = userResponse.readEntity(ArrayList.class);
-        return doExport(exporter, users, i18n, encoding);
+        return doExport(exporter, users, i18n);
     }
 
     /**
@@ -161,7 +161,7 @@ public class ExportProvider implements RealmResourceProvider {
         @SuppressWarnings("unchecked")
         ArrayList<Institution> institutions
             = instResponse.readEntity(ArrayList.class);
-        return doExport(exporter, institutions, i18n, encoding);
+        return doExport(exporter, institutions, i18n);
     }
 
     private <T> void setCsvOptions(
@@ -185,7 +185,7 @@ public class ExportProvider implements RealmResourceProvider {
     }
 
     private <T> Response doExport(CSVExporter<T> exporter,
-            ArrayList<T> objects, ResourceBundle i18n, String encoding) {
+            ArrayList<T> objects, ResourceBundle i18n) {
         InputStream result;
         try {
             result = exporter.export(objects);
@@ -201,10 +201,11 @@ public class ExportProvider implements RealmResourceProvider {
                 .build();
         }
 
-        return Response.ok(result, new MediaType("text", "csv", encoding))
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"export.csv\"")
-                .build();
+        return Response.ok(result, new MediaType(
+                "text", "csv", exporter.getEncoding().name()))
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"export.csv\"")
+            .build();
     }
 
     @Override
