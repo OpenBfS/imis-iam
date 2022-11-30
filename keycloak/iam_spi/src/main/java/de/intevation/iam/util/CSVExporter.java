@@ -56,7 +56,7 @@ public class CSVExporter<T> {
             .withQuote(quoteType)
             .withRecordSeparator(rowDelimiter)
             .withHeader(header);
-        try(CSVPrinter printer = new CSVPrinter(result, format)) {
+        try (CSVPrinter printer = new CSVPrinter(result, format)) {
             for (T object: objects) {
                 ArrayList<String> row = new ArrayList<String>();
                 for (PropertyDescriptor propertyDescriptor
@@ -68,12 +68,11 @@ public class CSVExporter<T> {
                     ) {
                         row.addAll(parseNestedModel(value));
                     } else {
-                        row.add(value != null? value.toString(): "");
+                        row.add(value != null ? value.toString() : "");
                     }
                 }
                 printer.printRecord(row);
             }
-            printer.close(true);
         }
         return new ByteArrayInputStream(
             encoding.encode(result.toString()).array());
