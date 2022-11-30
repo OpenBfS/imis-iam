@@ -163,6 +163,7 @@
                   dense
                   :label="$t('user.label_roles')"
                   :items="userRoles"
+                  item-value="name"
                   v-model="user.roles"
                   multiple
                   persistent-hint
@@ -266,11 +267,13 @@ form > div {
 <script setup>
 import { computed, onMounted, ref, nextTick } from "vue";
 import { useNotification } from "@/lib/use-notification";
+import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
 import { useForm } from "@/lib/use-form";
 import { expUser } from "@/components/User/user";
 
+const { t } = useI18n();
 const show = true;
 const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
@@ -320,7 +323,12 @@ const institutions = computed(() => {
   return store.state.institution.institutions;
 });
 const userRoles = computed(() => {
-  return store.state.user.roles;
+  var roles = store.state.user.roles;
+  // If available, use description field for localization
+  roles.forEach(
+    (item) => (item.title = item.description ? t(item.description) : item.name)
+  );
+  return roles;
 });
 // Deep Copy for objects
 const cloneObject = (obj) => {

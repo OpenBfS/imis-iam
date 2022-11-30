@@ -89,9 +89,10 @@ ${KEYCLOAK_HOME}/bin/kcadm.sh config credentials \
 
 for name in "techadmin" "chief_editor" "editor" "user"
 do
-    echo "$name"
+    # Create roles with name and key for localization
     role_id=$(${KEYCLOAK_HOME}/bin/kcadm.sh create \
-        clients/$IMIS_CLIENT_ID/roles -r "$IMIS_REALM" -s name="$name" -o | \
+        clients/$IMIS_CLIENT_ID/roles -r "$IMIS_REALM" \
+            -s name="$name" -s description="role_iam_$name" -o | \
         jq ".id" | tr -d '"')
     if [ "$comp_role_id" ]; then
         # Make previously created role a composite role by adding the new one

@@ -45,6 +45,7 @@ import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.UserAuthorizer;
 import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.model.jpa.UserPosition;
+import de.intevation.iam.model.representation.Role;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.model.representation.UserMembership;
 import de.intevation.iam.util.Constants;
@@ -320,9 +321,9 @@ public class UserProvider implements RealmResourceProvider {
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         Stream<RoleModel> roles = client.getRolesStream();
-        List<String> roleNames = new ArrayList<String>();
+        List<Role> roleNames = new ArrayList<>();
         roles.forEach(role -> {
-            roleNames.add(role.getName());
+            roleNames.add(new Role(role));
         });
         return Response.ok(roleNames).build();
     }

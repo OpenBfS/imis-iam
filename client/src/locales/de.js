@@ -5,6 +5,11 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 export default {
+  // Role names
+  role_iam_user: "Nutzer",
+  role_iam_editor: "Redakteur",
+  role_iam_chief_editor: "Chefredakteur",
+  role_iam_techadmin: "Technischer Administrator",
   // Appbar component
   appbar: {
     title: "IAM123",
