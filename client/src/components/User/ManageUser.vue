@@ -353,9 +353,9 @@ const createUser = (shouldClose) => {
         // Use the same roles of the last created user.
         const usedRoles = user.value.roles;
         user.value = cloneObject(expUser);
-        user.value.roles = usedRoles;
         nextTick(() => {
           form.value.resetValidation();
+          user.value.roles = usedRoles;
         });
       }
     })
@@ -363,6 +363,7 @@ const createUser = (shouldClose) => {
       hasRequestError.value = true;
     });
 };
+
 const updateUser = () => {
   resetNotification();
   HTTP.put("/iamuser", user.value)
