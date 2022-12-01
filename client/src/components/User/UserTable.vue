@@ -88,10 +88,9 @@ export default {
     const user = ref(cloneObject(expUser));
     const onCopyClicked = (id) => {
       user.value = cloneObject(getUserById(id));
-      savedUser.value = cloneObject(getUserById(id));
+      savedUser.value = cloneObject(user);
       user.value.email = "";
       user.value.username = "";
-      delete user.value.attributes.id;
       delete user.value["id"];
       store.commit("application/setManagedItem", user.value);
       store.commit("application/setSavedItem", savedUser.value);
