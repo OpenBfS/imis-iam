@@ -23,8 +23,6 @@ import org.apache.commons.csv.CSVPrinter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import de.intevation.iam.model.jpa.UserAttributes;
-
 public class CSVExporter<T> {
 
     private char fieldSeparator = ',';
@@ -63,40 +61,13 @@ public class CSVExporter<T> {
                         : getPropertyDescriptors(object)) {
                     Object value = propertyDescriptor.getReadMethod()
                         .invoke(object);
-                    if (value != null && value.getClass()
-                        == de.intevation.iam.model.jpa.UserAttributes.class
-                    ) {
-                        row.addAll(parseNestedModel(value));
-                    } else {
-                        row.add(value != null ? value.toString() : "");
-                    }
+                    row.add(value != null ? value.toString() : "");
                 }
                 printer.printRecord(row);
             }
         }
         return new ByteArrayInputStream(
             encoding.encode(result.toString()).array());
-    }
-
-    ArrayList<String> parseNestedModel(Object object)
-            throws IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException, IntrospectionException {
-        ArrayList<String> row = new ArrayList<String>();
-        for (PropertyDescriptor propertyDescriptor
-            : getPropertyDescriptors(object)) {
-            if (propertyDescriptor.getName().equals("id")) {
-                continue;
-            }
-            Object value;
-            value = propertyDescriptor.getReadMethod()
-                .invoke(object);
-            if (value != null) {
-                row.add(value.toString());
-            } else {
-                row.add("");
-            }
-        }
-        return row;
     }
 
     private String[] getHeader(Object object) throws IntrospectionException {
@@ -112,14 +83,7 @@ public class CSVExporter<T> {
             if (skipId && propertyDescriptor.getName().equals("id")) {
                 continue;
             }
-            //Check for nested models
-            if (propertyDescriptor.getPropertyType()
-                == de.intevation.iam.model.jpa.UserAttributes.class) {
-                String[] nestedHeader = getHeader(new UserAttributes(), true);
-                fields.addAll(Arrays.asList(nestedHeader));
-            } else {
-                fields.add(propertyDescriptor.getName());
-            }
+            fields.add(propertyDescriptor.getName());
         }
         return fields.toArray(new String[0]);
     }
