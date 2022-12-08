@@ -13,7 +13,7 @@
       <th class="text-left">{{ $t("label.actions") }}</th>
     </thead>
     <tbody>
-      <tr v-for="item in institutions" :key="item.id">
+      <tr v-for="item in props.institutions" :key="item.id">
         <td>{{ item.name }}</td>
         <td>{{ item.shortName }}</td>
         <td class="d-flex">
@@ -75,10 +75,8 @@
   </v-table>
 </template>
 
-<script>
-export default {
-  props: {
-    institutions: Array,
-  },
-};
+<script setup>
+const props = defineProps({
+  institutions: Array,
+});
 </script>

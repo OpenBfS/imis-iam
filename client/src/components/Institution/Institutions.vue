@@ -59,54 +59,39 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import { computed, onMounted, ref, defineAsyncComponent } from "vue";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
 import { expInstitution } from "@/components/Institution/institution";
 
-export default {
-  components: {
-    InstitutionTable: defineAsyncComponent(() =>
-      import("@/components/Institution/InstitutionTable.vue")
-    ),
-  },
-  setup() {
-    const store = useStore();
-    const { hasLoadingError } = useNotification();
-    const showManageDialog = ref(false);
-    const isAllowedToAdd = computed(() => {
-      return store.state.profile.isAllowedToManage;
-    });
-    // Institutions
-    const institutions = computed(() => {
-      return store.state.institution.institutions;
-    });
-    const institution = ref({ ...expInstitution });
+const InstitutionTable = defineAsyncComponent(() =>
+  import("@/components/Institution/InstitutionTable.vue")
+);
+const store = useStore();
+const { hasLoadingError } = useNotification();
+const isAllowedToAdd = computed(() => {
+  return store.state.profile.isAllowedToManage;
+});
+// Institutions
+const institutions = computed(() => {
+  return store.state.institution.institutions;
+});
+const institution = ref({ ...expInstitution });
 
-    const getInstitutions = () => {
-      store
-        .dispatch("institution/loadInstitutions")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    onMounted(() => {
-      getInstitutions();
+const getInstitutions = () => {
+  store
+    .dispatch("institution/loadInstitutions")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
     });
+};
+onMounted(() => {
+  getInstitutions();
+});
 
-    const resetInstitution = () => {
-      institution.value = { ...expInstitution };
-    };
-    return {
-      isAllowedToAdd,
-      resetInstitution,
-      hasLoadingError,
-      showManageDialog,
-      institution,
-      institutions,
-    };
-  },
+const resetInstitution = () => {
+  institution.value = { ...expInstitution };
 };
 </script>
