@@ -18,19 +18,19 @@
         >
           <div>
             <span class="subheading mr-2">{{ $t("mailinglist.from") }}: </span>
-            <span class="mr-1 mr-auto">{{ mail.sender }}</span>
+            <span class="mr-1 mr-auto">{{ props.mail.sender }}</span>
           </div>
           <div>
             <span class="subheading mr-2">{{ $t("mailinglist.date") }} : </span>
             <span class="mr-1">{{
-              new Date(mail.sendDate).toLocaleDateString()
+              new Date(props.mail.sendDate).toLocaleDateString()
             }}</span>
           </div>
           <div class="d-flex">
             <span class="subheading mr-2"
               >{{ $t("mailinglist.subject") }} :
             </span>
-            <span class="mr-1">{{ mail.subject }}</span>
+            <span class="mr-1">{{ props.mail.subject }}</span>
           </div>
         </div>
         <div class="d-flex align-self-start">
@@ -54,24 +54,16 @@
         </div>
       </v-layout>
       <v-divider></v-divider>
-      <v-card-text id="mail_content"> {{ mail.text }} </v-card-text>
+      <v-card-text id="mail_content"> {{ props.mail.text }} </v-card-text>
     </v-card>
   </v-dialog>
 </template>
 
-<script>
-export default {
-  props: {
-    mail: Object,
-  },
-  setup() {
-    const show = true;
-
-    return {
-      show,
-    };
-  },
-};
+<script setup>
+const props = defineProps({
+  mail: Object,
+});
+const show = true;
 </script>
 
 <style lang="scss" scoped>

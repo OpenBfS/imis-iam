@@ -116,190 +116,164 @@ tr {
   background-color: darkgray;
 }
 </style>
-<script>
+<script setup>
 import { onMounted, ref, defineAsyncComponent, computed, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { debounce } from "debounce";
+const MailContent = defineAsyncComponent(() =>
+  import("@/components/Mailing/MailContent.vue")
+);
+const mails = ref([]);
+const store = useStore();
+const route = useRoute();
+const { hasLoadingError } = useNotification();
+const getMails = () => {
+  let date = "";
+  if (startDate.value) {
+    date += `start=${new Date(startDate.value + "T00:00").getTime()}`;
+  }
+  if (endDate.value) {
+    date = date != "" ? date + "&" : date;
+    date += `end=${new Date(endDate.value + "T24:00").getTime()}`;
+  }
+  date = date === "" ? date : "&" + date;
 
-export default {
-  components: {
-    MailContent: defineAsyncComponent(() =>
-      import("@/components/Mailing/MailContent.vue")
-    ),
-  },
-  setup() {
-    const mails = ref([]);
-    const store = useStore();
-    const route = useRoute();
-    const { hasLoadingError } = useNotification();
-    const getMails = () => {
-      let date = "";
-      if (startDate.value) {
-        date += `start=${new Date(startDate.value + "T00:00").getTime()}`;
-      }
-      if (endDate.value) {
-        date = date != "" ? date + "&" : date;
-        date += `end=${new Date(endDate.value + "T24:00").getTime()}`;
-      }
-      date = date === "" ? date : "&" + date;
-
-      let payload =
-        date === "" ? "mail?archived=true" : "mail?archived=true" + date;
-      if (sender.value) {
-        payload += "&sender=" + sender.value;
-      }
-      if (selectedMailinglist.value && selectedMailinglist.value.length) {
-        selectedMailinglist.value.forEach((l) => {
-          payload += "&list=" + l.id;
-        });
-      }
-      if (selectedFilter.value && selectedFilter.value.length) {
-        selectedFilter.value.forEach((t) => {
-          payload += "&type=" + t.id;
-        });
-      }
-      HTTP.get(payload)
-        .then((response) => {
-          mails.value = response.data;
-        })
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    onMounted(() => {
-      setStartAndEndDate();
-      getMails();
-      store
-        .dispatch("mail/loadMailTypes")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-      store
-        .dispatch("mail/loadMailinglists")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
+  let payload =
+    date === "" ? "mail?archived=true" : "mail?archived=true" + date;
+  if (sender.value) {
+    payload += "&sender=" + sender.value;
+  }
+  if (selectedMailinglist.value && selectedMailinglist.value.length) {
+    selectedMailinglist.value.forEach((l) => {
+      payload += "&list=" + l.id;
     });
-    const selectedMail = ref();
-    const showMailContent = ref(false);
-    const checkChildObject = (e) => {
-      if (e.closeDialog) {
-        showMailContent.value = false;
-      }
-    };
-    // Filters
-    const mailTypes = computed(() => {
-      return store.state.mail.mailTypes;
+  }
+  if (selectedFilter.value && selectedFilter.value.length) {
+    selectedFilter.value.forEach((t) => {
+      payload += "&type=" + t.id;
     });
-    const selectedFilter = ref([]);
-    watch(
-      () => selectedFilter.value,
-      () => {
-        getMails();
-      }
-    );
-    const currentYear = new Date().getFullYear();
-    // Format date yyyy-mm-dd for the date picker
-    const formatDateToDisplay = (date) => {
-      const year = date.getFullYear();
-      let month = date.getMonth() + 1;
-      month = month < 10 ? "0" + month : month;
-      let day = date.getDate();
-      day = day < 10 ? "0" + day : day;
-      return year + "-" + month + "-" + day;
-    };
-    const setStartAndEndDate = () => {
-      if (route.params.year !== "all") {
-        switch (Number(route.params.year)) {
-          case currentYear:
-            startDate.value = formatDateToDisplay(
-              new Date(currentYear + "-01-01")
-            );
-            endDate.value = formatDateToDisplay(
-              new Date(currentYear + "-12-31")
-            );
-            break;
-          case currentYear - 1:
-            startDate.value = formatDateToDisplay(
-              new Date(currentYear - 1 + "-01-01")
-            );
-            endDate.value = formatDateToDisplay(
-              new Date(currentYear - 1 + "-12-31")
-            );
-            break;
-          case currentYear - 2:
-            startDate.value = formatDateToDisplay(
-              new Date(currentYear - 2 + "-01-01")
-            );
-            endDate.value = formatDateToDisplay(
-              new Date(currentYear - 2 + "-12-31")
-            );
-            break;
-        }
-      } else {
-        startDate.value = undefined;
-        endDate.value = undefined;
-      }
-    };
-    watch(
-      () => route.params,
-      (previousParams, toParams) => {
-        if (toParams.year !== previousParams.year) {
-          setStartAndEndDate(route.params.year);
-          getMails();
-        }
-      }
-    );
-    const startDate = ref("");
-    const endDate = ref("");
-    watch([() => endDate.value, () => startDate.value], () => {
-      getMails();
+  }
+  HTTP.get(payload)
+    .then((response) => {
+      mails.value = response.data;
+    })
+    .catch(() => {
+      hasLoadingError.value = true;
     });
-    const sender = ref("");
-    const triggerFilter = debounce(() => {
-      getMails();
-    }, 500);
-    watch(
-      () => sender.value,
-      (oldValue, newValue) => {
-        if (oldValue !== newValue) {
-          triggerFilter();
-        }
-      }
-    );
-    const selectedMailinglist = ref([]);
-    const mailinglists = computed(() => {
-      return store.state.mail.mailingLists;
-    });
-
-    watch(
-      () => selectedMailinglist.value,
-      (oldValue, newValue) => {
-        if (oldValue !== newValue) {
-          getMails();
-        }
-      }
-    );
-    return {
-      currentYear,
-      mailinglists,
-      selectedMailinglist,
-      sender,
-      endDate,
-      startDate,
-      mailTypes,
-      selectedFilter,
-      checkChildObject,
-      selectedMail,
-      showMailContent,
-      mails,
-      hasLoadingError,
-    };
-  },
 };
+onMounted(() => {
+  setStartAndEndDate();
+  getMails();
+  store
+    .dispatch("mail/loadMailTypes")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+  store
+    .dispatch("mail/loadMailinglists")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+});
+const selectedMail = ref();
+const showMailContent = ref(false);
+const checkChildObject = (e) => {
+  if (e.closeDialog) {
+    showMailContent.value = false;
+  }
+};
+// Filters
+const mailTypes = computed(() => {
+  return store.state.mail.mailTypes;
+});
+const selectedFilter = ref([]);
+watch(
+  () => selectedFilter.value,
+  () => {
+    getMails();
+  }
+);
+const currentYear = new Date().getFullYear();
+// Format date yyyy-mm-dd for the date picker
+const formatDateToDisplay = (date) => {
+  const year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  month = month < 10 ? "0" + month : month;
+  let day = date.getDate();
+  day = day < 10 ? "0" + day : day;
+  return year + "-" + month + "-" + day;
+};
+const setStartAndEndDate = () => {
+  if (route.params.year !== "all") {
+    switch (Number(route.params.year)) {
+      case currentYear:
+        startDate.value = formatDateToDisplay(new Date(currentYear + "-01-01"));
+        endDate.value = formatDateToDisplay(new Date(currentYear + "-12-31"));
+        break;
+      case currentYear - 1:
+        startDate.value = formatDateToDisplay(
+          new Date(currentYear - 1 + "-01-01")
+        );
+        endDate.value = formatDateToDisplay(
+          new Date(currentYear - 1 + "-12-31")
+        );
+        break;
+      case currentYear - 2:
+        startDate.value = formatDateToDisplay(
+          new Date(currentYear - 2 + "-01-01")
+        );
+        endDate.value = formatDateToDisplay(
+          new Date(currentYear - 2 + "-12-31")
+        );
+        break;
+    }
+  } else {
+    startDate.value = undefined;
+    endDate.value = undefined;
+  }
+};
+watch(
+  () => route.params,
+  (previousParams, toParams) => {
+    if (toParams.year !== previousParams.year) {
+      setStartAndEndDate(route.params.year);
+      getMails();
+    }
+  }
+);
+const startDate = ref("");
+const endDate = ref("");
+watch([() => endDate.value, () => startDate.value], () => {
+  getMails();
+});
+const sender = ref("");
+const triggerFilter = debounce(() => {
+  getMails();
+}, 500);
+watch(
+  () => sender.value,
+  (oldValue, newValue) => {
+    if (oldValue !== newValue) {
+      triggerFilter();
+    }
+  }
+);
+const selectedMailinglist = ref([]);
+const mailinglists = computed(() => {
+  return store.state.mail.mailingLists;
+});
+
+watch(
+  () => selectedMailinglist.value,
+  (oldValue, newValue) => {
+    if (oldValue !== newValue) {
+      getMails();
+    }
+  }
+);
 </script>

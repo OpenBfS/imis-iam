@@ -154,97 +154,69 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import { useNotification } from "@/lib/use-notification";
 import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { useStore } from "vuex";
 
-export default {
-  components: {
-    ManageMailing: defineAsyncComponent(() =>
-      import("@/components/Mailing/ManageMailing.vue")
-    ),
-    MailDialog: defineAsyncComponent(() =>
-      import("@/components/Mailing/MailDialog.vue")
-    ),
-  },
-  setup() {
-    const store = useStore();
-    const { hasLoadingError, resetNotification } = useNotification();
-    const mailingLists = computed(() => {
-      return store.state.mail.mailingLists;
+const ManageMailing = defineAsyncComponent(() =>
+  import("@/components/Mailing/ManageMailing.vue")
+);
+const MailDialog = defineAsyncComponent(() =>
+  import("@/components/Mailing/MailDialog.vue")
+);
+const store = useStore();
+const { hasLoadingError, resetNotification } = useNotification();
+const mailingLists = computed(() => {
+  return store.state.mail.mailingLists;
+});
+const isAllowedToManage = computed(() => {
+  return store.state.profile.isAllowedToManage;
+});
+const getMailLists = () => {
+  resetNotification();
+  store
+    .dispatch("mail/loadMailinglists")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
     });
-    const isAllowedToManage = computed(() => {
-      return store.state.profile.isAllowedToManage;
-    });
-    const getMailLists = () => {
-      resetNotification();
-      store
-        .dispatch("mail/loadMailinglists")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    onMounted(() => {
-      getMailLists();
-      getMyMailinglist();
-    });
+};
+onMounted(() => {
+  getMailLists();
+  getMyMailinglist();
+});
 
-    const getMyMailinglist = () => {
-      store
-        .dispatch("profile/getMyMailingLists")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    const showCreateDialog = ref(false);
-    const listName = ref("");
-    const showManagementDialog = ref(false);
-    const deleteList = () => {};
-    const editList = () => {};
-    const selectedItem = ref({});
-    const processType = ref({});
-    const checkChildObject = (e) => {
-      if (e.closeDialog) {
-        showManagementDialog.value = false;
-      }
-      if (e.hasChanges) {
-        getMailLists();
-        getMyMailinglist();
-      }
-    };
-    const showMailDialog = ref(false);
-    const checkMailDialogObject = (e) => {
-      if (e.closeDialog) {
-        showMailDialog.value = false;
-      }
-    };
-    const myMailingLists = computed(() => {
-      return store.state.profile.myMailingLists;
+const getMyMailinglist = () => {
+  store
+    .dispatch("profile/getMyMailingLists")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
     });
-    const isUserInList = (list) => {
-      return myMailingLists.value.map((l) => l.id).some((r) => r === list.id);
-    };
-
-    return {
-      isAllowedToManage,
-      isUserInList,
-      checkMailDialogObject,
-      showMailDialog,
-      checkChildObject,
-      showManagementDialog,
-      selectedItem,
-      processType,
-      deleteList,
-      editList,
-      resetNotification,
-      mailingLists,
-      listName,
-      showCreateDialog,
-      hasLoadingError,
-    };
-  },
+};
+const showManagementDialog = ref(false);
+const selectedItem = ref({});
+const processType = ref({});
+const checkChildObject = (e) => {
+  if (e.closeDialog) {
+    showManagementDialog.value = false;
+  }
+  if (e.hasChanges) {
+    getMailLists();
+    getMyMailinglist();
+  }
+};
+const showMailDialog = ref(false);
+const checkMailDialogObject = (e) => {
+  if (e.closeDialog) {
+    showMailDialog.value = false;
+  }
+};
+const myMailingLists = computed(() => {
+  return store.state.profile.myMailingLists;
+});
+const isUserInList = (list) => {
+  return myMailingLists.value.map((l) => l.id).some((r) => r === list.id);
 };
 </script>
