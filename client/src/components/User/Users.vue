@@ -60,59 +60,43 @@
     </v-row>
   </v-container>
 </template>
-<script>
+<script setup>
 import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
 import { expUser } from "@/components/User/user";
 
-export default {
-  components: {
-    UserTable: defineAsyncComponent(() =>
-      import("@/components/User/UserTable.vue")
-    ),
-  },
-  setup() {
-    const store = useStore();
-    const { hasLoadingError, resetNotification } = useNotification();
-    // User
-    // Deep Copy for objects
-    const cloneObject = (obj) => {
-      return JSON.parse(JSON.stringify(obj));
-    };
-    const users = computed(() => {
-      return store.state.user.users;
-    });
-    const user = ref(cloneObject(expUser));
-    const resetUser = () => {
-      user.value = cloneObject(expUser);
-    };
+const UserTable = defineAsyncComponent(() =>
+  import("@/components/User/UserTable.vue")
+);
 
-    onMounted(() => {
-      store
-        .dispatch("user/loadUsers")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-      store
-        .dispatch("user/loadRoles")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    });
-    // Handle requests
-    const showManageUserDialog = ref(false);
-
-    return {
-      showManageUserDialog,
-      resetNotification,
-      hasLoadingError,
-      resetUser,
-      user,
-      users,
-    };
-  },
+const store = useStore();
+const { hasLoadingError, resetNotification } = useNotification();
+// User
+// Deep Copy for objects
+const cloneObject = (obj) => {
+  return JSON.parse(JSON.stringify(obj));
 };
+const users = computed(() => {
+  return store.state.user.users;
+});
+const user = ref(cloneObject(expUser));
+const resetUser = () => {
+  user.value = cloneObject(expUser);
+};
+
+onMounted(() => {
+  store
+    .dispatch("user/loadUsers")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+  store
+    .dispatch("user/loadRoles")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+});
 </script>

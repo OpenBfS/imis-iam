@@ -11,14 +11,14 @@
       <v-list-item-subtitle>
         {{
           `${
-            type === "users"
+            props.type === "users"
               ? $t("search.found_users")
               : $t("search.found_institution")
           }`
         }}
       </v-list-item-subtitle>
       <InstitutionTable
-        v-if="type != 'users'"
+        v-if="props.type != 'users'"
         v-bind:institutions="$store.state.institution.foundInstitutions"
       />
       <UserTable v-else v-bind:users="$store.state.user.foundUsers" />
@@ -26,21 +26,22 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import { defineAsyncComponent } from "vue";
 
-export default {
-  components: {
-    InstitutionTable: defineAsyncComponent(() =>
-      import("@/components/Institution/InstitutionTable.vue")
-    ),
-    UserTable: defineAsyncComponent(() =>
-      import("@/components/User/UserTable.vue")
-    ),
-  },
-  props: {
+const InstitutionTable = defineAsyncComponent(() =>
+  import("@/components/Institution/InstitutionTable.vue")
+);
+const UserTable = defineAsyncComponent(() =>
+  import("@/components/User/UserTable.vue")
+);
+
+const props = defineProps({
+  type: {
     type: String,
-    default: () => "users",
+    default: () => {
+      return "users";
+    },
   },
-};
+});
 </script>

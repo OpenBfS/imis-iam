@@ -32,20 +32,11 @@
   </v-card>
 </template>
 
-<script>
+<script setup>
 import { ref, defineAsyncComponent } from "vue";
 
-export default {
-  components: {
-    ResultTable: defineAsyncComponent(() =>
-      import("@/components/Search/ResultTable.vue")
-    ),
-  },
-  setup() {
-    const tab = ref(null);
-    const userTab = ref("");
-    const institutionTab = ref();
-    return { tab, userTab, institutionTab };
-  },
-};
+const ResultTable = defineAsyncComponent(() =>
+  import("@/components/Search/ResultTable.vue")
+);
+const tab = ref(null);
 </script>

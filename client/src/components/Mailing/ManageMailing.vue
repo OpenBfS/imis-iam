@@ -6,13 +6,16 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-dialog v-model="show" v-if="['add', 'edit'].indexOf(processType) !== -1">
+  <v-dialog
+    v-model="show"
+    v-if="['add', 'edit'].indexOf(props.processType) !== -1"
+  >
     <v-card width="400px">
-      <v-card-title v-if="processType == 'add'">{{
+      <v-card-title v-if="props.processType == 'add'">{{
         $t("mailinglist.add_mailing_list")
       }}</v-card-title>
       <v-card-title v-else
-        >{{ item.name }} {{ $t("label.edit") }}
+        >{{ props.item.name }} {{ $t("label.edit") }}
       </v-card-title>
       <v-divider></v-divider>
       <v-container>
@@ -50,7 +53,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          v-if="processType == 'add'"
+          v-if="props.processType == 'add'"
           size="small"
           @click="createMailList()"
           :disabled="!valid"
@@ -83,7 +86,7 @@
   </v-dialog>
   <v-dialog
     v-model="show"
-    v-if="['delete', 'enter', 'exit'].indexOf(processType) !== -1"
+    v-if="['delete', 'enter', 'exit'].indexOf(props.processType) !== -1"
   >
     <v-card width="400px">
       <v-card-title>{{ getTitle() }}</v-card-title>
@@ -128,145 +131,126 @@
   align-self: center;
 }
 </style>
-<script>
+<script setup>
 import { ref, onMounted, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { useForm } from "@/lib/use-form";
-export default {
-  props: {
-    item: Object,
-    processType: String,
-  },
-  emits: ["child-object"],
-  setup(props, { emit }) {
-    const store = useStore();
-    const show = true;
+const props = defineProps({
+  processType: String,
+  item: Object,
+});
+const emit = defineEmits(["child-object"]);
 
-    const { valid, reqField, reqMultipleSelect } = useForm();
-    const { t } = useI18n();
-    const { hasRequestError, hasLoadingError, resetNotification } =
-      useNotification();
-    const listName = ref("");
-    const users = computed(() => {
-      return store.state.user.users;
-    });
-    const selectedUsers = ref([]);
-    const getUsers = () => {
-      store
-        .dispatch("user/loadUsers")
-        .then()
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    };
-    const createMailList = () => {
-      resetNotification();
-      HTTP.post("mail/list", {
-        name: listName.value,
-        users: selectedUsers.value,
-      })
-        .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
-          listName.value = "";
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const deleteList = () => {
-      HTTP.delete("mail/list/" + props.item.id)
-        .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    // Edit
-    onMounted(() => {
-      getUsers();
-      if (props.processType === "edit") {
-        listName.value = props.item.name;
-        selectedUsers.value = props.item.users;
-      }
-    });
-    const editMailList = () => {
-      HTTP.put("mail/list/", {
-        id: props.item.id,
-        name: listName.value,
-        users: selectedUsers.value,
-      })
-        .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    // Enter/Exit Mailing-list
-    const enterMailingList = () => {
-      HTTP.get("mail/list/" + props.item.id + "/join")
-        .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const exitMailingList = () => {
-      HTTP.get("mail/list/" + props.item.id + "/leave")
-        .then(() => {
-          emit("child-object", { closeDialog: true, hasChanges: true });
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    const checkDeleteEnterExit = () => {
-      switch (props.processType) {
-        case "delete": {
-          deleteList();
-          break;
-        }
-        case "enter": {
-          enterMailingList();
-          break;
-        }
-        case "exit": {
-          exitMailingList();
-          break;
-        }
-      }
-    };
-    const getTitle = () => {
-      switch (props.processType) {
-        case "delete":
-          return props.item.name + " " + t("label.delete");
-        case "enter":
-          return props.item.name + " " + t("mailinglist.enter");
-        case "exit":
-          return props.item.name + " " + t("mailinglist.exit");
-      }
-    };
+const store = useStore();
+const show = true;
 
-    return {
-      reqField,
-      reqMultipleSelect,
-      valid,
-      users,
-      selectedUsers,
-      getTitle,
-      checkDeleteEnterExit,
-      editMailList,
-      deleteList,
-      createMailList,
-      show,
-      listName,
-      hasRequestError,
-    };
-  },
+const { valid, reqField, reqMultipleSelect } = useForm();
+const { t } = useI18n();
+const { hasRequestError, hasLoadingError, resetNotification } =
+  useNotification();
+const listName = ref("");
+const users = computed(() => {
+  return store.state.user.users;
+});
+const selectedUsers = ref([]);
+const getUsers = () => {
+  store
+    .dispatch("user/loadUsers")
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+};
+const createMailList = () => {
+  resetNotification();
+  HTTP.post("mail/list", {
+    name: listName.value,
+    users: selectedUsers.value,
+  })
+    .then(() => {
+      emit("child-object", { closeDialog: true, hasChanges: true });
+      listName.value = "";
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const deleteList = () => {
+  HTTP.delete("mail/list/" + props.item.id)
+    .then(() => {
+      emit("child-object", { closeDialog: true, hasChanges: true });
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+// Edit
+onMounted(() => {
+  getUsers();
+  if (props.processType === "edit") {
+    listName.value = props.item.name;
+    selectedUsers.value = props.item.users;
+  }
+});
+const editMailList = () => {
+  HTTP.put("mail/list/", {
+    id: props.item.id,
+    name: listName.value,
+    users: selectedUsers.value,
+  })
+    .then(() => {
+      emit("child-object", { closeDialog: true, hasChanges: true });
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+// Enter/Exit Mailing-list
+const enterMailingList = () => {
+  HTTP.get("mail/list/" + props.item.id + "/join")
+    .then(() => {
+      emit("child-object", { closeDialog: true, hasChanges: true });
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const exitMailingList = () => {
+  HTTP.get("mail/list/" + props.item.id + "/leave")
+    .then(() => {
+      emit("child-object", { closeDialog: true, hasChanges: true });
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+const checkDeleteEnterExit = () => {
+  switch (props.processType) {
+    case "delete": {
+      deleteList();
+      break;
+    }
+    case "enter": {
+      enterMailingList();
+      break;
+    }
+    case "exit": {
+      exitMailingList();
+      break;
+    }
+  }
+};
+const getTitle = () => {
+  switch (props.processType) {
+    case "delete":
+      return props.item.name + " " + t("label.delete");
+    case "enter":
+      return props.item.name + " " + t("mailinglist.enter");
+    case "exit":
+      return props.item.name + " " + t("mailinglist.exit");
+  }
 };
 </script>
