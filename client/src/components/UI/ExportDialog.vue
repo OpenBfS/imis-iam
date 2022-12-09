@@ -17,7 +17,7 @@
               :no-data-text="$t('label.no_data_text')"
               :label="$t('label.field_seperator')"
               :items="fieldSeparators"
-              v-model="csvOptions.fieldSeperator"
+              v-model="csvOptions.fieldSeparator"
               item-title="name"
               item-value="value"
             >
@@ -131,30 +131,14 @@ const rowDelimiters = [
 ];
 const encoding = ["utf-8", "utf-16", "ascii"];
 const csvOptions = ref({
-  fieldSeperator: fieldSeparators[0].value,
+  fieldSeparator: fieldSeparators[0].value,
   rowDelimiter: rowDelimiters[0].value,
   encoding: encoding[0],
   quoteType: quoteTypes[0].value,
 });
 
 const exportRequest = (itemsName) => {
-  let payload = "";
-  if (csvOptions.value && csvOptions.value.fieldSeperator !== "") {
-    payload += "fieldSeparator=" + csvOptions.value.fieldSeperator;
-  }
-  if (csvOptions.value && csvOptions.value.rowDelimiter !== "") {
-    const row = "rowDelimiter=" + csvOptions.value.rowDelimiter;
-    payload += payload === "" ? row : "&" + row;
-  }
-  if (csvOptions.value && csvOptions.value.encoding !== "") {
-    const encoding = "encoding=" + csvOptions.value.encoding;
-    payload += payload === "" ? encoding : "&" + encoding;
-  }
-  if (csvOptions.value && csvOptions.value.quoteType !== "") {
-    const quoteType = "quoteType=" + csvOptions.value.quoteType;
-    payload += payload === "" ? quoteType : "&" + quoteType;
-  }
-  HTTP.get("export/" + itemsName + (payload !== "" ? "?" + payload : ""))
+  HTTP.get("export/" + itemsName, { params: csvOptions.value })
     .then((response) => {
       const blob = new Blob([response.data], {
         type: "application/octet-stream",
