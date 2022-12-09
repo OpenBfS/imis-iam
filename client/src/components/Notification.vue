@@ -188,89 +188,69 @@ p {
   overflow-y: auto;
 }
 </style>
-<script>
+<script setup>
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { ref, onMounted, defineAsyncComponent } from "vue";
-export default {
-  components: {
-    MailContent: defineAsyncComponent(() =>
-      import("@/components/Mailing/MailContent.vue")
-    ),
-  },
-  setup() {
-    const { hasRequestError, resetNotification } = useNotification();
-    const showMailContent = ref(false);
-    const selectedMail = ref();
-    const showMail = () => {
-      showMailContent.value = true;
-    };
-    // Mails
-    const otherMails = ref([]);
-    const failureMails = ref([]);
-    const maintenanceMails = ref([]);
-    const restTypes = [1, 2, 5, 6, 7, 8];
-    const getMailsbyTypes = (types, count) => {
-      let path = "mail?";
-      if (count) {
-        path += "count=" + count;
-      }
-      types.forEach((t) => {
-        path += "&type=" + t;
-      });
-      HTTP.get(path)
-        .then((response) => {
-          switch (types[0]) {
-            case 3:
-              failureMails.value = response.data;
-              break;
-            case 4:
-              maintenanceMails.value = response.data;
-              break;
-            default:
-              otherMails.value = response.data;
-          }
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
-    onMounted(() => {
-      getMailsbyTypes([3]);
-      getMailsbyTypes([4]);
-      getMailsbyTypes(restTypes, 2);
-    });
-    const checkChildObject = (e) => {
-      if (e.closeDialog) {
-        showMailContent.value = false;
-      }
-    };
-    const archiveMail = (id, type) => {
-      resetNotification();
-      HTTP.get("mail/archive/" + id)
-        .then(() => {
-          if ([3, 4].indexOf(type) !== -1) {
-            getMailsbyTypes([type]);
-          } else {
-            getMailsbyTypes(restTypes);
-          }
-        })
-        .catch(() => {
-          hasRequestError.value = true;
-        });
-    };
+const MailContent = defineAsyncComponent(() =>
+  import("@/components/Mailing/MailContent.vue")
+);
+const { hasRequestError, resetNotification } = useNotification();
+const showMailContent = ref(false);
+const selectedMail = ref();
 
-    return {
-      maintenanceMails,
-      hasRequestError,
-      archiveMail,
-      checkChildObject,
-      showMailContent,
-      selectedMail,
-      showMail,
-      otherMails,
-      failureMails,
-    };
-  },
+// Mails
+const otherMails = ref([]);
+const failureMails = ref([]);
+const maintenanceMails = ref([]);
+const restTypes = [1, 2, 5, 6, 7, 8];
+const getMailsbyTypes = (types, count) => {
+  let path = "mail?";
+  if (count) {
+    path += "count=" + count;
+  }
+  types.forEach((t) => {
+    path += "&type=" + t;
+  });
+  HTTP.get(path)
+    .then((response) => {
+      switch (types[0]) {
+        case 3:
+          failureMails.value = response.data;
+          break;
+        case 4:
+          maintenanceMails.value = response.data;
+          break;
+        default:
+          otherMails.value = response.data;
+      }
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
+};
+onMounted(() => {
+  getMailsbyTypes([3]);
+  getMailsbyTypes([4]);
+  getMailsbyTypes(restTypes, 2);
+});
+const checkChildObject = (e) => {
+  if (e.closeDialog) {
+    showMailContent.value = false;
+  }
+};
+const archiveMail = (id, type) => {
+  resetNotification();
+  HTTP.get("mail/archive/" + id)
+    .then(() => {
+      if ([3, 4].indexOf(type) !== -1) {
+        getMailsbyTypes([type]);
+      } else {
+        getMailsbyTypes(restTypes);
+      }
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
 };
 </script>

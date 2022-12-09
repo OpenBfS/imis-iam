@@ -23,17 +23,12 @@
   </v-container>
 </template>
 
-<script>
-import Applications from "../components/ApplicationComponent.vue";
+<script setup>
 import { defineAsyncComponent } from "vue";
-export default {
-  name: "Home",
-  components: {
-    Applications,
-    NOTIFICATION: defineAsyncComponent(() =>
-      import("../components/Notification.vue")
-    ),
-  },
-  setup() {},
-};
+const Applications = defineAsyncComponent(() =>
+  import("@/components/ApplicationComponent")
+);
+const NOTIFICATION = defineAsyncComponent(() =>
+  import("../components/Notification.vue")
+);
 </script>

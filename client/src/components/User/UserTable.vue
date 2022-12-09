@@ -16,7 +16,7 @@
       <th class="text-left">{{ $t("label.actions") }}</th>
     </thead>
     <tbody>
-      <tr v-for="user in users" :key="user.id">
+      <tr v-for="user in props.users" :key="user.id">
         <td class="text-truncate" style="max-width: 150px">
           {{ user.id }}
         </td>
@@ -66,50 +66,42 @@
   </v-table>
 </template>
 
-<script>
+<script setup>
 import { useStore } from "vuex";
 import { ref } from "vue";
 import { expUser } from "@/components/User/user";
+const props = defineProps({
+  users: Array,
+});
 
-export default {
-  props: {
-    users: Array,
-  },
-  setup(props) {
-    const store = useStore();
-    const savedUser = ref();
-    // Deep Copy for objects
-    const cloneObject = (obj) => {
-      return JSON.parse(JSON.stringify(obj));
-    };
-    const getUserById = (id) => {
-      return props.users.filter((u) => id === u.id)[0];
-    };
-    const user = ref(cloneObject(expUser));
-    const onCopyClicked = (id) => {
-      user.value = cloneObject(getUserById(id));
-      savedUser.value = cloneObject(user.value);
-      user.value.email = "";
-      user.value.username = "";
-      delete user.value["id"];
-      store.commit("application/setManagedItem", user.value);
-      store.commit("application/setSavedItem", savedUser.value);
-      store.commit("application/setProcessType", "copy");
-      store.commit("application/setShowManageUserDialog", true);
-    };
-    const onEditClicked = (id) => {
-      user.value = cloneObject(getUserById(id));
-      // Save original user data for "reset" button
-      savedUser.value = cloneObject(user.value);
-      store.commit("application/setManagedItem", user.value);
-      store.commit("application/setSavedItem", savedUser.value);
-      store.commit("application/setProcessType", "edit");
-      store.commit("application/setShowManageUserDialog", true);
-    };
-    return {
-      onEditClicked,
-      onCopyClicked,
-    };
-  },
+const store = useStore();
+const savedUser = ref();
+// Deep Copy for objects
+const cloneObject = (obj) => {
+  return JSON.parse(JSON.stringify(obj));
+};
+const getUserById = (id) => {
+  return props.users.filter((u) => id === u.id)[0];
+};
+const user = ref(cloneObject(expUser));
+const onCopyClicked = (id) => {
+  user.value = cloneObject(getUserById(id));
+  savedUser.value = cloneObject(user.value);
+  user.value.email = "";
+  user.value.username = "";
+  delete user.value["id"];
+  store.commit("application/setManagedItem", user.value);
+  store.commit("application/setSavedItem", savedUser.value);
+  store.commit("application/setProcessType", "copy");
+  store.commit("application/setShowManageUserDialog", true);
+};
+const onEditClicked = (id) => {
+  user.value = cloneObject(getUserById(id));
+  // Save original user data for "reset" button
+  savedUser.value = cloneObject(user.value);
+  store.commit("application/setManagedItem", user.value);
+  store.commit("application/setSavedItem", savedUser.value);
+  store.commit("application/setProcessType", "edit");
+  store.commit("application/setShowManageUserDialog", true);
 };
 </script>

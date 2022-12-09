@@ -25,28 +25,20 @@
     </v-container>
   </v-card>
 </template>
-<script>
-export default {
-  setup() {
-    const openInTab = (url) => {
-      window.open(url, "_blank").focus();
-    };
-    const applications = [
-      {
-        name: "Example Application 1",
-        icon: "mdi-application",
-        url: "https://exampleapp1.test",
-      },
-      {
-        name: "Example Application 2",
-        icon: "mdi-application",
-        url: "https://exampleapp2.test",
-      },
-    ];
-    return {
-      applications,
-      openInTab,
-    };
-  },
+<script setup>
+const openInTab = (url) => {
+  window.open(url, "_blank").focus();
 };
+const applications = [
+  {
+    name: "Example Application 1",
+    icon: "mdi-application",
+    url: "https://exampleapp1.test",
+  },
+  {
+    name: "Example Application 2",
+    icon: "mdi-application",
+    url: "https://exampleapp2.test",
+  },
+];
 </script>
