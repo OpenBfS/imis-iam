@@ -140,14 +140,8 @@ const exportRequest = (itemsName) => {
   fetch(
     "/backend/realms/imis3/export/" +
       itemsName +
-      "?fieldSeparator=" +
-      csvOptions.value.fieldSeparator +
-      "&rowDelimiter=" +
-      csvOptions.value.rowDelimiter +
-      "&encoding=" +
-      csvOptions.value.encoding +
-      "&quoteType=" +
-      csvOptions.value.quoteType
+      "?" +
+      new URLSearchParams(csvOptions.value).toString()
   )
     .then((res) => {
       if (!res.ok) throw new Error(res.statusText);
