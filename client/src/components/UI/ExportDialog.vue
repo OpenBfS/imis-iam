@@ -81,7 +81,6 @@
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
-import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 
 const show = true;
@@ -138,11 +137,24 @@ const csvOptions = ref({
 });
 
 const exportRequest = (itemsName) => {
-  HTTP.get("export/" + itemsName, { params: csvOptions.value })
-    .then((response) => {
-      const blob = new Blob([response.data], {
-        type: "application/octet-stream",
-      });
+  fetch(
+    "/backend/realms/imis3/export/" +
+      itemsName +
+      "?fieldSeparator=" +
+      csvOptions.value.fieldSeparator +
+      "&rowDelimiter=" +
+      csvOptions.value.rowDelimiter +
+      "&encoding=" +
+      csvOptions.value.encoding +
+      "&quoteType=" +
+      csvOptions.value.quoteType
+  )
+    .then((res) => {
+      if (!res.ok) throw new Error(res.statusText);
+      return res.blob();
+    })
+    .then((data) => {
+      const blob = new Blob([data]);
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = "export.csv";
@@ -150,8 +162,9 @@ const exportRequest = (itemsName) => {
       URL.revokeObjectURL(link.href);
       store.state.application.showExportDialog = false;
     })
-    .catch(() => {
+    .catch((error) => {
       hasRequestError.value = true;
+      store.commit("application/setHttpErrorMessage", error.message);
     });
 };
 const exportFile = () => {
