@@ -20,8 +20,6 @@
       <v-container class="pa-1 mt-4 mx-2">
         <v-row justify="center">
           <v-col jsutify="start" cols="11">
-            <!-- For now a '*' is prepended to the label value to indicate the required ones.
-                TODO: Use "Label" slot when this gets implemented by upstream -->
             <v-form
               v-model="valid"
               ref="form"
