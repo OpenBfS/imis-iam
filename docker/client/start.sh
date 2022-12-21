@@ -2,5 +2,6 @@
 
 #Refresh metadata
 service shibd restart
-apachectl start
+
+httpd-foreground &
 yarn install && yarn serve
