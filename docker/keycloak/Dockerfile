@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
             openjdk-17-jre-headless maven jq curl \
             postgresql-client wait-for-it
 
-ENV KEYCLOAK_VERSION 20.0.1
+ENV KEYCLOAK_VERSION 20.0.2
 ENV KEYCLOAK_HOME /opt/keycloak
 
 RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
