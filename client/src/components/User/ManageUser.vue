@@ -79,6 +79,9 @@
                   "
                   v-model="user.phone"
                 ></v-text-field>
+                <!--TODO: Add this rule once the validation for
+                    optional fields gets implemented by upstream.
+                    :rules="validPhone($t('form.valid_fax'))" -->
                 <v-text-field
                   variant="underlined"
                   :label="$t('user.mobile')"
@@ -170,6 +173,9 @@
                   :rules="reqMultipleSelect($t('user.required_roles'))"
                 >
                 </v-select>
+                <!-- TODO: Add this rule once the validation for
+                    optional fields gets implemented by upstream.
+                    :rules="validPostalcode($t('form.valid_postalcode'))" -->
                 <v-select
                   :readonly="!$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"

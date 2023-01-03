@@ -82,9 +82,9 @@
               </div>
 
               <div class="group_class">
-                <!-- TODO: Read this rules once the validation for
+                <!-- TODO: Add this rules once the validation for
                     optional fields gets implemented by upstream.
-                :rules="validPostalcode($t('form.valid_postalcode'))" -->
+                    :rules="validPostalcode($t('form.valid_postalcode'))" -->
                 <v-text-field
                   variant="underlined"
                   density="compact"
@@ -129,7 +129,7 @@
                   "
                   v-model="institution.centralMail"
                 ></v-text-field>
-                <!--TODO: Read this rules once the validation for
+                <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validPhone($t('form.valid_fax'))" -->
                 <v-text-field
@@ -146,7 +146,7 @@
                   :label="$t('institution.imis_Id')"
                   v-model="institution.imisId"
                 ></v-text-field>
-                <!-- TODO: Read this rules once the validation for
+                <!-- TODO: Add this rules once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validMail($t('form.valid_email'))"  -->
                 <v-text-field
