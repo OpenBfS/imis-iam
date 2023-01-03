@@ -87,9 +87,7 @@ const show = true;
 const store = useStore();
 const { t } = useI18n();
 const { hasRequestError } = useNotification();
-// Use objects to enable translation of the itemes in <v-select> element
-// TODO: Use slots to change the appearance of the items in the element
-// when this gets implemented by Vuetify upstream.
+// Use array of objects to enable translation of the itemes in <v-select> element
 const fieldSeparators = [
   {
     name: t("label.comma"),
