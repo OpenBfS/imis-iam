@@ -21,6 +21,11 @@
         <v-row justify="center">
           <v-col jsutify="start" cols="11">
             <v-form v-model="valid" ref="form" :readonly="isReadOnly">
+              <!-- Readonly attribut of the v-form does not applied to the
+                v-select element. For now a "readonly" attribute is added
+                to each v-select element.
+                TODO: Check if this gets fixed by upstream
+               -->
               <div class="two_group_class">
                 <v-text-field
                   :variant="
@@ -94,6 +99,10 @@
                 ></v-text-field>
               </div>
               <div class="two_group_class">
+                <!-- readonly attribute is set for each v-select element explicitly, which
+                 should inherit the state from the <v-form> element.
+                TODO: Check if this gets fixed by upstream
+                 -->
                 <v-select
                   :readonly="!$store.state.profile.isAllowedToManage"
                   :clearable="$store.state.profile.isAllowedToManage"
@@ -122,10 +131,6 @@
                 </v-select>
               </div>
               <div class="two_group_class">
-                <!-- readonly attribute is set here explicitly, which
-                 should inherit this value from the <v-form> element.
-                TODO: Check if this gets fixed by upstream
-                 -->
                 <v-select
                   :readonly="!$store.state.profile.isAllowedToManage"
                   :clearable="$store.state.profile.isAllowedToManage"
