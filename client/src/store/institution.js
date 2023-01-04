@@ -65,39 +65,5 @@ export const institution = {
           .catch((error) => reject(error));
       });
     },
-    loadInstitutionNames({ commit }) {
-      HTTP.get("/institution")
-        .then((response) => {
-          commit("setInstitutionNames", response.data);
-        })
-        .catch((error) => console.log(error)); // TODO: Handle http error in component
-    },
-
-    loadInstitutionById({ commit }, id) {
-      return new Promise((resolve, reject) => {
-        HTTP.get("/institution/" + id)
-          .then((response) => {
-            commit("setInstitution", response.data);
-            resolve(response);
-          })
-          .catch((error) => reject(error)); // TODO: Handle http error in component
-      });
-    },
-
-    /**
-     * Store the institution
-     * @param {Function} then Function, called after saving
-     */
-    storeInstitution({ commit, state }) {
-      commit("convertCurrentInstitutionAttributes");
-      return new Promise((resolve, reject) => {
-        //var instData = context.store.state.institution;
-        HTTP.put("/institution", state.institution)
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((error) => reject(error)); // TODO: Handle http error in component
-      });
-    },
   },
 };
