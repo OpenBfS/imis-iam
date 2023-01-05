@@ -23,6 +23,7 @@
           <v-form v-model="valid" class="v-col v-col-10">
             <v-text-field
               variant="underlined"
+              density="compact"
               :label="$t('mailinglist.name')"
               v-model="listName"
               :rules="reqField($t('mailinglist.required_mailinglist_name'))"

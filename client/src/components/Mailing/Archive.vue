@@ -55,10 +55,8 @@
           ><input class="ml-2" type="date" name="endDate" v-model="endDate" />
         </div>
       </div>
-      <!-- TODO: Check if the density attribute is implemented for the
-      v-select element to use the same density for all components. -->
       <v-text-field
-        density="comfortable"
+        density="compact"
         class="mx-1"
         variant="underlined"
         style="max-width: 20%"

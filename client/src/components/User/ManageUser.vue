@@ -28,6 +28,7 @@
                -->
               <div class="two_group_class">
                 <v-text-field
+                  density="compact"
                   :variant="
                     ['add', 'copy'].indexOf(processType) !== -1
                       ? 'underlined'
@@ -39,6 +40,7 @@
                   :readonly="processType === 'edit'"
                 ></v-text-field>
                 <v-text-field
+                  density="compact"
                   variant="underlined"
                   :label="$t('user.title')"
                   v-model="user.title"
@@ -46,6 +48,7 @@
               </div>
               <div class="two_group_class">
                 <v-text-field
+                  density="compact"
                   variant="underlined"
                   :label="$t('user.firstname')"
                   v-model="user.firstName"
@@ -53,6 +56,7 @@
                 ></v-text-field>
                 <v-text-field
                   variant="underlined"
+                  density="compact"
                   :label="$t('user.lastname')"
                   :rules="reqField($t('user.required_lastname'))"
                   v-model="user.lastName"
@@ -60,6 +64,7 @@
               </div>
               <div class="one_group_class">
                 <v-text-field
+                  density="compact"
                   variant="underlined"
                   :label="$t('label.email')"
                   v-model="user.email"
@@ -74,6 +79,7 @@
 
               <div class="three_group_class">
                 <v-text-field
+                  density="compact"
                   variant="underlined"
                   :label="$t('user.phone')"
                   :rules="
@@ -88,11 +94,13 @@
                     optional fields gets implemented by upstream.
                     :rules="validPhone($t('form.valid_fax'))" -->
                 <v-text-field
+                  density="compact"
                   variant="underlined"
                   :label="$t('user.mobile')"
                   v-model="user.mobile"
                 ></v-text-field>
                 <v-text-field
+                  density="compact"
                   variant="underlined"
                   :label="$t('user.fax')"
                   v-model="user.fax"

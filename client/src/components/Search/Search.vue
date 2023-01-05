@@ -16,7 +16,7 @@
         class="v-col v-col-5"
         v-model="searchString"
         clearable
-        density="comfortable"
+        density="compact"
       >
       </v-text-field>
     </v-row>
