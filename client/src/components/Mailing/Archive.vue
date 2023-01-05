@@ -11,7 +11,6 @@
       {{ $t("archive.title") }}
     </UIHeader>
     <v-row class="mt-6" align="center">
-      <!--TODO: Use @change event when this gets implemented by upstream -->
       <v-select
         :no-data-text="$t('label.no_data_text')"
         class="mx-1"
