@@ -48,13 +48,6 @@ export const institution = {
     },
   },
   actions: {
-    createInstitution(context, then) {
-      HTTP.post("/institution", context.state.newInstitution).then(() => {
-        if (then) {
-          then();
-        }
-      });
-    },
     loadInstitutions({ commit }) {
       return new Promise((resolve, reject) => {
         HTTP.get("/institution")
