@@ -8,6 +8,7 @@ import Vuex from "vuex";
 import { profile } from "./profile";
 import { institution } from "./institution";
 import { application } from "./application";
+import { coordinates } from "./coordinates";
 import { mail } from "./mail";
 import { user } from "./user";
 
@@ -17,6 +18,7 @@ export default new Vuex.Store({
     profile,
     user,
     application,
+    coordinates,
     mail,
   },
 });

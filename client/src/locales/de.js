@@ -66,6 +66,9 @@ export default {
     active: "Aktiv",
     new_category: "Kategorie Hinzufügen",
     category_name: "Kategorienname",
+    coordinates: "Koordinaten",
+    x_coordinate: "X-Koordinate",
+    y_coordinate: "Y-Koordinate",
   },
   // Main component
   main: {

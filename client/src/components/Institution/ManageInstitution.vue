@@ -105,6 +105,35 @@
                 ></v-text-field>
               </div>
               <div class="group_class">
+                <v-select
+                  :no-data-text="$t('label.no_data_text')"
+                  v-model="coordinates.coordinate"
+                  dense
+                  :label="$t('institution.coordinates')"
+                  :loading="coordinatesLoading"
+                  :items="coordinates"
+                  item-title="properties.display"
+                  item-value="id"
+                  persistent-hint
+                  :return-object="coordinatesReturnObj"
+                  density="compact"
+                ></v-select>
+                <v-text-field
+                  :readonly="true"
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.x_coordinate')"
+                  v-model="institution.xCoordinate"
+                ></v-text-field>
+                <v-text-field
+                  :readonly="true"
+                  variant="underlined"
+                  density="compact"
+                  :label="$t('institution.y_coordinate')"
+                  v-model="institution.yCoordinate"
+                ></v-text-field>
+              </div>
+              <div class="group_class">
                 <v-text-field
                   variant="underlined"
                   density="compact"
@@ -295,18 +324,21 @@ form > div {
 }
 </style>
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useStore } from "vuex";
 import { computed } from "@vue/reactivity";
+import { debounce } from "debounce";
+
 const show = true;
 const { hasLoadingError, hasRequestError } = useNotification();
 const store = useStore();
 const institution = ref(store.state.application.managedItem);
 const originalInstitution = { ...institution.value };
 const processType = ref(store.state.application.processType);
+const coordinates = ref(store.state.coordinates.coordinates);
 const {
   form,
   valid,
@@ -394,4 +426,40 @@ const hasNoChange = computed(() => {
     JSON.stringify(originalInstitution) === JSON.stringify(institution.value)
   );
 });
+
+const coordinatesLoading = ref(false);
+const coordinatesReturnObj = ref(true);
+
+//Handle coordinates picked
+const coordinatesPicked = () => {
+  var geometry = coordinates.value.coordinate.geometry.coordinates;
+  institution.value.xCoordinate = geometry[0];
+  institution.value.yCoordinate = geometry[1];
+};
+//Load coordinate store
+const loadCoordinates = (queryString) => {
+  return store.dispatch("coordinates/loadCoordinates", queryString);
+};
+const triggerLoadCoordinates = debounce((queryString) => {
+  coordinatesLoading.value = true;
+  loadCoordinates(queryString).then(() => {
+    coordinatesLoading.value = false;
+  });
+}, 500);
+watch(
+  () => coordinates.value.coordinate,
+  () => {
+    coordinatesPicked();
+  }
+);
+watch(
+  [
+    () => institution.value.addressLocation,
+    () => institution.value.addressPostalCode,
+    () => institution.value.addressStreet,
+  ],
+  ([newLoc, newPc, newStreet]) => {
+    triggerLoadCoordinates([newLoc, newPc, newStreet].join(" "));
+  }
+);
 </script>

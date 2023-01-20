@@ -28,7 +28,7 @@ RUN npm install --global yarn
 #
 # httpd setup
 #
-RUN sed -i -e "/^#LoadModule proxy_module/s/#//;/^#LoadModule proxy_http_module/s/#//;/^#LoadModule deflate_module/s/#//;/^#Include conf.*httpd-vhosts.conf/s/#//" $HTTPD_PREFIX/conf/httpd.conf
+RUN sed -i -e "/^#LoadModule ssl_module/s/#//;/^#LoadModule proxy_module/s/#//;/^#LoadModule proxy_http_module/s/#//;/^#LoadModule deflate_module/s/#//;/^#Include conf.*httpd-vhosts.conf/s/#//" $HTTPD_PREFIX/conf/httpd.conf
 
 RUN mkdir /usr/local/iamclient
 ADD client /usr/local/iamclient

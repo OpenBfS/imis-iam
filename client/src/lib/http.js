@@ -36,4 +36,8 @@ const ShibHTTP = axios.create({
   baseURL: "/",
 });
 
-export { HTTP, ShibHTTP };
+const OSMHTTP = axios.create({
+  baseURL: "/",
+});
+
+export { HTTP, ShibHTTP, OSMHTTP };
