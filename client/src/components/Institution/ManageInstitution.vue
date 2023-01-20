@@ -157,13 +157,7 @@
                 ></v-text-field>
               </div>
               <div class="group_class align-center">
-                <!-- Readonly attribut of the v-form does not applied to the
-                v-select element. For now a "readonly" attribute is added explicitly
-                to v-select element.
-                TODO: Check if this gets fixed by upstream
-               -->
                 <v-select
-                  :readonly="!$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
                   :label="$t('institution.categories')"

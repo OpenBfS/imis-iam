@@ -21,11 +21,6 @@
         <v-row justify="center">
           <v-col jsutify="start" cols="11">
             <v-form v-model="valid" ref="form" :readonly="isReadOnly">
-              <!-- Readonly attribut of the v-form does not applied to the
-                v-select element. For now a "readonly" attribute is added
-                to each v-select element.
-                TODO: Check if this gets fixed by upstream
-               -->
               <div class="two_group_class">
                 <v-text-field
                   density="compact"
@@ -112,7 +107,6 @@
                 TODO: Check if this gets fixed by upstream
                  -->
                 <v-select
-                  :readonly="!$store.state.profile.isAllowedToManage"
                   :clearable="$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
@@ -125,7 +119,6 @@
                 >
                 </v-select>
                 <v-select
-                  :readonly="!$store.state.profile.isAllowedToManage"
                   :clearable="$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
@@ -140,7 +133,6 @@
               </div>
               <div class="two_group_class">
                 <v-select
-                  :readonly="!$store.state.profile.isAllowedToManage"
                   :clearable="$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
@@ -155,7 +147,6 @@
                 >
                 </v-select>
                 <v-select
-                  :readonly="!$store.state.profile.isAllowedToManage"
                   :clearable="$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
@@ -174,7 +165,6 @@
               </div>
               <div class="two_group_class">
                 <v-select
-                  :readonly="!$store.state.profile.isAllowedToManage"
                   :clearable="$store.state.profile.isAllowedToManage"
                   dense
                   :label="$t('user.label_roles')"
@@ -190,7 +180,6 @@
                     optional fields gets implemented by upstream.
                     :rules="validPostalcode($t('form.valid_postalcode'))" -->
                 <v-select
-                  :readonly="!$store.state.profile.isAllowedToManage"
                   :no-data-text="$t('label.no_data_text')"
                   dense
                   :label="$t('user.label_positions')"
