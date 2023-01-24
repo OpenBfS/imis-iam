@@ -42,7 +42,6 @@ services:
       - ../keycloak/iam_spi:/opt/iam_spi
     ports:
       - 48080:8080
-      - 49990:9990
     env_file:
       - keycloak/.env
   client:
