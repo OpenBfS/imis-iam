@@ -3,5 +3,6 @@
 #Refresh metadata
 service shibd restart
 
-httpd-foreground &
+rm -f /run/apache2/apache2.pid
+apache2ctl -D FOREGROUND &
 yarn install && yarn serve
