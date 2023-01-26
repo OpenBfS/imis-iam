@@ -28,6 +28,7 @@ RUN npm install --global yarn
 RUN a2enmod -q ssl
 RUN a2enmod -q headers
 RUN a2enmod -q proxy_http
+RUN a2dissite -q 000-default
 
 ADD client /usr/local/iamclient
 WORKDIR /usr/local/iamclient
