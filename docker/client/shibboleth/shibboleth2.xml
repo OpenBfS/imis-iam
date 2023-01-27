@@ -25,13 +25,7 @@
         <Sessions lifetime="28800" timeout="3600" relayState="ss:mem"
                   checkAddress="false" handlerSSL="false" cookieProps="http">
 
-            <!--
-            Configures SSO for a default IdP. To properly allow for >1 IdP, remove
-            entityID property and adjust discoveryURL to point to discovery service.
-            You can also override entityID on /Login query string, or in RequestMap/htaccess.
-            -->
-            <SSO entityID="http://localhost:48080/realms/imis3"
-                 outgoingBindings="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">
+            <SSO outgoingBindings="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">
               SAML2
             </SSO>
 

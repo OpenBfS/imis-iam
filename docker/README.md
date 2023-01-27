@@ -4,17 +4,15 @@ Use docker-compose to build/start the whole IAM stack at once, e.g. with
 
 ```bash
 cd docker
-docker-compose up
+docker compose up
 ```
 
-Note that the configuration of SP and IdP only allows local access. Thus,
-if your browser does not run on your Docker host, use port forwarding to
-make the applications available on your local machine, e.g. using
-(assuming you have ssh access to remote-host and docker-host can be reached
-from remote-host):
+The default configuration of SP and IdP only allows local access.
+In case remote access to the application on the Docker host should be enabled,
+change the respective environment variables, e.g. using:
 
 ```bash
-ssh -L 48081:docker-host:48081 -L 48080:docker-host:48080 remote-host
+KC_HOSTNAME=docker-host docker compose up -d
 ```
 
 
