@@ -32,12 +32,9 @@ HTTP.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-const ShibHTTP = axios.create({
-  baseURL: "/",
-});
 
 const OSMHTTP = axios.create({
   baseURL: "/",
 });
 
-export { HTTP, ShibHTTP, OSMHTTP };
+export { HTTP, OSMHTTP };

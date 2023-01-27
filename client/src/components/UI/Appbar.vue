@@ -37,7 +37,6 @@
 </template>
 <style scoped></style>
 <script setup>
-import { ShibHTTP } from "../../lib/http";
 import { useStore } from "vuex";
 import { computed } from "@vue/reactivity";
 
@@ -50,11 +49,7 @@ const savedUser = computed(() => {
 });
 
 const logout = () => {
-  console.log("logout");
-  ShibHTTP.get("Shibboleth.sso/Logout").then((response) => {
-    console.log(response);
-    window.location.reload();
-  });
+  window.location.assign("Shibboleth.sso/Logout");
 };
 
 const editProfile = () => {

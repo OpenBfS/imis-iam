@@ -30,7 +30,9 @@
             </SSO>
 
             <!-- SAML and local-only logout. -->
-            <Logout>SAML2 Local</Logout>
+            <Logout outgoingBindings="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">
+                SAML2 Local
+            </Logout>
 
             <!-- Administrative logout. -->
             <LogoutInitiator type="Admin" Location="/Logout/Admin" acl="127.0.0.1 ::1" />
