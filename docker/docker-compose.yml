@@ -43,7 +43,10 @@ services:
     ports:
       - ${KC_HOSTNAME_PORT}:8080
     environment:
+      - PROTOCOLL
       - KC_HOSTNAME_URL=${PROTOCOLL}://${KC_HOSTNAME}:${KC_HOSTNAME_PORT}
+      - SP_HOSTNAME=${KC_HOSTNAME}
+      - SP_PORT
     env_file:
       - keycloak/.env
   client:

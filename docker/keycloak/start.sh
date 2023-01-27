@@ -60,10 +60,12 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms" \
 
 # Create SAML client for the client web application
 echo "Creating iam client: $IMIS_REALM->$(jq .clientId ${DIR}/iam_client.json)"
+SP_URL="${PROTOCOLL}://${SP_HOSTNAME}:${SP_PORT}"
+CLIENT_CONFIG=$(sed "s@%SP_URL@${SP_URL}@g" ${DIR}/iam_client.json)
 curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TKN" \
-    -d @${DIR}/iam_client.json
+    --data "$CLIENT_CONFIG"
 
 # Add inital user
 echo "Creating example users"
