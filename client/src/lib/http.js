@@ -33,8 +33,9 @@ HTTP.interceptors.response.use(
   }
 );
 
-const OSMHTTP = axios.create({
-  baseURL: "/",
+// Base URL for photon geocoder API
+const PhotonHTTP = axios.create({
+  baseURL: "/photon",
 });
 
-export { HTTP, OSMHTTP };
+export { HTTP, PhotonHTTP };

@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { Promise } from "core-js";
-import { OSMHTTP } from "../lib/http";
+import { PhotonHTTP } from "../lib/http";
 export const coordinates = {
   namespaced: true,
   state: () => ({
@@ -32,7 +32,7 @@ export const coordinates = {
   actions: {
     loadCoordinates({ commit }, query) {
       return new Promise((resolve, reject) => {
-        OSMHTTP.get("/osm/photon/api?q=" + query)
+        PhotonHTTP.get("/api?q=" + query)
           .then((response) => {
             commit("setCoordinateList", response.data);
             resolve(response);

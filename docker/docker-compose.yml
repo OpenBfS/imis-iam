@@ -69,6 +69,7 @@ services:
       - SP_PORT
       - KC_HOSTNAME
       - KC_HOSTNAME_PORT
+      - PHOTON_URL
 networks:
   imis3:
     name: imis3
