@@ -111,6 +111,8 @@
                   dense
                   :label="$t('institution.coordinates')"
                   :loading="coordinatesLoading"
+                  :error="coordinatesError"
+                  :errorMessages="coordinatesErrorMessages"
                   :items="coordinates"
                   item-title="properties.display"
                   item-value="id"
@@ -428,6 +430,8 @@ const hasNoChange = computed(() => {
 });
 
 const coordinatesLoading = ref(false);
+const coordinatesError = ref(false);
+const coordinatesErrorMessages = ref("");
 const coordinatesReturnObj = ref(true);
 
 //Handle coordinates picked
@@ -442,9 +446,18 @@ const loadCoordinates = (queryString) => {
 };
 const triggerLoadCoordinates = debounce((queryString) => {
   coordinatesLoading.value = true;
-  loadCoordinates(queryString).then(() => {
-    coordinatesLoading.value = false;
-  });
+  loadCoordinates(queryString).then(
+    () => {
+      coordinatesLoading.value = false;
+      coordinatesError.value = false;
+      coordinatesErrorMessages.value = "";
+    },
+    (error) => {
+      coordinatesLoading.value = false;
+      coordinatesError.value = true;
+      coordinatesErrorMessages.value = error.message;
+    }
+  );
 }, 500);
 watch(
   () => coordinates.value.coordinate,
