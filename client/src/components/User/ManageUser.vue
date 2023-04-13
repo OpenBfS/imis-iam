@@ -291,10 +291,7 @@ const originalUser = ref(store.state.application.savedItem);
 const processType = ref(store.state.application.processType);
 
 const getUserMemberships = () => {
-  HTTP.get("iamuser/membership")
-    .then((response) => {
-      store.commit("user/setMemberships", response.data);
-    })
+  store.dispatch("user/loadMemberships")
     .catch(() => {
       hasLoadingError.value = false;
     });

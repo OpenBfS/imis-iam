@@ -98,5 +98,7 @@ onMounted(() => {
     .catch(() => {
       hasLoadingError.value = true;
     });
+  store
+    .dispatch("user/loadMemberships")
 });
 </script>

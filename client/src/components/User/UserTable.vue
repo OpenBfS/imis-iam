@@ -13,6 +13,7 @@
       <th class="text-left">{{ $t("user.lastname") }}</th>
       <th class="text-left">{{ $t("label.email") }}</th>
       <th class="text-left">{{ $t("user.phone") }}</th>
+      <th class="text-left">{{ $t("user.label_memberships") }}</th>
       <th class="text-left">{{ $t("label.actions") }}</th>
     </thead>
     <tbody>
@@ -22,6 +23,7 @@
         <td>{{ user.lastName }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.phone }}</td>
+        <td>{{ getMembershipNamesById(user.groups) }}</td>
         <td class="d-flex">
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
@@ -66,7 +68,7 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { expUser } from "@/components/User/user";
 const props = defineProps({
   users: Array,
@@ -74,6 +76,7 @@ const props = defineProps({
 
 const store = useStore();
 const savedUser = ref();
+
 // Deep Copy for objects
 const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
@@ -102,4 +105,19 @@ const onEditClicked = (id) => {
   store.commit("application/setProcessType", "edit");
   store.commit("application/setShowManageUserDialog", true);
 };
+
+//Get the membership names as string using the given id array
+const getMembershipNamesById = (ids) => {
+  var result = "";
+  var memberships = store.state.user.memberships;
+  ids.forEach(id => {
+    var m = memberships.find(membership => membership.id === id);
+    if (result.length != 0) {
+      result += ", ";
+    }
+    result += m.name;
+  })
+  return result;
+};
+
 </script>
