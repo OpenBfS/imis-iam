@@ -8,22 +8,20 @@
 <template>
   <v-table class="ma-2 pa-2">
     <thead>
-      <th class="text-left">{{ $t("user.id") }}</th>
       <th class="text-left">{{ $t("user.username") }}</th>
       <th class="text-left">{{ $t("user.firstname") }}</th>
       <th class="text-left">{{ $t("user.lastname") }}</th>
       <th class="text-left">{{ $t("label.email") }}</th>
+      <th class="text-left">{{ $t("user.phone") }}</th>
       <th class="text-left">{{ $t("label.actions") }}</th>
     </thead>
     <tbody>
       <tr v-for="user in props.users" :key="user.id">
-        <td class="text-truncate" style="max-width: 150px">
-          {{ user.id }}
-        </td>
         <td>{{ user.username }}</td>
         <td>{{ user.firstName }}</td>
         <td>{{ user.lastName }}</td>
         <td>{{ user.email }}</td>
+        <td>{{ user.phone }}</td>
         <td class="d-flex">
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
