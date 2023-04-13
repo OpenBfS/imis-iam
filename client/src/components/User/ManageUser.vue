@@ -291,10 +291,9 @@ const originalUser = ref(store.state.application.savedItem);
 const processType = ref(store.state.application.processType);
 
 const getUserMemberships = () => {
-  store.dispatch("user/loadMemberships")
-    .catch(() => {
-      hasLoadingError.value = false;
-    });
+  store.dispatch("user/loadMemberships").catch(() => {
+    hasLoadingError.value = false;
+  });
 };
 const getUserPsositions = () => {
   HTTP.get("iamuser/position")

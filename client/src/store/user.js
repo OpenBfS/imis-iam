@@ -35,11 +35,11 @@ export const user = {
     loadMemberships({ commit }) {
       return new Promise((resolve, reject) => {
         HTTP.get("iamuser/membership")
-        .then((response) => {
-          commit("setMemberships", response.data);
-          resolve(response);
-        })
-        .catch((error) => reject(error));
+          .then((response) => {
+            commit("setMemberships", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
       });
     },
     loadUsers({ commit }) {

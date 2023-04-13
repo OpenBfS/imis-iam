@@ -68,7 +68,7 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { expUser } from "@/components/User/user";
 const props = defineProps({
   users: Array,
@@ -110,14 +110,13 @@ const onEditClicked = (id) => {
 const getMembershipNamesById = (ids) => {
   var result = "";
   var memberships = store.state.user.memberships;
-  ids.forEach(id => {
-    var m = memberships.find(membership => membership.id === id);
+  ids.forEach((id) => {
+    var m = memberships.find((membership) => membership.id === id);
     if (result.length != 0) {
       result += ", ";
     }
     result += m.name;
-  })
+  });
   return result;
 };
-
 </script>
