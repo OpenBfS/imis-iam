@@ -26,6 +26,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -94,18 +95,28 @@ public class UserProvider implements RealmResourceProvider {
     /**
      * Get all users.
      * @param headers Request headers
+     * @param search Optional search parameter
      * @return List of user json objects
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsers(@Context HttpHeaders headers) {
+    public Response getUsers(@Context HttpHeaders headers,
+            @QueryParam("search") String search) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         Stream<UserModel> users = session.users()
             .searchForUserStream(realm, Collections.emptyMap());
+        String filter = search != null ? search.toUpperCase() : "";
         List<User> userList = new ArrayList<User>();
-        for (UserModel user: users.collect(Collectors.toList())) {
+        List<UserModel> filteredModels = users
+            .filter((user) -> {
+                return user.getUsername().toUpperCase().contains(filter)
+                    || user.getFirstName().toUpperCase().contains(filter)
+                    || user.getLastName().toUpperCase().contains(filter);
+            })
+            .collect(Collectors.toList());
+        for (UserModel user: filteredModels) {
             userList.add(new User(user, em));
         }
         userList = auth.filter(userList, headers);

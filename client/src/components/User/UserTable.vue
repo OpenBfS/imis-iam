@@ -108,6 +108,9 @@ const onEditClicked = (id) => {
 
 //Get the membership names as string using the given id array
 const getMembershipNamesById = (ids) => {
+  if (!ids) {
+    return;
+  }
   var result = "";
   var memberships = store.state.user.memberships;
   ids.forEach((id) => {

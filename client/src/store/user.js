@@ -42,9 +42,10 @@ export const user = {
           .catch((error) => reject(error));
       });
     },
-    loadUsers({ commit }) {
+    loadUsers({ commit }, searchString) {
+      var url = searchString ? "/iamuser?search=" + searchString : "/iamuser";
       return new Promise((resolve, reject) => {
-        HTTP.get("/iamuser")
+        HTTP.get(url)
           .then((response) => {
             commit("setUsers", response.data);
             resolve(response);

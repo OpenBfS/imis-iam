@@ -22,6 +22,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -106,13 +107,22 @@ public class InstitutionProvider implements RealmResourceProvider {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getInstitutions(@Context HttpHeaders headers) {
+    public Response getInstitutions(@Context HttpHeaders headers,
+            @QueryParam("search") String search) {
+        String filter = search != null ?
+                "%" + search.toLowerCase() + "%" : "";
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
         Root<Institution> root = query.from(Institution.class);
         query.select(root);
+        if (!filter.isEmpty()) {
+            query.where(cb.like(
+                cb.lower(root.get("name")),
+                filter
+            ));
+        }
         List<Institution> institutions = auth.filter(
             em.createQuery(query).getResultList(), headers);
         return Response.ok(institutions).build();

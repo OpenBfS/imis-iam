@@ -120,7 +120,7 @@ public class ExportProvider implements RealmResourceProvider {
             headers.getHeaderString(Constants.SHIB_USER_HEADER));
 
         UserProvider userProvider = new UserProvider(session);
-        Response userResponse = userProvider.getUsers(headers);
+        Response userResponse = userProvider.getUsers(headers, null);
         @SuppressWarnings("unchecked")
         ArrayList<User> users = userResponse.readEntity(ArrayList.class);
         return doExport(exporter, users, i18n);
@@ -157,7 +157,7 @@ public class ExportProvider implements RealmResourceProvider {
                 headers.getHeaderString(Constants.SHIB_USER_HEADER));
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
-        Response instResponse = instProvider.getInstitutions(headers);
+        Response instResponse = instProvider.getInstitutions(headers, null);
         @SuppressWarnings("unchecked")
         ArrayList<Institution> institutions
             = instResponse.readEntity(ArrayList.class);

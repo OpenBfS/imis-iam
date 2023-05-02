@@ -41,8 +41,8 @@ const searchRequest = () => {
   // ToDo: Replace this with the right request for search
   // once this gets implemnted in backend
   Promise.all([
-    store.dispatch("user/loadUsers"),
-    store.dispatch("institution/loadInstitutions"),
+    store.dispatch("user/loadUsers", searchString.value),
+    store.dispatch("institution/loadInstitutions", searchString.value),
   ]).then(() => {
     store.commit("user/setFoundUsers", store.state.user.users.slice(0, 3));
     store.commit(

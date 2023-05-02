@@ -48,9 +48,12 @@ export const institution = {
     },
   },
   actions: {
-    loadInstitutions({ commit }) {
+    loadInstitutions({ commit }, searchString) {
+      var url = searchString
+        ? "/institution?search=" + searchString
+        : "/institution";
       return new Promise((resolve, reject) => {
-        HTTP.get("/institution")
+        HTTP.get(url)
           .then((response) => {
             commit("setInstitutionList", response.data);
             resolve(response);
