@@ -43,9 +43,10 @@ export const user = {
       });
     },
     loadUsers({ commit }, searchString) {
-      var url = searchString ? "/iamuser?search=" + searchString : "/iamuser";
       return new Promise((resolve, reject) => {
-        HTTP.get(url)
+        HTTP.get("/iamuser", {
+          params: { search: searchString },
+        })
           .then((response) => {
             commit("setUsers", response.data);
             resolve(response);
