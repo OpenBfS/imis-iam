@@ -7,7 +7,6 @@
 package de.intevation.iam;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -19,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -40,6 +40,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorizer;
@@ -105,23 +106,36 @@ public class UserProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
-        Stream<UserModel> users = session.users()
-            .searchForUserStream(realm, Collections.emptyMap());
-        String filter = search != null && !search.isEmpty() ?
-                search.toUpperCase() : "";
-        List<User> userList = new ArrayList<User>();
-        List<UserModel> filteredModels = users
-            .filter((user) -> {
-                return user.getUsername().toUpperCase().contains(filter)
-                    || user.getFirstName().toUpperCase().contains(filter)
-                    || user.getLastName().toUpperCase().contains(filter);
-            })
-            .collect(Collectors.toList());
-        for (UserModel user: filteredModels) {
-            userList.add(new User(user, em));
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<UserEntity> query = builder.createQuery(
+            UserEntity.class);
+        Root<UserEntity> root = query.from(UserEntity.class);
+        query.select(root);
+        //Filter by realm
+        Predicate filters = builder.equal(root.get("realmId"), realm.getId());
+        //If search string is given: add to filters
+        if (search != null && !search.isEmpty()) {
+            Predicate searchFilters;
+            String filter = search != null && !search.isEmpty()?
+                "%" + search.toLowerCase() + "%" : "";
+            Predicate usernameFilter = builder.like(root.get("username"),
+                filter);
+            Predicate firstNameFilter = builder.like(root.get("firstName"),
+                filter);
+            Predicate lastNameFilter = builder.like(root.get("lastName"),
+                filter);
+            searchFilters = builder.or(usernameFilter, lastNameFilter);
+            searchFilters = builder.or(searchFilters, firstNameFilter);
+            filters = builder.and(filters, searchFilters);
         }
-        userList = auth.filter(userList, headers);
-        return Response.ok(userList).build();
+        query.where(filters);
+        //Create User model list from UserEntity result
+        List<User> userList = em.createQuery(query).getResultStream()
+            .map(userEntity -> new User(
+                session.users().getUserById(realm, userEntity.getId()),
+                em))
+            .collect(Collectors.toList());
+        return Response.ok(auth.filter(userList, headers)).build();
     }
 
     /**
