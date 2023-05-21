@@ -107,7 +107,8 @@ public class UserProvider implements RealmResourceProvider {
         RealmModel realm = session.getContext().getRealm();
         Stream<UserModel> users = session.users()
             .searchForUserStream(realm, Collections.emptyMap());
-        String filter = search != null ? search.toUpperCase() : "";
+        String filter = search != null && !search.isEmpty() ?
+                search.toUpperCase() : "";
         List<User> userList = new ArrayList<User>();
         List<UserModel> filteredModels = users
             .filter((user) -> {
