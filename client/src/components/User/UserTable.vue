@@ -70,12 +70,17 @@
 import { useStore } from "vuex";
 import { ref } from "vue";
 import { expUser } from "@/components/User/user";
+import { onMounted } from "vue";
 const props = defineProps({
   users: Array,
 });
 
 const store = useStore();
 const savedUser = ref();
+
+onMounted(() => {
+  store.dispatch("user/loadMemberships");
+});
 
 // Deep Copy for objects
 const cloneObject = (obj) => {
