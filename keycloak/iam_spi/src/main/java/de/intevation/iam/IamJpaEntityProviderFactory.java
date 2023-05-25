@@ -12,7 +12,7 @@ import org.keycloak.connections.jpa.entityprovider.JpaEntityProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
-public class IamJpaEntityProviderFactory implements JpaEntityProviderFactory{
+public class IamJpaEntityProviderFactory implements JpaEntityProviderFactory {
 
     protected static final String ID = "iam-entity-provider";
 

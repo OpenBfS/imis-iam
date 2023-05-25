@@ -116,8 +116,8 @@ public class UserProvider implements RealmResourceProvider {
         //If search string is given: add to filters
         if (search != null && !search.isEmpty()) {
             Predicate searchFilters;
-            String filter = search != null && !search.isEmpty()?
-                "%" + search.toLowerCase() + "%" : "";
+            String filter = search != null && !search.isEmpty()
+                ? "%" + search.toLowerCase() + "%" : "";
             Predicate usernameFilter = builder.like(root.get("username"),
                 filter);
             Predicate firstNameFilter = builder.like(root.get("firstName"),

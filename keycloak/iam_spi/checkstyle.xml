@@ -144,27 +144,15 @@ Maven Checkstyle plugin. Some design related checks where removed.
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
     <module name="EmptyForIteratorPad"/>
-    <module name="MethodParamPad">
-      <property name="severity" value="warning"/>
-    </module>
-    <module name="NoWhitespaceAfter">
-      <property name="severity" value="warning"/>
-    </module>
-    <module name="NoWhitespaceBefore">
-      <property name="severity" value="warning"/>
-    </module>
-    <module name="OperatorWrap">
-      <property name="severity" value="warning"/>
-    </module>
-    <module name="ParenPad">
-      <property name="severity" value="warning"/>
-    </module>
+    <module name="MethodParamPad"/>
+    <module name="NoWhitespaceAfter"/>
+    <module name="NoWhitespaceBefore"/>
+    <module name="OperatorWrap"/>
+    <module name="ParenPad"/>
     <module name="TypecastParenPad"/>
-    <module name="WhitespaceAfter">
-      <property name="severity" value="warning"/>
-    </module>
+    <module name="WhitespaceAfter"/>
     <module name="WhitespaceAround">
-      <property name="severity" value="warning"/>
+      <property name="allowEmptyMethods" value="true"/>
     </module>
 
 

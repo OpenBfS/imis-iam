@@ -110,8 +110,8 @@ public class InstitutionProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getInstitutions(@Context HttpHeaders headers,
             @QueryParam("search") String search) {
-        String filter = search != null && !search.isEmpty()?
-                "%" + search.toLowerCase() + "%" : "";
+        String filter = search != null && !search.isEmpty()
+            ? "%" + search.toLowerCase() + "%" : "";
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
