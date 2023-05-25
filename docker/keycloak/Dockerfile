@@ -16,8 +16,11 @@ ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
 
 # Deploy SPI
 ENV SPI_SRC /opt/iam_spi
-ADD keycloak/iam_spi ${SPI_SRC}
 WORKDIR ${SPI_SRC}
+# Download dependencies before adding sources to leverage build cache
+ADD keycloak/iam_spi/pom.xml ${SPI_SRC}/
+RUN mvn -q dependency:go-offline
+ADD keycloak/iam_spi ${SPI_SRC}
 RUN mvn -q package
 RUN cp target/iam-api-extension-jar-with-dependencies.jar $KEYCLOAK_HOME/providers/
 
