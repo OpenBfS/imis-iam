@@ -128,7 +128,7 @@
   </v-dialog>
 </template>
 <style lang="scss" scoped>
-::v-deep .v-card {
+::v-deep(.v-card) {
   align-self: center;
 }
 </style>
