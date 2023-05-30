@@ -6,22 +6,15 @@
  */
 package de.intevation.iam.model.jpa;
 
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.keycloak.models.jpa.entities.UserEntity;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
@@ -84,23 +77,6 @@ public class Institution {
 
     @Column(name = "active")
     private Boolean active;
-
-    @ManyToMany
-    @JoinTable(
-        name = "iam_institution_user",
-        joinColumns = { @JoinColumn(name = "institution_id")},
-        inverseJoinColumns = {@JoinColumn(name = "user_id")}
-    )
-    @JsonIgnore
-    private List<UserEntity> userEntities;
-
-    public List<UserEntity> getUserEntities() {
-        return userEntities;
-    }
-
-    public void setUserEntities(List<UserEntity> userEntities) {
-        this.userEntities = userEntities;
-    }
 
     @Transient
     private Boolean readonly;
