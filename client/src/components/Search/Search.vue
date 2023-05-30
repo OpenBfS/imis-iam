@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, defineAsyncComponent, watch } from "vue";
+import { ref, defineAsyncComponent, onMounted, watch } from "vue";
 import { debounce } from "debounce";
 import { useStore } from "vuex";
 
@@ -37,17 +37,14 @@ const Results = defineAsyncComponent(() =>
 const store = new useStore();
 const searchString = ref("");
 const searchRequest = () => {
-  // Simulate the search request
-  // ToDo: Replace this with the right request for search
-  // once this gets implemnted in backend
   Promise.all([
     store.dispatch("user/loadUsers", searchString.value),
     store.dispatch("institution/loadInstitutions", searchString.value),
   ]).then(() => {
-    store.commit("user/setFoundUsers", store.state.user.users.slice(0, 3));
+    store.commit("user/setFoundUsers", store.state.user.users);
     store.commit(
       "institution/setFoundInstitutions",
-      store.state.institution.institutions.slice(0, 3)
+      store.state.institution.institutions
     );
   });
 };
@@ -62,4 +59,9 @@ watch(
     }
   }
 );
+onMounted(() => {
+  store.dispatch("user/loadMemberships").then(() => {
+    searchRequest();
+  });
+});
 </script>
