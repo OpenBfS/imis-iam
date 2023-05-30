@@ -370,13 +370,13 @@ const createUser = (shouldClose) => {
 
 const updateUser = () => {
   resetNotification();
-  HTTP.put("/iamuser", user.value)
+  store
+    .dispatch("user/updateUser", user.value)
     .then(() => {
       // Update current user Profile and thus the data in App bar.
       if (store.state.profile.userData.id === user.value.id) {
         store.dispatch("profile/loadProfile");
       }
-      getUsers();
       store.commit("application/setOwnAccount", false);
       store.commit("application/setShowManageUserDialog", false);
     })

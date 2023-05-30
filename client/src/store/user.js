@@ -30,6 +30,13 @@ export const user = {
     setRoles: (state, data) => {
       state.roles = data;
     },
+    updateUserEntity: (state, data) => {
+      state.users.forEach((element, index) => {
+        if (element.id === data.id) {
+          state.users[index] = data;
+        }
+      });
+    },
   },
   actions: {
     loadMemberships({ commit }) {
@@ -59,6 +66,17 @@ export const user = {
         HTTP.get("iamuser/roles")
           .then((response) => {
             commit("setRoles", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
+    },
+    updateUser({ commit }, user) {
+      return new Promise((resolve, reject) => {
+        HTTP.put("iamuser", user)
+          .then((response) => {
+            //Update the stored entity using repsonse data
+            commit("updateUserEntity", response.data);
             resolve(response);
           })
           .catch((error) => reject(error));

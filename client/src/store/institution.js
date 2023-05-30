@@ -46,6 +46,13 @@ export const institution = {
     setInstitution: (state, data) => {
       state.institution = data;
     },
+    updateInstitutionEntity: (state, data) => {
+      state.institutions.forEach((element, index) => {
+        if (element.id === data.id) {
+          state.institutions[index] = data;
+        }
+      });
+    },
   },
   actions: {
     loadInstitutions({ commit }, searchString) {
@@ -55,6 +62,16 @@ export const institution = {
         })
           .then((response) => {
             commit("setInstitutionList", response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
+    },
+    updateInstitution({ commit }, institution) {
+      return new Promise((resolve, reject) => {
+        HTTP.put("/institution", institution)
+          .then((response) => {
+            commit("updateInstitutionEntity", response.data);
             resolve(response);
           })
           .catch((error) => reject(error));

@@ -390,9 +390,9 @@ const createInstitution = () => {
 };
 const updateInstitution = () => {
   let payload = { ...institution.value };
-  HTTP.put("/institution", payload)
+  store
+    .dispatch("institution/updateInstitution", payload)
     .then(() => {
-      getInstitutions();
       store.commit("application/setShowManageInstitutionDialog", false);
     })
     .catch(() => {
