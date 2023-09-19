@@ -10,7 +10,7 @@ package de.intevation.iam.auth;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.HttpHeaders;
 
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;

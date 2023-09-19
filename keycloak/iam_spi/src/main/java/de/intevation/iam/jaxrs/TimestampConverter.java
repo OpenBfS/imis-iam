@@ -8,11 +8,11 @@ package de.intevation.iam.jaxrs;
 
 import java.sql.Timestamp;
 
-import javax.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverter;
 
 /**
  * Convert values used with method parameters annotated with
- * javax.ws.rs.*Param to/from java.sql.Timestamp.
+ * jakarta.ws.rs.*Param to/from java.sql.Timestamp.
  */
 public class TimestampConverter implements ParamConverter<Timestamp> {
     @Override

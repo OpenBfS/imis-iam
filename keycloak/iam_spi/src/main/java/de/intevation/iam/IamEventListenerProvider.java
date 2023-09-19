@@ -8,7 +8,7 @@ package de.intevation.iam;
 
 import java.util.logging.Logger;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.events.Event;

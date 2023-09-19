@@ -8,13 +8,15 @@ package de.intevation.iam.model.representation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.CriteriaBuilder.In;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 
 import org.keycloak.models.UserModel;
 import org.keycloak.models.jpa.entities.GroupEntity;
@@ -136,17 +138,15 @@ public class User {
                 USER_PARAM, jpaModel.getUserEntity());
             List<UserGroupMembershipEntity> groupMappings
                 = groupMappingQuery.getResultList();
-            //Query group entities as mapping entities only contain group ids
-            CriteriaQuery<GroupEntity> groupQuery
-                = cb.createQuery(GroupEntity.class);
-            Root<GroupEntity> groupRoot = groupQuery.from(GroupEntity.class);
-            groupQuery.select(groupRoot);
-            In<String> groupIdFilter = cb.in(root.get(ID_PARAM));
-            groupMappings.forEach(
-                mapping -> groupIdFilter.value(mapping.getGroupId()));
-            groupQuery.where(groupIdFilter);
-            List<GroupEntity> groupEntities
-                = em.createQuery(groupQuery).getResultList();
+            List<String> idList = groupMappings
+                .stream()
+                .map(map -> map.getGroupId())
+                .collect(Collectors.toList());
+            Query query = em.createNativeQuery(
+                "SELECT * FROM keycloak.KEYCLOAK_GROUP WHERE ID in (:ids)",
+                GroupEntity.class);
+            query.setParameter("ids", idList);
+            List<GroupEntity> groupEntities = query.getResultList();
             this.groups = new ArrayList<String>();
             groupEntities.forEach(groupEnt -> groups.add(groupEnt.getId()));
         }

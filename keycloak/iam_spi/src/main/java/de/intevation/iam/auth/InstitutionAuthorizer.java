@@ -8,7 +8,7 @@ package de.intevation.iam.auth;
 
 import java.util.List;
 
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.HttpHeaders;
 
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
