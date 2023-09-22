@@ -31,7 +31,8 @@ ADD docker/keycloak ${SRC_DIR}
 
 RUN ln -fs $SRC_DIR/keycloak.conf $KEYCLOAK_HOME/conf/keycloak.conf
 
-RUN ${KEYCLOAK_HOME}/bin/kc.sh build
+#Set freemarker template provider as default
+RUN ${KEYCLOAK_HOME}/bin/kc.sh build --spi-email-template-provider=freemarker
 
 ENV KEYCLOAK_ADMIN admin
 ENV KEYCLOAK_ADMIN_PASSWORD secret
