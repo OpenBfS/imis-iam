@@ -23,7 +23,7 @@ wait_for_db () {
 
 # Start Keycloak
 wait_for_db
-${KEYCLOAK_HOME}/bin/kc.sh --verbose start &
+${KEYCLOAK_HOME}/bin/kc.sh --verbose start --optimized &
 wait-for-it localhost:8080 -t 120 || { echo "Failed starting Keycloak"; exit 1; }
 
 echo "Configure realm, SAML client and example account if not existing ..."
