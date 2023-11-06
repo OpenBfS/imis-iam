@@ -36,10 +36,10 @@ in keycloak/.env.
 
 ## Client application
 
-Additionally, another user is created within Keycloak which can be used to access
-the client application:
+Additionally, other users are created within Keycloak which can be used to access
+the client application with the roles according to the usernames:
 
-* Username: exampleuser
+* Usernames: exampleuser, redakteur, chefredakteur, techadmin
 * Password: secret
 
 Further, the users provided by the LDAP container can be used to login.
