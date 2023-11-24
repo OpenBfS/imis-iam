@@ -7,8 +7,7 @@
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
-import { createI18n } from "vue-i18n";
-import de from "@/locales/de";
+import i18n from "@/i18n";
 import { vi } from "vitest";
 import store from "@/store";
 import { mount } from "@vue/test-utils";
@@ -19,15 +18,6 @@ import { test, expect } from "vitest";
 const vuetify = createVuetify({
   components,
   directives,
-});
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: "de",
-  messages: {
-    de: de,
-  },
 });
 
 // Mock HTTP request/response

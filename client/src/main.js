@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { createApp, defineAsyncComponent } from "vue";
-import { createI18n, useI18n } from "vue-i18n";
+import { useI18n } from "vue-i18n";
 import { createVueI18nAdapter } from "vuetify/locale/adapters/vue-i18n";
 import UIHeader from "@/components/UI/UIHeader.vue";
 
@@ -14,21 +14,11 @@ import vuetify from "./plugins/vuetify";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import i18n from "./i18n";
 
 const UIAlert = defineAsyncComponent(() =>
   import("@/components/UI/UIAlert.vue")
 );
-
-import de from "./locales/de";
-
-const i18n = createI18n({
-  legacy: false,
-  globalInjection: true,
-  locale: "de",
-  messages: {
-    de: de,
-  },
-});
 
 vuetify.locale = createVueI18nAdapter({ i18n, useI18n });
 
