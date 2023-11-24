@@ -16,7 +16,9 @@
         v-bind:message="$store.state.application.httpErrorMessage"
       />
       <ExportDialog v-if="$store.state.application.showExportDialog" />
-      <ManageUser v-if="$store.state.application.showManageUserDialog" />
+      <v-dialog v-model="$store.state.application.showManageUserDialog">
+        <ManageUser />
+      </v-dialog>
       <ManageInstitution
         v-if="$store.state.application.showManageInstitutionDialog"
       />
@@ -24,6 +26,12 @@
     <Appfooter />
   </v-app>
 </template>
+
+<style lang="scss" scoped>
+::v-deep(.v-card) {
+  align-self: center;
+}
+</style>
 
 <script>
 import { defineAsyncComponent, onMounted } from "vue";
