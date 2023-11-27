@@ -36,3 +36,23 @@ test("First name is displayed in respective input", () => {
 test("Missing attribute is rendered as empty string", () => {
   expect(wrapper.get("input[name='lastname']").element.value).toBe("");
 });
+
+test("Input changes existing attribute", () => {
+  const fieldName = "firstName";
+  expect(user[fieldName]).toBeDefined();
+  testFieldInput(fieldName);
+});
+
+test("Input adds non-existing attribute", () => {
+  const fieldName = "lastName";
+  expect(user[fieldName]).toBeUndefined();
+  testFieldInput("lastName");
+});
+
+async function testFieldInput(name) {
+  const input = wrapper.get(`input[name='${name.toLowerCase()}']`);
+  const newValue = "test";
+  await input.setValue(newValue);
+  expect(input.element.value).toBe(newValue);
+  expect(user[name]).toBe(newValue);
+}
