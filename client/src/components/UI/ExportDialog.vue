@@ -6,75 +6,73 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-dialog v-model="show">
-    <v-card min-width="460px" class="align-self-center">
-      <v-card-title>{{ $t("label.csv_options") }}</v-card-title>
-      <v-divider></v-divider>
-      <v-container class="mt-4">
-        <v-row justify="center">
-          <v-col justify="center" cols="10">
-            <v-select
-              :no-data-text="$t('label.no_data_text')"
-              :label="$t('label.field_seperator')"
-              :items="fieldSeparators"
-              v-model="csvOptions.fieldSeparator"
-              item-title="name"
-              item-value="value"
-            >
-            </v-select>
-            <v-select
-              :no-data-text="$t('label.no_data_text')"
-              :label="$t('label.row_delimiter')"
-              :items="rowDelimiters"
-              item-title="name"
-              item-value="value"
-              v-model="csvOptions.rowDelimiter"
-              persistent-hint
-            >
-            </v-select>
-            <v-combobox
-              :no-data-text="$t('label.no_data_text')"
-              :label="$t('label.encoding')"
-              :items="encoding"
-              item-title="name"
-              item-value="value"
-              v-model="csvOptions.encoding"
-              persistent-hint
-            >
-            </v-combobox>
-            <v-select
-              :no-data-text="$t('label.no_data_text')"
-              :label="$t('label.quote_type')"
-              :items="quoteTypes"
-              item-title="name"
-              item-value="value"
-              v-model="csvOptions.quoteType"
-              persistent-hint
-            >
-            </v-select>
-          </v-col>
-          <UIAlert
-            v-if="hasRequestError"
-            v-bind:isSuccessful="!hasRequestError"
-            v-bind:message="$store.state.application.httpErrorMessage"
-          />
-        </v-row>
-      </v-container>
-      <v-divider></v-divider>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="accent" @click="exportFile">
-          {{ $t("label.export") }}
-        </v-btn>
-        <v-btn
-          color="accent"
-          @click="$store.commit('application/setShowExportDialog', false)"
-        >
-          {{ $t("button.cancel") }}
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <v-card min-width="460px">
+    <v-card-title>{{ $t("label.csv_options") }}</v-card-title>
+    <v-divider></v-divider>
+    <v-container class="mt-4">
+      <v-row justify="center">
+        <v-col justify="center" cols="10">
+          <v-select
+            :no-data-text="$t('label.no_data_text')"
+            :label="$t('label.field_seperator')"
+            :items="fieldSeparators"
+            v-model="csvOptions.fieldSeparator"
+            item-title="name"
+            item-value="value"
+          >
+          </v-select>
+          <v-select
+            :no-data-text="$t('label.no_data_text')"
+            :label="$t('label.row_delimiter')"
+            :items="rowDelimiters"
+            item-title="name"
+            item-value="value"
+            v-model="csvOptions.rowDelimiter"
+            persistent-hint
+          >
+          </v-select>
+          <v-combobox
+            :no-data-text="$t('label.no_data_text')"
+            :label="$t('label.encoding')"
+            :items="encoding"
+            item-title="name"
+            item-value="value"
+            v-model="csvOptions.encoding"
+            persistent-hint
+          >
+          </v-combobox>
+          <v-select
+            :no-data-text="$t('label.no_data_text')"
+            :label="$t('label.quote_type')"
+            :items="quoteTypes"
+            item-title="name"
+            item-value="value"
+            v-model="csvOptions.quoteType"
+            persistent-hint
+          >
+          </v-select>
+        </v-col>
+        <UIAlert
+          v-if="hasRequestError"
+          v-bind:isSuccessful="!hasRequestError"
+          v-bind:message="$store.state.application.httpErrorMessage"
+        />
+      </v-row>
+    </v-container>
+    <v-divider></v-divider>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="accent" @click="exportFile">
+        {{ $t("label.export") }}
+      </v-btn>
+      <v-btn
+        color="accent"
+        @click="$store.commit('application/setShowExportDialog', false)"
+      >
+        {{ $t("button.cancel") }}
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script setup>
@@ -83,7 +81,6 @@ import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
 
-const show = true;
 const store = useStore();
 const { t } = useI18n();
 const { hasRequestError } = useNotification();

@@ -15,13 +15,15 @@
         v-if="hasLoadingError"
         v-bind:message="$store.state.application.httpErrorMessage"
       />
-      <ExportDialog v-if="$store.state.application.showExportDialog" />
+      <v-dialog v-model="$store.state.application.showExportDialog">
+        <ExportDialog />
+      </v-dialog>
       <v-dialog v-model="$store.state.application.showManageUserDialog">
         <ManageUser />
       </v-dialog>
-      <ManageInstitution
-        v-if="$store.state.application.showManageInstitutionDialog"
-      />
+      <v-dialog v-model="$store.state.application.showManageInstitutionDialog">
+        <ManageInstitution />
+      </v-dialog>
     </v-main>
     <Appfooter />
   </v-app>
