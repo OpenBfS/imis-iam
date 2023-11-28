@@ -1,0 +1,104 @@
+/* Imis specific rules */
+
+/* Custom properties */
+:root {
+    --imis-primary-color:#5b8445;
+    --imis-secondary-color:#caddc1;
+    --background: white;
+    --imis-card-background-color: white;
+    --imis-border: 1px solid #dedede;
+
+    /* Button/Form colors */
+    --imis-button-primary-color: black;
+    --imis-button-primary-background-color: #5b8445;
+    --imis-button-primary-hover-color: black;
+    --imis-button-primary-background-hover-color: #779b63;
+}
+
+.imis-logo {
+    margin-left: 5px;
+}
+
+#imis-header {
+    background: var(--imis-secondary-color);
+    color: black;
+    height: 75px;
+    padding: 15px;
+}
+
+#imis-info {
+    margin-top: 5px;
+    margin-bottom: 75px;
+    border-width: 5px;
+    padding: 5px;
+    background-color: white;
+    width: 75%;
+
+    margin: 0 auto;
+    box-shadow: var(--pf-global--BoxShadow--lg);
+    padding: 0 20px;
+    padding-left: 5px;
+    border-top: 4px solid;
+    border-color: var(--imis-primary-color);
+}
+
+#imis-info ul{
+    list-style-type: circle;
+    padding-left: 15px;
+}
+
+#imis-footer {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    background-color: white;
+
+    box-shadow: var(--pf-global--BoxShadow--lg);
+    padding: 0 20px;
+    padding-left: 5px;
+    border-top: 4px solid;
+    border-color: var(--imis-primary-color);
+}
+#imis-footer div {
+    padding-left: 15px;
+}
+#imis-footer a {
+    color: black;
+}
+
+/** Modified KC rules */
+.login-pf body {
+    background: var(--background);
+}
+
+.card-pf {
+    position: relative;
+    margin: auto;
+    margin-top: 75px;
+    box-shadow: var(--pf-global--BoxShadow--lg);
+    max-width: 500px;
+    padding: 0 20px;
+    border-top: 4px solid;
+    border-color: var(--imis-primary-color);
+    background-color: var(--imis-card-background-color)
+}
+
+.pf-c-button.pf-m-primary {
+    color: var(--imis-button-primary-color);
+    background-color: var(--imis-button-primary-background-color);
+}
+
+.pf-m-primary:hover {
+    color: var(--imis-button-primary-hover-color);
+    background-color: var(--imis-button-primary-background-hover-color);
+}
+
+.pf-c-form-control:hover, .pf-c-form-control:focus {
+    border-bottom-color: var(--imis-button-primary-background-hover-color);
+    border-bottom-width: 2px;
+    border-bottom-width: var(--pf-global--BorderWidth--md);
+}
