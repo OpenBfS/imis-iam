@@ -1,9 +1,17 @@
 {
-    "firstName": "Example",
-    "lastName": "Redakteur",
     "username": "redakteur",
     "email": "example@redakteur.example",
     "enabled": "true",
+    "attributes": {
+        "firstName": "Example",
+        "lastName": "Redakteur",
+        "position": "Leiter",
+        "phone": "01234 123456",
+        "mobile": "0654-321",
+        "fax": "0123-654",
+        "oe": "oe",
+        "bfslocation": "location"
+    },
     "credentials": [
         {
             "type": "password",

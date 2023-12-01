@@ -1,0 +1,141 @@
+{
+  "attributes" : [ {
+    "name" : "username",
+    "displayName" : "${username}",
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "validations" : {
+      "length" : {
+        "min" : 3,
+        "max" : 255
+      },
+      "username-prohibited-characters" : { },
+      "up-username-not-idn-homograph" : { }
+    }
+  }, {
+    "name" : "email",
+    "displayName" : "${email}",
+    "required" : {
+      "roles" : [ "user" ]
+    },
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "validations" : {
+      "email" : { },
+      "length" : {
+        "max" : 255
+      }
+    }
+  }, {
+    "name" : "firstName",
+    "displayName" : "${firstName}",
+    "required" : {
+      "roles" : [ "user" ]
+    },
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "validations" : {
+      "length" : {
+        "max" : 255
+      },
+      "person-name-prohibited-characters" : { }
+    }
+  }, {
+    "name" : "lastName",
+    "displayName" : "${lastName}",
+    "required" : {
+      "roles" : [ "user" ]
+    },
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "validations" : {
+      "length" : {
+        "max" : 255
+      },
+      "person-name-prohibited-characters" : { }
+    }
+  }, {
+    "name" : "title",
+    "displayName" : "",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { }
+  }, {
+    "name" : "phone",
+    "displayName" : "",
+    "required" : {
+      "roles" : [ "admin", "user" ]
+    },
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { }
+  }, {
+    "name" : "mobile",
+    "displayName" : "",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { }
+  }, {
+    "name" : "fax",
+    "displayName" : "",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { }
+  }, {
+    "name" : "oe",
+    "displayName" : "",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { }
+  }, {
+    "name" : "bfslocation",
+    "displayName" : "",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { }
+  }, {
+    "name" : "position",
+    "displayName" : "",
+    "required" : {
+      "roles" : [ "admin", "user" ]
+    },
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : {
+      "inputType" : "select"
+    },
+    "validations" : {
+      "options" : {
+        "options" : [ "Leiter", "Vertreter", "Radiologischer Ansprechpartner", "Mitarbeiter", "IT-Ansprechperson", "Störplatz" ]
+      }
+    }
+  } ]
+}

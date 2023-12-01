@@ -20,8 +20,22 @@ vi.spyOn(HTTP, "get").mockResolvedValue({});
 const firstName = "One";
 const user = {
   id: "1",
-  username: "one",
-  firstName: firstName,
+  attributes: {
+    username: ["one"],
+    firstName: [firstName],
+  },
+  userProfileMetadata: {
+    attributes: [
+      {
+        name: "position",
+        validations: {
+          options: {
+            options: [],
+          },
+        },
+      },
+    ],
+  },
 };
 store.state.application.managedItem = user;
 
@@ -39,13 +53,13 @@ test("Missing attribute is rendered as empty string", () => {
 
 test("Input changes existing attribute", () => {
   const fieldName = "firstName";
-  expect(user[fieldName]).toBeDefined();
+  expect(user.attributes[fieldName]).toBeDefined();
   testFieldInput(fieldName);
 });
 
 test("Input adds non-existing attribute", () => {
   const fieldName = "lastName";
-  expect(user[fieldName]).toBeUndefined();
+  expect(user.attributes[fieldName]).toBeUndefined();
   testFieldInput("lastName");
 });
 
@@ -54,5 +68,5 @@ async function testFieldInput(name) {
   const newValue = "test";
   await input.setValue(newValue);
   expect(input.element.value).toBe(newValue);
-  expect(user[name]).toBe(newValue);
+  expect(user.attributes[name]).toStrictEqual([newValue]);
 }

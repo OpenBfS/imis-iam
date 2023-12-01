@@ -18,11 +18,11 @@
     </thead>
     <tbody>
       <tr v-for="user in props.users" :key="user.id">
-        <td>{{ user.username }}</td>
-        <td>{{ user.firstName }}</td>
-        <td>{{ user.lastName }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.phone }}</td>
+        <td>{{ getUserAttribute(user, "username") }}</td>
+        <td>{{ getUserAttribute(user, "firstName") }}</td>
+        <td>{{ getUserAttribute(user, "lastName") }}</td>
+        <td>{{ getUserAttribute(user, "email") }}</td>
+        <td>{{ getUserAttribute(user, "phone") }}</td>
         <td>{{ getMembershipNamesById(user.groups) }}</td>
         <td class="d-flex">
           <v-tooltip location="top">
@@ -74,6 +74,14 @@ import { onMounted } from "vue";
 const props = defineProps({
   users: Array,
 });
+
+function getUserAttribute(user, attributeName) {
+  // Keycloak User Profile attributes are either missing (if no value is given)
+  // or an array expected to contain a single value
+  return user.attributes[attributeName]
+    ? user.attributes[attributeName][0]
+    : "";
+}
 
 const store = useStore();
 const savedUser = ref();

@@ -18,14 +18,18 @@ vi.spyOn(store, "dispatch").mockResolvedValue({});
 const users = [
   {
     id: "1",
-    username: "one",
-    firstName: "One",
-    lastName: "Two",
+    attributes: {
+      username: ["one"],
+      firstName: ["One"],
+      lastName: ["Two"],
+    },
   },
   {
     id: "2",
-    username: "two",
-    lastName: "Three",
+    attributes: {
+      username: ["two"],
+      lastName: ["Three"],
+    },
   },
 ];
 
@@ -39,7 +43,7 @@ const wrapper = mount(UserTable, {
 
 test("Username is displayed in first column", () => {
   wrapper.findAll("tr").forEach((row, i) => {
-    expect(row.get("td").text()).toBe(users[i].username);
+    expect(row.get("td").text()).toBe(users[i].attributes.username[0]);
   });
 });
 

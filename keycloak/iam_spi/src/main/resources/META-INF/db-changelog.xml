@@ -4,20 +4,8 @@
         <sql dbms="all"
              splitStatements="true"
              stripComments="true">
-            CREATE TABLE iam_user_position (
-                id SERIAL PRIMARY KEY,
-                position VARCHAR NOT NULL
-            );
-
             CREATE TABLE iam_user_attributes (
                 id VARCHAR(36) PRIMARY KEY REFERENCES user_entity(id),
-                position_id INTEGER NOT NULL REFERENCES iam_user_position(id),
-                title VARCHAR,
-                phone VARCHAR NOT NULL,
-                mobile VARCHAR,
-                fax VARCHAR,
-                oe VARCHAR,
-                bfs_location VARCHAR NOT NULL,
                 expiry_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
                 inactivity_notification_sent BOOLEAN DEFAULT false,
                 expired_notification_sent BOOLEAN DEFAULT false
@@ -107,15 +95,6 @@
                 (6, 'Release Note'),
                 (7, 'Soll/Ist-Vergleich'),
                 (8, 'Hinweis');
-
-            INSERT INTO iam_user_position (position) VALUES
-                ('Leiter'),
-                ('Vertreter'),
-                ('Radiologischer Ansprechpartner'),
-                ('Mitarbeiter'),
-                ('IT-Ansprechperson'),
-                ('Störplatz');
-
         </sql>
     </changeSet>
 </databaseChangeLog>

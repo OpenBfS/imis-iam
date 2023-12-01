@@ -6,6 +6,8 @@
  */
 package de.intevation.iam;
 
+import static org.keycloak.userprofile.UserProfileContext.USER_API;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +17,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -42,11 +43,11 @@ import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.services.resource.RealmResourceProvider;
+import org.keycloak.userprofile.UserProfileProvider;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.UserAuthorizer;
 import de.intevation.iam.model.jpa.UserAttributes;
-import de.intevation.iam.model.jpa.UserPosition;
 import de.intevation.iam.model.representation.Role;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.model.representation.UserMembership;
@@ -64,6 +65,8 @@ public class UserProvider implements RealmResourceProvider {
 
     private Authorizer<User> auth;
 
+    private UserProfileProvider userProfileProvider;
+
     /**
      * Constructor.
      * @param session Session
@@ -71,6 +74,8 @@ public class UserProvider implements RealmResourceProvider {
     public UserProvider(KeycloakSession session) {
         this.session = session;
         this.auth = new UserAuthorizer(session);
+        this.userProfileProvider =
+            session.getProvider(UserProfileProvider.class);
     }
 
     /**
@@ -82,15 +87,13 @@ public class UserProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
     public Response getProfile(@Context HttpHeaders headers) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
         String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (id == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
-        return Response.ok(new User(user, em)).build();
+        return Response.ok(new User(user, session)).build();
     }
 
     /**
@@ -133,7 +136,7 @@ public class UserProvider implements RealmResourceProvider {
         List<User> userList = em.createQuery(query).getResultStream()
             .map(userEntity -> new User(
                 session.users().getUserById(realm, userEntity.getId()),
-                em))
+                session))
             .collect(Collectors.toList());
         return Response.ok(auth.filter(userList, headers)).build();
     }
@@ -156,9 +159,7 @@ public class UserProvider implements RealmResourceProvider {
             return Response.status(Status.NOT_FOUND).build();
         }
 
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        User user = new User(userModel, em);
+        User user = new User(userModel, session);
         if (!auth.isAuthorizedById(user, RequestMethod.GET, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -208,12 +209,12 @@ public class UserProvider implements RealmResourceProvider {
         UserModel newUserModel
                 = session.users().addUser(realm, rep.getUsername());
 
-        newUserModel.setFirstName(rep.getFirstName());
-        newUserModel.setLastName(rep.getLastName());
-        newUserModel.setEmail(rep.getEmail());
         rep.setId(newUserModel.getId());
 
         //Create attributes
+        this.userProfileProvider
+            .create(USER_API, rep.getAttributes(), newUserModel)
+            .update();
         UserAttributes attributes = rep.createOrUpdateJpaModel(em);
 
         //Update roles
@@ -244,7 +245,7 @@ public class UserProvider implements RealmResourceProvider {
         //Force flush and update to ensure attributes are persisted
         em.flush();
         em.refresh(attributes);
-        return Response.ok(new User(newUserModel, em)).build();
+        return Response.ok(new User(newUserModel, session)).build();
     }
 
     /**
@@ -296,27 +297,7 @@ public class UserProvider implements RealmResourceProvider {
         attributes.setInactivityNotificationSent(
                 dbAttributes.getInactivityNotificationSent());
         em.merge(attributes);
-        return Response.ok(new User(user, em)).build();
-    }
-
-    /**
-     * Get all position entries.
-     * @return Positions as json
-     */
-    @GET
-    @Path("/position")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getPositions() {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<UserPosition> critQuery
-                = cb.createQuery(UserPosition.class);
-        Root<UserPosition> root = critQuery.from(UserPosition.class);
-        critQuery.select(root);
-        TypedQuery<UserPosition> query = em.createQuery(critQuery);
-        List<UserPosition> positions = query.getResultList();
-        return Response.ok(positions).build();
+        return Response.ok(new User(user, session)).build();
     }
 
     /**
@@ -414,9 +395,9 @@ public class UserProvider implements RealmResourceProvider {
             throw new InvalidUserPropertiesException("Email already in use");
         }
         //Update user
-        oldUser.setFirstName(newUser.getFirstName());
-        oldUser.setLastName(newUser.getLastName());
-        oldUser.setEmail(newUser.getEmail());
+        this.userProfileProvider
+            .create(USER_API, newUser.getAttributes(), oldUser)
+            .update();
 
         //Get new groups list and update
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
@@ -447,7 +428,8 @@ public class UserProvider implements RealmResourceProvider {
      */
     private boolean isEmailAlreadyUsed(RealmModel realm, User user) {
         //Search for user with the given email
-        UserModel u = session.users().getUserByEmail(realm, user.getEmail());
+        UserModel u = session.users().getUserByEmail(
+            realm, user.getAttributes().get("email").get(0));
         if (u == null) {
             return false;
         }

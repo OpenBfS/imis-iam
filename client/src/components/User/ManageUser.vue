@@ -12,7 +12,7 @@
     </v-card-title>
     <v-card-title v-if="processType === 'edit'">
       <span class="text-h5">{{
-        $t("user.edit_title", { name: user.username })
+        $t("user.edit_title", { name: user.attributes.username[0] })
       }}</span>
     </v-card-title>
     <v-divider></v-divider>
@@ -29,15 +29,16 @@
                     : 'plain'
                 "
                 :label="$t('user.username')"
-                v-model="user.username"
-                :rules="reqField($t('user.required_username'))"
+                :model-value="user.attributes.username"
+                @update:model-value="setUserAttribute('username', $event)"
                 :readonly="processType === 'edit'"
               ></v-text-field>
               <v-text-field
                 density="compact"
                 variant="underlined"
                 :label="$t('user.title')"
-                v-model="user.title"
+                :model-value="user.attributes.title"
+                @update:model-value="setUserAttribute('title', $event)"
               ></v-text-field>
             </div>
             <div class="two_group_class">
@@ -46,7 +47,8 @@
                 variant="underlined"
                 name="firstname"
                 :label="$t('user.firstname')"
-                v-model="user.firstName"
+                :model-value="user.attributes.firstName"
+                @update:model-value="setUserAttribute('firstName', $event)"
                 :rules="reqField($t('user.required_firstname'))"
               ></v-text-field>
               <v-text-field
@@ -55,7 +57,8 @@
                 name="lastname"
                 :label="$t('user.lastname')"
                 :rules="reqField($t('user.required_lastname'))"
-                v-model="user.lastName"
+                :model-value="user.attributes.lastName"
+                @update:model-value="setUserAttribute('lastName', $event)"
               ></v-text-field>
             </div>
             <div class="one_group_class">
@@ -63,7 +66,8 @@
                 density="compact"
                 variant="underlined"
                 :label="$t('label.email')"
-                v-model="user.email"
+                :model-value="user.attributes.email"
+                @update:model-value="setUserAttribute('email', $event)"
                 :rules="
                   reqValidmail(
                     $t('form.required_email'),
@@ -84,7 +88,8 @@
                     $t('form.valid_phone')
                   )
                 "
-                v-model="user.phone"
+                :model-value="user.attributes.phone"
+                @update:model-value="setUserAttribute('phone', $event)"
               ></v-text-field>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
@@ -93,13 +98,15 @@
                 density="compact"
                 variant="underlined"
                 :label="$t('user.mobile')"
-                v-model="user.mobile"
+                :model-value="user.attributes.mobile"
+                @update:model-value="setUserAttribute('mobile', $event)"
               ></v-text-field>
               <v-text-field
                 density="compact"
                 variant="underlined"
                 :label="$t('user.fax')"
-                v-model="user.fax"
+                :model-value="user.attributes.fax"
+                @update:model-value="setUserAttribute('fax', $event)"
               ></v-text-field>
             </div>
             <div class="two_group_class">
@@ -113,7 +120,8 @@
                 dense
                 :label="$t('user.oe')"
                 :items="[]"
-                v-model="user.oe"
+                :model-value="user.oe"
+                @update:model-value="setUserAttribute('oe', $event)"
                 item-title="name"
                 item-value="id"
                 persistent-hint
@@ -125,7 +133,8 @@
                 dense
                 :label="$t('user.bfslocation')"
                 :items="[]"
-                v-model="user.bfslocation"
+                :model-value="user.bfslocation"
+                @update:model-value="setUserAttribute('bfsLocation', $event)"
                 item-title="name"
                 item-value="id"
                 persistent-hint
@@ -184,8 +193,13 @@
                 :no-data-text="$t('label.no_data_text')"
                 dense
                 :label="$t('user.label_positions')"
-                :items="positions"
-                v-model="user.position"
+                :items="
+                  user.userProfileMetadata.attributes.find(
+                    (item) => item.name === 'position'
+                  ).validations.options.options
+                "
+                :model-value="user.attributes.position"
+                @update:model-value="setUserAttribute('position', $event)"
                 item-title="position"
                 item-value="id"
                 persistent-hint
@@ -286,19 +300,21 @@ const user = ref(store.state.application.managedItem);
 const originalUser = ref(store.state.application.savedItem);
 const processType = ref(store.state.application.processType);
 
+function setUserAttribute(name, value) {
+  const attrs = user.value.attributes;
+  if (value) {
+    // Keycloak User Profile attributes are arrays expected to
+    // contain a single value
+    attrs[name] = [value];
+  } else {
+    delete attrs[name];
+  }
+}
+
 const getUserMemberships = () => {
   store.dispatch("user/loadMemberships").catch(() => {
     hasLoadingError.value = false;
   });
-};
-const getUserPsositions = () => {
-  HTTP.get("iamuser/position")
-    .then((response) => {
-      store.commit("user/setPositions", response.data);
-    })
-    .catch(() => {
-      hasLoadingError.value = false;
-    });
 };
 const getInstitutions = () => {
   store
@@ -310,11 +326,7 @@ const getInstitutions = () => {
 };
 onMounted(() => {
   getUserMemberships();
-  getUserPsositions();
   getInstitutions();
-});
-const positions = computed(() => {
-  return store.state.user.positions;
 });
 const memeberships = computed(() => {
   return store.state.user.memberships;

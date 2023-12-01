@@ -67,16 +67,6 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients" \
     -H "Authorization: Bearer $TKN" \
     --data "$CLIENT_CONFIG"
 
-# Add inital user
-echo "Creating example users"
-for user in "iam_user.json" "iam_redakteur.json" "iam_chefredakteur.json" "iam_admin.json"
-do
-    curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN" \
-        -d @${DIR}/${user}
-done
-
 # Configure and sync LDAP
 echo "Creating LDAP user federation"
 curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
@@ -84,11 +74,21 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
      -H "Authorization: Bearer $TKN" \
      -d @${DIR}/ldap_provider.json
 
-echo "Creating client roles"
 ${KEYCLOAK_HOME}/bin/kcadm.sh config credentials \
     --server http://localhost:8080 --realm master \
     --user $KEYCLOAK_ADMIN --password $KEYCLOAK_ADMIN_PASSWORD
 
+echo "Creating user profile"
+${KEYCLOAK_HOME}/bin/kcadm.sh update realms/$IMIS_REALM/users/profile \
+    -f ${DIR}/user_profile.json
+
+echo "Creating example users"
+for user in "iam_user.json" "iam_redakteur.json" "iam_chefredakteur.json" "iam_admin.json"
+do
+    ${KEYCLOAK_HOME}/bin/kcadm.sh create users -r $IMIS_REALM -f ${DIR}/${user}
+done
+
+echo "Creating client roles"
 for name in "techadmin" "chief_editor" "editor" "user"
 do
     # Create roles with name and key for localization

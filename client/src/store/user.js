@@ -10,7 +10,6 @@ export const user = {
   state: () => ({
     users: [],
     memberships: [],
-    positions: [],
     roles: [],
     foundUsers: [],
   }),
@@ -23,9 +22,6 @@ export const user = {
     },
     setMemberships: (state, data) => {
       state.memberships = data;
-    },
-    setPositions: (state, data) => {
-      state.positions = data;
     },
     setRoles: (state, data) => {
       state.roles = data;

@@ -101,6 +101,7 @@ public class ExportProvider implements RealmResourceProvider {
      */
     @GET
     @Path("/user")
+    // TODO: Adapt to UserProfile attributes
     public Response exportUsers(
             @QueryParam("fieldSeparator") String fieldSeparator,
             @QueryParam("quoteType") String quoteType,

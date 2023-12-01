@@ -15,8 +15,17 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <div>
-      {{ $t("appbar.text_login") }} {{ savedUser.firstName }}
-      {{ savedUser.lastName }} ({{ savedUser.username }})
+      {{ $t("appbar.text_login") }}
+      {{
+        savedUser.attributes
+          ? savedUser.attributes.firstName[0] +
+            " " +
+            savedUser.attributes.lastName[0] +
+            " (" +
+            savedUser.attributes.username[0] +
+            ")"
+          : ""
+      }}
     </div>
     <v-menu left>
       <template v-slot:activator="{ props }">
