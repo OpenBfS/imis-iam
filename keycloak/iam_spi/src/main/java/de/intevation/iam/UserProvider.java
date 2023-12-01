@@ -43,6 +43,7 @@ import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.services.resource.RealmResourceProvider;
+import org.keycloak.representations.userprofile.config.UPConfig;
 import org.keycloak.userprofile.UserProfileProvider;
 
 import de.intevation.iam.auth.Authorizer;
@@ -76,6 +77,17 @@ public class UserProvider implements RealmResourceProvider {
         this.auth = new UserAuthorizer(session);
         this.userProfileProvider =
             session.getProvider(UserProfileProvider.class);
+    }
+
+    /**
+     * Get user profile metadata.
+     * @return User profile metdata as json
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/userprofilemetadata")
+    public UPConfig getUserProfileMetadata() {
+        return this.userProfileProvider.getConfiguration();
     }
 
     /**
