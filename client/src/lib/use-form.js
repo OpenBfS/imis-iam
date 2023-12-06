@@ -20,7 +20,14 @@ export function useForm() {
     return [(v) => regExprEmail.test(v) || v == "" || validMsg];
   };
   const reqValidPhone = (reqMsg, validMsg) => {
-    return [(v) => !!v || reqMsg, (v) => regExprPhone.test(v) || validMsg];
+    return [
+      (v) => !!v || reqMsg,
+      (v) =>
+        (v.toString().match(regExprPhone)?.[0] === v.toString() &&
+          v.toString().match(regExprPhone)?.[0].length ===
+            v.toString().length) ||
+        validMsg,
+    ];
   };
   const validPhone = (validMsg) => {
     (v) => regExprPhone.test(v) || validMsg;

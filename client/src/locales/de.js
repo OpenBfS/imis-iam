@@ -88,6 +88,7 @@ export default {
     phone: "Telefon",
     fax: "Fax",
     mobile: "Handy",
+    email: "E-Mail",
     oe: "OE",
     bfslocation: "Standort BfS",
     title: "Titel",
@@ -96,6 +97,7 @@ export default {
     lastname: "Nachname",
     name: "Name",
     username: "Benutzername",
+    position: "Position",
     required_telephone: "Telefon ist erforderlich",
     label_memberships: "Mitgliedschaften",
     label_positions: "Positionen",
@@ -107,6 +109,7 @@ export default {
     required_institution: "Institution ist erforderlich",
     label_roles: "Rollen",
     required_roles: "Rolle ist erforderlich",
+    is_required: "{attr} ist erforderlich",
   },
   // Shared button texts
   button: {

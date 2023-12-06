@@ -20,6 +20,32 @@
       <v-row justify="center">
         <v-col jsutify="start" cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
+            <!-- eslint-disable-next-line vue/no-v-for-template-key -->
+            <template v-for="(value, key) in user.attributes" :key="key">
+              <v-row>
+                <v-text-field
+                  v-if="getElementType(key) === 'input'"
+                  density="compact"
+                  :variant="
+                    key === 'username' && processType === 'edit'
+                      ? 'plain'
+                      : 'underlined'
+                  "
+                  :label="$t(`user.${key.toLowerCase()}`)"
+                  :model-value="user.attributes[key]"
+                  :type="getInputTypeOfAttribute(key)"
+                  :readonly="key === 'username' && processType === 'edit'"
+                  :rules="getRules(key)"
+                ></v-text-field>
+                <v-select
+                  v-else
+                  :label="$t(`user.${key.toLowerCase()}`)"
+                  :items="getSelectItems(key)"
+                  :model-value="user.attributes[key]"
+                ></v-select>
+              </v-row>
+            </template>
+            <hr style="margin: 40pt 0pt; color: red" />
             <div class="two_group_class">
               <v-text-field
                 density="compact"
@@ -311,6 +337,43 @@ function setUserAttribute(name, value) {
   }
 }
 
+const getMetaDataAttribute = (nameOfAttribute) => {
+  return store.state.application.managedItem.userProfileMetadata?.attributes.find(
+    (item) => item.name === nameOfAttribute
+  );
+};
+const getInputTypeOfAttribute = (nameOfAttribute) => {
+  const attribute = getMetaDataAttribute(nameOfAttribute);
+  if (attribute.name === "email") {
+    return "email";
+  } else if (["phone", "mobile", "fax"].includes(attribute.name)) {
+    return "tel";
+  } else {
+    return "text";
+  }
+};
+const getElementType = (nameOfAttribute) => {
+  const attribute = getMetaDataAttribute(nameOfAttribute);
+  return attribute.annotations?.inputType ?? "input";
+};
+const getSelectItems = (nameOfAttribute) => {
+  const attribute = getMetaDataAttribute(nameOfAttribute);
+  return attribute.validations.options.options;
+};
+const getRules = (nameOfAttribute) => {
+  const attribute = getMetaDataAttribute(nameOfAttribute);
+  if (attribute.name === "email") {
+    return reqValidmail(t("form.required_email"), t("form.valid_email"));
+  } else if (attribute.name === "phone") {
+    return reqValidPhone(t("form.required_phone"), t("form.valid_phone"));
+  } else if (["lastname", "firstname"].includes(attribute.name.toLowerCase())) {
+    return reqField(
+      t("user.is_required", {
+        attr: t(`user.${nameOfAttribute.toLowerCase()}`),
+      })
+    );
+  }
+};
 const getUserMemberships = () => {
   store.dispatch("user/loadMemberships").catch(() => {
     hasLoadingError.value = false;
