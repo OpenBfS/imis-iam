@@ -42,7 +42,7 @@ export function useForm() {
     ];
   };
   const reqField = (reqMsg) => {
-    return [(v) => !!v || reqMsg];
+    return [(v) => Boolean(v.toString()) || reqMsg];
   };
   const reqMultipleSelect = (reqMsg) => {
     return [(v) => !!(v && v.length) || reqMsg];

@@ -39,9 +39,13 @@
                 ></v-text-field>
                 <v-select
                   v-else
+                  density="compact"
                   :label="$t(`user.${key.toLowerCase()}`)"
+                  :item-title="key"
+                  :item-value="value.name"
                   :items="getSelectItems(key)"
                   :model-value="user.attributes[key]"
+                  :rules="getRules(key)"
                 ></v-select>
               </v-row>
             </template>
@@ -363,42 +367,51 @@ const getSelectItems = (nameOfAttribute) => {
 const getRules = (nameOfAttribute) => {
   const attribute = getMetaDataAttribute(nameOfAttribute);
   const rules = [];
-  if (attribute.name === "email") {
-    rules.push(
-      ...reqValidmail(t("form.required_email"), t("form.valid_email"))
-    );
-  } else if (attribute.name === "phone") {
-    rules.push(
-      ...reqValidPhone(t("form.required_phone"), t("form.valid_phone"))
-    );
-  } else if (["lastname", "firstname"].includes(attribute.name.toLowerCase())) {
-    rules.push(
-      ...reqField(
-        t("user.is_required", {
-          attr: t(`user.${nameOfAttribute.toLowerCase()}`),
-        })
-      )
-    );
-  }
-
-  if (attribute.validations?.length) {
-    const length = attribute.validations.length;
-    let message;
-    if (length.min && length.max) {
-      message = t("user.min_and_max_characters_allowed", {
-        min: length.min,
-        max: length.max,
-      });
-    } else if (length.min) {
-      message = t("user.min_characters_necessary", {
-        min: length.min,
-      });
-    } else {
-      message = t("user.max_characters_allowed", {
-        max: length.max,
-      });
+  // Rules for text field components
+  if (!attribute.validations.options) {
+    if (attribute.name === "email") {
+      rules.push(
+        ...reqValidmail(t("form.required_email"), t("form.valid_email"))
+      );
+    } else if (attribute.name === "phone") {
+      rules.push(
+        ...reqValidPhone(t("form.required_phone"), t("form.valid_phone"))
+      );
+    } else if (
+      ["lastname", "firstname"].includes(attribute.name.toLowerCase())
+    ) {
+      rules.push(
+        ...reqField(
+          t("user.is_required", {
+            attr: t(`user.${nameOfAttribute.toLowerCase()}`),
+          })
+        )
+      );
     }
-    rules.push(...validLength(length.min ?? 0, length.max ?? 0, message));
+
+    if (attribute.validations?.length) {
+      const length = attribute.validations.length;
+      let message;
+      if (length.min && length.max) {
+        message = t("user.min_and_max_characters_allowed", {
+          min: length.min,
+          max: length.max,
+        });
+      } else if (length.min) {
+        message = t("user.min_characters_necessary", {
+          min: length.min,
+        });
+      } else {
+        message = t("user.max_characters_allowed", {
+          max: length.max,
+        });
+      }
+      rules.push(...validLength(length.min ?? 0, length.max ?? 0, message));
+    }
+  }
+  // Rules for select components
+  else {
+    rules.push(...reqField(t(`user.required_${attribute.name}`)));
   }
   return rules;
 };
