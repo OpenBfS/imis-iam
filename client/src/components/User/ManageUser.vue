@@ -33,6 +33,7 @@
                   "
                   :label="$t(`user.${key.toLowerCase()}`)"
                   :model-value="user.attributes[key]"
+                  @update:model-value="setUserAttribute(key, $event)"
                   :type="getInputTypeOfAttribute(key)"
                   :readonly="key === 'username' && processType === 'edit'"
                   :rules="getRules(key)"
@@ -45,24 +46,12 @@
                   :item-value="value.name"
                   :items="getSelectItems(key)"
                   :model-value="user.attributes[key]"
+                  @update:model-value="setUserAttribute(key, $event)"
                   :rules="getRules(key)"
                 ></v-select>
               </v-row>
             </template>
-            <hr style="margin: 40pt 0pt; color: red" />
-            <div class="two_group_class">
-              <v-text-field
-                density="compact"
-                :variant="
-                  ['add', 'copy'].indexOf(processType) !== -1
-                    ? 'underlined'
-                    : 'plain'
-                "
-                :label="$t('user.username')"
-                :model-value="user.attributes.username"
-                @update:model-value="setUserAttribute('username', $event)"
-                :readonly="processType === 'edit'"
-              ></v-text-field>
+            <div class="one_group_class">
               <v-text-field
                 density="compact"
                 variant="underlined"
@@ -71,106 +60,7 @@
                 @update:model-value="setUserAttribute('title', $event)"
               ></v-text-field>
             </div>
-            <div class="two_group_class">
-              <v-text-field
-                density="compact"
-                variant="underlined"
-                name="firstname"
-                :label="$t('user.firstname')"
-                :model-value="user.attributes.firstName"
-                @update:model-value="setUserAttribute('firstName', $event)"
-                :rules="reqField($t('user.required_firstname'))"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                name="lastname"
-                :label="$t('user.lastname')"
-                :rules="reqField($t('user.required_lastname'))"
-                :model-value="user.attributes.lastName"
-                @update:model-value="setUserAttribute('lastName', $event)"
-              ></v-text-field>
-            </div>
-            <div class="one_group_class">
-              <v-text-field
-                density="compact"
-                variant="underlined"
-                :label="$t('label.email')"
-                :model-value="user.attributes.email"
-                @update:model-value="setUserAttribute('email', $event)"
-                :rules="
-                  reqValidmail(
-                    $t('form.required_email'),
-                    $t('form.valid_email')
-                  )
-                "
-              ></v-text-field>
-            </div>
 
-            <div class="three_group_class">
-              <v-text-field
-                density="compact"
-                variant="underlined"
-                :label="$t('user.phone')"
-                :rules="
-                  reqValidPhone(
-                    $t('form.required_phone'),
-                    $t('form.valid_phone')
-                  )
-                "
-                :model-value="user.attributes.phone"
-                @update:model-value="setUserAttribute('phone', $event)"
-              ></v-text-field>
-              <!--TODO: Add this rule once the validation for
-                    optional fields gets implemented by upstream.
-                    :rules="validPhone($t('form.valid_fax'))" -->
-              <v-text-field
-                density="compact"
-                variant="underlined"
-                :label="$t('user.mobile')"
-                :model-value="user.attributes.mobile"
-                @update:model-value="setUserAttribute('mobile', $event)"
-              ></v-text-field>
-              <v-text-field
-                density="compact"
-                variant="underlined"
-                :label="$t('user.fax')"
-                :model-value="user.attributes.fax"
-                @update:model-value="setUserAttribute('fax', $event)"
-              ></v-text-field>
-            </div>
-            <div class="two_group_class">
-              <!-- readonly attribute is set for each v-select element explicitly, which
-                 should inherit the state from the <v-form> element.
-                TODO: Check if this gets fixed by upstream
-                 -->
-              <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
-                :no-data-text="$t('label.no_data_text')"
-                dense
-                :label="$t('user.oe')"
-                :items="[]"
-                :model-value="user.oe"
-                @update:model-value="setUserAttribute('oe', $event)"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-              >
-              </v-select>
-              <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
-                :no-data-text="$t('label.no_data_text')"
-                dense
-                :label="$t('user.bfslocation')"
-                :items="[]"
-                :model-value="user.bfslocation"
-                @update:model-value="setUserAttribute('bfsLocation', $event)"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-              >
-              </v-select>
-            </div>
             <div class="two_group_class">
               <v-select
                 :clearable="$store.state.profile.isAllowedToManage"
@@ -203,7 +93,7 @@
               >
               </v-select>
             </div>
-            <div class="two_group_class">
+            <div class="one_group_class">
               <v-select
                 :clearable="$store.state.profile.isAllowedToManage"
                 dense
@@ -214,26 +104,6 @@
                 multiple
                 persistent-hint
                 :rules="reqMultipleSelect($t('user.required_roles'))"
-              >
-              </v-select>
-              <!-- TODO: Add this rule once the validation for
-                    optional fields gets implemented by upstream.
-                    :rules="validPostalcode($t('form.valid_postalcode'))" -->
-              <v-select
-                :no-data-text="$t('label.no_data_text')"
-                dense
-                :label="$t('user.label_positions')"
-                :items="
-                  user.userProfileMetadata.attributes.find(
-                    (item) => item.name === 'position'
-                  ).validations.options.options
-                "
-                :model-value="user.attributes.position"
-                @update:model-value="setUserAttribute('position', $event)"
-                item-title="position"
-                item-value="id"
-                persistent-hint
-                :rules="reqField($t('user.required_position'))"
               >
               </v-select>
             </div>
