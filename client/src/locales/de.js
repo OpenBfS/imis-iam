@@ -110,6 +110,10 @@ export default {
     label_roles: "Rollen",
     required_roles: "Rolle ist erforderlich",
     is_required: "{attr} ist erforderlich",
+    min_and_max_characters_allowed:
+      "Mindestens {min} und maximal {max} Zeichen erlaubt",
+    min_characters_necessary: "Mindestens {min} Zeichen erforderlich",
+    max_characters_allowed: "Maximal {max} Zeichen erlaubt",
   },
   // Shared button texts
   button: {
