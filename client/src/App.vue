@@ -64,7 +64,9 @@ export default {
     onMounted(() => {
       store
         .dispatch("profile/loadProfile")
-        .then(() => {})
+        .then(() => {
+          store.dispatch("profile/loadUserProfileMetadata");
+        })
         .catch(() => {
           hasLoadingError.value = true;
         });

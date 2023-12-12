@@ -9,6 +9,7 @@ export const profile = {
   namespaced: true,
   state: () => ({
     userData: {},
+    userProfileMetadata: {},
     myMailingLists: [],
     isAllowedToManage: true,
   }),
@@ -16,11 +17,19 @@ export const profile = {
     setUserData: (state, data) => {
       state.userData = data;
     },
+    setUserProfileMetadata: (state, data) => {
+      state.userProfileMetadata = data;
+    },
     setMyMailingLists: (state, data) => {
       state.myMailingLists = data;
     },
     setIsAllowedToManage: (state, data) => {
       state.isAllowedToManage = data;
+    },
+  },
+  getters: {
+    attributes: (state) => {
+      return state.userProfileMetadata.attributes;
     },
   },
   actions: {
@@ -35,6 +44,16 @@ export const profile = {
             } else {
               commit("setIsAllowedToManage", true);
             }
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
+    },
+    loadUserProfileMetadata({ commit }) {
+      return new Promise((resolve, reject) => {
+        HTTP.get("/iamuser/userprofilemetadata")
+          .then((response) => {
+            commit("setUserProfileMetadata", response.data);
             resolve(response);
           })
           .catch((error) => reject(error));

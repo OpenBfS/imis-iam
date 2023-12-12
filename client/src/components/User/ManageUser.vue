@@ -5,6 +5,8 @@
  This file is Free Software under the GNU GPL (v>=3)
  and comes with ABSOLUTELY NO WARRANTY!
  -->
+
+<!-- eslint-disable vue/no-v-for-template-key -->
 <template>
   <v-card width="80vw">
     <v-card-title v-if="['add', 'copy'].indexOf(processType) !== -1">
@@ -20,46 +22,36 @@
       <v-row justify="center">
         <v-col jsutify="start" cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
-            <!-- eslint-disable-next-line vue/no-v-for-template-key -->
-            <template v-for="(value, key) in user.attributes" :key="key">
+            <template v-for="attribute in attributes" :key="attribute.name">
               <v-row>
                 <v-text-field
-                  v-if="getElementType(key) === 'input'"
+                  v-if="getElementType(attribute.name) === 'input'"
                   density="compact"
                   :variant="
                     key === 'username' && processType === 'edit'
                       ? 'plain'
                       : 'underlined'
                   "
-                  :label="$t(`user.${key.toLowerCase()}`)"
-                  :model-value="user.attributes[key]"
-                  @update:model-value="setUserAttribute(key, $event)"
-                  :type="getInputTypeOfAttribute(key)"
+                  :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                  :model-value="user.attributes[attribute.name]"
+                  @update:model-value="setUserAttribute(attribute.name, $event)"
+                  :type="getInputTypeOfAttribute(attribute.name)"
                   :readonly="key === 'username' && processType === 'edit'"
-                  :rules="getRules(key)"
+                  :rules="getRules(attribute.name)"
                 ></v-text-field>
                 <v-select
                   v-else
                   density="compact"
-                  :label="$t(`user.${key.toLowerCase()}`)"
-                  :item-title="key"
-                  :item-value="value.name"
-                  :items="getSelectItems(key)"
-                  :model-value="user.attributes[key]"
-                  @update:model-value="setUserAttribute(key, $event)"
-                  :rules="getRules(key)"
+                  :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                  :item-title="attribute.name"
+                  :item-value="attribute.displayName"
+                  :items="getSelectItems(attribute.name)"
+                  :model-value="user.attributes[attribute.name]"
+                  @update:model-value="setUserAttribute(attribute.name, $event)"
+                  :rules="getRules(attribute.name)"
                 ></v-select>
               </v-row>
             </template>
-            <div class="one_group_class">
-              <v-text-field
-                density="compact"
-                variant="underlined"
-                :label="$t('user.title')"
-                :model-value="user.attributes.title"
-                @update:model-value="setUserAttribute('title', $event)"
-              ></v-text-field>
-            </div>
 
             <div class="two_group_class">
               <v-select
@@ -212,8 +204,8 @@ function setUserAttribute(name, value) {
 }
 
 const getMetaDataAttribute = (nameOfAttribute) => {
-  return store.state.application.managedItem.userProfileMetadata?.attributes.find(
-    (item) => item.name === nameOfAttribute
+  return JSON.parse(JSON.stringify(store.getters["profile/attributes"])).find(
+    (attribute) => attribute.name === nameOfAttribute
   );
 };
 const getInputTypeOfAttribute = (nameOfAttribute) => {
@@ -301,6 +293,9 @@ const getInstitutions = () => {
 onMounted(() => {
   getUserMemberships();
   getInstitutions();
+});
+const attributes = computed(() => {
+  return JSON.parse(JSON.stringify(store.getters["profile/attributes"]));
 });
 const memeberships = computed(() => {
   return store.state.user.memberships;
