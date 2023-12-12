@@ -42,7 +42,7 @@ export function useForm() {
     ];
   };
   const reqField = (reqMsg) => {
-    return [(v) => Boolean(v.toString()) || reqMsg];
+    return [(v) => (v && Boolean(v.toString())) || reqMsg];
   };
   const reqMultipleSelect = (reqMsg) => {
     return [(v) => !!(v && v.length) || reqMsg];
@@ -50,7 +50,8 @@ export function useForm() {
   const validLength = (minLength, maxLength, validMsg) => {
     return [
       (v) =>
-        (v.toString().length >= minLength &&
+        (v &&
+          v.toString().length >= minLength &&
           v.toString().length <= maxLength) ||
         validMsg,
     ];
