@@ -22,34 +22,91 @@
       <v-row justify="center">
         <v-col jsutify="start" cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
-            <template v-for="attribute in attributes" :key="attribute.name">
+            <template v-for="group in attributeGroups" :key="group.name">
               <v-row>
-                <v-text-field
-                  v-if="getElementType(attribute.name) === 'input'"
-                  density="compact"
-                  :variant="
-                    key === 'username' && processType === 'edit'
-                      ? 'plain'
-                      : 'underlined'
-                  "
-                  :label="$t(`user.${attribute.name.toLowerCase()}`)"
-                  :model-value="user.attributes[attribute.name]"
-                  @update:model-value="setUserAttribute(attribute.name, $event)"
-                  :type="getInputTypeOfAttribute(attribute.name)"
-                  :readonly="key === 'username' && processType === 'edit'"
-                  :rules="getRules(attribute.name)"
-                ></v-text-field>
-                <v-select
-                  v-else
-                  density="compact"
-                  :label="$t(`user.${attribute.name.toLowerCase()}`)"
-                  :item-title="attribute.name"
-                  :item-value="attribute.displayName"
-                  :items="getSelectItems(attribute.name)"
-                  :model-value="user.attributes[attribute.name]"
-                  @update:model-value="setUserAttribute(attribute.name, $event)"
-                  :rules="getRules(attribute.name)"
-                ></v-select>
+                <v-label>{{ $t(`user.${group.name}`) }}</v-label>
+              </v-row>
+              <v-row>
+                <template
+                  v-for="attribute in getAttributesForGroup(group.name)"
+                  :key="attribute.name"
+                >
+                  <v-col cols="4">
+                    <v-text-field
+                      v-if="getElementType(attribute.name) === 'input'"
+                      density="compact"
+                      :variant="
+                        key === 'username' && processType === 'edit'
+                          ? 'plain'
+                          : 'underlined'
+                      "
+                      :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                      :model-value="user.attributes[attribute.name]"
+                      @update:model-value="
+                        setUserAttribute(attribute.name, $event)
+                      "
+                      :type="getInputTypeOfAttribute(attribute.name)"
+                      :readonly="key === 'username' && processType === 'edit'"
+                      :rules="getRules(attribute.name)"
+                    ></v-text-field>
+                    <v-select
+                      v-else
+                      density="compact"
+                      :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                      :item-title="attribute.name"
+                      :item-value="attribute.displayName"
+                      :items="getSelectItems(attribute.name)"
+                      :model-value="user.attributes[attribute.name]"
+                      @update:model-value="
+                        setUserAttribute(attribute.name, $event)
+                      "
+                      :rules="getRules(attribute.name)"
+                    ></v-select>
+                  </v-col>
+                </template>
+              </v-row>
+            </template>
+
+            <v-row>
+              <v-label>{{ $t("user.misc") }}</v-label>
+            </v-row>
+            <template
+              v-for="attribute in attributesWithoutGroup"
+              :key="attribute.name"
+            >
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    v-if="getElementType(attribute.name) === 'input'"
+                    density="compact"
+                    :variant="
+                      key === 'username' && processType === 'edit'
+                        ? 'plain'
+                        : 'underlined'
+                    "
+                    :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                    :model-value="user.attributes[attribute.name]"
+                    @update:model-value="
+                      setUserAttribute(attribute.name, $event)
+                    "
+                    :type="getInputTypeOfAttribute(attribute.name)"
+                    :readonly="key === 'username' && processType === 'edit'"
+                    :rules="getRules(attribute.name)"
+                  ></v-text-field>
+                  <v-select
+                    v-else
+                    density="compact"
+                    :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                    :item-title="attribute.name"
+                    :item-value="attribute.displayName"
+                    :items="getSelectItems(attribute.name)"
+                    :model-value="user.attributes[attribute.name]"
+                    @update:model-value="
+                      setUserAttribute(attribute.name, $event)
+                    "
+                    :rules="getRules(attribute.name)"
+                  ></v-select>
+                </v-col>
               </v-row>
             </template>
 
@@ -203,6 +260,11 @@ function setUserAttribute(name, value) {
   }
 }
 
+const getAttributesForGroup = (groupName) => {
+  return JSON.parse(JSON.stringify(store.getters["profile/attributes"])).filter(
+    (attribute) => attribute.group === groupName
+  );
+};
 const getMetaDataAttribute = (nameOfAttribute) => {
   return JSON.parse(JSON.stringify(store.getters["profile/attributes"])).find(
     (attribute) => attribute.name === nameOfAttribute
@@ -294,8 +356,13 @@ onMounted(() => {
   getUserMemberships();
   getInstitutions();
 });
-const attributes = computed(() => {
-  return JSON.parse(JSON.stringify(store.getters["profile/attributes"]));
+const attributesWithoutGroup = computed(() => {
+  return JSON.parse(
+    JSON.stringify(store.getters["profile/attributesWithoutGroup"])
+  );
+});
+const attributeGroups = computed(() => {
+  return JSON.parse(JSON.stringify(store.getters["profile/attributeGroups"]));
 });
 const memeberships = computed(() => {
   return store.state.user.memberships;

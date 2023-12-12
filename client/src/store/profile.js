@@ -31,6 +31,14 @@ export const profile = {
     attributes: (state) => {
       return state.userProfileMetadata.attributes;
     },
+    attributeGroups: (state) => {
+      return state.userProfileMetadata.groups;
+    },
+    attributesWithoutGroup: (state) => {
+      return state.userProfileMetadata.attributes.filter(
+        (attribute) => !attribute.group
+      );
+    },
   },
   actions: {
     loadProfile({ commit }) {

@@ -29,7 +29,18 @@
       "length" : {
         "max" : 255
       }
-    }
+    },
+    "group": "contact"
+  }, {
+    "name" : "title",
+    "displayName" : "",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { },
+    "group": "name"
   }, {
     "name" : "firstName",
     "displayName" : "${firstName}",
@@ -45,7 +56,8 @@
         "max" : 255
       },
       "person-name-prohibited-characters" : { }
-    }
+    },
+    "group": "name"
   }, {
     "name" : "lastName",
     "displayName" : "${lastName}",
@@ -61,16 +73,8 @@
         "max" : 255
       },
       "person-name-prohibited-characters" : { }
-    }
-  }, {
-    "name" : "title",
-    "displayName" : "",
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
     },
-    "annotations" : { },
-    "validations" : { }
+    "group": "name"
   }, {
     "name" : "phone",
     "displayName" : "",
@@ -82,7 +86,8 @@
       "view" : [ "user", "admin" ]
     },
     "annotations" : { },
-    "validations" : { }
+    "validations" : { },
+    "group": "contact"
   }, {
     "name" : "mobile",
     "displayName" : "",
@@ -91,7 +96,8 @@
       "view" : [ "user", "admin" ]
     },
     "annotations" : { },
-    "validations" : { }
+    "validations" : { },
+    "group": "contact"
   }, {
     "name" : "fax",
     "displayName" : "",
@@ -100,7 +106,8 @@
       "view" : [ "user", "admin" ]
     },
     "annotations" : { },
-    "validations" : { }
+    "validations" : { },
+    "group": "contact"
   }, {
     "name" : "oe",
     "displayName" : "",
@@ -137,5 +144,19 @@
         "options" : [ "Leiter", "Vertreter", "Radiologischer Ansprechpartner", "Mitarbeiter", "IT-Ansprechperson", "Störplatz" ]
       }
     }
-  } ]
+  } ],
+  "groups": [
+    {
+      "name": "name",
+      "displayHeader": "",
+      "displayDescription": "",
+      "annotations": {}
+    },
+    {
+      "name": "contact",
+      "displayHeader": "",
+      "displayDescription": "",
+      "annotations": {}
+    }
+  ]
 }
