@@ -31,7 +31,7 @@
                   v-for="attribute in getAttributesForGroup(group.name)"
                   :key="attribute.name"
                 >
-                  <v-col cols="4">
+                  <v-col cols="6">
                     <v-text-field
                       v-if="getElementType(attribute.name) === 'input'"
                       density="compact"
@@ -72,12 +72,12 @@
             <v-row>
               <v-label>{{ $t("user.misc") }}</v-label>
             </v-row>
-            <template
-              v-for="attribute in attributesWithoutGroup"
-              :key="attribute.name"
-            >
-              <v-row>
-                <v-col>
+            <v-row>
+              <template
+                v-for="attribute in attributesWithoutGroup"
+                :key="attribute.name"
+              >
+                <v-col cols="6">
                   <v-text-field
                     v-if="getElementType(attribute.name) === 'input'"
                     density="compact"
@@ -111,8 +111,8 @@
                     :rules="getRules(attribute.name)"
                   ></v-select>
                 </v-col>
-              </v-row>
-            </template>
+              </template>
+            </v-row>
 
             <div class="two_group_class">
               <v-select
