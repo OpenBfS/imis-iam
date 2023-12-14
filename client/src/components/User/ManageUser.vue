@@ -22,6 +22,22 @@
       <v-row justify="center">
         <v-col jsutify="start" cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
+            <v-row>
+              <v-col>
+                <v-text-field
+                  density="compact"
+                  :variant="
+                    ['add', 'copy'].indexOf(processType) !== -1
+                      ? 'underlined'
+                      : 'plain'
+                  "
+                  :label="$t('user.username')"
+                  :model-value="user.attributes.username"
+                  @update:model-value="setUserAttribute('username', $event)"
+                  :readonly="processType === 'edit'"
+                ></v-text-field>
+              </v-col>
+            </v-row>
             <template v-for="group in attributeGroups" :key="group.name">
               <v-row>
                 <v-label>{{ $t(`user.${group.name}`) }}</v-label>
@@ -35,20 +51,13 @@
                     <v-text-field
                       v-if="getElementType(attribute.name) === 'input'"
                       density="compact"
-                      :variant="
-                        attribute.name === 'username' && processType === 'edit'
-                          ? 'plain'
-                          : 'underlined'
-                      "
+                      variant="underlined"
                       :label="$t(`user.${attribute.name.toLowerCase()}`)"
                       :model-value="user.attributes[attribute.name]"
                       @update:model-value="
                         setUserAttribute(attribute.name, $event)
                       "
                       :type="getInputTypeOfAttribute(attribute.name)"
-                      :readonly="
-                        attribute.name === 'username' && processType === 'edit'
-                      "
                       :rules="getRules(attribute.name)"
                     ></v-text-field>
                     <v-select
@@ -81,20 +90,13 @@
                   <v-text-field
                     v-if="getElementType(attribute.name) === 'input'"
                     density="compact"
-                    :variant="
-                      attribute.name === 'username' && processType === 'edit'
-                        ? 'plain'
-                        : 'underlined'
-                    "
+                    variant="underlined"
                     :label="$t(`user.${attribute.name.toLowerCase()}`)"
                     :model-value="user.attributes[attribute.name]"
                     @update:model-value="
                       setUserAttribute(attribute.name, $event)
                     "
                     :type="getInputTypeOfAttribute(attribute.name)"
-                    :readonly="
-                      attribute.name === 'username' && processType === 'edit'
-                    "
                     :rules="getRules(attribute.name)"
                   ></v-text-field>
                   <v-select
