@@ -22,7 +22,7 @@
       <v-row justify="center">
         <v-col jsutify="start" cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
-            <v-row>
+            <v-row v-if="processType !== 'edit'">
               <v-col>
                 <v-text-field
                   density="compact"
@@ -34,7 +34,6 @@
                   :label="$t('user.username')"
                   :model-value="user.attributes.username"
                   @update:model-value="setUserAttribute('username', $event)"
-                  :readonly="processType === 'edit'"
                 ></v-text-field>
               </v-col>
             </v-row>
