@@ -36,7 +36,7 @@
                       v-if="getElementType(attribute.name) === 'input'"
                       density="compact"
                       :variant="
-                        key === 'username' && processType === 'edit'
+                        attribute.name === 'username' && processType === 'edit'
                           ? 'plain'
                           : 'underlined'
                       "
@@ -46,7 +46,9 @@
                         setUserAttribute(attribute.name, $event)
                       "
                       :type="getInputTypeOfAttribute(attribute.name)"
-                      :readonly="key === 'username' && processType === 'edit'"
+                      :readonly="
+                        attribute.name === 'username' && processType === 'edit'
+                      "
                       :rules="getRules(attribute.name)"
                     ></v-text-field>
                     <v-select
@@ -80,7 +82,7 @@
                     v-if="getElementType(attribute.name) === 'input'"
                     density="compact"
                     :variant="
-                      key === 'username' && processType === 'edit'
+                      attribute.name === 'username' && processType === 'edit'
                         ? 'plain'
                         : 'underlined'
                     "
@@ -90,7 +92,9 @@
                       setUserAttribute(attribute.name, $event)
                     "
                     :type="getInputTypeOfAttribute(attribute.name)"
-                    :readonly="key === 'username' && processType === 'edit'"
+                    :readonly="
+                      attribute.name === 'username' && processType === 'edit'
+                    "
                     :rules="getRules(attribute.name)"
                   ></v-text-field>
                   <v-select
