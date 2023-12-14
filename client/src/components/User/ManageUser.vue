@@ -49,7 +49,10 @@
                 >
                   <v-col cols="6">
                     <v-text-field
-                      v-if="getElementType(attribute.name) === 'input'"
+                      v-if="
+                        !attribute.annotations ||
+                        attribute.annotations.inputType === 'text'
+                      "
                       density="compact"
                       variant="underlined"
                       :label="$t(`user.${attribute.name.toLowerCase()}`)"
@@ -61,12 +64,16 @@
                       :rules="getRules(attribute.name)"
                     ></v-text-field>
                     <v-select
-                      v-else
+                      v-else-if="
+                        ['select', 'multiselect'].includes(
+                          attribute.annotations.inputType
+                        )
+                      "
                       density="compact"
                       :label="$t(`user.${attribute.name.toLowerCase()}`)"
-                      :item-title="attribute.name"
-                      :item-value="attribute.displayName"
-                      :items="getSelectItems(attribute.name)"
+                      item-title="name"
+                      item-value="id"
+                      :items="attribute.validations.options.options"
                       :model-value="user.attributes[attribute.name]"
                       @update:model-value="
                         setUserAttribute(attribute.name, $event)
@@ -88,7 +95,10 @@
               >
                 <v-col cols="6">
                   <v-text-field
-                    v-if="getElementType(attribute.name) === 'input'"
+                    v-if="
+                      !attribute.annotations ||
+                      attribute.annotations.inputType === 'text'
+                    "
                     density="compact"
                     variant="underlined"
                     :label="$t(`user.${attribute.name.toLowerCase()}`)"
@@ -100,13 +110,20 @@
                     :rules="getRules(attribute.name)"
                   ></v-text-field>
                   <v-select
-                    v-else
+                    v-else-if="
+                      ['select', 'multiselect'].includes(
+                        attribute.annotations.inputType
+                      )
+                    "
                     density="compact"
                     :label="$t(`user.${attribute.name.toLowerCase()}`)"
-                    :item-title="attribute.name"
-                    :item-value="attribute.displayName"
-                    :items="getSelectItems(attribute.name)"
+                    item-title="name"
+                    item-value="id"
+                    :items="attribute.validations.options.options"
                     :model-value="user.attributes[attribute.name]"
+                    :multiple="
+                      attribute.annotations.inputType === 'multiselect'
+                    "
                     @update:model-value="
                       setUserAttribute(attribute.name, $event)
                     "
@@ -285,14 +302,6 @@ const getInputTypeOfAttribute = (nameOfAttribute) => {
   } else {
     return "text";
   }
-};
-const getElementType = (nameOfAttribute) => {
-  const attribute = getMetaDataAttribute(nameOfAttribute);
-  return attribute.annotations?.inputType ?? "input";
-};
-const getSelectItems = (nameOfAttribute) => {
-  const attribute = getMetaDataAttribute(nameOfAttribute);
-  return attribute.validations.options.options;
 };
 const getRules = (nameOfAttribute) => {
   const attribute = getMetaDataAttribute(nameOfAttribute);

@@ -9,6 +9,9 @@
       "view" : [ "admin", "user" ],
       "edit" : [ "admin", "user" ]
     },
+    "annotations" : {
+      "inputType" : "text"
+    },
     "validations" : {
       "email" : { },
       "length" : {
@@ -122,7 +125,7 @@
       "view" : [ "user", "admin" ]
     },
     "annotations" : {
-      "inputType" : "select"
+      "inputType" : "multiselect"
     },
     "validations" : {
       "options" : {
