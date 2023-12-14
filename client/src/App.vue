@@ -62,14 +62,12 @@ export default {
     const store = useStore();
     const { hasLoadingError } = useNotification();
     onMounted(() => {
-      store
-        .dispatch("profile/loadProfile")
-        .then(() => {
-          store.dispatch("profile/loadUserProfileMetadata");
-        })
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
+      store.dispatch("profile/loadUserProfileMetadata").catch(() => {
+        hasLoadingError.value = true;
+      });
+      store.dispatch("profile/loadProfile").catch(() => {
+        hasLoadingError.value = true;
+      });
     });
     return {
       hasLoadingError,
