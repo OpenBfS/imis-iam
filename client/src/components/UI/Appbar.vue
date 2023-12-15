@@ -46,15 +46,17 @@
 </template>
 <style scoped></style>
 <script setup>
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
 import { computed } from "@vue/reactivity";
 
 const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
-const store = useStore();
+const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
 const savedUser = computed(() => {
-  return store.state.profile.userData;
+  return profileStore.userData;
 });
 
 const logout = () => {
@@ -63,10 +65,10 @@ const logout = () => {
 
 const editProfile = () => {
   const user = cloneObject(savedUser.value);
-  store.commit("application/setOwnAccount", true);
-  store.commit("application/setManagedItem", user);
-  store.commit("application/setSavedItem", savedUser.value);
-  store.commit("application/setProcessType", "edit");
-  store.commit("application/setShowManageUserDialog", true);
+  applicationStore.setOwnAccount(true);
+  applicationStore.setManagedItem(user);
+  applicationStore.setSavedItem(savedUser.value);
+  applicationStore.setProcessType("edit");
+  applicationStore.setShowManageUserDialog(true);
 };
 </script>

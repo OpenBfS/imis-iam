@@ -94,7 +94,7 @@
         <UIAlert
           v-if="hasLoadingError"
           v-bind:isSuccessful="!hasLoadingError"
-          v-bind:message="$store.state.application.httpErrorMessage"
+          v-bind:message="applicationStore.httpErrorMessage"
         />
       </v-col>
     </v-row>
@@ -117,14 +117,16 @@ tr {
 import { onMounted, ref, defineAsyncComponent, computed, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useMailStore } from "@/stores/mail";
 import { useRoute } from "vue-router";
 import { debounce } from "debounce";
 const MailContent = defineAsyncComponent(() =>
   import("@/components/Mailing/MailContent.vue")
 );
 const mails = ref([]);
-const store = useStore();
+const applicationStore = useApplicationStore();
+const mailStore = useMailStore();
 const route = useRoute();
 const { hasLoadingError } = useNotification();
 const getMails = () => {
@@ -164,14 +166,14 @@ const getMails = () => {
 onMounted(() => {
   setStartAndEndDate();
   getMails();
-  store
-    .dispatch("mail/loadMailTypes")
+  mailStore
+    .loadMailTypes()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
     });
-  store
-    .dispatch("mail/loadMailinglists")
+  mailStore
+    .loadMailinglists()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
@@ -186,7 +188,7 @@ const checkChildObject = (e) => {
 };
 // Filters
 const mailTypes = computed(() => {
-  return store.state.mail.mailTypes;
+  return mailStore.mailTypes;
 });
 const selectedFilter = ref([]);
 watch(
@@ -262,7 +264,7 @@ watch(
 );
 const selectedMailinglist = ref([]);
 const mailinglists = computed(() => {
-  return store.state.mail.mailingLists;
+  return mailStore.mailingLists;
 });
 
 watch(

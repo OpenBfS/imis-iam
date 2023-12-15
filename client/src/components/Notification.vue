@@ -42,7 +42,7 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
-                v-if="$store.state.profile.isAllowedToManage"
+                v-if="profileStore.isAllowedToManage"
                 v-bind="props"
                 color="#E57373"
                 class="ml-2"
@@ -95,7 +95,7 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
-                v-if="$store.state.profile.isAllowedToManage"
+                v-if="profileStore.isAllowedToManage"
                 v-bind="props"
                 color="#E0E0E0"
                 class="ml-2"
@@ -148,7 +148,7 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
-                v-if="$store.state.profile.isAllowedToManage"
+                v-if="profileStore.isAllowedToManage"
                 v-bind="props"
                 color="#E0E0E0"
                 class="ml-2"
@@ -175,7 +175,7 @@
       <UIAlert
         v-if="hasRequestError"
         v-bind:isSuccessful="!hasRequestError"
-        v-bind:message="$store.state.application.httpErrorMessage"
+        v-bind:message="applicationStore.httpErrorMessage"
       />
     </v-row>
   </v-container>
@@ -191,7 +191,13 @@ p {
 <script setup>
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
+import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
 import { ref, onMounted, defineAsyncComponent } from "vue";
+
+const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
+
 const MailContent = defineAsyncComponent(() =>
   import("@/components/Mailing/MailContent.vue")
 );

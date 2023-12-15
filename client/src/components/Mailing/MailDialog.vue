@@ -104,7 +104,7 @@
         </v-row>
         <UIAlert
           v-if="hasRequestError || hasLoadingError"
-          v-bind:message="$store.state.application.httpErrorMessage"
+          v-bind:message="applicationStore.httpErrorMessage"
         />
       </v-container>
       <v-divider></v-divider>
@@ -137,7 +137,9 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import { HTTP } from "@/lib/http";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useMailStore } from "@/stores/mail";
+import { useProfileStore } from "@/stores/profile";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 
@@ -147,7 +149,10 @@ const props = defineProps({
 const emit = defineEmits(["mail-dialog-object"]);
 
 const show = true;
-const store = useStore();
+const applicationStore = useApplicationStore();
+const mailStore = useMailStore();
+const profileStore = useProfileStore();
+
 const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
 // Mail
@@ -157,10 +162,10 @@ const mailText = ref("");
 const subject = ref("");
 const archived = ref(false);
 const expiryDate = ref("");
-const userData = store.state.profile.userData;
+const userData = profileStore.userData;
 const senderList = ref([
   [userData.firstName, userData.lastName, "<" + userData.email + ">"].join(" "),
-  store.state.application.reportMail,
+  applicationStore.reportMail,
 ]);
 const selectedSender = ref(senderList.value[0] || senderList.value[0] || "");
 
@@ -187,11 +192,11 @@ const sendMail = () => {
 // type
 const selectedType = ref();
 const types = computed(() => {
-  return store.state.mail.mailTypes;
+  return mailStore.mailTypes;
 });
 const getTypes = () => {
-  store
-    .dispatch("mail/loadMailTypes")
+  mailStore
+    .loadMailTypes()
     .then()
     .catch(() => {
       hasLoadingError.value = true;

@@ -19,15 +19,20 @@
       </v-list-item-subtitle>
       <InstitutionTable
         v-if="props.type != 'users'"
-        v-bind:institutions="$store.state.institution.foundInstitutions"
+        v-bind:institutions="institutionStore.foundInstitutions"
       />
-      <UserTable v-else v-bind:users="$store.state.user.foundUsers" />
+      <UserTable v-else v-bind:users="userStore.foundUsers" />
     </v-list>
   </v-container>
 </template>
 
 <script setup>
 import { defineAsyncComponent } from "vue";
+import { useInstitutionStore } from "@/stores/institution";
+import { useUserStore } from "@/stores/user";
+
+const institutionStore = useInstitutionStore();
+const userStore = useUserStore();
 
 const InstitutionTable = defineAsyncComponent(() =>
   import("@/components/Institution/InstitutionTable.vue")

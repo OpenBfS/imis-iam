@@ -137,7 +137,7 @@
       <UIAlert
         v-if="hasLoadingError"
         v-bind:isSuccessful="!hasLoadingError"
-        v-bind:message="$store.state.application.httpErrorMessage"
+        v-bind:message="applicationStore.httpErrorMessage"
       />
     </v-row>
     <ManageMailing
@@ -157,7 +157,9 @@
 <script setup>
 import { useNotification } from "@/lib/use-notification";
 import { onMounted, ref, defineAsyncComponent, computed } from "vue";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useMailStore } from "@/stores/mail";
+import { useProfileStore } from "@/stores/profile";
 
 const ManageMailing = defineAsyncComponent(() =>
   import("@/components/Mailing/ManageMailing.vue")
@@ -165,18 +167,20 @@ const ManageMailing = defineAsyncComponent(() =>
 const MailDialog = defineAsyncComponent(() =>
   import("@/components/Mailing/MailDialog.vue")
 );
-const store = useStore();
+const applicationStore = useApplicationStore();
+const mailStore = useMailStore();
+const profileStore = useProfileStore();
 const { hasLoadingError, resetNotification } = useNotification();
 const mailingLists = computed(() => {
-  return store.state.mail.mailingLists;
+  return mailStore.mailingLists;
 });
 const isAllowedToManage = computed(() => {
-  return store.state.profile.isAllowedToManage;
+  return profileStore.isAllowedToManage;
 });
 const getMailLists = () => {
   resetNotification();
-  store
-    .dispatch("mail/loadMailinglists")
+  mailStore
+    .loadMailinglists()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
@@ -188,8 +192,8 @@ onMounted(() => {
 });
 
 const getMyMailinglist = () => {
-  store
-    .dispatch("profile/getMyMailingLists")
+  profileStore
+    .getMyMailingLists()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
@@ -214,7 +218,7 @@ const checkMailDialogObject = (e) => {
   }
 };
 const myMailingLists = computed(() => {
-  return store.state.profile.myMailingLists;
+  return profileStore.myMailingLists;
 });
 const isUserInList = (list) => {
   return myMailingLists.value.map((l) => l.id).some((r) => r === list.id);

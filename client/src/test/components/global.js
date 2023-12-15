@@ -8,7 +8,6 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import i18n from "@/i18n";
-import store from "@/store";
 import UIAlert from "@/components/UI/UIAlert.vue";
 
 const vuetify = createVuetify({
@@ -17,7 +16,10 @@ const vuetify = createVuetify({
 });
 
 const global = {
-  plugins: [vuetify, store, i18n],
+  plugins: [
+    vuetify,
+    i18n,
+  ],
   components: { UIAlert },
 };
 

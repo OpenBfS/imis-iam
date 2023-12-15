@@ -54,12 +54,12 @@
 
 <script>
 import { computed, onMounted } from "vue";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
 export default {
   setup() {
-    const store = useStore();
+    const applicationStore = useApplicationStore();
     const links = computed(() => {
-      return store.state.application.footerLinks;
+      return applicationStore.footerLinks;
     });
     onMounted(() => {
       links.value;

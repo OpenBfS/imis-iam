@@ -9,13 +9,11 @@
   <v-card flat>
     <v-tabs density="compact" v-model="tab" grow>
       <v-tab value="users"
-        >{{ $t("main.users") }} ({{
-          $store.state.user.foundUsers.length
-        }})</v-tab
+        >{{ $t("main.users") }} ({{ userStore.foundUsers.length }})</v-tab
       >
       <v-tab value="institutions"
         >{{ $t("main.institutions") }} ({{
-          $store.state.institution.foundInstitutions.length
+          institutionStore.foundInstitutions.length
         }})</v-tab
       >
     </v-tabs>
@@ -34,6 +32,11 @@
 
 <script setup>
 import { ref, defineAsyncComponent } from "vue";
+import { useInstitutionStore } from "@/stores/institution";
+import { useUserStore } from "@/stores/user";
+
+const institutionStore = useInstitutionStore();
+const userStore = useUserStore();
 
 const ResultTable = defineAsyncComponent(() =>
   import("@/components/Search/ResultTable.vue")

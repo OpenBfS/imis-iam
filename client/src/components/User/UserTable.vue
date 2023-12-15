@@ -30,7 +30,7 @@
               <v-btn
                 variant="plain"
                 :icon="`${
-                  $store.state.profile.isAllowedToManage
+                  profileStore.isAllowedToManage
                     ? 'mdi-account-edit-outline'
                     : 'mdi-information-outline'
                 }`"
@@ -40,7 +40,7 @@
               ></v-btn>
             </template>
             <span>{{
-              $store.state.profile.isAllowedToManage
+              profileStore.isAllowedToManage
                 ? $t("label.edit")
                 : $t("label.show_info")
             }}</span>
@@ -48,7 +48,7 @@
           <v-tooltip>
             <template
               v-slot:activator="{ props }"
-              v-if="$store.state.profile.isAllowedToManage"
+              v-if="profileStore.isAllowedToManage"
             >
               <v-btn
                 variant="plain"
@@ -67,7 +67,9 @@
 </template>
 
 <script setup>
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
+import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
 import { expUser } from "@/components/User/user";
 import { onMounted } from "vue";
@@ -83,11 +85,13 @@ function getUserAttribute(user, attributeName) {
     : "";
 }
 
-const store = useStore();
+const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
+const userStore = useUserStore();
 const savedUser = ref();
 
 onMounted(() => {
-  store.dispatch("user/loadMemberships");
+  userStore.loadMemberships();
 });
 
 // Deep Copy for objects
@@ -104,19 +108,19 @@ const onCopyClicked = (id) => {
   user.value.email = "";
   user.value.username = "";
   delete user.value["id"];
-  store.commit("application/setManagedItem", user.value);
-  store.commit("application/setSavedItem", savedUser.value);
-  store.commit("application/setProcessType", "copy");
-  store.commit("application/setShowManageUserDialog", true);
+  applicationStore.setManagedItem(user.value);
+  applicationStore.setSavedItem(savedUser.value);
+  applicationStore.setProcessType("copy");
+  applicationStore.setShowManageUserDialog(true);
 };
 const onEditClicked = (id) => {
   user.value = cloneObject(getUserById(id));
   // Save original user data for "reset" button
   savedUser.value = cloneObject(user.value);
-  store.commit("application/setManagedItem", user.value);
-  store.commit("application/setSavedItem", savedUser.value);
-  store.commit("application/setProcessType", "edit");
-  store.commit("application/setShowManageUserDialog", true);
+  applicationStore.setManagedItem(user.value);
+  applicationStore.setSavedItem(savedUser.value);
+  applicationStore.setProcessType("edit");
+  applicationStore.setShowManageUserDialog(true);
 };
 
 //Get the membership names as string using the given id array
@@ -125,7 +129,7 @@ const getMembershipNamesById = (ids) => {
     return;
   }
   var result = "";
-  var memberships = store.state.user.memberships;
+  var memberships = userStore.memberships;
   ids.forEach((id) => {
     var m = memberships.find((membership) => membership.id === id);
     if (result.length != 0) {

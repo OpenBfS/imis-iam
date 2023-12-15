@@ -4,7 +4,7 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
-import store from "@/store";
+import { useApplicationStore } from "@/stores/application";
 import axios from "axios";
 
 const HTTP = axios.create({
@@ -14,20 +14,18 @@ const HTTP = axios.create({
 HTTP.interceptors.response.use(
   (response) => response,
   (error) => {
+    const applicationStore = useApplicationStore();
     if (error.response) {
       if (error.response.data) {
-        store.commit("application/setHttpErrorMessage", error.response.data);
+        applicationStore.setHttpErrorMessage(error.response.data);
       } else {
-        store.commit(
-          "application/setHttpErrorMessage",
-          error.response.statusText
-        );
+        applicationStore.setHttpErrorMessage(error.response.statusText);
       }
       // Handle other type of errors.
     } else if (error.request) {
-      store.commit("application/setHttpErrorMessage", error.request);
+      applicationStore.setHttpErrorMessage(error.request);
     } else {
-      store.commit("application/setHttpErrorMessage", "Error" + error.message);
+      applicationStore.setHttpErrorMessage("Error" + error.message);
     }
     return Promise.reject(error);
   }

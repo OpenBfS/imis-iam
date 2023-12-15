@@ -4,17 +4,28 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
+import { defineStore } from "pinia";
 import { Promise } from "core-js";
 import { PhotonHTTP } from "../lib/http";
-export const coordinates = {
+export const useCoordinatesStore = defineStore("coordinates", {
   namespaced: true,
   state: () => ({
     coordinates: [],
     coordinate: {},
   }),
-  mutations: {
-    setCoordinateList: (state, data) => {
-      state.coordinates.length = 0;
+  actions: {
+    loadCoordinates(query) {
+      return new Promise((resolve, reject) => {
+        PhotonHTTP.get("/api?q=" + query)
+          .then((response) => {
+            this.setCoordinateList(response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
+    },
+    setCoordinateList(data) {
+      this.coordinates.length = 0;
       data.features.forEach((feature) => {
         var properties = feature.properties;
         var xCoord = feature.geometry.coordinates[0];
@@ -25,20 +36,8 @@ export const coordinates = {
         var housenumber = properties.housenumber ? properties.housenumber : "";
 
         feature.properties.display = `${street} ${housenumber}, ${city}, ${country} [${xCoord} - ${yCoord}]`;
-        state.coordinates.push(feature);
+        this.coordinates.push(feature);
       });
     },
   },
-  actions: {
-    loadCoordinates({ commit }, query) {
-      return new Promise((resolve, reject) => {
-        PhotonHTTP.get("/api?q=" + query)
-          .then((response) => {
-            commit("setCoordinateList", response.data);
-            resolve(response);
-          })
-          .catch((error) => reject(error));
-      });
-    },
-  },
-};
+});

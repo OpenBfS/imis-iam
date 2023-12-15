@@ -5,15 +5,24 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { vi } from "vitest";
-import store from "@/store";
+import { setActivePinia, createPinia } from "pinia";
+import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
+import { useUserStore } from "@/stores/user";
 import { HTTP } from "@/lib/http";
 import { mount } from "@vue/test-utils";
 import ManageUser from "@/components/User/ManageUser.vue";
 import global from "@/test/components/global";
 import { test, expect } from "vitest";
 
+setActivePinia(createPinia());
+
+const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
+const userStore = useUserStore();
+
 // Mock HTTP requests/responses
-vi.spyOn(store, "dispatch").mockResolvedValue({});
+vi.spyOn(userStore, "loadMemberships").mockResolvedValue({});
 vi.spyOn(HTTP, "get").mockResolvedValue({});
 
 // Test data
@@ -34,21 +43,28 @@ const user = {
           },
         },
       },
+      {
+        name: "firstName",
+      },
+      {
+        name: "lastName",
+      },
     ],
   },
 };
-store.state.application.managedItem = user;
+applicationStore.managedItem = user;
+profileStore.setUserProfileMetadata(user.userProfileMetadata);
 
 const wrapper = mount(ManageUser, {
   global: global,
 });
 
 test("First name is displayed in respective input", () => {
-  expect(wrapper.get("input[name='firstname']").element.value).toBe(firstName);
+  expect(wrapper.get("input[name='firstName']").element.value).toBe(firstName);
 });
 
 test("Missing attribute is rendered as empty string", () => {
-  expect(wrapper.get("input[name='lastname']").element.value).toBe("");
+  expect(wrapper.get("input[name='lastName']").element.value).toBe("");
 });
 
 test("Input changes existing attribute", () => {
@@ -64,7 +80,7 @@ test("Input adds non-existing attribute", () => {
 });
 
 async function testFieldInput(name) {
-  const input = wrapper.get(`input[name='${name.toLowerCase()}']`);
+  const input = wrapper.get(`input[name='${name}']`);
   const newValue = "test";
   await input.setValue(newValue);
   expect(input.element.value).toBe(newValue);

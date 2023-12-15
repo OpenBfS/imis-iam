@@ -22,7 +22,7 @@
           <v-form
             v-model="valid"
             ref="form"
-            :readonly="!$store.state.profile.isAllowedToManage"
+            :readonly="!profileStore.isAllowedToManage"
           >
             <div class="group_class">
               <v-text-field
@@ -200,9 +200,7 @@
               </v-select>
               <v-btn
                 variant="plain"
-                v-if="
-                  !showAddCategory && $store.state.profile.isAllowedToManage
-                "
+                v-if="!showAddCategory && profileStore.isAllowedToManage"
                 @click="showAddCategory = true"
               >
                 {{ $t("institution.new_category") }}
@@ -247,14 +245,14 @@
       </v-row>
       <UIAlert
         v-if="hasLoadingError || hasRequestError"
-        v-bind:message="$store.state.application.httpErrorMessage"
+        v-bind:message="applicationStore.httpErrorMessage"
       />
     </v-container>
     <v-divider></v-divider>
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn
-        v-if="$store.state.profile.isAllowedToManage"
+        v-if="profileStore.isAllowedToManage"
         color="accent"
         :disabled="!valid || hasNoChange"
         @click="
@@ -264,7 +262,7 @@
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
       </v-btn>
       <v-btn
-        v-if="processType === 'edit' && $store.state.profile.isAllowedToManage"
+        v-if="processType === 'edit' && profileStore.isAllowedToManage"
         color="accent"
         @click="institution = { ...originalInstitution }"
       >
@@ -272,9 +270,7 @@
       </v-btn>
       <v-btn
         color="accent"
-        @click="
-          $store.commit('application/setShowManageInstitutionDialog', false)
-        "
+        @click="applicationStore.setShowManageInstitutionDialog(false)"
       >
         {{ $t("button.cancel") }}
       </v-btn>
@@ -294,9 +290,7 @@
       </v-btn>
       <v-btn
         color="accent"
-        @click="
-          $store.commit('application/setShowManageInstitutionDialog', false)
-        "
+        @click="applicationStore.setShowManageInstitutionDialog(false)"
       >
         {{ $t("button.cancel") }}
       </v-btn>
@@ -321,16 +315,24 @@ import { onMounted, ref, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useCoordinatesStore } from "@/stores/coordinates";
+import { useInstitutionStore } from "@/stores/institution";
+import { useProfileStore } from "@/stores/profile";
 import { computed } from "@vue/reactivity";
 import { debounce } from "debounce";
 
 const { hasLoadingError, hasRequestError } = useNotification();
-const store = useStore();
-const institution = ref(store.state.application.managedItem);
+
+const applicationStore = useApplicationStore();
+const coordinatesStore = useCoordinatesStore();
+const institutionStore = useInstitutionStore();
+const profileStore = useProfileStore();
+
+const institution = ref(applicationStore.managedItem);
 const originalInstitution = { ...institution.value };
-const processType = ref(store.state.application.processType);
-const coordinates = ref(store.state.coordinates.coordinates);
+const processType = ref(applicationStore.processType);
+const coordinates = ref(coordinatesStore.coordinates);
 const {
   form,
   valid,
@@ -360,8 +362,8 @@ onMounted(() => {
   }
 });
 const getInstitutions = () => {
-  store
-    .dispatch("institution/loadInstitutions")
+  institutionStore
+    .loadInstitutions()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
@@ -372,7 +374,7 @@ const createInstitution = () => {
   HTTP.post("/institution", payload)
     .then(() => {
       getInstitutions();
-      store.commit("application/setShowManageInstitutionDialog", false);
+      applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch(() => {
       hasRequestError.value = true;
@@ -380,10 +382,10 @@ const createInstitution = () => {
 };
 const updateInstitution = () => {
   let payload = { ...institution.value };
-  store
-    .dispatch("institution/updateInstitution", payload)
+  institutionStore
+    .updateInstitution(payload)
     .then(() => {
-      store.commit("application/setShowManageInstitutionDialog", false);
+      applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch(() => {
       hasRequestError.value = true;
@@ -393,7 +395,7 @@ const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)
     .then(() => {
       getInstitutions();
-      store.commit("application/setShowManageInstitutionDialog", false);
+      applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch(() => {
       hasRequestError.value = true;
@@ -432,7 +434,7 @@ const coordinatesPicked = () => {
 };
 //Load coordinate store
 const loadCoordinates = (queryString) => {
-  return store.dispatch("coordinates/loadCoordinates", queryString);
+  return coordinatesStore.loadCoordinates(queryString);
 };
 const triggerLoadCoordinates = debounce((queryString) => {
   coordinatesLoading.value = true;

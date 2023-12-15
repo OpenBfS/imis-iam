@@ -37,7 +37,10 @@
                 ></v-text-field>
               </v-col>
             </v-row>
-            <template v-for="group in attributeGroups" :key="group.name">
+            <template
+              v-for="group in profileStore.attributeGroups"
+              :key="group.name"
+            >
               <v-row>
                 <v-label>{{ $t(`user.${group.name}`) }}</v-label>
               </v-row>
@@ -49,12 +52,13 @@
                   <v-col cols="6">
                     <v-text-field
                       v-if="
-                        !attribute.annotations ||
+                        !attribute.annotations?.inputType ||
                         attribute.annotations.inputType === 'text'
                       "
                       density="compact"
                       variant="underlined"
                       :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                      :name="attribute.name"
                       :model-value="user.attributes[attribute.name]"
                       @update:model-value="
                         setUserAttribute(attribute.name, $event)
@@ -72,6 +76,7 @@
                       :label="$t(`user.${attribute.name.toLowerCase()}`)"
                       item-title="name"
                       item-value="id"
+                      :name="attribute.name"
                       :items="attribute.validations.options.options"
                       :model-value="user.attributes[attribute.name]"
                       @update:model-value="
@@ -89,7 +94,7 @@
             </v-row>
             <v-row>
               <template
-                v-for="attribute in attributesWithoutGroup"
+                v-for="attribute in profileStore.attributesWithoutGroup"
                 :key="attribute.name"
               >
                 <v-col cols="6">
@@ -101,6 +106,7 @@
                     density="compact"
                     variant="underlined"
                     :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                    :name="attribute.name"
                     :model-value="user.attributes[attribute.name]"
                     @update:model-value="
                       setUserAttribute(attribute.name, $event)
@@ -119,6 +125,7 @@
                     item-title="name"
                     item-value="id"
                     :items="attribute.validations.options.options"
+                    :name="attribute.name"
                     :model-value="user.attributes[attribute.name]"
                     :multiple="
                       attribute.annotations.inputType === 'multiselect'
@@ -134,11 +141,11 @@
 
             <div class="two_group_class">
               <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
+                :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
                 dense
                 :label="$t('user.label_institutions')"
-                :items="institutions"
+                :items="institutionStore.institutions"
                 v-model="user.institutions"
                 item-title="name"
                 item-value="id"
@@ -148,11 +155,11 @@
               >
               </v-select>
               <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
+                :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
                 dense
                 :label="$t('user.label_memberships')"
-                :items="memeberships"
+                :items="userStore.memberships"
                 v-model="user.groups"
                 item-title="name"
                 item-value="id"
@@ -166,7 +173,7 @@
             </div>
             <div class="one_group_class">
               <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
+                :clearable="profileStore.isAllowedToManage"
                 dense
                 :label="$t('user.label_roles')"
                 :items="userRoles"
@@ -181,7 +188,7 @@
           </v-form>
           <UIAlert
             v-if="hasLoadingError || hasRequestError"
-            v-bind:message="$store.state.application.httpErrorMessage"
+            v-bind:message="applicationStore.httpErrorMessage"
           />
         </v-col>
       </v-row>
@@ -223,8 +230,8 @@
       <v-btn
         color="accent"
         @click="
-          $store.commit('application/setOwnAccount', false);
-          $store.commit('application/setShowManageUserDialog', false);
+          applicationStore.setOwnAccount(false);
+          applicationStore.setShowManageUserDialog(false);
         "
       >
         {{ $t("button.cancel") }}
@@ -255,21 +262,25 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onMounted, ref, nextTick } from "vue";
+import { computed, onMounted, nextTick } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useInstitutionStore } from "@/stores/institution";
+import { useProfileStore } from "@/stores/profile";
+import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import { expUser } from "@/components/User/user";
 
 const { t } = useI18n();
 const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
-const store = useStore();
-const user = ref(store.state.application.managedItem);
-const originalUser = ref(store.state.application.savedItem);
-const processType = ref(store.state.application.processType);
+
+const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
+const profileStore = useProfileStore();
+const userStore = useUserStore();
 
 function setUserAttribute(name, value) {
   const attrs = user.value.attributes;
@@ -283,12 +294,12 @@ function setUserAttribute(name, value) {
 }
 
 const getAttributesForGroup = (groupName) => {
-  return JSON.parse(JSON.stringify(store.getters["profile/attributes"])).filter(
+  return JSON.parse(JSON.stringify(profileStore.attributes)).filter(
     (attribute) => attribute.group === groupName
   );
 };
 const getMetaDataAttribute = (nameOfAttribute) => {
-  return JSON.parse(JSON.stringify(store.getters["profile/attributes"])).find(
+  return JSON.parse(JSON.stringify(profileStore.attributes)).find(
     (attribute) => attribute.name === nameOfAttribute
   );
 };
@@ -306,7 +317,7 @@ const getRules = (nameOfAttribute) => {
   const attribute = getMetaDataAttribute(nameOfAttribute);
   const rules = [];
   // Rules for text field components
-  if (!attribute.validations.options) {
+  if (!attribute.validations?.options) {
     if (attribute.name === "email") {
       rules.push(
         ...reqValidmail(t("form.required_email"), t("form.valid_email"))
@@ -354,13 +365,13 @@ const getRules = (nameOfAttribute) => {
   return rules;
 };
 const getUserMemberships = () => {
-  store.dispatch("user/loadMemberships").catch(() => {
+  userStore.loadMemberships().catch(() => {
     hasLoadingError.value = false;
   });
 };
 const getInstitutions = () => {
-  store
-    .dispatch("institution/loadInstitutions")
+  institutionStore
+    .loadInstitutions()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
@@ -370,22 +381,17 @@ onMounted(() => {
   getUserMemberships();
   getInstitutions();
 });
-const attributesWithoutGroup = computed(() => {
-  return JSON.parse(
-    JSON.stringify(store.getters["profile/attributesWithoutGroup"])
-  );
+const user = computed(() => {
+  return applicationStore.managedItem;
 });
-const attributeGroups = computed(() => {
-  return JSON.parse(JSON.stringify(store.getters["profile/attributeGroups"]));
+const originalUser = computed(() => {
+  return applicationStore.savedItem;
 });
-const memeberships = computed(() => {
-  return store.state.user.memberships;
-});
-const institutions = computed(() => {
-  return store.state.institution.institutions;
+const processType = computed(() => {
+  return applicationStore.processType;
 });
 const userRoles = computed(() => {
-  var roles = store.state.user.roles;
+  var roles = userStore.roles;
   // If available, use description field for localization
   roles.forEach(
     (item) => (item.title = item.description ? t(item.description) : item.name)
@@ -397,8 +403,8 @@ const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const getUsers = () => {
-  store
-    .dispatch("user/loadUsers")
+  userStore
+    .loadUsers()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
@@ -409,8 +415,8 @@ const createUser = (shouldClose) => {
     .then(() => {
       getUsers();
       if (shouldClose) {
-        store.commit("application/setOwnAccount", true);
-        store.commit("application/setShowManageUserDialog", false);
+        applicationStore.setOwnAccount(true);
+        applicationStore.setShowManageUserDialog(false);
       } else {
         // Use the same roles of the last created user.
         const usedRoles = user.value.roles;
@@ -428,15 +434,15 @@ const createUser = (shouldClose) => {
 
 const updateUser = () => {
   resetNotification();
-  store
-    .dispatch("user/updateUser", user.value)
+  userStore
+    .updateUser(user.value)
     .then(() => {
       // Update current user Profile and thus the data in App bar.
-      if (store.state.profile.userData.id === user.value.id) {
-        store.dispatch("profile/loadProfile");
+      if (profileStore.userData.id === user.value.id) {
+        profileStore.loadProfile();
       }
-      store.commit("application/setOwnAccount", false);
-      store.commit("application/setShowManageUserDialog", false);
+      applicationStore.setOwnAccount(false);
+      applicationStore.setShowManageUserDialog(false);
     })
     .catch(() => {
       hasRequestError.value = true;
@@ -479,9 +485,9 @@ const hasNoChanges = computed(() => {
   );
 });
 const isReadOnly = computed(() => {
-  if (store.state.application.ownAccount) {
+  if (applicationStore.ownAccount) {
     return false;
   }
-  return !store.state.profile.isAllowedToManage;
+  return !profileStore.isAllowedToManage;
 });
 </script>

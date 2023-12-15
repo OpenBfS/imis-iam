@@ -4,8 +4,10 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
+import { defineStore } from "pinia";
 import { HTTP } from "../lib/http";
-export const profile = {
+
+export const useProfileStore = defineStore("profile", {
   namespaced: true,
   state: () => ({
     userData: {},
@@ -13,20 +15,6 @@ export const profile = {
     myMailingLists: [],
     isAllowedToManage: true,
   }),
-  mutations: {
-    setUserData: (state, data) => {
-      state.userData = data;
-    },
-    setUserProfileMetadata: (state, data) => {
-      state.userProfileMetadata = data;
-    },
-    setMyMailingLists: (state, data) => {
-      state.myMailingLists = data;
-    },
-    setIsAllowedToManage: (state, data) => {
-      state.isAllowedToManage = data;
-    },
-  },
   getters: {
     attributes: (state) => {
       return state.userProfileMetadata.attributes;
@@ -35,47 +23,67 @@ export const profile = {
       return state.userProfileMetadata.groups;
     },
     attributesWithoutGroup: (state) => {
-      return state.userProfileMetadata.attributes.filter(
+      return state.userProfileMetadata.attributes?.filter(
         (attribute) => !attribute.group
       );
     },
   },
   actions: {
-    loadProfile({ commit }) {
+    setUserData(data) {
+      this.$patch({
+        userData: data,
+      });
+    },
+    setUserProfileMetadata(data) {
+      this.$patch({
+        userProfileMetadata: data,
+      });
+    },
+    setMyMailingLists(data) {
+      this.$patch({
+        myMailingLists: data,
+      });
+    },
+    setIsAllowedToManage(data) {
+      this.$patch({
+        isAllowedToManage: data,
+      });
+    },
+    loadProfile() {
       return new Promise((resolve, reject) => {
         HTTP.get("/iamuser/profile")
           .then((response) => {
-            commit("setUserData", response.data);
+            this.setUserData(response.data);
             const roles = response.data.roles;
             if (roles.length === 1 && ["user"].indexOf(roles[0]) !== -1) {
-              commit("setIsAllowedToManage", false);
+              this.setIsAllowedToManage(false);
             } else {
-              commit("setIsAllowedToManage", true);
+              this.setIsAllowedToManage(true);
             }
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
-    loadUserProfileMetadata({ commit }) {
+    loadUserProfileMetadata() {
       return new Promise((resolve, reject) => {
         HTTP.get("/iamuser/userprofilemetadata")
           .then((response) => {
-            commit("setUserProfileMetadata", response.data);
+            this.setUserProfileMetadata(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
-    getMyMailingLists({ commit }) {
+    getMyMailingLists() {
       return new Promise((resolve, reject) => {
         HTTP.get("mail/list?subscribed=true")
           .then((response) => {
-            commit("setMyMailingLists", response.data);
+            this.setMyMailingLists(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
   },
-};
+});

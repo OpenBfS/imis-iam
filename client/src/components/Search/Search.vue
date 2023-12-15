@@ -29,23 +29,22 @@
 <script setup>
 import { ref, defineAsyncComponent, onMounted, watch } from "vue";
 import { debounce } from "debounce";
-import { useStore } from "vuex";
+import { useInstitutionStore } from "@/stores/institution";
+import { useUserStore } from "@/stores/user";
 
 const Results = defineAsyncComponent(() =>
   import("@/components/Search/Results.vue")
 );
-const store = new useStore();
+const institutionStore = useInstitutionStore();
+const userStore = useUserStore();
 const searchString = ref("");
 const searchRequest = () => {
   Promise.all([
-    store.dispatch("user/loadUsers", searchString.value),
-    store.dispatch("institution/loadInstitutions", searchString.value),
+    userStore.loadUsers(searchString.value),
+    institutionStore.loadInstitutions(searchString.value),
   ]).then(() => {
-    store.commit("user/setFoundUsers", store.state.user.users);
-    store.commit(
-      "institution/setFoundInstitutions",
-      store.state.institution.institutions
-    );
+    userStore.setFoundUsers(userStore.users);
+    institutionStore.setFoundInstitutions(institutionStore.institutions);
   });
 };
 const triggerSearch = debounce(() => {
@@ -60,7 +59,7 @@ watch(
   }
 );
 onMounted(() => {
-  store.dispatch("user/loadMemberships").then(() => {
+  userStore.loadMemberships().then(() => {
     searchRequest();
   });
 });

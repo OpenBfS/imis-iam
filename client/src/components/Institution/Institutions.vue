@@ -20,9 +20,9 @@
             v-bind="props"
             @click="
               resetInstitution();
-              $store.commit('application/setManagedItem', institution);
-              $store.commit('application/setProcessType', 'add');
-              $store.commit('application/setShowManageInstitutionDialog', true);
+              applicationStore.setManagedItem(institution);
+              applicationStore.setProcessType('add');
+              applicationStore.setShowManageInstitutionDialog(true);
             "
             icon="mdi-plus"
           >
@@ -38,8 +38,8 @@
             v-bind="props"
             icon="mdi-import"
             @click="
-              $store.commit('application/setlistToExport', 'institutions');
-              $store.commit('application/setShowExportDialog', true);
+              applicationStore.setlistToExport('institutions');
+              applicationStore.setShowExportDialog(true);
             "
           >
           </v-btn>
@@ -52,7 +52,7 @@
         <InstitutionTable v-bind:institutions="institutions" />
         <UIAlert
           v-if="hasLoadingError"
-          v-bind:message="$store.state.application.httpErrorMessage"
+          v-bind:message="applicationStore.httpErrorMessage"
         />
       </v-col>
     </v-row>
@@ -61,27 +61,31 @@
 
 <script setup>
 import { computed, onMounted, ref, defineAsyncComponent } from "vue";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useInstitutionStore } from "@/stores/institution";
+import { useProfileStore } from "@/stores/profile";
 import { useNotification } from "@/lib/use-notification";
 import { expInstitution } from "@/components/Institution/institution";
 
 const InstitutionTable = defineAsyncComponent(() =>
   import("@/components/Institution/InstitutionTable.vue")
 );
-const store = useStore();
+const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
+const profileStore = useProfileStore();
 const { hasLoadingError } = useNotification();
 const isAllowedToAdd = computed(() => {
-  return store.state.profile.isAllowedToManage;
+  return profileStore.isAllowedToManage;
 });
 // Institutions
 const institutions = computed(() => {
-  return store.state.institution.institutions;
+  return institutionStore.institutions;
 });
 const institution = ref({ ...expInstitution });
 
 const getInstitutions = () => {
-  store
-    .dispatch("institution/loadInstitutions")
+  institutionStore
+    .loadInstitutions()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
