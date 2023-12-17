@@ -81,6 +81,12 @@
                       :name="attribute.name"
                       :items="attribute.validations.options.options"
                       :model-value="user.attributes[attribute.name]"
+                      :clearable="
+                        attribute.annotations.inputType === 'multiselect'
+                      "
+                      :multiple="
+                        attribute.annotations.inputType === 'multiselect'
+                      "
                       @update:model-value="
                         setUserAttribute(attribute.name, $event)
                       "
@@ -129,6 +135,9 @@
                     :items="attribute.validations.options.options"
                     :name="attribute.name"
                     :model-value="user.attributes[attribute.name]"
+                    :clearable="
+                      attribute.annotations.inputType === 'multiselect'
+                    "
                     :multiple="
                       attribute.annotations.inputType === 'multiselect'
                     "
@@ -286,7 +295,12 @@ const userStore = useUserStore();
 
 function setUserAttribute(name, value) {
   const attrs = user.value.attributes;
-  if (value) {
+  if (
+    typeof value !== "string" &&
+    (value?.length === 0 || value?.[0]?.length)
+  ) {
+    attrs[name] = value;
+  } else if (value) {
     // Keycloak User Profile attributes are arrays expected to
     // contain a single value
     attrs[name] = [value];
