@@ -27,6 +27,12 @@ export const useProfileStore = defineStore("profile", {
         (attribute) => !attribute.group
       );
     },
+    attributesOfGroup: (state) => {
+      return (groupName) =>
+        state.userProfileMetadata.attributes.filter(
+          (attribute) => attribute.group === groupName
+        );
+    },
   },
   actions: {
     setUserData(data) {

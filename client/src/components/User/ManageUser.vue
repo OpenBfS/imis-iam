@@ -46,7 +46,9 @@
               </v-row>
               <v-row>
                 <template
-                  v-for="attribute in getAttributesForGroup(group.name)"
+                  v-for="attribute in profileStore.attributesOfGroup(
+                    group.name
+                  )"
                   :key="attribute.name"
                 >
                   <v-col cols="6">
@@ -293,13 +295,8 @@ function setUserAttribute(name, value) {
   }
 }
 
-const getAttributesForGroup = (groupName) => {
-  return JSON.parse(JSON.stringify(profileStore.attributes)).filter(
-    (attribute) => attribute.group === groupName
-  );
-};
 const getMetaDataAttribute = (nameOfAttribute) => {
-  return JSON.parse(JSON.stringify(profileStore.attributes)).find(
+  return profileStore.attributes.find(
     (attribute) => attribute.name === nameOfAttribute
   );
 };
