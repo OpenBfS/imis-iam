@@ -48,7 +48,16 @@ export function useForm() {
     return [(v) => !!(v && v.length) || reqMsg];
   };
   const validRegex = (regex, validMsg) => {
-    return [(v) => new RegExp(regex).test(v) || v == "" || validMsg];
+    return [
+      (v) =>
+        // Make sure that the whole string has to be a match and that this
+        // match is the only one.
+        // Otherwise a string could be valid even if it had two or more
+        // matches.
+        (v.toString().match(regex)?.[0] === v.toString() &&
+          v.toString().match(regex)?.[0].length === v.toString().length) ||
+        validMsg,
+    ];
   };
   const validLength = (minLength, maxLength, validMsg) => {
     return [
