@@ -1,6 +1,6 @@
 {
     "username": "exampleuser",
-    "email": "example@user.example",
+    "email": "example@user.com",
     "enabled": "true",
     "attributes": {
         "firstName": "Example",
