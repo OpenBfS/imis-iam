@@ -53,10 +53,7 @@
                 >
                   <v-col cols="6">
                     <v-text-field
-                      v-if="
-                        !attribute.annotations?.inputType ||
-                        attribute.annotations.inputType === 'text'
-                      "
+                      v-if="isTextField(attribute.annotations?.inputType)"
                       density="compact"
                       variant="underlined"
                       :label="$t(`user.${attribute.displayName}`)"
@@ -65,15 +62,11 @@
                       @update:model-value="
                         setUserAttribute(attribute.name, $event)
                       "
-                      :type="getInputTypeOfAttribute(attribute.name)"
+                      :type="getTextFieldType(attribute.name)"
                       :rules="getRules(attribute.name)"
                     ></v-text-field>
                     <v-select
-                      v-else-if="
-                        ['select', 'multiselect'].includes(
-                          attribute.annotations.inputType
-                        )
-                      "
+                      v-else-if="isSelection(attribute.annotations?.inputType)"
                       density="compact"
                       :label="$t(`user.${attribute.displayName}`)"
                       item-title="name"
@@ -107,10 +100,7 @@
               >
                 <v-col cols="6">
                   <v-text-field
-                    v-if="
-                      !attribute.annotations ||
-                      attribute.annotations.inputType === 'text'
-                    "
+                    v-if="isTextField(attribute.annotations?.inputType)"
                     density="compact"
                     variant="underlined"
                     :label="$t(`user.${attribute.displayName}`)"
@@ -119,7 +109,7 @@
                     @update:model-value="
                       setUserAttribute(attribute.name, $event)
                     "
-                    :type="getInputTypeOfAttribute(attribute.name)"
+                    :type="getTextFieldType(attribute.name)"
                     :rules="getRules(attribute.name)"
                   ></v-text-field>
                   <v-select
@@ -314,11 +304,30 @@ const getMetaDataAttribute = (nameOfAttribute) => {
     (attribute) => attribute.name === nameOfAttribute
   );
 };
-const getInputTypeOfAttribute = (nameOfAttribute) => {
+const isTextField = (inputType) => {
+  if (
+    !inputType ||
+    ["text", "html5-email", "html5-tel", "html5-url", "html5-number"].includes(
+      inputType
+    )
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+};
+const isSelection = (inputType) => {
+  if (inputType && ["select", "multiselect"].includes(inputType)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+const getTextFieldType = (nameOfAttribute) => {
   const attribute = getMetaDataAttribute(nameOfAttribute);
-  if (attribute.name === "email") {
+  if (attribute.annotations?.inputType === "html5-email") {
     return "email";
-  } else if (["phone", "mobile", "fax"].includes(attribute.name)) {
+  } else if (attribute.annotations?.inputType === "html5-tel") {
     return "tel";
   } else {
     return "text";
