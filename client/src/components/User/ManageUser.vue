@@ -329,17 +329,7 @@ const getRules = (nameOfAttribute) => {
   const rules = [];
   // Rules for text field components
   if (!attribute.validations?.options) {
-    if (attribute.name === "email") {
-      rules.push(
-        ...reqValidmail(t("form.required_email"), t("form.valid_email"))
-      );
-    } else if (attribute.name === "phone") {
-      rules.push(
-        ...reqValidPhone(t("form.required_phone"), t("form.valid_phone"))
-      );
-    } else if (
-      ["lastname", "firstname"].includes(attribute.name.toLowerCase())
-    ) {
+    if (["lastname", "firstname"].includes(attribute.name.toLowerCase())) {
       rules.push(
         ...reqField(
           t("user.is_required", {
@@ -347,6 +337,12 @@ const getRules = (nameOfAttribute) => {
           })
         )
       );
+    }
+
+    if (attribute.validations?.pattern) {
+      const pattern = attribute.validations.pattern.pattern;
+      const errorMessage = attribute.validations.pattern["error-message"];
+      rules.push(...validRegex(pattern, t(errorMessage)));
     }
 
     if (attribute.validations?.length) {
@@ -474,15 +470,8 @@ onMounted(() => {
   }
 });
 // Form
-const {
-  form,
-  valid,
-  reqField,
-  reqValidPhone,
-  reqValidmail,
-  reqMultipleSelect,
-  validLength,
-} = useForm();
+const { form, valid, reqField, reqMultipleSelect, validRegex, validLength } =
+  useForm();
 // Activate button only if some values are changed for "edit"
 // and username and email are changed for "copy"
 // to avoid useless requests

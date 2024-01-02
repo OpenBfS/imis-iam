@@ -47,6 +47,9 @@ export function useForm() {
   const reqMultipleSelect = (reqMsg) => {
     return [(v) => !!(v && v.length) || reqMsg];
   };
+  const validRegex = (regex, validMsg) => {
+    return [(v) => new RegExp(regex).test(v) || v == "" || validMsg];
+  };
   const validLength = (minLength, maxLength, validMsg) => {
     return [
       (v) =>
@@ -67,6 +70,7 @@ export function useForm() {
     validPostalcode,
     reqValidPostalcode,
     reqMultipleSelect,
+    validRegex,
     validLength,
   };
 }
