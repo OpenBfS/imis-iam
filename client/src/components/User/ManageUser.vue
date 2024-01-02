@@ -59,7 +59,7 @@
                       "
                       density="compact"
                       variant="underlined"
-                      :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                      :label="$t(`user.${attribute.displayName}`)"
                       :name="attribute.name"
                       :model-value="user.attributes[attribute.name]"
                       @update:model-value="
@@ -75,7 +75,7 @@
                         )
                       "
                       density="compact"
-                      :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                      :label="$t(`user.${attribute.displayName}`)"
                       item-title="name"
                       item-value="id"
                       :name="attribute.name"
@@ -113,7 +113,7 @@
                     "
                     density="compact"
                     variant="underlined"
-                    :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                    :label="$t(`user.${attribute.displayName}`)"
                     :name="attribute.name"
                     :model-value="user.attributes[attribute.name]"
                     @update:model-value="
@@ -129,7 +129,7 @@
                       )
                     "
                     density="compact"
-                    :label="$t(`user.${attribute.name.toLowerCase()}`)"
+                    :label="$t(`user.${attribute.displayName}`)"
                     item-title="name"
                     item-value="id"
                     :items="attribute.validations.options.options"
@@ -329,11 +329,11 @@ const getRules = (nameOfAttribute) => {
   const rules = [];
   // Rules for text field components
   if (!attribute.validations?.options) {
-    if (["lastname", "firstname"].includes(attribute.name.toLowerCase())) {
+    if (["lastname", "firstname"].includes(attribute.displayName)) {
       rules.push(
         ...reqField(
           t("user.is_required", {
-            attr: t(`user.${nameOfAttribute.toLowerCase()}`),
+            attr: t(`user.${attribute.displayName}`),
           })
         )
       );
@@ -451,7 +451,8 @@ const updateUser = () => {
       applicationStore.setOwnAccount(false);
       applicationStore.setShowManageUserDialog(false);
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error(error);
       hasRequestError.value = true;
     });
 };

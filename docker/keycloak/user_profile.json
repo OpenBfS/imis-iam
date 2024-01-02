@@ -1,7 +1,7 @@
 {
   "attributes" : [ {
     "name" : "email",
-    "displayName" : "${email}",
+    "displayName" : "email",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -25,7 +25,7 @@
     "group": "contact"
   }, {
     "name" : "title",
-    "displayName" : "",
+    "displayName" : "title",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -35,7 +35,7 @@
     "group": "name"
   }, {
     "name" : "firstName",
-    "displayName" : "${firstName}",
+    "displayName" : "firstname",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -52,7 +52,7 @@
     "group": "name"
   }, {
     "name" : "lastName",
-    "displayName" : "${lastName}",
+    "displayName" : "lastname",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -69,7 +69,7 @@
     "group": "name"
   }, {
     "name" : "phone",
-    "displayName" : "",
+    "displayName" : "phone",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -87,7 +87,7 @@
     "group": "contact"
   }, {
     "name" : "mobile",
-    "displayName" : "",
+    "displayName" : "mobile",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -97,7 +97,7 @@
     "group": "contact"
   }, {
     "name" : "fax",
-    "displayName" : "",
+    "displayName" : "fax",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -107,7 +107,7 @@
     "group": "contact"
   }, {
     "name" : "oe",
-    "displayName" : "",
+    "displayName" : "oe",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -116,7 +116,7 @@
     "validations" : { }
   }, {
     "name" : "bfslocation",
-    "displayName" : "",
+    "displayName" : "bfslocation",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -125,7 +125,7 @@
     "validations" : { }
   }, {
     "name" : "position",
-    "displayName" : "",
+    "displayName" : "position",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
