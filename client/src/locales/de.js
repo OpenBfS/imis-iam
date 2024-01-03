@@ -42,9 +42,9 @@ export default {
     service_building_location: "Ort des Dienstgebäudes",
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
-    service_building_street: "Straße des Dienstgebäudes",
+    service_building_street: "Straße/Hausnummer des Dienstgebäudes",
     required_service_building_street:
-      "Straße des Dienstgebäudes ist erforderlich",
+      "Straße/Hausnummer des Dienstgebäudes ist erforderlich",
     service_building_postalcode: "PLZ des Dienstgebäudes",
     required_service_building_postalcode:
       "PLZ des Dienstgebäudes ist erforderlich",
