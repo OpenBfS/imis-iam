@@ -63,11 +63,15 @@ export function useForm() {
   };
   const validLength = (minLength, maxLength, validMsg) => {
     return [
-      (v) =>
-        (v &&
-          v.toString().length >= minLength &&
-          v.toString().length <= maxLength) ||
-        validMsg,
+      (v) => {
+        return (
+          !v ||
+          (v &&
+            (!minLength || (minLength && v.toString().length >= minLength)) &&
+            (!maxLength || (maxLength && v.toString().length <= maxLength))) ||
+          validMsg
+        );
+      },
     ];
   };
   return {

@@ -33,6 +33,11 @@
                   "
                   :label="$t('user.username')"
                   :model-value="user.attributes.username"
+                  :rules="
+                    reqField(
+                      $t('user.is_required', { attr: t('user.username') })
+                    )
+                  "
                   @update:model-value="setUserAttribute('username', $event)"
                 ></v-text-field>
               </v-col>
@@ -338,7 +343,14 @@ const getRules = (nameOfAttribute) => {
   const rules = [];
   // Rules for text field components
   if (!attribute.validations?.options) {
-    if (["lastname", "firstname"].includes(attribute.displayName)) {
+    if (
+      // In Keycloak it is not possible to choose if email
+      // is a required attribute so it won't appear in the
+      // UserProfileMetadata. That's why we can't handle it the "generic"
+      // way.
+      attribute.displayName === "email" ||
+      attribute.required?.roles?.includes("user")
+    ) {
       rules.push(
         ...reqField(
           t("user.is_required", {
@@ -371,7 +383,7 @@ const getRules = (nameOfAttribute) => {
           max: length.max,
         });
       }
-      rules.push(...validLength(length.min ?? 0, length.max ?? 0, message));
+      rules.push(...validLength(length.min, length.max, message));
     }
   }
   // Rules for select components

@@ -2,9 +2,6 @@
   "attributes" : [ {
     "name" : "email",
     "displayName" : "email",
-    "required" : {
-      "roles" : [ "user" ]
-    },
     "permissions" : {
       "view" : [ "admin", "user" ],
       "edit" : [ "admin", "user" ]
@@ -45,6 +42,7 @@
     },
     "validations" : {
       "length" : {
+        "min": 3,
         "max" : 255
       },
       "person-name-prohibited-characters" : { }
