@@ -36,9 +36,9 @@ export default {
     no_institutions_available: "Es sind keine Institutionen vorhanden",
     fax: "Fax",
     phone: "Telephon",
-    shortname: "Kurzbezeichnung",
+    shortname: "Messstellen-Bezeichnung",
     required_name: "Institutionsname ist erfoderlich",
-    required_shortname: "Kurzbezeichnung ist erforderlich",
+    required_shortname: "Messstellen-Bezeichnung ist erforderlich",
     service_building_location: "Ort des Dienstgebäudes",
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
