@@ -42,7 +42,11 @@
                 "
               ></v-btn>
             </template>
-            <span>{{ $t("label.edit") }}</span>
+            <span>{{
+              $store.state.profile.isAllowedToManage
+                ? $t("label.edit")
+                : $t("label.show_info")
+            }}</span>
           </v-tooltip>
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
