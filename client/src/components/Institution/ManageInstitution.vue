@@ -172,6 +172,12 @@
                 variant="underlined"
                 density="compact"
                 :label="$t('institution.imis_Id')"
+                :rules="[
+                  (v) =>
+                    !v ||
+                    (v && v.length === 5) ||
+                    $t('institution.imis_Id_length_validation_message'),
+                ]"
                 v-model="institution.imisId"
               ></v-text-field>
               <!-- TODO: Add this rules once the validation for

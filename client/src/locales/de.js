@@ -61,7 +61,9 @@ export default {
     address_street: "Postanschrift: Straße",
     address_postalcode: "Postanschrift: PLZ",
     address_location: "Postanschrift: Ort",
-    imis_Id: "IMIS-Kennung",
+    imis_Id: "Messstellen-ID",
+    imis_Id_length_validation_message:
+      "Die Messstellen-ID muss exakt 5 Zeichen beinhalten",
     imis_mail: "IMIS-E-Mail",
     active: "Aktiv",
     new_category: "Kategorie Hinzufügen",
