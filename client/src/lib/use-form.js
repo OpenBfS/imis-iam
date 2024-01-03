@@ -23,7 +23,8 @@ export function useForm() {
     return [
       (v) => !!v || reqMsg,
       (v) =>
-        (v.toString().match(regExprPhone)?.[0] === v.toString() &&
+        (v &&
+          v.toString().match(regExprPhone)?.[0] === v.toString() &&
           v.toString().match(regExprPhone)?.[0].length ===
             v.toString().length) ||
         validMsg,
@@ -54,7 +55,8 @@ export function useForm() {
         // match is the only one.
         // Otherwise a string could be valid even if it had two or more
         // matches.
-        (v.toString().match(regex)?.[0] === v.toString() &&
+        (v &&
+          v.toString().match(regex)?.[0] === v.toString() &&
           v.toString().match(regex)?.[0].length === v.toString().length) ||
         validMsg,
     ];
