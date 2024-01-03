@@ -172,6 +172,9 @@
                 variant="underlined"
                 density="compact"
                 :label="$t('institution.imis_Id')"
+                :disabled="
+                  !$store.state.profile.userData.roles.includes('techadmin')
+                "
                 :rules="[
                   (v) =>
                     !v ||
