@@ -37,6 +37,7 @@ const user = {
     attributes: [
       {
         name: "position",
+        displayName: "position",
         validations: {
           options: {
             options: [],
@@ -45,9 +46,11 @@ const user = {
       },
       {
         name: "firstName",
+        displayName: "firstname"
       },
       {
         name: "lastName",
+        displayName: "lastname"
       },
     ],
   },
