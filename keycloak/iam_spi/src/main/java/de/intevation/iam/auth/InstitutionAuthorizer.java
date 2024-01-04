@@ -10,6 +10,7 @@ import java.util.List;
 
 import jakarta.ws.rs.core.HttpHeaders;
 
+import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -39,8 +40,18 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
 
         switch (requestMethod) {
             case GET: return Role.USER.isRoleOf(requestingUser, session);
+            // Only Role.CHIEF_EDITOR is allowed to set/edit imisId:
             case PUT:
+                if (data.getImisId() != session.getProvider(
+                        JpaConnectionProvider.class).getEntityManager().find(
+                            Institution.class, data.getId()).getImisId()) {
+                    return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+                }
+                return Role.EDITOR.isRoleOf(requestingUser, session);
             case POST:
+                if (data.getImisId() != null) {
+                    return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+                }
             case DELETE: return Role.EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
