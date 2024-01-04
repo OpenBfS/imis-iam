@@ -173,7 +173,9 @@
                 density="compact"
                 :label="$t('institution.imis_Id')"
                 :disabled="
-                  !$store.state.profile.userData.roles.includes('techadmin')
+                  !$store.state.profile.userData.roles.some(
+                    (e) => e === 'chief_editor' || e === 'techadmin'
+                  )
                 "
                 :rules="[
                   (v) =>
