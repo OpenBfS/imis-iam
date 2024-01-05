@@ -15,7 +15,7 @@ const addressPlace = {
   addressPostalCode: "",
   addressLocation: "",
 };
-const imis = { imisId: null, imisMail: "" };
+const imis = { imisId: null };
 const central = { centralMail: "", centralPhone: "", centralFax: "" };
 const expInstitution = {
   name: "",

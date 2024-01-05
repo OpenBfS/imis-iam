@@ -185,15 +185,6 @@
                 ]"
                 v-model="institution.imisId"
               ></v-text-field>
-              <!-- TODO: Add this rules once the validation for
-                    optional fields gets implemented by upstream.
-                    :rules="validMail($t('form.valid_email'))"  -->
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.imis_mail')"
-                v-model="institution.imisMail"
-              ></v-text-field>
             </div>
             <div class="group_class align-center">
               <v-select
@@ -209,15 +200,6 @@
                 :rules="reqField($t('institution.required_category'))"
               >
               </v-select>
-              <v-btn
-                variant="plain"
-                v-if="
-                  !showAddCategory && $store.state.profile.isAllowedToManage
-                "
-                @click="showAddCategory = true"
-              >
-                {{ $t("institution.new_category") }}
-              </v-btn>
               <div v-if="showAddCategory" class="d-flex align-baseline mt-1">
                 <v-text-field
                   variant="underlined"

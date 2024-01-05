@@ -64,9 +64,6 @@ public class Institution {
     @Column(name = "imis_id")
     private String imisId;
 
-    @Column(name = "imis_mail")
-    private String imisMail;
-
     @Column(name = "x_coordinate")
     @JsonProperty("xCoordinate")
     private Float xCoordinate;
@@ -199,14 +196,6 @@ public class Institution {
 
     public void setImisId(String imisId) {
         this.imisId = imisId;
-    }
-
-    public String getImisMail() {
-        return imisMail;
-    }
-
-    public void setImisMail(String imisMail) {
-        this.imisMail = imisMail;
     }
 
     public Float getXCoordinate() {

@@ -64,9 +64,7 @@ export default {
     imis_Id: "Messstellen-ID",
     imis_Id_length_validation_message:
       "Die Messstellen-ID muss exakt 5 Zeichen beinhalten",
-    imis_mail: "IMIS-E-Mail",
     active: "Aktiv",
-    new_category: "Kategorie Hinzufügen",
     category_name: "Kategorienname",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
