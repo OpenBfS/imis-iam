@@ -392,41 +392,6 @@ public class InstitutionProvider implements RealmResourceProvider {
         return Response.ok(in).build();
     }
 
-    /**
-     * Create a new category.
-     * Response:
-     * <pre>
-     * <code>
-     * {
-     *   id: [String] InstitutionCategory ID,
-     *   name: [String] InstitutionCategory Name
-     * }
-     * </code>
-     * </pre>
-     * @param intCategory Institution category representation
-     * @param headers Request headers
-     * @return InstitutionCategory JSON or 404 if not found
-     */
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/category")
-    public Response createInstitutionCategory(
-            final InstitutionCategory intCategory,
-            @Context HttpHeaders headers) {
-        if (
-            !authCat.isAuthorizedById(intCategory, RequestMethod.POST, headers)
-        ) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
-        if (intCategory == null) {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        em.persist(intCategory);
-        return Response.ok(intCategory).build();
-    }
-
     private boolean isShortNameAlreadyUsed(Institution inst, EntityManager em) {
         try {
             TypedQuery<Institution> query = em.createQuery(

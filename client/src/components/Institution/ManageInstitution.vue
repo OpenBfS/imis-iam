@@ -200,40 +200,6 @@
                 :rules="reqField($t('institution.required_category'))"
               >
               </v-select>
-              <div v-if="showAddCategory" class="d-flex align-baseline mt-1">
-                <v-text-field
-                  variant="underlined"
-                  density="compact"
-                  :label="$t('institution.category_name')"
-                  v-model="newCategory"
-                ></v-text-field>
-                <v-tooltip location="top">
-                  <template v-slot:activator="{ props }">
-                    <v-icon
-                      v-bind="props"
-                      @click="addCategory"
-                      color="accent"
-                      size="small"
-                      class="mx-1"
-                      icon="mdi-plus"
-                    ></v-icon>
-                  </template>
-                  <span>{{ $t("button.add") }}</span>
-                </v-tooltip>
-                <v-tooltip location="top">
-                  <template v-slot:activator="{ props }">
-                    <v-icon
-                      v-bind="props"
-                      style="opacity: 1"
-                      color="accent"
-                      size="small"
-                      icon="mdi-close"
-                      @click="showAddCategory = false"
-                    ></v-icon>
-                  </template>
-                  <span>{{ $t("button.close") }}</span>
-                </v-tooltip>
-              </div>
             </div>
           </v-form>
         </v-col>
@@ -391,20 +357,6 @@ const deleteInstitution = () => {
     .catch(() => {
       hasRequestError.value = true;
     });
-};
-const showAddCategory = ref(false);
-const newCategory = ref("");
-const addCategory = () => {
-  if (newCategory.value && newCategory.value !== "") {
-    HTTP.post("institution/category", { name: newCategory.value })
-      .then(() => {
-        newCategory.value = "";
-        getCategories();
-      })
-      .catch(() => {
-        hasLoadingError.value = true;
-      });
-  }
 };
 const hasNoChange = computed(() => {
   return (
