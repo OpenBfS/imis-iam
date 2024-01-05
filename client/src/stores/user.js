@@ -17,24 +17,16 @@ export const useUserStore = defineStore("user", {
   }),
   actions: {
     setFoundUsers(data) {
-      this.$patch({
-        foundUsers: data,
-      });
+      this.foundUsers = data;
     },
     setUsers(data) {
-      this.$patch({
-        users: data,
-      });
+      this.users = data;
     },
     setMemberships(data) {
-      this.$patch({
-        memberships: data,
-      });
+      this.memberships = data;
     },
     setRoles(data) {
-      this.$patch({
-        roles: data,
-      });
+      this.roles = data;
     },
     updateUserEntity(data) {
       this.users.forEach((element, index) => {

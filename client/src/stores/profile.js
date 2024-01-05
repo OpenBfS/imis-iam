@@ -36,24 +36,16 @@ export const useProfileStore = defineStore("profile", {
   },
   actions: {
     setUserData(data) {
-      this.$patch({
-        userData: data,
-      });
+      this.userData = data;
     },
     setUserProfileMetadata(data) {
-      this.$patch({
-        userProfileMetadata: data,
-      });
+      this.userProfileMetadata = data;
     },
     setMyMailingLists(data) {
-      this.$patch({
-        myMailingLists: data,
-      });
+      this.myMailingLists = data;
     },
     setIsAllowedToManage(data) {
-      this.$patch({
-        isAllowedToManage: data,
-      });
+      this.isAllowedToManage = data;
     },
     loadProfile() {
       return new Promise((resolve, reject) => {

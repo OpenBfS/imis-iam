@@ -33,28 +33,20 @@ export const useInstitutionStore = defineStore("institution", {
       }
     },
     setInstitutionList(data) {
-      this.$patch({
-        institutions: data,
-      });
+      this.institutions = data;
     },
     setFoundInstitutions(data) {
-      this.$patch({
-        foundInstitutions: data,
-      });
+      this.foundInstitutions = data;
     },
     setInstitutionNames(data) {
       var names = [];
       data.forEach((institution) => {
         names.push(institution.name);
       });
-      this.$patch({
-        institutionNames: names,
-      });
+      this.institutionNames = names;
     },
     setInstitution(data) {
-      this.$patch({
-        institution: data,
-      });
+      this.institution = data;
     },
     updateInstitutionEntity(data) {
       this.institutions.forEach((element, index) => {

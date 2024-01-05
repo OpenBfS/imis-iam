@@ -31,54 +31,34 @@ export const useApplicationStore = defineStore("application", {
   }),
   actions: {
     setOwnAccount(data) {
-      this.$patch({
-        ownAccount: data,
-      });
+      this.ownAccount = data;
     },
     setShowManageUserDialog(data) {
-      this.$patch({
-        showManageUserDialog: data,
-      });
+      this.showManageUserDialog = data;
     },
     setSearchString(data) {
-      this.$patch({
-        searchSting: data,
-      });
+      this.searchSting = data;
     },
     setSavedItem(data) {
-      this.$patch({
-        savedItem: data,
-      });
+      this.savedItem = data;
     },
     setProcessType(data) {
-      this.$patch({
-        processType: data,
-      });
+      this.processType = data;
     },
     setShowManageInstitutionDialog(data) {
-      this.$patch({
-        showManageInstitutionDialog: data,
-      });
+      this.showManageInstitutionDialog = data;
     },
     setManagedItem(item) {
-      this.$patch({
-        managedItem: item,
-      });
+      this.managedItem = item;
     },
     setHttpErrorMessage(message) {
-      this.$patch({
-        httpErrorMessage: message,
-      });
+      this.httpErrorMessage = message;
     },
     setShowExportDialog(message) {
-      this.$patch({
-        showExportDialog: message,
-      });
+      this.showExportDialog = message;
     },
     setlistToExport(message) {
-      this.$patch({
-        listToExport: message,
-      });
+      this.listToExport = message;
     },
   },
 });

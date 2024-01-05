@@ -15,14 +15,10 @@ export const useMailStore = defineStore("mail", {
   }),
   actions: {
     setMailTypes(data) {
-      this.$patch({
-        mailTypes: data,
-      });
+      this.mailTypes = data;
     },
     setMailinglists(data) {
-      this.$patch({
-        mailingLists: data,
-      });
+      this.mailingLists = data;
     },
     loadMailTypes() {
       return new Promise((resolve, reject) => {

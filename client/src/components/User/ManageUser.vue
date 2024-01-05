@@ -229,7 +229,7 @@
       <v-btn
         v-if="processType === 'edit' && !isReadOnly"
         color="accent"
-        @click="user = cloneObject(originalUser)"
+        @click="applicationStore.setManagedItem(cloneObject(originalUser))"
       >
         {{ $t("button.reset") }}
       </v-btn>
