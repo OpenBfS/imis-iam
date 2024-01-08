@@ -36,15 +36,15 @@ export default {
     no_institutions_available: "Es sind keine Institutionen vorhanden",
     fax: "Fax",
     phone: "Telephon",
-    shortname: "Kurzbezeichnung",
+    shortname: "Messstellen-Bezeichnung",
     required_name: "Institutionsname ist erfoderlich",
-    required_shortname: "Kurzbezeichnung ist erforderlich",
+    required_shortname: "Messstellen-Bezeichnung ist erforderlich",
     service_building_location: "Ort des Dienstgebäudes",
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
-    service_building_street: "Straße des Dienstgebäudes",
+    service_building_street: "Straße/Hausnummer des Dienstgebäudes",
     required_service_building_street:
-      "Straße des Dienstgebäudes ist erforderlich",
+      "Straße/Hausnummer des Dienstgebäudes ist erforderlich",
     service_building_postalcode: "PLZ des Dienstgebäudes",
     required_service_building_postalcode:
       "PLZ des Dienstgebäudes ist erforderlich",
@@ -61,10 +61,10 @@ export default {
     address_street: "Postanschrift: Straße",
     address_postalcode: "Postanschrift: PLZ",
     address_location: "Postanschrift: Ort",
-    imis_Id: "IMIS-Kennung",
-    imis_mail: "IMIS-E-Mail",
+    imis_Id: "Messstellen-ID",
+    imis_Id_length_validation_message:
+      "Die Messstellen-ID muss exakt 5 Zeichen beinhalten",
     active: "Aktiv",
-    new_category: "Kategorie Hinzufügen",
     category_name: "Kategorienname",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",

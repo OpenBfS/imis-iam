@@ -10,12 +10,14 @@
     <thead>
       <th class="text-left">{{ $t("label.name") }}</th>
       <th class="text-left">{{ $t("institution.shortname") }}</th>
+      <th class="text-left">{{ $t("institution.imis_Id") }}</th>
       <th class="text-left">{{ $t("label.actions") }}</th>
     </thead>
     <tbody>
       <tr v-for="item in props.institutions" :key="item.id">
         <td>{{ item.name }}</td>
         <td>{{ item.shortName }}</td>
+        <td>{{ item.imisId }}</td>
         <td class="d-flex">
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
@@ -37,7 +39,11 @@
                 "
               ></v-btn>
             </template>
-            <span>{{ $t("label.edit") }}</span>
+            <span>{{
+              $store.state.profile.isAllowedToManage
+                ? $t("label.edit")
+                : $t("label.show_info")
+            }}</span>
           </v-tooltip>
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
