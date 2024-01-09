@@ -21,6 +21,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -45,6 +46,7 @@ import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.keycloak.userprofile.UserProfileProvider;
+import org.keycloak.userprofile.ValidationException;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.UserAuthorizer;
@@ -185,6 +187,7 @@ public class UserProvider implements RealmResourceProvider {
      * @return New user json if successfull,
      *         400 if username is empty,
      *         409 if either username or email are already used
+     * @throws BadRequestException in case validation fails
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -224,9 +227,7 @@ public class UserProvider implements RealmResourceProvider {
         rep.setId(newUserModel.getId());
 
         //Create attributes
-        this.userProfileProvider
-            .create(USER_API, rep.getAttributes(), newUserModel)
-            .update();
+        handleUserProfile(rep.getAttributes(), newUserModel);
         UserAttributes attributes = rep.createOrUpdateJpaModel(em);
 
         //Update roles
@@ -267,6 +268,7 @@ public class UserProvider implements RealmResourceProvider {
      * @return Updated user json if succesfull,
      *         403 if not authorized,
      *         409 if the new email address is already used
+     * @throws BadRequestException in case validation fails
      */
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
@@ -407,9 +409,7 @@ public class UserProvider implements RealmResourceProvider {
             throw new InvalidUserPropertiesException("Email already in use");
         }
         //Update user
-        this.userProfileProvider
-            .create(USER_API, newUser.getAttributes(), oldUser)
-            .update();
+        handleUserProfile(newUser.getAttributes(), oldUser);
 
         //Get new groups list and update
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
@@ -463,9 +463,29 @@ public class UserProvider implements RealmResourceProvider {
         return session.users().getUserByUsername(realm, user.getUsername())
             != null;
     }
+
     private class InvalidUserPropertiesException extends Exception {
         InvalidUserPropertiesException(String message) {
             super(message);
+        }
+    }
+
+    private void handleUserProfile(
+        Map<String, List<String>> attributes,
+        UserModel user
+    ) {
+        try {
+            this.userProfileProvider
+                .create(USER_API, attributes, user).update();
+        } catch (ValidationException ve) {
+            // TODO: User created anyhow. Why is transaction not rolled back
+            // while it seems to have been without catching ValidationException?
+            throw new BadRequestException(
+                Response.status(Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(ve.getErrors())
+                    .build(),
+                ve);
         }
     }
 
