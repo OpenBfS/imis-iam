@@ -59,16 +59,52 @@
             <v-row>
               <v-col cols="10">
                 <v-row align="center">
-                  <!-- TODO: Use the v-date-picker from vuetify when this gets implemented -->
-                  <div class="d-flex v-col-6" style="opacity: 0.6">
-                    <label class="" for="from"
-                      >{{ $t("mailinglist.expiry_date") }}:</label
-                    ><input
-                      class="ml-2"
-                      type="date"
-                      name="startDate"
+                  <div class="d-flex flex-column v-col-6">
+                    <div id="expiry-checkbox-container">
+                      <v-checkbox
+                        v-model="useExpiryDate"
+                        className="mb-0 expiry-checkbox"
+                        id="expiry-checkbox"
+                        :label="$t('mailinglist.expiry_date')"
+                      ></v-checkbox>
+                    </div>
+                    <v-text-field
+                      prepend-inner-icon="mdi-calendar-blank"
+                      readonly
+                      @click="toggleExpiryDatePicker"
+                      :v-model="$d(expiryDate, 'short')"
+                      :disabled="!useExpiryDate"
+                      >{{ $d(expiryDate, "short") }}
+                      <template v-slot:details></template>
+                    </v-text-field>
+                    <v-date-picker
+                      v-click-outside="{
+                        handler: toggleExpiryDatePicker,
+                        closeConditional: closeConditional,
+                        include: includeExpiryDatePicker,
+                      }"
                       v-model="expiryDate"
-                    />
+                      v-show="isExpiryDatePickerOpen"
+                      className="expiryDatePicker"
+                      color="accent"
+                      elevation="6"
+                      position="absolute"
+                      style="
+                        position: absolute;
+                        z-index: 20;
+                        background-color: white;
+                        box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
+                      "
+                      :show-adjacent-months="true"
+                      :title="$t('mailinglist.expiry_date')"
+                      ><template v-slot:header>
+                        <div class="v-date-picker-header bg-accent">
+                          <div class="v-date-picker-header__content">
+                            {{ $d(expiryDate, "short") }}
+                          </div>
+                        </div>
+                      </template>
+                    </v-date-picker>
                   </div>
                   <v-checkbox
                     density="compact"
@@ -134,6 +170,14 @@
   </v-dialog>
 </template>
 
+<style>
+#expiry-checkbox-container .v-input__details {
+  padding-top: 0pt;
+  min-height: 0pt;
+  height: 0pt;
+}
+</style>
+
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import { HTTP } from "@/lib/http";
@@ -156,14 +200,29 @@ const selectedList = ref(null);
 const mailText = ref("");
 const subject = ref("");
 const archived = ref(false);
-const expiryDate = ref("");
+const expiryDate = ref(new Date());
+const useExpiryDate = ref(false);
+const isExpiryDatePickerOpen = ref(false);
 const userData = store.state.profile.userData;
 const senderList = ref([
   [userData.firstName, userData.lastName, "<" + userData.email + ">"].join(" "),
   store.state.application.reportMail,
 ]);
 const selectedSender = ref(senderList.value[0] || senderList.value[0] || "");
-
+const toggleExpiryDatePicker = () => {
+  isExpiryDatePickerOpen.value = !isExpiryDatePickerOpen.value;
+};
+const closeConditional = () => {
+  return isExpiryDatePickerOpen.value;
+};
+const includeExpiryDatePicker = () => {
+  const elements = document.querySelectorAll(".expiryDatePicker *");
+  const includedElements = [];
+  for (let i = 0; i < elements.length; i++) {
+    includedElements.push(elements[i]);
+  }
+  return includedElements;
+};
 const sendMail = () => {
   resetNotification();
   HTTP.post("mail", {
@@ -173,7 +232,7 @@ const sendMail = () => {
     archived: archived.value,
     type: selectedType.value.id,
     recipient: selectedList.value.id,
-    expiryDate: expiryDate.value ? expiryDate.value : "",
+    expiryDate: useExpiryDate.value ? expiryDate.value.toISOString() : "",
   })
     .then(() => {
       emit("mail-dialog-object", {

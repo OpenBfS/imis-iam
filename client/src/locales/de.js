@@ -198,6 +198,7 @@ export default {
     archive: "Archivieren",
     filter_by_type: "Filtern nach Typ",
     filter_by_sender: "Filtern nach Absender",
+    filter_by_period: "Filtern nach Zeitraum",
     filter_by_maillist: "Filtern nach E-Mail-Verteiler",
     maintenance: "Wartungsmeldungen",
     expiry_date: "Ablaufdatum",
