@@ -54,15 +54,14 @@
             );
 
             CREATE TABLE iam_institution_category (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR NOT NULL
+                name VARCHAR PRIMARY KEY
             );
 
             CREATE TABLE iam_institution (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR NOT NULL UNIQUE,
                 short_name VARCHAR NOT NULL UNIQUE,
-                category_id INTEGER REFERENCES iam_institution_category(id),
+                category_name VARCHAR REFERENCES iam_institution_category,
                 service_building_street VARCHAR NOT NULL,
                 service_building_postal_code VARCHAR NOT NULL,
                 service_building_location VARCHAR NOT NULL,
