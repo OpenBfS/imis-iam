@@ -35,7 +35,9 @@
                   :model-value="user.attributes.username"
                   :rules="
                     reqField(
-                      $t('user.is_required', { attr: t('user.username') })
+                      $t('error.user_attribute_required', {
+                        attr: t('user.username'),
+                      })
                     )
                   "
                   @update:model-value="setUserAttribute('username', $event)"
@@ -61,7 +63,7 @@
                       v-if="isTextField(attribute.annotations?.inputType)"
                       density="compact"
                       variant="underlined"
-                      :label="$t(`user.${attribute.displayName}`)"
+                      :label="handleDisplayName(attribute.displayName)"
                       :name="attribute.name"
                       :model-value="user.attributes[attribute.name]"
                       @update:model-value="
@@ -73,7 +75,7 @@
                     <v-select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
                       density="compact"
-                      :label="$t(`user.${attribute.displayName}`)"
+                      :label="handleDisplayName(attribute.displayName)"
                       item-title="name"
                       item-value="id"
                       :name="attribute.name"
@@ -108,7 +110,7 @@
                     v-if="isTextField(attribute.annotations?.inputType)"
                     density="compact"
                     variant="underlined"
-                    :label="$t(`user.${attribute.displayName}`)"
+                    :label="handleDisplayName(attribute.displayName)"
                     :name="attribute.name"
                     :model-value="user.attributes[attribute.name]"
                     @update:model-value="
@@ -124,7 +126,7 @@
                       )
                     "
                     density="compact"
-                    :label="$t(`user.${attribute.displayName}`)"
+                    :label="handleDisplayName(attribute.displayName)"
                     item-title="name"
                     item-value="id"
                     :items="attribute.validations.options.options"
@@ -187,7 +189,7 @@
                 v-model="user.roles"
                 multiple
                 persistent-hint
-                :rules="reqMultipleSelect($t('user.required_roles'))"
+                :rules="reqMultipleSelect($t('error.required_roles'))"
               >
               </v-select>
             </div>
@@ -338,6 +340,12 @@ const getTextFieldType = (nameOfAttribute) => {
     return "text";
   }
 };
+const handleDisplayName = (displayName) => {
+  if (displayName.startsWith("${") && displayName.endsWith("}")) {
+    return t(`user.${displayName.replace("${", "").slice(0, -1)}`);
+  }
+  return displayName;
+};
 const getRules = (nameOfAttribute) => {
   const attribute = getMetaDataAttribute(nameOfAttribute);
   const rules = [];
@@ -348,13 +356,13 @@ const getRules = (nameOfAttribute) => {
       // is a required attribute so it won't appear in the
       // UserProfileMetadata. That's why we can't handle it the "generic"
       // way.
-      attribute.displayName === "email" ||
+      attribute.name === "email" ||
       attribute.required?.roles?.includes("user")
     ) {
       rules.push(
         ...reqField(
-          t("user.is_required", {
-            attr: t(`user.${attribute.displayName}`),
+          t("error.user_attribute_required", {
+            attr: handleDisplayName(attribute.displayName),
           })
         )
       );
@@ -369,17 +377,21 @@ const getRules = (nameOfAttribute) => {
     if (attribute.validations?.length) {
       const length = attribute.validations.length;
       let message;
+      const displayName = handleDisplayName(attribute.displayName);
       if (length.min && length.max) {
-        message = t("user.min_and_max_characters_allowed", {
+        message = t("error.invalid_length", {
+          attr: displayName,
           min: length.min,
           max: length.max,
         });
       } else if (length.min) {
-        message = t("user.min_characters_necessary", {
+        message = t("error.invalid_length_too_short", {
+          attr: displayName,
           min: length.min,
         });
       } else {
-        message = t("user.max_characters_allowed", {
+        message = t("error.invalid_length_too_long", {
+          attr: displayName,
           max: length.max,
         });
       }
@@ -388,7 +400,9 @@ const getRules = (nameOfAttribute) => {
   }
   // Rules for select components
   else {
-    rules.push(...reqField(t(`user.required_${attribute.name}`)));
+    rules.push(
+      ...reqField(t("error.user_attribute_required", { attr: attribute.name }))
+    );
   }
   return rules;
 };

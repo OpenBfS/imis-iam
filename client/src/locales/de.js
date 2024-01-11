@@ -26,6 +26,43 @@ export default {
     title: "Archiv",
     search: "Durchsuchen",
   },
+  error: {
+    // Keys which Keycloak can return after validations fail.
+    // Source: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_de.properties
+    username_invalid_character: "'{attr}' enthält ungültige Zeichen.",
+    invalid_length_too_short:
+      "'{attr}' muss mindestens eine Länge von {min} haben.",
+    number_out_of_range_too_big: "'{attr}' darf maximal den Wert {max} haben.",
+    number_out_of_range_too_small:
+      "'{attr}' muss mindestens den Wert {min} haben.",
+    user_attribute_required: "Bitte geben Sie '{attr}' an.",
+    empty: "Bitte geben Sie einen Wert für '{attr}' an.",
+    invalid_uri_fragment: "'{value}' ist ein ungültiges URL-Fragment.",
+    invalid_blank: "Bitte geben Sie einen Wert für '{attr}' an.",
+    number_out_of_range:
+      "'{attr}' muss eine Zahl zwischen {min} und {max} sein.",
+    invalid_email: "Ungültige E-Mail.",
+    invalid_length_too_long:
+      "'{attr}' darf maximal eine Länge von {max} haben.",
+    invalid_value: "'{attr}' hat einen ungültigen Wert.",
+    invalid_number: "'{value}' ist eine ungültige Zahl.",
+    invalid_uri_scheme: "'{value}' ist ein ungültiges URL-Schema.",
+    user_attribute_read_only: "Das Feld {attr} is schreibgeschützt.",
+    invalid_date: "'{value}' ist ein ungültiges Datum.",
+    invalid_length: "'{attr}' muss eine Länge zwischen {min} und {max} haben.",
+    invalid_uri: "'{value}' ist eine ungültige URL.",
+    pattern_no_match: "'{value}' entspricht nicht dem erforderlichen Format.",
+    person_name_invalid_character: "'{value}' enthält ungültige Zeichen.",
+
+    // Custom errors
+    required_category: "Kategorie ist erforderlich",
+    required_email: "Email ist erforderlich",
+    valid_email: "Email muss gültig sein",
+    valid_phone: "Telefon muss gültig sein",
+    required_phone: "Telefon ist erforderlich",
+    valid_fax: "Faxnummer muss gültig sein",
+    valid_postalcode: "PLZ muss gültig sein",
+  },
   // Institutions component
   institution: {
     export: "Institutionen-Liste exportieren",
@@ -56,7 +93,6 @@ export default {
     street: "Straße",
     postal_code: "PLZ",
     categories: "Kategorien",
-    required_category: "Kategorie ist erforderlich",
     central_fax: "Zentrales Fax",
     address_street: "Postanschrift: Straße",
     address_postalcode: "Postanschrift: PLZ",
@@ -100,22 +136,13 @@ export default {
     username: "Benutzername",
     position: "Position",
     misc: "Weiteres",
-    required_telephone: "Telefon ist erforderlich",
     label_memberships: "Mitgliedschaften",
     label_positions: "Positionen",
-    required_firstname: "Vorname ist erforderlich",
-    required_lastname: "Nachname ist erforderlich",
-    required_username: "Benutzername ist erforderlich",
     required_membership: "Mitgliedschaft ist erforderlich",
     required_position: "Position ist erforderlich",
     required_institution: "Institution ist erforderlich",
     label_roles: "Rollen",
     required_roles: "Rolle ist erforderlich",
-    is_required: "{attr} ist erforderlich",
-    min_and_max_characters_allowed:
-      "Mindestens {min} und maximal {max} Zeichen erlaubt",
-    min_characters_necessary: "Mindestens {min} Zeichen erforderlich",
-    max_characters_allowed: "Maximal {max} Zeichen erlaubt",
   },
   // Shared button texts
   button: {
@@ -169,15 +196,6 @@ export default {
     csv_options: "Zusätzliche CSV-Optionen",
     encoding: "Encoding",
     quote_type: "Textbegrenzung",
-  },
-  // Form labels
-  form: {
-    required_email: "Email ist erforderlich",
-    valid_email: "Email muss gültig sein",
-    valid_phone: "Telefon muss gültig sein",
-    required_phone: "Telefon ist erforderlich",
-    valid_fax: "Faxnummer muss gültig sein",
-    valid_postalcode: "PLZ muss gültig sein",
   },
   // MailingList
   mailinglist: {

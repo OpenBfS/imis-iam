@@ -1,7 +1,7 @@
 {
   "attributes" : [ {
     "name" : "email",
-    "displayName" : "email",
+    "displayName" : "${email}",
     "permissions" : {
       "view" : [ "admin", "user" ],
       "edit" : [ "admin", "user" ]
@@ -16,13 +16,13 @@
       },
       "pattern": {
         "pattern": "[a-z0-9]+@[a-z]+\\.[a-z]{2,3}",
-        "error-message": "form.valid_email"
+        "error-message": "error.valid_email"
       }
     },
     "group": "contact"
   }, {
     "name" : "title",
-    "displayName" : "title",
+    "displayName" : "${title}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -32,7 +32,7 @@
     "group": "name"
   }, {
     "name" : "firstName",
-    "displayName" : "firstname",
+    "displayName" : "${firstname}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -50,7 +50,7 @@
     "group": "name"
   }, {
     "name" : "lastName",
-    "displayName" : "lastname",
+    "displayName" : "${lastname}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -67,7 +67,7 @@
     "group": "name"
   }, {
     "name" : "phone",
-    "displayName" : "phone",
+    "displayName" : "${phone}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -81,13 +81,13 @@
     "validations" : {
       "pattern": {
         "pattern": "(\\(?([\\d \\-)–+/(]+){6,}\\)?([ .\\-–/]?)([\\d]+))",
-        "error-message": "form.valid_phone"
+        "error-message": "error.valid_phone"
       }
     },
     "group": "contact"
   }, {
     "name" : "mobile",
-    "displayName" : "mobile",
+    "displayName" : "${mobile}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -99,7 +99,7 @@
     "group": "contact"
   }, {
     "name" : "fax",
-    "displayName" : "fax",
+    "displayName" : "${fax}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -111,7 +111,7 @@
     "group": "contact"
   }, {
     "name" : "oe",
-    "displayName" : "oe",
+    "displayName" : "${oe}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -120,7 +120,7 @@
     "validations" : { }
   }, {
     "name" : "bfslocation",
-    "displayName" : "bfslocation",
+    "displayName" : "${bfslocation}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -129,7 +129,7 @@
     "validations" : { }
   }, {
     "name" : "position",
-    "displayName" : "position",
+    "displayName" : "${position}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },

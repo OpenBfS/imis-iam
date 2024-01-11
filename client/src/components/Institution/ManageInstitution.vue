@@ -62,7 +62,7 @@
                 :rules="
                   reqValidPostalcode(
                     $t('institution.required_service_building_postalcode'),
-                    $t('form.valid_postalcode')
+                    $t('error.valid_postalcode')
                   )
                 "
                 v-model="institution.serviceBuildingPostalCode"
@@ -81,7 +81,7 @@
             <div class="group_class">
               <!-- TODO: Add this rules once the validation for
                     optional fields gets implemented by upstream.
-                    :rules="validPostalcode($t('form.valid_postalcode'))" -->
+                    :rules="validPostalcode($t('error.valid_postalcode'))" -->
               <v-text-field
                 variant="underlined"
                 density="compact"
@@ -140,7 +140,7 @@
                 :rules="
                   reqValidPhone(
                     $t('institution.required_central_phone'),
-                    $t('form.valid_phone')
+                    $t('error.valid_phone')
                   )
                 "
                 v-model="institution.centralPhone"
@@ -152,14 +152,14 @@
                 :rules="
                   reqValidmail(
                     $t('institution.required_central_email'),
-                    $t('form.valid_email')
+                    $t('error.valid_email')
                   )
                 "
                 v-model="institution.centralMail"
               ></v-text-field>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
-                    :rules="validPhone($t('form.valid_fax'))" -->
+                    :rules="validPhone($t('error.valid_fax'))" -->
               <v-text-field
                 variant="underlined"
                 density="compact"
@@ -197,7 +197,7 @@
                 item-value="id"
                 persistent-hint
                 density="compact"
-                :rules="reqField($t('institution.required_category'))"
+                :rules="reqField($t('error.required_category'))"
               >
               </v-select>
             </div>

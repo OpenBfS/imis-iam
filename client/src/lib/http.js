@@ -5,6 +5,8 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { useApplicationStore } from "@/stores/application";
+import i18n from "@/i18n";
+const { t } = i18n.global;
 import axios from "axios";
 
 const HTTP = axios.create({
@@ -16,7 +18,21 @@ HTTP.interceptors.response.use(
   (error) => {
     const applicationStore = useApplicationStore();
     if (error.response) {
-      if (error.response.data) {
+      if (error.response.status === 400 && error.response.data[0]?.message) {
+        let allMessages = "";
+        for (let i = 0; i < error.response.data.length; i++) {
+          const errorObject = error.response.data[i];
+          const message = errorObject.message;
+          const stringToTranslate = message.includes("-")
+            ? message.replaceAll("-", "_")
+            : message;
+          allMessages = allMessages.concat(t(stringToTranslate));
+          if (i < error.response.data.length - 1) {
+            allMessages = allMessages.concat("; ");
+          }
+        }
+        applicationStore.setHttpErrorMessage(allMessages);
+      } else if (error.response.data) {
         applicationStore.setHttpErrorMessage(error.response.data);
       } else {
         applicationStore.setHttpErrorMessage(error.response.statusText);
