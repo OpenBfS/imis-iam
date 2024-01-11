@@ -40,7 +40,7 @@
               ></v-btn>
             </template>
             <span>{{
-              $store.state.profile.isAllowedToManage
+              profileStore.isAllowedToManage
                 ? $t("label.edit")
                 : $t("label.show_info")
             }}</span>
