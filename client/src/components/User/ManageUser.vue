@@ -103,10 +103,6 @@
               ></v-text-field>
             </div>
             <div class="two_group_class">
-              <!-- readonly attribute is set for each v-select element explicitly, which
-                 should inherit the state from the <v-form> element.
-                TODO: Check if this gets fixed by upstream
-                 -->
               <v-select
                 :clearable="$store.state.profile.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
