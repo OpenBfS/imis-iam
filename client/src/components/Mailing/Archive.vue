@@ -40,20 +40,19 @@
         persistent-hint
       ></v-select>
       <div class="d-flex mx-3 flex-column" style="width: 20%">
-        <v-checkbox
-          v-model="usePeriod"
-          :label="$t('mailinglist.filter_by_period')"
-        ></v-checkbox>
         <div style="position: relative">
-          <v-label>{{ $t("label.from") }}</v-label>
-          <v-text-field
-            prepend-inner-icon="mdi-calendar-blank"
-            readonly
-            @click="toggleStartDatePicker"
-            :v-model="$d(startDate, 'short')"
-            :disabled="!usePeriod"
-            >{{ $d(startDate, "short") }}
-          </v-text-field>
+          <div id="startDateTextfield">
+            <v-text-field
+              v-model="startDateString"
+              clearable
+              prepend-inner-icon="mdi-calendar-blank"
+              :hint="$t('form.date_format')"
+              :label="$t('label.from')"
+              :rules="validGermanDate()"
+              @click="isStartDatePickerOpen = true"
+              @input="handleInputForStartDate"
+            ></v-text-field>
+          </div>
           <v-date-picker
             v-click-outside="{
               handler: toggleStartDatePicker,
@@ -68,12 +67,14 @@
             position="absolute"
             style="
               position: absolute;
+              top: 70pt;
               z-index: 20;
               background-color: white;
               box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
             "
             :show-adjacent-months="true"
             :title="$t('label.from')"
+            @update:modelValue="handleStartDateUpdate"
           >
             <template v-slot:header>
               <div class="v-date-picker-header bg-accent">
@@ -85,15 +86,18 @@
           </v-date-picker>
         </div>
         <div style="position: relative">
-          <v-label>{{ $t("label.to") }}</v-label>
-          <v-text-field
-            prepend-inner-icon="mdi-calendar-blank"
-            readonly
-            @click="toggleEndDatePicker"
-            :v-model="$d(endDate, 'short')"
-            :disabled="!usePeriod"
-            >{{ $d(endDate, "short") }}
-          </v-text-field>
+          <div id="endDateTextfield">
+            <v-text-field
+              v-model="endDateString"
+              clearable
+              prepend-inner-icon="mdi-calendar-blank"
+              :hint="$t('form.date_format')"
+              :label="$t('label.to')"
+              :rules="validGermanDate()"
+              @click="isEndDatePickerOpen = true"
+              @input="handleInputForEndDate"
+            ></v-text-field>
+          </div>
           <v-date-picker
             v-click-outside="{
               handler: toggleEndDatePicker,
@@ -108,12 +112,14 @@
             position="absolute"
             style="
               position: absolute;
+              top: 70pt;
               z-index: 20;
               background-color: white;
               box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
             "
             :show-adjacent-months="true"
             :title="$t('label.to')"
+            @update:modelValue="handleEndDateUpdate"
           >
             <template v-slot:header>
               <div class="v-date-picker-header bg-accent">
@@ -186,16 +192,26 @@ tr {
 <script setup>
 import { onMounted, ref, defineAsyncComponent, computed, watch } from "vue";
 import { HTTP } from "@/lib/http";
+import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { debounce } from "debounce";
+import { useI18n } from "vue-i18n";
 const MailContent = defineAsyncComponent(() =>
   import("@/components/Mailing/MailContent.vue")
 );
-const usePeriod = ref(false);
+const {
+  dateStringToDate,
+  validGermanDate,
+  doesRegexMatchWholeString,
+  germanDateRegex,
+} = useForm();
+const { d } = useI18n();
 const startDate = ref(new Date());
+const startDateString = ref("");
 const endDate = ref(new Date());
+const endDateString = ref("");
 const isStartDatePickerOpen = ref(false);
 const isEndDatePickerOpen = ref(false);
 const mails = ref([]);
@@ -205,8 +221,32 @@ const { hasLoadingError } = useNotification();
 const toggleStartDatePicker = () => {
   isStartDatePickerOpen.value = !isStartDatePickerOpen.value;
 };
+const handleInputForStartDate = (event) => {
+  const input = event.target.value;
+  if (doesRegexMatchWholeString(germanDateRegex, input)) {
+    const newDate = dateStringToDate(input);
+    if (newDate) {
+      startDate.value = newDate;
+    }
+  }
+};
+const handleStartDateUpdate = (event) => {
+  startDateString.value = d(event, "short");
+};
 const toggleEndDatePicker = () => {
   isEndDatePickerOpen.value = !isEndDatePickerOpen.value;
+};
+const handleInputForEndDate = (event) => {
+  const input = event.target.value;
+  if (doesRegexMatchWholeString(germanDateRegex, input)) {
+    const newDate = dateStringToDate(input);
+    if (newDate) {
+      endDate.value = newDate;
+    }
+  }
+};
+const handleEndDateUpdate = (event) => {
+  endDateString.value = d(event, "short");
 };
 const startDateCloseConditional = () => {
   return isStartDatePickerOpen.value;
@@ -223,10 +263,10 @@ const getIncludedElements = (selector) => {
   return includedElements;
 };
 const includeStartDatePicker = () => {
-  return getIncludedElements(".startDatePicker *");
+  return getIncludedElements(".startDatePicker *, #startDateTextfield *");
 };
 const includeEndDatePicker = () => {
-  return getIncludedElements(".endDatePicker *");
+  return getIncludedElements(".endDatePicker *, #endDateTextfield *");
 };
 const resetMinutesSecondsMilliseconds = (date) => {
   date.setMinutes(0);
@@ -237,7 +277,7 @@ const getMails = () => {
   if (!startDate.value) return;
   let date = "";
 
-  if (usePeriod.value) {
+  if (startDateString.value.length > 0 && endDateString.value.length > 0) {
     const tmpStartDate = new Date(Date.parse(startDate.value));
     tmpStartDate.setHours(0);
     resetMinutesSecondsMilliseconds(tmpStartDate);
@@ -342,12 +382,9 @@ watch(
     }
   }
 );
-watch(
-  [() => endDate.value, () => startDate.value, () => usePeriod.value],
-  () => {
-    getMails();
-  }
-);
+watch([() => endDate.value, () => startDate.value], () => {
+  getMails();
+});
 const sender = ref("");
 const triggerFilter = debounce(() => {
   getMails();

@@ -59,24 +59,24 @@
             <v-row>
               <v-col cols="10">
                 <v-row align="center">
-                  <div class="d-flex flex-column v-col-6">
-                    <div id="expiry-checkbox-container">
-                      <v-checkbox
-                        v-model="useExpiryDate"
-                        className="mb-0 expiry-checkbox"
-                        id="expiry-checkbox"
+                  <div
+                    class="d-flex flex-column v-col-6"
+                    style="position: relative"
+                  >
+                    <div id="expiryDateTextfield">
+                      <v-text-field
+                        v-model="expiryDateString"
+                        clearable
+                        prepend-inner-icon="mdi-calendar-blank"
+                        :hint="$t('form.date_format')"
                         :label="$t('mailinglist.expiry_date')"
-                      ></v-checkbox>
+                        :rules="validGermanDate()"
+                        @click="isExpiryDatePickerOpen = true"
+                        @input="handleInputForExpiryDate"
+                      >
+                        <template v-slot:details></template>
+                      </v-text-field>
                     </div>
-                    <v-text-field
-                      prepend-inner-icon="mdi-calendar-blank"
-                      readonly
-                      @click="toggleExpiryDatePicker"
-                      :v-model="$d(expiryDate, 'short')"
-                      :disabled="!useExpiryDate"
-                      >{{ $d(expiryDate, "short") }}
-                      <template v-slot:details></template>
-                    </v-text-field>
                     <v-date-picker
                       v-click-outside="{
                         handler: toggleExpiryDatePicker,
@@ -88,15 +88,16 @@
                       className="expiryDatePicker"
                       color="accent"
                       elevation="6"
-                      position="absolute"
                       style="
                         position: absolute;
+                        top: 80pt;
                         z-index: 20;
                         background-color: white;
                         box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
                       "
                       :show-adjacent-months="true"
                       :title="$t('mailinglist.expiry_date')"
+                      @update:modelValue="handleExpiryDateUpdate"
                       ><template v-slot:header>
                         <div class="v-date-picker-header bg-accent">
                           <div class="v-date-picker-header__content">
@@ -170,20 +171,13 @@
   </v-dialog>
 </template>
 
-<style>
-#expiry-checkbox-container .v-input__details {
-  padding-top: 0pt;
-  min-height: 0pt;
-  height: 0pt;
-}
-</style>
-
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   mailingLists: Array,
@@ -192,16 +186,25 @@ const emit = defineEmits(["mail-dialog-object"]);
 
 const show = true;
 const store = useStore();
+const { d } = useI18n();
 const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
 // Mail
-const { form, valid, reqField } = useForm();
+const {
+  form,
+  valid,
+  reqField,
+  dateStringToDate,
+  validGermanDate,
+  doesRegexMatchWholeString,
+  germanDateRegex,
+} = useForm();
 const selectedList = ref(null);
 const mailText = ref("");
 const subject = ref("");
 const archived = ref(false);
 const expiryDate = ref(new Date());
-const useExpiryDate = ref(false);
+const expiryDateString = ref("");
 const isExpiryDatePickerOpen = ref(false);
 const userData = store.state.profile.userData;
 const senderList = ref([
@@ -212,11 +215,25 @@ const selectedSender = ref(senderList.value[0] || senderList.value[0] || "");
 const toggleExpiryDatePicker = () => {
   isExpiryDatePickerOpen.value = !isExpiryDatePickerOpen.value;
 };
+const handleInputForExpiryDate = (event) => {
+  const input = event.target.value;
+  if (doesRegexMatchWholeString(germanDateRegex, input)) {
+    const newDate = dateStringToDate(input);
+    if (newDate) {
+      expiryDate.value = newDate;
+    }
+  }
+};
+const handleExpiryDateUpdate = (event) => {
+  expiryDateString.value = d(event, "short");
+};
 const closeConditional = () => {
   return isExpiryDatePickerOpen.value;
 };
 const includeExpiryDatePicker = () => {
-  const elements = document.querySelectorAll(".expiryDatePicker *");
+  const elements = document.querySelectorAll(
+    ".expiryDatePicker *, #expiryDateTextfield *"
+  );
   const includedElements = [];
   for (let i = 0; i < elements.length; i++) {
     includedElements.push(elements[i]);
@@ -232,7 +249,8 @@ const sendMail = () => {
     archived: archived.value,
     type: selectedType.value.id,
     recipient: selectedList.value.id,
-    expiryDate: useExpiryDate.value ? expiryDate.value.toISOString() : "",
+    expiryDate:
+      expiryDateString.value.length > 0 ? expiryDate.value.toISOString() : "",
   })
     .then(() => {
       emit("mail-dialog-object", {

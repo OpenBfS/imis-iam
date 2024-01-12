@@ -12,7 +12,7 @@ const datetimeFormats = {
   de: {
     short: {
       year: "numeric",
-      month: "short",
+      month: "numeric",
       day: "numeric",
     },
     long: {

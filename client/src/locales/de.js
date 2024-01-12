@@ -169,6 +169,8 @@ export default {
     required_phone: "Telefon ist erforderlich",
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
+    valid_date: "Datum muss gültig sein",
+    date_format: "Format: dd.mm.jjjj",
   },
   // MailingList
   mailinglist: {

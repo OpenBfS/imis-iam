@@ -6,12 +6,15 @@
  */
 
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 export function useForm() {
+  const { t } = useI18n();
   const form = ref(null);
   const valid = ref(false);
   const regExprPhone = /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/;
   const regExprEmail = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
+  const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
   // Validation rules
   const reqValidmail = (reqMsg, validMsg) => {
     return [(v) => !!v || reqMsg, (v) => regExprEmail.test(v) || validMsg];
@@ -27,6 +30,29 @@ export function useForm() {
   };
   const validPostalcode = (validMsg) => {
     return [(v) => /^\d{5}$/.test(v) || v == "" || validMsg];
+  };
+  const dateStringToDate = (dateString) => {
+    const parts = dateString.split(".");
+    const year = parts[2];
+    const month = parts[1].length === 1 ? "0" + parts[1] : parts[1];
+    const day = parts[0].length === 1 ? "0" + parts[0] : parts[0];
+    const date = new Date(`${year}-${month}-${day}T23:59:59`);
+    date.setMilliseconds(999);
+    return date.toDateString() !== "Invalid Date" ? date : undefined;
+  };
+  const doesRegexMatchWholeString = (regex, text) => {
+    const matches = regex.exec(text);
+    return matches && matches.length === 1 && matches[0] === text;
+  };
+  const validGermanDate = () => {
+    return [
+      (v) =>
+        !v ||
+        v.length === 0 ||
+        (doesRegexMatchWholeString(germanDateRegex, v) &&
+          dateStringToDate(v) !== undefined) ||
+        t("form.valid_date"),
+    ];
   };
   const reqValidPostalcode = (reqMsg, validMsg) => {
     return [
@@ -49,7 +75,11 @@ export function useForm() {
     reqValidPhone,
     validPhone,
     validPostalcode,
+    validGermanDate,
     reqValidPostalcode,
     reqMultipleSelect,
+    dateStringToDate,
+    doesRegexMatchWholeString,
+    germanDateRegex,
   };
 }
