@@ -72,6 +72,7 @@
                         :label="$t('mailinglist.expiry_date')"
                         :rules="validGermanDate()"
                         @click="isExpiryDatePickerOpen = true"
+                        @click:clear="isExpiryDatePickerOpen = false"
                         @input="handleInputForExpiryDate"
                       >
                         <template v-slot:details></template>
@@ -250,7 +251,7 @@ const sendMail = () => {
     type: selectedType.value.id,
     recipient: selectedList.value.id,
     expiryDate:
-      expiryDateString.value.length > 0 ? expiryDate.value.toISOString() : "",
+      expiryDateString.value?.length > 0 ? expiryDate.value.toISOString() : "",
   })
     .then(() => {
       emit("mail-dialog-object", {

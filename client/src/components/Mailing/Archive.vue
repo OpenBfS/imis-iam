@@ -50,6 +50,7 @@
               :label="$t('label.from')"
               :rules="validGermanDate()"
               @click="isStartDatePickerOpen = true"
+              @click:clear="handleClearStartDateTextfield"
               @input="handleInputForStartDate"
             ></v-text-field>
           </div>
@@ -95,6 +96,7 @@
               :label="$t('label.to')"
               :rules="validGermanDate()"
               @click="isEndDatePickerOpen = true"
+              @click:clear="handleClearEndDateTextfield"
               @input="handleInputForEndDate"
             ></v-text-field>
           </div>
@@ -233,6 +235,10 @@ const handleInputForStartDate = (event) => {
 const handleStartDateUpdate = (event) => {
   startDateString.value = d(event, "short");
 };
+const handleClearStartDateTextfield = () => {
+  isStartDatePickerOpen.value = false;
+  getMails();
+};
 const toggleEndDatePicker = () => {
   isEndDatePickerOpen.value = !isEndDatePickerOpen.value;
 };
@@ -247,6 +253,10 @@ const handleInputForEndDate = (event) => {
 };
 const handleEndDateUpdate = (event) => {
   endDateString.value = d(event, "short");
+};
+const handleClearEndDateTextfield = () => {
+  isEndDatePickerOpen.value = false;
+  getMails();
 };
 const startDateCloseConditional = () => {
   return isStartDatePickerOpen.value;
@@ -277,17 +287,21 @@ const getMails = () => {
   if (!startDate.value) return;
   let date = "";
 
-  if (startDateString.value.length > 0 && endDateString.value.length > 0) {
+  if (startDateString.value?.length > 0) {
     const tmpStartDate = new Date(Date.parse(startDate.value));
     tmpStartDate.setHours(0);
     resetMinutesSecondsMilliseconds(tmpStartDate);
 
-    const tmpEndDate = new Date(Date.parse(endDate.value));
-    tmpEndDate.setHours(24);
-    resetMinutesSecondsMilliseconds(tmpEndDate);
     if (startDate.value) {
       date += `start=${tmpStartDate.getTime()}`;
     }
+  }
+
+  if (endDateString.value?.length > 0) {
+    const tmpEndDate = new Date(Date.parse(endDate.value));
+    tmpEndDate.setHours(24);
+    resetMinutesSecondsMilliseconds(tmpEndDate);
+
     if (endDate.value) {
       date = date != "" ? date + "&" : date;
       date += `end=${tmpEndDate.getTime()}`;
