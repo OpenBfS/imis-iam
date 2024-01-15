@@ -40,8 +40,12 @@
                       })
                     )
                   "
-                  @update:model-value="setUserAttribute('username', $event)"
+                  @update:model-value="
+                    setUserAttribute('username', $event);
+                    clearValidationError(attribute.name);
+                  "
                 ></v-text-field>
+                <p id="username-validation-error" class="validation-error"></p>
               </v-col>
             </v-row>
             <template
@@ -67,7 +71,8 @@
                       :name="attribute.name"
                       :model-value="user.attributes[attribute.name]"
                       @update:model-value="
-                        setUserAttribute(attribute.name, $event)
+                        setUserAttribute(attribute.name, $event);
+                        clearValidationError(attribute.name);
                       "
                       :type="getTextFieldType(attribute.name)"
                       :rules="getRules(attribute.name)"
@@ -88,10 +93,15 @@
                         attribute.annotations.inputType === 'multiselect'
                       "
                       @update:model-value="
-                        setUserAttribute(attribute.name, $event)
+                        setUserAttribute(attribute.name, $event);
+                        clearValidationError(attribute.name);
                       "
                       :rules="getRules(attribute.name)"
                     ></v-select>
+                    <p
+                      :id="`${attribute.name}-validation-error`"
+                      class="validation-error"
+                    ></p>
                   </v-col>
                 </template>
               </v-row>
@@ -114,7 +124,8 @@
                     :name="attribute.name"
                     :model-value="user.attributes[attribute.name]"
                     @update:model-value="
-                      setUserAttribute(attribute.name, $event)
+                      setUserAttribute(attribute.name, $event);
+                      clearValidationError(attribute.name);
                     "
                     :type="getTextFieldType(attribute.name)"
                     :rules="getRules(attribute.name)"
@@ -139,10 +150,15 @@
                       attribute.annotations.inputType === 'multiselect'
                     "
                     @update:model-value="
-                      setUserAttribute(attribute.name, $event)
+                      setUserAttribute(attribute.name, $event);
+                      clearValidationError(attribute.name);
                     "
                     :rules="getRules(attribute.name)"
                   ></v-select>
+                  <p
+                    :id="`${attribute.name}-validation-error`"
+                    class="validation-error"
+                  ></p>
                 </v-col>
               </template>
             </v-row>
@@ -268,6 +284,10 @@ form > div {
 .two_group_class > div:nth-child(2) {
   padding: 0 10px;
 }
+.validation-error {
+  color: #b00020;
+  font-size: 11pt;
+}
 </style>
 <script setup>
 import { computed, onMounted, nextTick } from "vue";
@@ -361,47 +381,47 @@ const getRules = (nameOfAttribute) => {
     ) {
       rules.push(
         ...reqField(
-          t("error.user_attribute_required", {
-            attr: handleDisplayName(attribute.displayName),
-          })
+          t("error.user_attribute_required", [
+            handleDisplayName(attribute.displayName),
+          ])
         )
       );
-    }
 
-    if (attribute.validations?.pattern) {
-      const pattern = attribute.validations.pattern.pattern;
-      const errorMessage = attribute.validations.pattern["error-message"];
-      rules.push(...validRegex(pattern, t(errorMessage)));
-    }
-
-    if (attribute.validations?.length) {
-      const length = attribute.validations.length;
-      let message;
-      const displayName = handleDisplayName(attribute.displayName);
-      if (length.min && length.max) {
-        message = t("error.invalid_length", {
-          attr: displayName,
-          min: length.min,
-          max: length.max,
-        });
-      } else if (length.min) {
-        message = t("error.invalid_length_too_short", {
-          attr: displayName,
-          min: length.min,
-        });
-      } else {
-        message = t("error.invalid_length_too_long", {
-          attr: displayName,
-          max: length.max,
-        });
+      if (attribute.validations?.pattern) {
+        const pattern = attribute.validations.pattern.pattern;
+        const errorMessage = attribute.validations.pattern["error-message"];
+        rules.push(...validRegex(pattern, t(errorMessage)));
       }
-      rules.push(...validLength(length.min, length.max, message));
+
+      if (attribute.validations?.length) {
+        const length = attribute.validations.length;
+        let message;
+        const displayName = handleDisplayName(attribute.displayName);
+        if (length.min && length.max) {
+          message = t("error.invalid_length", [
+            displayName,
+            length.min,
+            length.max,
+          ]);
+        } else if (length.min) {
+          message = t("error.invalid_length_too_short", [
+            displayName,
+            length.min,
+          ]);
+        } else {
+          message = t("error.invalid_length_too_long", [
+            displayName,
+            length.max,
+          ]);
+        }
+        rules.push(...validLength(length.min, length.max, message));
+      }
     }
   }
   // Rules for select components
   else {
     rules.push(
-      ...reqField(t("error.user_attribute_required", { attr: attribute.name }))
+      ...reqField(t("error.user_attribute_required", [attribute.name]))
     );
   }
   return rules;
@@ -469,8 +489,10 @@ const createUser = (shouldClose) => {
         });
       }
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      if (error.response.status === 400 && error.response.data[0]?.message) {
+        handleValidationErrorFromServer(error.response.data);
+      }
     });
 };
 
@@ -488,28 +510,34 @@ const updateUser = () => {
     })
     .catch((error) => {
       if (error.response.status === 400 && error.response.data[0]?.message) {
-        let allMessages = "";
-        for (let i = 0; i < error.response.data.length; i++) {
-          const errorObject = error.response.data[i];
-          const message = errorObject.message;
-          const stringToTranslate = message.startsWith("error-")
-            ? message.replace("error-", "error.").replaceAll("-", "_")
-            : message;
-          errorObject.messageParameters[0] = t(
-            `user.${errorObject.messageParameters[0].toLowerCase()}`
-          );
-          allMessages = allMessages.concat(
-            t(stringToTranslate, errorObject.messageParameters)
-          );
-          if (i < error.response.data.length - 1) {
-            allMessages = allMessages.concat(" ");
-          }
-        }
-        applicationStore.setHttpErrorMessage(allMessages);
+        handleValidationErrorFromServer(error.response.data);
       }
       console.error(error);
-      hasRequestError.value = true;
     });
+};
+
+const handleValidationErrorFromServer = (error) => {
+  for (let i = 0; i < error.length; i++) {
+    const errorObject = error[i];
+    const message = errorObject.message;
+    const stringToTranslate = message.startsWith("error-")
+      ? message.replace("error-", "error.").replaceAll("-", "_")
+      : message;
+    const attributeName = errorObject.messageParameters[0];
+    errorObject.messageParameters[0] = t(
+      `user.${errorObject.messageParameters[0].toLowerCase()}`
+    );
+    const translatedString = t(
+      stringToTranslate,
+      errorObject.messageParameters
+    );
+    document.getElementById(`${attributeName}-validation-error`).textContent =
+      translatedString;
+  }
+};
+
+const clearValidationError = (attributeName) => {
+  document.getElementById(`${attributeName}-validation-error`).textContent = "";
 };
 const createAndPrepare = () => {
   resetNotification();

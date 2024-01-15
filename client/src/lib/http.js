@@ -16,10 +16,8 @@ HTTP.interceptors.response.use(
   (error) => {
     const applicationStore = useApplicationStore();
     if (error.response) {
-      if (error.response.data) {
+      if (!error.response.data) {
         applicationStore.setHttpErrorMessage(error.response.data);
-      } else {
-        applicationStore.setHttpErrorMessage(error.response.statusText);
       }
       // Handle other type of errors.
     } else if (error.request) {
