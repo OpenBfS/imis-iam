@@ -189,7 +189,7 @@
                 v-model="user.roles"
                 multiple
                 persistent-hint
-                :rules="reqMultipleSelect($t('error.required_roles'))"
+                :rules="reqMultipleSelect($t('user.required_roles'))"
               >
               </v-select>
             </div>
@@ -487,6 +487,26 @@ const updateUser = () => {
       applicationStore.setShowManageUserDialog(false);
     })
     .catch((error) => {
+      if (error.response.status === 400 && error.response.data[0]?.message) {
+        let allMessages = "";
+        for (let i = 0; i < error.response.data.length; i++) {
+          const errorObject = error.response.data[i];
+          const message = errorObject.message;
+          const stringToTranslate = message.startsWith("error-")
+            ? message.replace("error-", "error.").replaceAll("-", "_")
+            : message;
+          errorObject.messageParameters[0] = t(
+            `user.${errorObject.messageParameters[0].toLowerCase()}`
+          );
+          allMessages = allMessages.concat(
+            t(stringToTranslate, errorObject.messageParameters)
+          );
+          if (i < error.response.data.length - 1) {
+            allMessages = allMessages.concat(" ");
+          }
+        }
+        applicationStore.setHttpErrorMessage(allMessages);
+      }
       console.error(error);
       hasRequestError.value = true;
     });

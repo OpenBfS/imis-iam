@@ -29,30 +29,30 @@ export default {
   error: {
     // Keys which Keycloak can return after validations fail.
     // Source: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_de.properties
-    username_invalid_character: "'{attr}' enthält ungültige Zeichen.",
+    username_invalid_character: "'{0}' enthält ungültige Zeichen.",
     invalid_length_too_short:
-      "'{attr}' muss mindestens eine Länge von {min} haben.",
-    number_out_of_range_too_big: "'{attr}' darf maximal den Wert {max} haben.",
+      "'{0}' muss mindestens eine Länge von {1} haben.",
+    number_out_of_range_too_big: "'{0}' darf maximal den Wert {1} haben.",
     number_out_of_range_too_small:
-      "'{attr}' muss mindestens den Wert {min} haben.",
-    user_attribute_required: "Bitte geben Sie '{attr}' an.",
-    empty: "Bitte geben Sie einen Wert für '{attr}' an.",
-    invalid_uri_fragment: "'{value}' ist ein ungültiges URL-Fragment.",
-    invalid_blank: "Bitte geben Sie einen Wert für '{attr}' an.",
+      "'{0}' muss mindestens den Wert {1} haben.",
+    user_attribute_required: "Bitte geben Sie '{0}' an.",
+    empty: "Bitte geben Sie einen Wert für '{0}' an.",
+    invalid_uri_fragment: "'{0}' ist ein ungültiges URL-Fragment.",
+    invalid_blank: "Bitte geben Sie einen Wert für '{0}' an.",
     number_out_of_range:
-      "'{attr}' muss eine Zahl zwischen {min} und {max} sein.",
+      "'{0}' muss eine Zahl zwischen {1} und {2} sein.",
     invalid_email: "Ungültige E-Mail.",
     invalid_length_too_long:
-      "'{attr}' darf maximal eine Länge von {max} haben.",
-    invalid_value: "'{attr}' hat einen ungültigen Wert.",
-    invalid_number: "'{value}' ist eine ungültige Zahl.",
-    invalid_uri_scheme: "'{value}' ist ein ungültiges URL-Schema.",
-    user_attribute_read_only: "Das Feld {attr} is schreibgeschützt.",
-    invalid_date: "'{value}' ist ein ungültiges Datum.",
-    invalid_length: "'{attr}' muss eine Länge zwischen {min} und {max} haben.",
-    invalid_uri: "'{value}' ist eine ungültige URL.",
-    pattern_no_match: "'{value}' entspricht nicht dem erforderlichen Format.",
-    person_name_invalid_character: "'{value}' enthält ungültige Zeichen.",
+      "'{0}' darf maximal eine Länge von {max} haben.",
+    invalid_value: "'{0}' hat einen ungültigen Wert.",
+    invalid_number: "'{0}' ist eine ungültige Zahl.",
+    invalid_uri_scheme: "'{0}' ist ein ungültiges URL-Schema.",
+    user_attribute_read_only: "Das Feld {0} is schreibgeschützt.",
+    invalid_date: "'{0}' ist ein ungültiges Datum.",
+    invalid_length: "'{0}' muss eine Länge zwischen {1} und {2} haben.",
+    invalid_uri: "'{0}' ist eine ungültige URL.",
+    pattern_no_match: "'{0}' entspricht nicht dem erforderlichen Format.",
+    person_name_invalid_character: "'{0}' enthält ungültige Zeichen.",
 
     // Custom errors
     required_category: "Kategorie ist erforderlich",
