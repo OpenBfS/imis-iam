@@ -478,8 +478,9 @@ public class UserProvider implements RealmResourceProvider {
             this.userProfileProvider
                 .create(USER_API, attributes, user).update();
         } catch (ValidationException ve) {
-            // TODO: User created anyhow. Why is transaction not rolled back
-            // while it seems to have been without catching ValidationException?
+            if (session.getTransactionManager().isActive()) {
+                session.getTransactionManager().setRollbackOnly();
+            }
             throw new BadRequestException(
                 Response.status(Status.BAD_REQUEST)
                     .type(MediaType.APPLICATION_JSON)
