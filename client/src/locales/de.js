@@ -70,7 +70,7 @@ export default {
     categories: "Kategorien",
     required_category: "Kategorie ist erforderlich",
     central_fax: "Zentrales Fax",
-    address_street: "Postanschrift: Straße",
+    address_street: "Postanschrift: Straße/Hausnummer",
     address_postalcode: "Postanschrift: PLZ",
     address_location: "Postanschrift: Ort",
     imis_Id: "Messstellen-ID",
