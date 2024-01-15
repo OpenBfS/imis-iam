@@ -15,6 +15,7 @@ export const application = {
     savedItem: {},
     showManageUserDialog: false,
     showManageInstitutionDialog: false,
+    showManageEventDialog: false,
     processType: "",
     footerLinks: {
       contact: process.env.VUE_APP_FOOTER_CONTACT,
@@ -45,6 +46,9 @@ export const application = {
     },
     setShowManageInstitutionDialog: (state, data) => {
       state.showManageInstitutionDialog = data;
+    },
+    setShowManageEventDialog: (state, data) => {
+      state.showManageEventDialog = data;
     },
     setManagedItem: (state, item) => {
       state.managedItem = item;

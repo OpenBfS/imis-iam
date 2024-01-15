@@ -24,6 +24,9 @@
       <v-dialog v-model="$store.state.application.showManageInstitutionDialog">
         <ManageInstitution />
       </v-dialog>
+      <v-dialog v-model="$store.state.application.showManageEventDialog">
+        <ManageEvent />
+      </v-dialog>
     </v-main>
     <Appfooter />
   </v-app>
@@ -47,6 +50,9 @@ export default {
     ),
     ManageInstitution: defineAsyncComponent(() =>
       import("@/components/Institution/ManageInstitution.vue")
+    ),
+    ManageEvent: defineAsyncComponent(() =>
+      import("@/components/Calendar/ManageEvent.vue")
     ),
     Sidebar: defineAsyncComponent(() => import("@/components/UI/Sidebar.vue")),
     Appbar: defineAsyncComponent(() => import("@/components/UI/Appbar.vue")),

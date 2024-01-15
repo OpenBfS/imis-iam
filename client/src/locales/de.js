@@ -26,6 +26,18 @@ export default {
     title: "Archiv",
     search: "Durchsuchen",
   },
+  // Calendar component
+  calendar: {
+    add_entry: "Eintrag hinzufügen",
+    component_title: "Anstehende Veranstaltungen",
+    create_title: "Neue Veranstaltung erstellen",
+    edit_title: "Veranstaltung {title} bearbeiten",
+    required_description: "Beschreibung ist erforderlich",
+    required_startDate: "Beginn ist erforderlich",
+    required_endDate: "Ende ist erforderlich",
+    required_site: "Ort ist erforderlich",
+    required_title: "Titel ist erforderlich",
+  },
   // Institutions component
   institution: {
     export: "Institutionen-Liste exportieren",
@@ -160,6 +172,9 @@ export default {
     csv_options: "Zusätzliche CSV-Optionen",
     encoding: "Encoding",
     quote_type: "Textbegrenzung",
+    title: "Titel",
+    site: "Ort",
+    description: "Beschreibung",
   },
   // Form labels
   form: {

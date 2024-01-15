@@ -11,6 +11,7 @@ import { application } from "./application";
 import { coordinates } from "./coordinates";
 import { mail } from "./mail";
 import { user } from "./user";
+import { events } from "./events";
 
 export default new Vuex.Store({
   modules: {
@@ -20,5 +21,6 @@ export default new Vuex.Store({
     application,
     coordinates,
     mail,
+    events,
   },
 });
