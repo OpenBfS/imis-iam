@@ -15,6 +15,7 @@ export const useApplicationStore = defineStore("application", {
     isAllowedToManageUser: false,
     managedItem: {},
     savedItem: {},
+    showManageEventDialog: false,
     showManageUserDialog: false,
     showManageInstitutionDialog: false,
     processType: "",
@@ -35,6 +36,9 @@ export const useApplicationStore = defineStore("application", {
     },
     setShowManageUserDialog(data) {
       this.showManageUserDialog = data;
+    },
+    setShowManageEventDialog(data) {
+      this.showManageEventDialog = data;
     },
     setSearchString(data) {
       this.searchSting = data;

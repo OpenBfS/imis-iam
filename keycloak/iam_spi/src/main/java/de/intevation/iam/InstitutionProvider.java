@@ -37,7 +37,6 @@ import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
-import de.intevation.iam.auth.InstitutionCategoryAuthorizer;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionCategory;
 import de.intevation.iam.util.Constants;
@@ -54,7 +53,6 @@ public class InstitutionProvider implements RealmResourceProvider {
     private KeycloakSession session;
 
     private Authorizer<Institution> auth;
-    private Authorizer<InstitutionCategory> authCat;
 
     private static final String NAME_ALREADY_USED_KEY
         = "error_name_already_used";
@@ -68,7 +66,6 @@ public class InstitutionProvider implements RealmResourceProvider {
     public InstitutionProvider(KeycloakSession session) {
         this.session = session;
         this.auth = new InstitutionAuthorizer(session);
-        this.authCat = new InstitutionCategoryAuthorizer(session);
     }
 
     /**
@@ -364,32 +361,6 @@ public class InstitutionProvider implements RealmResourceProvider {
         List<InstitutionCategory> institutionCategories
             = em.createQuery(query).getResultList();
         return Response.ok(institutionCategories).build();
-    }
-
-    /**
-     * Get institutionCategory with the given id.
-     * Response:
-     * <pre>
-     * <code>
-     * {
-     *   id: [String] InstitutionCategory ID,
-     *   name: [String] InstitutionCategory Name
-     * }
-     * </code>
-     * </pre>
-     * @param id InstitutionCategory id
-     * @return InstitutionCategory JSON or 404 if not found
-     */
-    @GET
-    @Path("/category/{id}")
-    public Response getInstitutionCategoryById(@PathParam("id") Integer id) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        InstitutionCategory in = em.find(InstitutionCategory.class, id);
-        if (in == null) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        return Response.ok(in).build();
     }
 
     private boolean isShortNameAlreadyUsed(Institution inst, EntityManager em) {

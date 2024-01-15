@@ -192,7 +192,7 @@
                 dense
                 :label="$t('institution.categories')"
                 :items="categories"
-                v-model="institution.category"
+                v-model="institution.categoryName"
                 item-title="name"
                 item-value="id"
                 persistent-hint

@@ -8,7 +8,27 @@ import { createI18n } from "vue-i18n";
 
 import de from "@/locales/de";
 
+const datetimeFormats = {
+  de: {
+    short: {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    },
+    long: {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      weekday: "short",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    },
+  },
+};
+
 const i18n = createI18n({
+  datetimeFormats: datetimeFormats,
   legacy: false,
   globalInjection: true,
   locale: "de",

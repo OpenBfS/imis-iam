@@ -31,8 +31,8 @@ public class Institution {
     @Column(name = "short_name", nullable = false)
     private String shortName;
 
-    @Column(name = "category_id")
-    private Integer category;
+    @Column(name = "category_name")
+    private String categoryName;
 
     @Column(name = "service_building_street", nullable = false)
     private String serviceBuildingStreet;
@@ -110,12 +110,12 @@ public class Institution {
         this.shortName = shortName;
     }
 
-    public Integer getCategory() {
-        return category;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setCategory(Integer category) {
-        this.category = category;
+    public void setCategory(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public String getServiceBuildingStreet() {

@@ -24,6 +24,9 @@
       <v-dialog v-model="applicationStore.showManageInstitutionDialog">
         <ManageInstitution />
       </v-dialog>
+      <v-dialog v-model="applicationStore.showManageEventDialog">
+        <ManageEvent />
+      </v-dialog>
     </v-main>
     <Appfooter />
   </v-app>
@@ -49,6 +52,9 @@ const ManageUser = defineAsyncComponent(() =>
 );
 const ManageInstitution = defineAsyncComponent(() =>
   import("@/components/Institution/ManageInstitution.vue")
+);
+const ManageEvent = defineAsyncComponent(() =>
+  import("@/components/Calendar/ManageEvent.vue")
 );
 const Sidebar = defineAsyncComponent(() =>
   import("@/components/UI/Sidebar.vue")

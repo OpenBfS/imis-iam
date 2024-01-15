@@ -39,20 +39,98 @@
         :hint="$t('mailinglist.filter_by_maillist')"
         persistent-hint
       ></v-select>
-      <!-- TODO: Use the v-date-picker from vuetify when this gets implemented -->
       <div class="d-flex mx-3 flex-column" style="width: 20%">
-        <div class="d-flex">
-          <label class="v-col-4" for="from">{{ $t("label.from") }}</label
-          ><input
-            class="ml-2"
-            type="date"
-            name="startDate"
+        <div style="position: relative">
+          <div id="startDateTextfield">
+            <v-text-field
+              v-model="startDateString"
+              clearable
+              prepend-inner-icon="mdi-calendar-blank"
+              :hint="$t('hints.date_format')"
+              :label="$t('label.from')"
+              :rules="validGermanDate()"
+              @click="isStartDatePickerOpen = true"
+              @click:clear="handleClearStartDateTextfield"
+              @input="handleInputForStartDate"
+            ></v-text-field>
+          </div>
+          <v-date-picker
+            v-click-outside="{
+              handler: toggleStartDatePicker,
+              closeConditional: startDateCloseConditional,
+              include: includeStartDatePicker,
+            }"
             v-model="startDate"
-          />
+            v-show="isStartDatePickerOpen"
+            className="startDatePicker"
+            color="accent"
+            elevation="6"
+            position="absolute"
+            style="
+              position: absolute;
+              top: 70pt;
+              z-index: 20;
+              background-color: white;
+              box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
+            "
+            :show-adjacent-months="true"
+            :title="$t('label.from')"
+            @update:modelValue="handleStartDateUpdate"
+          >
+            <template v-slot:header>
+              <div class="v-date-picker-header bg-accent">
+                <div class="v-date-picker-header__content">
+                  {{ $d(startDate, "short") }}
+                </div>
+              </div>
+            </template>
+          </v-date-picker>
         </div>
-        <div class="d-flex">
-          <label for="to" class="v-col-4">{{ $t("label.to") }}</label
-          ><input class="ml-2" type="date" name="endDate" v-model="endDate" />
+        <div style="position: relative">
+          <div id="endDateTextfield">
+            <v-text-field
+              v-model="endDateString"
+              clearable
+              prepend-inner-icon="mdi-calendar-blank"
+              :hint="$t('hints.date_format')"
+              :label="$t('label.to')"
+              :rules="validGermanDate()"
+              @click="isEndDatePickerOpen = true"
+              @click:clear="handleClearEndDateTextfield"
+              @input="handleInputForEndDate"
+            ></v-text-field>
+          </div>
+          <v-date-picker
+            v-click-outside="{
+              handler: toggleEndDatePicker,
+              closeConditional: endDateCloseConditional,
+              include: includeEndDatePicker,
+            }"
+            v-model="endDate"
+            v-show="isEndDatePickerOpen"
+            className="endDatePicker"
+            color="accent"
+            elevation="6"
+            position="absolute"
+            style="
+              position: absolute;
+              top: 70pt;
+              z-index: 20;
+              background-color: white;
+              box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
+            "
+            :show-adjacent-months="true"
+            :title="$t('label.to')"
+            @update:modelValue="handleEndDateUpdate"
+          >
+            <template v-slot:header>
+              <div class="v-date-picker-header bg-accent">
+                <div class="v-date-picker-header__content">
+                  {{ $d(endDate, "short") }}
+                </div>
+              </div>
+            </template>
+          </v-date-picker>
         </div>
       </div>
       <v-text-field
@@ -116,28 +194,122 @@ tr {
 <script setup>
 import { onMounted, ref, defineAsyncComponent, computed, watch } from "vue";
 import { HTTP } from "@/lib/http";
+import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
 import { useMailStore } from "@/stores/mail";
 import { useRoute } from "vue-router";
 import { debounce } from "debounce";
+import { useI18n } from "vue-i18n";
 const MailContent = defineAsyncComponent(() =>
   import("@/components/Mailing/MailContent.vue")
 );
+const {
+  dateStringToDate,
+  validGermanDate,
+  doesRegexMatchWholeString,
+  germanDateRegex,
+} = useForm();
+const { d } = useI18n();
+const startDate = ref(new Date());
+const startDateString = ref("");
+const endDate = ref(new Date());
+const endDateString = ref("");
+const isStartDatePickerOpen = ref(false);
+const isEndDatePickerOpen = ref(false);
 const mails = ref([]);
 const applicationStore = useApplicationStore();
 const mailStore = useMailStore();
 const route = useRoute();
 const { hasLoadingError } = useNotification();
+const toggleStartDatePicker = () => {
+  isStartDatePickerOpen.value = !isStartDatePickerOpen.value;
+};
+const handleInputForStartDate = (event) => {
+  const input = event.target.value;
+  if (doesRegexMatchWholeString(germanDateRegex, input)) {
+    const newDate = dateStringToDate(input);
+    if (newDate) {
+      startDate.value = newDate;
+    }
+  }
+};
+const handleStartDateUpdate = (event) => {
+  startDateString.value = d(event, "short");
+};
+const handleClearStartDateTextfield = () => {
+  isStartDatePickerOpen.value = false;
+  getMails();
+};
+const toggleEndDatePicker = () => {
+  isEndDatePickerOpen.value = !isEndDatePickerOpen.value;
+};
+const handleInputForEndDate = (event) => {
+  const input = event.target.value;
+  if (doesRegexMatchWholeString(germanDateRegex, input)) {
+    const newDate = dateStringToDate(input);
+    if (newDate) {
+      endDate.value = newDate;
+    }
+  }
+};
+const handleEndDateUpdate = (event) => {
+  endDateString.value = d(event, "short");
+};
+const handleClearEndDateTextfield = () => {
+  isEndDatePickerOpen.value = false;
+  getMails();
+};
+const startDateCloseConditional = () => {
+  return isStartDatePickerOpen.value;
+};
+const endDateCloseConditional = () => {
+  return isEndDatePickerOpen.value;
+};
+const getIncludedElements = (selector) => {
+  const elements = document.querySelectorAll(selector);
+  const includedElements = [];
+  for (let i = 0; i < elements.length; i++) {
+    includedElements.push(elements[i]);
+  }
+  return includedElements;
+};
+const includeStartDatePicker = () => {
+  return getIncludedElements(".startDatePicker *, #startDateTextfield *");
+};
+const includeEndDatePicker = () => {
+  return getIncludedElements(".endDatePicker *, #endDateTextfield *");
+};
+const resetMinutesSecondsMilliseconds = (date) => {
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+};
 const getMails = () => {
+  if (!startDate.value) return;
   let date = "";
-  if (startDate.value) {
-    date += `start=${new Date(startDate.value + "T00:00").getTime()}`;
+
+  if (startDateString.value?.length > 0) {
+    const tmpStartDate = new Date(Date.parse(startDate.value));
+    tmpStartDate.setHours(0);
+    resetMinutesSecondsMilliseconds(tmpStartDate);
+
+    if (startDate.value) {
+      date += `start=${tmpStartDate.getTime()}`;
+    }
   }
-  if (endDate.value) {
-    date = date != "" ? date + "&" : date;
-    date += `end=${new Date(endDate.value + "T24:00").getTime()}`;
+
+  if (endDateString.value?.length > 0) {
+    const tmpEndDate = new Date(Date.parse(endDate.value));
+    tmpEndDate.setHours(24);
+    resetMinutesSecondsMilliseconds(tmpEndDate);
+
+    if (endDate.value) {
+      date = date != "" ? date + "&" : date;
+      date += `end=${tmpEndDate.getTime()}`;
+    }
   }
+
   date = date === "" ? date : "&" + date;
 
   let payload =
@@ -198,42 +370,23 @@ watch(
   }
 );
 const currentYear = new Date().getFullYear();
-// Format date yyyy-mm-dd for the date picker
-const formatDateToDisplay = (date) => {
-  const year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  month = month < 10 ? "0" + month : month;
-  let day = date.getDate();
-  day = day < 10 ? "0" + day : day;
-  return year + "-" + month + "-" + day;
-};
+
 const setStartAndEndDate = () => {
   if (route.params.year !== "all") {
     switch (Number(route.params.year)) {
       case currentYear:
-        startDate.value = formatDateToDisplay(new Date(currentYear + "-01-01"));
-        endDate.value = formatDateToDisplay(new Date(currentYear + "-12-31"));
+        startDate.value = new Date(currentYear + "-01-01");
+        endDate.value = new Date(currentYear + "-12-31");
         break;
       case currentYear - 1:
-        startDate.value = formatDateToDisplay(
-          new Date(currentYear - 1 + "-01-01")
-        );
-        endDate.value = formatDateToDisplay(
-          new Date(currentYear - 1 + "-12-31")
-        );
+        startDate.value = new Date(currentYear - 1 + "-01-01");
+        endDate.value = new Date(currentYear - 1 + "-12-31");
         break;
       case currentYear - 2:
-        startDate.value = formatDateToDisplay(
-          new Date(currentYear - 2 + "-01-01")
-        );
-        endDate.value = formatDateToDisplay(
-          new Date(currentYear - 2 + "-12-31")
-        );
+        startDate.value = new Date(currentYear - 2 + "-01-01");
+        endDate.value = new Date(currentYear - 2 + "-12-31");
         break;
     }
-  } else {
-    startDate.value = undefined;
-    endDate.value = undefined;
   }
 };
 watch(
@@ -245,8 +398,6 @@ watch(
     }
   }
 );
-const startDate = ref("");
-const endDate = ref("");
 watch([() => endDate.value, () => startDate.value], () => {
   getMails();
 });

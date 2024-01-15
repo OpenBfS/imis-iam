@@ -11,8 +11,11 @@
       {{ $t("main.title") }}
     </UIHeader>
     <v-row class="mt-4">
-      <v-col cols="8">
+      <v-col cols="4">
         <NOTIFICATION />
+      </v-col>
+      <v-col cols="8">
+        <CALENDAR />
       </v-col>
     </v-row>
     <v-row justify="space-between" class="my-2">
@@ -30,5 +33,8 @@ const Applications = defineAsyncComponent(() =>
 );
 const NOTIFICATION = defineAsyncComponent(() =>
   import("../components/Notification.vue")
+);
+const CALENDAR = defineAsyncComponent(() =>
+  import("../components/Calendar/Calendar.vue")
 );
 </script>

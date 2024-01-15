@@ -26,24 +26,32 @@ export default {
     title: "Archiv",
     search: "Durchsuchen",
   },
+  // Calendar component
+  calendar: {
+    add_entry: "Eintrag hinzufügen",
+    component_title: "Anstehende Veranstaltungen",
+    create_title: "Neue Veranstaltung erstellen",
+    edit_title: "Veranstaltung {title} bearbeiten",
+    required_description: "Beschreibung ist erforderlich",
+    required_startDate: "Beginn ist erforderlich",
+    required_endDate: "Ende ist erforderlich",
+    required_site: "Ort ist erforderlich",
+    required_title: "Titel ist erforderlich",
+  },
   error: {
     // Keys which Keycloak can return after validations fail.
     // Source: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_de.properties
     username_invalid_character: "'{0}' enthält ungültige Zeichen.",
-    invalid_length_too_short:
-      "'{0}' muss mindestens eine Länge von {1} haben.",
+    invalid_length_too_short: "'{0}' muss mindestens eine Länge von {1} haben.",
     number_out_of_range_too_big: "'{0}' darf maximal den Wert {1} haben.",
-    number_out_of_range_too_small:
-      "'{0}' muss mindestens den Wert {1} haben.",
+    number_out_of_range_too_small: "'{0}' muss mindestens den Wert {1} haben.",
     user_attribute_required: "Bitte geben Sie '{0}' an.",
     empty: "Bitte geben Sie einen Wert für '{0}' an.",
     invalid_uri_fragment: "'{0}' ist ein ungültiges URL-Fragment.",
     invalid_blank: "Bitte geben Sie einen Wert für '{0}' an.",
-    number_out_of_range:
-      "'{0}' muss eine Zahl zwischen {1} und {2} sein.",
+    number_out_of_range: "'{0}' muss eine Zahl zwischen {1} und {2} sein.",
     invalid_email: "Ungültige E-Mail.",
-    invalid_length_too_long:
-      "'{0}' darf maximal eine Länge von {max} haben.",
+    invalid_length_too_long: "'{0}' darf maximal eine Länge von {max} haben.",
     invalid_value: "'{0}' hat einen ungültigen Wert.",
     invalid_number: "'{0}' ist eine ungültige Zahl.",
     invalid_uri_scheme: "'{0}' ist ein ungültiges URL-Schema.",
@@ -62,6 +70,10 @@ export default {
     required_phone: "Telefon ist erforderlich",
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
+    valid_date: "Datum muss gültig sein",
+  },
+  hints: {
+    date_format: "Format: dd.mm.jjjj",
   },
   // Institutions component
   institution: {
@@ -196,6 +208,9 @@ export default {
     csv_options: "Zusätzliche CSV-Optionen",
     encoding: "Encoding",
     quote_type: "Textbegrenzung",
+    title: "Titel",
+    site: "Ort",
+    description: "Beschreibung",
   },
   // MailingList
   mailinglist: {
@@ -225,6 +240,7 @@ export default {
     archive: "Archivieren",
     filter_by_type: "Filtern nach Typ",
     filter_by_sender: "Filtern nach Absender",
+    filter_by_period: "Filtern nach Zeitraum",
     filter_by_maillist: "Filtern nach E-Mail-Verteiler",
     maintenance: "Wartungsmeldungen",
     expiry_date: "Ablaufdatum",
