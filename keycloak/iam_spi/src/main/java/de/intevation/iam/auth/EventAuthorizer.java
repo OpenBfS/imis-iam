@@ -60,7 +60,7 @@ public class EventAuthorizer extends Authorizer<Event> {
         return data.stream()
             .map((event) -> {
                 event.setReadonly(
-                    isAuthorizedById(event, null, headers));
+                    !isAuthorizedById(event, null, headers));
                 return event;
             })
             .collect(Collectors.toList());
