@@ -26,6 +26,7 @@
               <v-col>
                 <v-text-field
                   density="compact"
+                  :ref="'username'"
                   :variant="
                     ['add', 'copy'].indexOf(processType) !== -1
                       ? 'underlined'
@@ -40,12 +41,8 @@
                       })
                     )
                   "
-                  @update:model-value="
-                    setUserAttribute('username', $event);
-                    clearValidationError(attribute.name);
-                  "
+                  @update:model-value="setUserAttribute('username', $event)"
                 ></v-text-field>
-                <p id="username-validation-error" class="validation-error"></p>
               </v-col>
             </v-row>
             <template
@@ -75,7 +72,7 @@
                         clearValidationError(attribute.name);
                       "
                       :type="getTextFieldType(attribute.name)"
-                      :rules="getRules(attribute.name)"
+                      :rules="rules[attribute.name]"
                     ></v-text-field>
                     <v-select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
@@ -96,12 +93,8 @@
                         setUserAttribute(attribute.name, $event);
                         clearValidationError(attribute.name);
                       "
-                      :rules="getRules(attribute.name)"
+                      :rules="rules[attribute.name]"
                     ></v-select>
-                    <p
-                      :id="`${attribute.name}-validation-error`"
-                      class="validation-error"
-                    ></p>
                   </v-col>
                 </template>
               </v-row>
@@ -128,7 +121,7 @@
                       clearValidationError(attribute.name);
                     "
                     :type="getTextFieldType(attribute.name)"
-                    :rules="getRules(attribute.name)"
+                    :rules="rules[attribute.name]"
                   ></v-text-field>
                   <v-select
                     v-else-if="
@@ -153,7 +146,7 @@
                       setUserAttribute(attribute.name, $event);
                       clearValidationError(attribute.name);
                     "
-                    :rules="getRules(attribute.name)"
+                    :rules="rules[attribute.name]"
                   ></v-select>
                   <p
                     :id="`${attribute.name}-validation-error`"
@@ -284,13 +277,9 @@ form > div {
 .two_group_class > div:nth-child(2) {
   padding: 0 10px;
 }
-.validation-error {
-  color: #b00020;
-  font-size: 11pt;
-}
 </style>
 <script setup>
-import { computed, onMounted, nextTick } from "vue";
+import { computed, onMounted, nextTick, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
@@ -309,6 +298,9 @@ const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
+
+const rules = ref({});
+const serverValidationRules = {};
 
 function setUserAttribute(name, value) {
   const attrs = user.value.attributes;
@@ -366,9 +358,8 @@ const handleDisplayName = (displayName) => {
   }
   return displayName;
 };
-const getRules = (nameOfAttribute) => {
-  const attribute = getMetaDataAttribute(nameOfAttribute);
-  const rules = [];
+const getRules = (attribute) => {
+  const tmpRules = [];
   // Rules for text field components
   if (!attribute.validations?.options) {
     if (
@@ -379,7 +370,7 @@ const getRules = (nameOfAttribute) => {
       attribute.name === "email" ||
       attribute.required?.roles?.includes("user")
     ) {
-      rules.push(
+      tmpRules.push(
         ...reqField(
           t("error.user_attribute_required", [
             handleDisplayName(attribute.displayName),
@@ -390,7 +381,7 @@ const getRules = (nameOfAttribute) => {
       if (attribute.validations?.pattern) {
         const pattern = attribute.validations.pattern.pattern;
         const errorMessage = attribute.validations.pattern["error-message"];
-        rules.push(...validRegex(pattern, t(errorMessage)));
+        tmpRules.push(...validRegex(pattern, t(errorMessage)));
       }
 
       if (attribute.validations?.length) {
@@ -414,17 +405,29 @@ const getRules = (nameOfAttribute) => {
             length.max,
           ]);
         }
-        rules.push(...validLength(length.min, length.max, message));
+        tmpRules.push(...validLength(length.min, length.max, message));
       }
     }
   }
   // Rules for select components
   else {
-    rules.push(
+    tmpRules.push(
       ...reqField(t("error.user_attribute_required", [attribute.name]))
     );
   }
-  return rules;
+  if (serverValidationRules[attribute.name]) {
+    tmpRules.push(serverValidationRules[attribute.name]);
+  }
+  return tmpRules;
+};
+const updateRule = (nameOfAttribute) => {
+  const attribute = getMetaDataAttribute(nameOfAttribute);
+  rules.value[nameOfAttribute] = attribute ? getRules(attribute) : [];
+};
+const updateRules = () => {
+  profileStore.attributes.forEach((attribute) => {
+    rules.value[attribute.name] = getRules(attribute);
+  });
 };
 const getUserMemberships = () => {
   userStore.loadMemberships().catch(() => {
@@ -442,6 +445,7 @@ const getInstitutions = () => {
 onMounted(() => {
   getUserMemberships();
   getInstitutions();
+  updateRules();
 });
 const user = computed(() => {
   return applicationStore.managedItem;
@@ -531,13 +535,17 @@ const handleValidationErrorFromServer = (error) => {
       stringToTranslate,
       errorObject.messageParameters
     );
-    document.getElementById(`${attributeName}-validation-error`).textContent =
-      translatedString;
+    serverValidationRules[attributeName] = () => {
+      return translatedString;
+    };
+    form.value.validate();
+    updateRules();
   }
 };
 
 const clearValidationError = (attributeName) => {
-  document.getElementById(`${attributeName}-validation-error`).textContent = "";
+  delete serverValidationRules[attributeName];
+  updateRule(attributeName);
 };
 const createAndPrepare = () => {
   resetNotification();
