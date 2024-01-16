@@ -16,8 +16,17 @@ HTTP.interceptors.response.use(
   (error) => {
     const applicationStore = useApplicationStore();
     if (error.response) {
-      if (!error.response.data) {
+      // If the error has status 400 and contains at least one message it is probably
+      // a validation error from keycloak which is handled in ManageUser.vue. In that
+      // case we don't want to set the httpErrorMessage because we show the error right
+      // below the text field in the form.
+      if (
+        error.response.data &&
+        !(error.response.status === 400 && error.response.data[0]?.message)
+      ) {
         applicationStore.setHttpErrorMessage(error.response.data);
+      } else {
+        applicationStore.setHttpErrorMessage(error.response.statusText);
       }
       // Handle other type of errors.
     } else if (error.request) {
