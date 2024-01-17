@@ -26,8 +26,6 @@ import org.keycloak.models.jpa.entities.GroupEntity;
 import org.keycloak.models.jpa.entities.RoleEntity;
 import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 import org.keycloak.models.jpa.entities.UserRoleMappingEntity;
-import org.keycloak.userprofile.UserProfileProvider;
-import org.keycloak.representations.userprofile.config.UPConfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -52,8 +50,6 @@ public class User {
     private List<String> roles;
     private Boolean readonly;
 
-    private UPConfig userProfileMetadata;
-
     private static final String ID_PARAM = "id";
     private static final String USER_PARAM = "user";
 
@@ -74,9 +70,6 @@ public class User {
         // Contains custom attributes defined via User Profile config,
         // but only if actually a value is set.
         this.attributes = userModel.getAttributes();
-
-        this.userProfileMetadata = session.getProvider(UserProfileProvider.class)
-            .getConfiguration();
 
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -189,13 +182,6 @@ public class User {
     }
     public void setRoles(List<String> roles) {
         this.roles = roles;
-    }
-
-    public UPConfig getUserProfileMetadata() {
-        return userProfileMetadata;
-    }
-    public void setUserProfileMetadata(UPConfig userProfileMetadata) {
-        this.userProfileMetadata = userProfileMetadata;
     }
 
     /**

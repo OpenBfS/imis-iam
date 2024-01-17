@@ -9,25 +9,5 @@ const expUser = {
   groups: [],
   institutions: [],
   roles: [],
-  // TODO: fetch from server
-  userProfileMetadata: {
-    attributes: [
-      {
-        name: "position",
-        validations: {
-          options: {
-            options: [
-              "Leiter",
-              "Vertreter",
-              "Radiologischer Ansprechpartner",
-              "Mitarbeiter",
-              "IT-Ansprechperson",
-              "Störplatz",
-            ],
-          },
-        },
-      },
-    ],
-  },
 };
 export { expUser };

@@ -33,30 +33,30 @@ const user = {
     username: ["one"],
     firstName: [firstName],
   },
-  userProfileMetadata: {
-    attributes: [
-      {
-        name: "position",
-        displayName: "position",
-        validations: {
-          options: {
-            options: [],
-          },
+};
+const userProfileMetadata = {
+  attributes: [
+    {
+      name: "position",
+      displayName: "position",
+      validations: {
+        options: {
+          options: [],
         },
       },
-      {
-        name: "firstName",
-        displayName: "firstname"
-      },
-      {
-        name: "lastName",
-        displayName: "lastname"
-      },
-    ],
-  },
+    },
+    {
+      name: "firstName",
+      displayName: "firstname",
+    },
+    {
+      name: "lastName",
+      displayName: "lastname",
+    },
+  ],
 };
 applicationStore.managedItem = user;
-profileStore.setUserProfileMetadata(user.userProfileMetadata);
+profileStore.setUserProfileMetadata(userProfileMetadata);
 
 const wrapper = mount(ManageUser, {
   global: global,
