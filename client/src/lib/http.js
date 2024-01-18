@@ -11,24 +11,28 @@ const HTTP = axios.create({
   baseURL: "/backend/realms/imis3",
 });
 
+function handleError(error) {
+  if (error.response) {
+    if (error.response.data) {
+      store.commit("application/setHttpErrorMessage", error.response.data);
+    } else {
+      store.commit(
+        "application/setHttpErrorMessage",
+        error.response.statusText
+      );
+    }
+    // Handle other type of errors.
+  } else if (error.request) {
+    store.commit("application/setHttpErrorMessage", error.request);
+  } else {
+    store.commit("application/setHttpErrorMessage", "Error" + error.message);
+  }
+}
+
 HTTP.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response) {
-      if (error.response.data) {
-        store.commit("application/setHttpErrorMessage", error.response.data);
-      } else {
-        store.commit(
-          "application/setHttpErrorMessage",
-          error.response.statusText
-        );
-      }
-      // Handle other type of errors.
-    } else if (error.request) {
-      store.commit("application/setHttpErrorMessage", error.request);
-    } else {
-      store.commit("application/setHttpErrorMessage", "Error" + error.message);
-    }
+    handleError(error);
     return Promise.reject(error);
   }
 );
@@ -38,4 +42,4 @@ const PhotonHTTP = axios.create({
   baseURL: "/photon",
 });
 
-export { HTTP, PhotonHTTP };
+export { handleError, HTTP, PhotonHTTP };
