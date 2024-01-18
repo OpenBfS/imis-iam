@@ -11,29 +11,33 @@ const HTTP = axios.create({
   baseURL: "/backend/realms/imis3",
 });
 
+function handleError(error) {
+  const applicationStore = useApplicationStore();
+  // If the error has status 400 and contains at least one message it is probably
+  // a validation error from keycloak which is handled in ManageUser.vue. In that
+  // case we don't want to set the httpErrorMessage because we show the error right
+  // below the text field in the form.
+  if (error.response?.status === 400 && error.response.data?.[0]?.message) {
+    return;
+  }
+  if (error.response) {
+    if (error.response.data) {
+      applicationStore.setHttpErrorMessage(JSON.stringify(error.response.data));
+    } else {
+      applicationStore.setHttpErrorMessage(error.response.statusText);
+    }
+    // Handle other type of errors.
+  } else if (error.request) {
+    applicationStore.setHttpErrorMessage(error.request);
+  } else {
+    applicationStore.setHttpErrorMessage("Error" + error.message);
+  }
+}
+
 HTTP.interceptors.response.use(
   (response) => response,
   (error) => {
-    const applicationStore = useApplicationStore();
-    if (error.response) {
-      // If the error has status 400 and contains at least one message it is probably
-      // a validation error from keycloak which is handled in ManageUser.vue. In that
-      // case we don't want to set the httpErrorMessage because we show the error right
-      // below the text field in the form.
-      if (
-        error.response.data &&
-        !(error.response.status === 400 && error.response.data[0]?.message)
-      ) {
-        applicationStore.setHttpErrorMessage(error.response.data);
-      } else {
-        applicationStore.setHttpErrorMessage(error.response.statusText);
-      }
-      // Handle other type of errors.
-    } else if (error.request) {
-      applicationStore.setHttpErrorMessage(error.request);
-    } else {
-      applicationStore.setHttpErrorMessage("Error" + error.message);
-    }
+    handleError(error);
     return Promise.reject(error);
   }
 );
@@ -43,4 +47,4 @@ const PhotonHTTP = axios.create({
   baseURL: "/photon",
 });
 
-export { HTTP, PhotonHTTP };
+export { handleError, HTTP, PhotonHTTP };

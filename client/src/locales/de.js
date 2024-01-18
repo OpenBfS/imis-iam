@@ -106,7 +106,7 @@ export default {
     postal_code: "PLZ",
     categories: "Kategorien",
     central_fax: "Zentrales Fax",
-    address_street: "Postanschrift: Straße",
+    address_street: "Postanschrift: Straße/Hausnummer",
     address_postalcode: "Postanschrift: PLZ",
     address_location: "Postanschrift: Ort",
     imis_Id: "Messstellen-ID",

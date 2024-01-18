@@ -494,8 +494,13 @@ const createUser = (shouldClose) => {
       }
     })
     .catch((error) => {
-      if (error.response.status === 400 && error.response.data[0]?.message) {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.[0]?.message
+      ) {
         handleValidationErrorFromServer(error.response.data);
+      } else {
+        hasRequestError.value = true;
       }
     });
 };
@@ -513,8 +518,13 @@ const updateUser = () => {
       applicationStore.setShowManageUserDialog(false);
     })
     .catch((error) => {
-      if (error.response.status === 400 && error.response.data[0]?.message) {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.[0]?.message
+      ) {
         handleValidationErrorFromServer(error.response.data);
+      } else {
+        hasRequestError.value = true;
       }
       console.error(error);
     });
