@@ -42,7 +42,7 @@ public class EventAuthorizer extends Authorizer<Event> {
         if (requestingUser == null) {
             return false;
         }
-        return Role.TECHADMIN.isRoleOf(requestingUser, session);
+        return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
     }
 
     /**

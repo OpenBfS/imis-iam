@@ -174,7 +174,7 @@
                 :label="$t('institution.imis_Id')"
                 :disabled="
                   !$store.state.profile.userData.roles.some(
-                    (e) => e === 'chief_editor' || e === 'techadmin'
+                    (e) => e === 'chief_editor'
                   )
                 "
                 :rules="[

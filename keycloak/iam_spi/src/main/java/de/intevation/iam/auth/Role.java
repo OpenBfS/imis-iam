@@ -17,8 +17,7 @@ import de.intevation.iam.util.Constants;
 public enum Role {
     USER,
     EDITOR,
-    CHIEF_EDITOR,
-    TECHADMIN;
+    CHIEF_EDITOR;
 
     @Override
     public String toString() {
