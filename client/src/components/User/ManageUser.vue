@@ -240,7 +240,7 @@
       <v-btn
         v-if="processType === 'edit' && !isReadOnly"
         color="accent"
-        @click="applicationStore.setManagedItem(cloneObject(originalUser))"
+        @click="handleReset"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -560,6 +560,14 @@ const clearValidationError = (attributeName) => {
 const createAndPrepare = () => {
   resetNotification();
   createUser(false);
+};
+const handleReset = () => {
+  applicationStore.setManagedItem(cloneObject(applicationStore.savedItem));
+  const keys = Object.keys(serverValidationRules);
+  keys.forEach((key) => {
+    delete serverValidationRules[key];
+  });
+  updateRules();
 };
 onMounted(() => {
   // This is necessary as the form value is not change to true with valid inputs
