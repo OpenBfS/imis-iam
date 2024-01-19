@@ -300,6 +300,11 @@ const profileStore = useProfileStore();
 const userStore = useUserStore();
 
 const rules = ref({});
+
+// Object that contains maximal one rule per user attribute.
+// These rules always return a message so they always lead to an
+// error message for the attribute. That's why they are only added then
+// the keycloak server returns a validation error.
 const serverValidationRules = {};
 
 function setUserAttribute(name, value) {
@@ -342,6 +347,8 @@ const isSelection = (inputType) => {
     return false;
   }
 };
+
+// Convert the input type that Keycloak uses to a type that can be used by Vuetify.
 const getTextFieldType = (nameOfAttribute) => {
   const attribute = getMetaDataAttribute(nameOfAttribute);
   if (attribute.annotations?.inputType === "html5-email") {
@@ -358,6 +365,8 @@ const handleDisplayName = (displayName) => {
   }
   return displayName;
 };
+
+// Creating rules for the validation of form components.
 const getRules = (attribute) => {
   const tmpRules = [];
   // Rules for text field components
@@ -545,6 +554,8 @@ const handleValidationErrorFromServer = (error) => {
       stringToTranslate,
       errorObject.messageParameters
     );
+
+    // Create rules that can be used by the validation mechanism of Vuetify.
     serverValidationRules[attributeName] = () => {
       return translatedString;
     };
