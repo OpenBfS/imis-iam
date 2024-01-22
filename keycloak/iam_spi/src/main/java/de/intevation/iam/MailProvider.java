@@ -8,7 +8,6 @@ package de.intevation.iam;
 
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -486,13 +485,13 @@ public class MailProvider implements RealmResourceProvider {
 
         //Filter mails by start and end date
         if (start != null) {
-            Timestamp startTimestamp = Timestamp.valueOf(start.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
+            Timestamp startTimestamp = Timestamp.from(start.toInstant());
             Predicate dateFilter = cb.greaterThanOrEqualTo(
                 root.<Timestamp>get("sendDate"), startTimestamp);
             filter = cb.and(filter, dateFilter);
         }
         if (end != null) {
-            Timestamp endTimestamp = Timestamp.valueOf(end.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
+            Timestamp endTimestamp = Timestamp.from(end.toInstant());
             Predicate dateFilter = cb.lessThanOrEqualTo(
                 root.<Timestamp>get("sendDate"), endTimestamp);
             filter = cb.and(filter, dateFilter);
