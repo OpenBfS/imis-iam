@@ -33,14 +33,21 @@
                 :rules="reqField($t('user.required_username'))"
                 :readonly="processType === 'edit'"
               ></v-text-field>
+              <v-checkbox
+                :label="$t('user.enabled')"
+                v-model="user.enabled"
+                :disabled="
+                  !$store.state.profile.userData.roles.includes('chief_editor')
+                "
+              ></v-checkbox>
+            </div>
+            <div class="three_group_class">
               <v-text-field
                 density="compact"
                 variant="underlined"
                 :label="$t('user.title')"
                 v-model="user.title"
               ></v-text-field>
-            </div>
-            <div class="two_group_class">
               <v-text-field
                 density="compact"
                 variant="underlined"

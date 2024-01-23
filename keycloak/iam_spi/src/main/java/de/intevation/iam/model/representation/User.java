@@ -42,6 +42,7 @@ public class User {
     private String lastName;
     private String email;
     private String username;
+    private Boolean enabled;
     //IAM specific attributes
     private String title;
     private String phone;
@@ -77,6 +78,7 @@ public class User {
         this.lastName = userModel.getLastName();
         this.username = userModel.getUsername();
         this.email = userModel.getEmail();
+        this.enabled = userModel.isEnabled();
 
         UserAttributes jpaModel = em.find(
             UserAttributes.class, userModel.getId());
@@ -157,6 +159,12 @@ public class User {
     }
     public void setReadonly(Boolean readonly) {
         this.readonly = readonly;
+    }
+    public Boolean isEnabled() {
+        return enabled;
+    }
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
     public String getId() {
         return id;

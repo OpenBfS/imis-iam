@@ -95,6 +95,7 @@ const onCopyClicked = (id) => {
   savedUser.value = cloneObject(user.value);
   user.value.email = "";
   user.value.username = "";
+  user.value.enabled = false;
   delete user.value["id"];
   store.commit("application/setManagedItem", user.value);
   store.commit("application/setSavedItem", savedUser.value);
