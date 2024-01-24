@@ -17,16 +17,21 @@ export function useForm() {
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
   // Validation rules
   const reqValidmail = (reqMsg, validMsg) => {
-    return [(v) => !!v || reqMsg, (v) => regExprEmail.test(v) || validMsg];
+    return [
+      (v) => !!v || reqMsg,
+      (v) => doesRegexMatchWholeString(regExprEmail, v) || validMsg,
+    ];
   };
   const validMail = (validMsg) => {
-    return [(v) => regExprEmail.test(v) || v == "" || validMsg];
+    return [
+      (v) => doesRegexMatchWholeString(regExprEmail, v) || v == "" || validMsg,
+    ];
   };
   const reqValidPhone = (reqMsg, validMsg) => {
     return [(v) => !!v || reqMsg, (v) => regExprPhone.test(v) || validMsg];
   };
   const validPhone = (validMsg) => {
-    (v) => regExprPhone.test(v) || validMsg;
+    (v) => doesRegexMatchWholeString(regExprPhone, v) || validMsg;
   };
   const validPostalcode = (validMsg) => {
     return [(v) => /^\d{5}$/.test(v) || v == "" || validMsg];
