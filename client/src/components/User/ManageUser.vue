@@ -387,16 +387,6 @@ const createAndPrepare = () => {
   resetNotification();
   createUser(false);
 };
-onMounted(() => {
-  // This is necessary as the form value is not change to true with valid inputs
-  // for the first load by filling the fields (copy, edit).
-  // TODO: Check if this gets fixed by upstream with the next release.
-  if (["edit", "copy"].indexOf(processType.value) !== -1) {
-    setTimeout(() => {
-      form.value.validate();
-    }, 100);
-  }
-});
 // Form
 const {
   form,

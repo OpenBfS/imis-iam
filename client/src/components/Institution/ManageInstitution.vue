@@ -310,13 +310,6 @@ const getCategories = () => {
 };
 onMounted(() => {
   getCategories();
-  // This is necessary as the form value is not change to true with valid inputs.
-  // TODO: Check if this is fixed by upstream with the next release.
-  if (processType.value === "edit") {
-    setTimeout(() => {
-      form.value.validate();
-    }, 100);
-  }
 });
 const getInstitutions = () => {
   store
