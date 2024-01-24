@@ -286,7 +286,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onMounted, nextTick, ref } from "vue";
+import { computed, onBeforeMount, onMounted, nextTick, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
@@ -458,10 +458,12 @@ const getInstitutions = () => {
       hasLoadingError.value = true;
     });
 };
+onBeforeMount(() => {
+  updateRules();
+});
 onMounted(() => {
   getUserMemberships();
   getInstitutions();
-  updateRules();
 });
 const user = computed(() => {
   return applicationStore.managedItem;
