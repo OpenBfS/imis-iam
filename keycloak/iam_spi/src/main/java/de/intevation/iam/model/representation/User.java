@@ -49,6 +49,7 @@ public class User {
     private List<Integer> institutions;
     private List<String> roles;
     private Boolean readonly;
+    private Boolean enabled;
 
     private static final String ID_PARAM = "id";
     private static final String USER_PARAM = "user";
@@ -66,6 +67,7 @@ public class User {
      */
     public User(UserModel userModel, KeycloakSession session) {
         this.id = userModel.getId();
+        this.enabled = userModel.isEnabled();
 
         // Contains custom attributes defined via User Profile config,
         // but only if actually a value is set.
@@ -142,6 +144,13 @@ public class User {
     }
     public void setReadonly(Boolean readonly) {
         this.readonly = readonly;
+    }
+
+    public Boolean isEnabled() {
+        return enabled;
+    }
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getId() {

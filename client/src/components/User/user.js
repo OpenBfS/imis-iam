@@ -9,5 +9,6 @@ const expUser = {
   groups: [],
   institutions: [],
   roles: [],
+  enabled: false,
 };
 export { expUser };

@@ -9,7 +9,6 @@ export default {
   role_iam_user: "Nutzer",
   role_iam_editor: "Redakteur",
   role_iam_chief_editor: "Chefredakteur",
-  role_iam_techadmin: "Technischer Administrator",
   // Appbar component
   appbar: {
     title: "IAM123",
@@ -146,6 +145,7 @@ export default {
     lastname: "Nachname",
     name: "Name",
     username: "Benutzername",
+    enabled: "Aktiviert",
     position: "Position",
     misc: "Weiteres",
     label_memberships: "Mitgliedschaften",

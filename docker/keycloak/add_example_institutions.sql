@@ -5,5 +5,4 @@ INSERT INTO keycloak.iam_institution(name, short_name, category_name, service_bu
 INSERT INTO keycloak.iam_institution_user(user_id, institution_id) VALUES
 ((SELECT id FROM keycloak.user_entity WHERE username = 'exampleuser'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')),
 ((SELECT id FROM keycloak.user_entity WHERE username = 'redakteur'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')),
-((SELECT id FROM keycloak.user_entity WHERE username = 'chefredakteur'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')),
-((SELECT id FROM keycloak.user_entity WHERE username = 'techadmin'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1'));
+((SELECT id FROM keycloak.user_entity WHERE username = 'chefredakteur'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1'));

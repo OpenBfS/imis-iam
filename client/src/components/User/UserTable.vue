@@ -105,8 +105,9 @@ const user = ref(cloneObject(expUser));
 const onCopyClicked = (id) => {
   user.value = cloneObject(getUserById(id));
   savedUser.value = cloneObject(user.value);
-  user.value.email = "";
-  user.value.username = "";
+  user.value.attributes.username = "";
+  user.value.attributes.email = "";
+  user.value.enabled = false;
   delete user.value["id"];
   applicationStore.setManagedItem(user.value);
   applicationStore.setSavedItem(savedUser.value);

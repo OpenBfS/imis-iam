@@ -22,8 +22,8 @@
       <v-row justify="center">
         <v-col jsutify="start" cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
-            <v-row v-if="processType !== 'edit'">
-              <v-col>
+            <v-row>
+              <v-col v-if="processType !== 'edit'">
                 <v-text-field
                   density="compact"
                   :ref="'username'"
@@ -36,13 +36,20 @@
                   :model-value="user.attributes.username"
                   :rules="
                     reqField(
-                      $t('error.user_attribute_required', {
-                        attr: t('user.username'),
-                      })
+                      $t('error.user_attribute_required', [t('user.username')])
                     )
                   "
                   @update:model-value="setUserAttribute('username', $event)"
                 ></v-text-field>
+              </v-col>
+              <v-col>
+                <v-checkbox
+                  :label="$t('user.enabled')"
+                  v-model="user.enabled"
+                  :disabled="
+                    !profileStore.userData.roles.includes('chief_editor')
+                  "
+                ></v-checkbox>
               </v-col>
             </v-row>
             <template
@@ -580,16 +587,6 @@ const handleReset = () => {
   });
   updateRules();
 };
-onMounted(() => {
-  // This is necessary as the form value is not change to true with valid inputs
-  // for the first load by filling the fields (copy, edit).
-  // TODO: Check if this gets fixed by upstream with the next release.
-  if (["edit", "copy"].indexOf(processType.value) !== -1) {
-    setTimeout(() => {
-      form.value.validate();
-    }, 100);
-  }
-});
 // Form
 const { form, valid, reqField, reqMultipleSelect, validRegex, validLength } =
   useForm();
@@ -601,8 +598,9 @@ const hasNoChanges = computed(() => {
     (processType.value === "edit" &&
       JSON.stringify(originalUser.value) === JSON.stringify(user.value)) ||
     (processType.value === "copy" &&
-      (user.value.username === originalUser.value.username ||
-        user.value.email === originalUser.value.email))
+      user.value.attributes.username ===
+        originalUser.value.attributes.username) ||
+    user.value.attributes.email === originalUser.value.attributes.email
   );
 });
 const isReadOnly = computed(() => {

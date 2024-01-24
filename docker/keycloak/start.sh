@@ -89,7 +89,7 @@ do
 done
 
 echo "Creating client roles"
-for name in "techadmin" "chief_editor" "editor" "user"
+for name in "chief_editor" "editor" "user"
 do
     # Create roles with name and key for localization
     role_id=$(${KEYCLOAK_HOME}/bin/kcadm.sh create \
@@ -152,18 +152,6 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId
         -H "Authorization: Bearer $TKN" \
         -d "$chiefEditorRole"
 curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId/groups/$defaultGroupId" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN"
-
-#Assign techadmin role
-adminRole=$(echo $roles | jq 'map(select(.name=="techadmin"))')
-adminUserId=$(echo $users | jq 'map(select(.username=="techadmin")) | .[0]' | jq .id | tr -d '"')
-
-curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$adminUserId/role-mappings/clients/$IMIS_CLIENT_ID" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN" \
-        -d "$adminRole"
-curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$adminUserId/groups/$defaultGroupId" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN"
 

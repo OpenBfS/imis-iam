@@ -39,7 +39,7 @@ in keycloak/.env.
 Additionally, other users are created within Keycloak which can be used to access
 the client application with the roles according to the usernames:
 
-* Usernames: exampleuser, redakteur, chefredakteur, techadmin
+* Usernames: exampleuser, redakteur, chefredakteur
 * Password: secret
 
 Further, the users provided by the LDAP container can be used to login.
