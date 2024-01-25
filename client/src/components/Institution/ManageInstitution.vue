@@ -5,7 +5,7 @@
  This file is Free Software under the GNU GPL (v>=3)
  and comes with ABSOLUTELY NO WARRANTY!
  -->
- <template>
+<template>
   <v-card width="80vw" v-if="['add', 'edit'].indexOf(processType) !== -1">
     <v-card-title v-if="processType === 'add'">
       <span class="text-h5">{{ $t("institution.create_title") }}</span>
