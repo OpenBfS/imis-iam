@@ -77,30 +77,6 @@
                 "
               ></v-text-field>
             </div>
-
-            <div class="group_class">
-              <!-- TODO: Add this rules once the validation for
-                    optional fields gets implemented by upstream.
-                    :rules="validPostalcode($t('error.valid_postalcode'))" -->
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.address_location')"
-                v-model="institution.addressLocation"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.address_postalcode')"
-                v-model="institution.addressPostalCode"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.address_street')"
-                v-model="institution.addressStreet"
-              ></v-text-field>
-            </div>
             <div class="group_class">
               <v-select
                 :no-data-text="$t('label.no_data_text')"
@@ -130,6 +106,30 @@
                 density="compact"
                 :label="$t('institution.y_coordinate')"
                 v-model="institution.yCoordinate"
+              ></v-text-field>
+            </div>
+
+            <div class="group_class">
+              <!-- TODO: Add this rules once the validation for
+                    optional fields gets implemented by upstream.
+                    :rules="validPostalcode($t('error.valid_postalcode'))" -->
+              <v-text-field
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.address_location')"
+                v-model="institution.addressLocation"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.address_postalcode')"
+                v-model="institution.addressPostalCode"
+              ></v-text-field>
+              <v-text-field
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.address_street')"
+                v-model="institution.addressStreet"
               ></v-text-field>
             </div>
             <div class="group_class">
@@ -397,9 +397,9 @@ watch(
 );
 watch(
   [
-    () => institution.value.addressLocation,
-    () => institution.value.addressPostalCode,
-    () => institution.value.addressStreet,
+    () => institution.value.serviceBuildingLocation,
+    () => institution.value.serviceBuildingPostalCode,
+    () => institution.value.serviceBuildingStreet,
   ],
   ([newLoc, newPc, newStreet]) => {
     triggerLoadCoordinates([newLoc, newPc, newStreet].join(" "));
