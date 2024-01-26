@@ -36,10 +36,6 @@ services:
       - db
       - ldap
       - mailhog
-    volumes:
-      - ./keycloak:/opt/src
-      - ../keycloak/iam_theme:/opt/keycloak/themes/iam_theme
-      - ../keycloak/iam_spi:/opt/iam_spi
     ports:
       - ${KC_HOSTNAME_PORT}:8080
     environment:
@@ -58,9 +54,6 @@ services:
       - imis3
     depends_on:
       - keycloak
-    volumes:
-      - ./client:/usr/local/iamdocker
-      - ../client:/usr/local/iamclient
     ports:
       - ${SP_PORT}:80
     environment:
