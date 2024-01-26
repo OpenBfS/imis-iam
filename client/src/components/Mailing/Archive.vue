@@ -293,7 +293,7 @@ const getMails = () => {
     resetMinutesSecondsMilliseconds(tmpStartDate);
 
     if (startDate.value) {
-      date += `start=${tmpStartDate.getTime()}`;
+      date += `start=${tmpStartDate.toISOString()}`;
     }
   }
 
@@ -304,7 +304,7 @@ const getMails = () => {
 
     if (endDate.value) {
       date = date != "" ? date + "&" : date;
-      date += `end=${tmpEndDate.getTime()}`;
+      date += `end=${tmpEndDate.toISOString()}`;
     }
   }
 
