@@ -33,14 +33,21 @@
                 :rules="reqField($t('user.required_username'))"
                 :readonly="processType === 'edit'"
               ></v-text-field>
+              <v-checkbox
+                :label="$t('user.enabled')"
+                v-model="user.enabled"
+                :disabled="
+                  !$store.state.profile.userData.roles.includes('chief_editor')
+                "
+              ></v-checkbox>
+            </div>
+            <div class="three_group_class">
               <v-text-field
                 density="compact"
                 variant="underlined"
                 :label="$t('user.title')"
                 v-model="user.title"
               ></v-text-field>
-            </div>
-            <div class="two_group_class">
               <v-text-field
                 density="compact"
                 variant="underlined"
@@ -380,16 +387,6 @@ const createAndPrepare = () => {
   resetNotification();
   createUser(false);
 };
-onMounted(() => {
-  // This is necessary as the form value is not change to true with valid inputs
-  // for the first load by filling the fields (copy, edit).
-  // TODO: Check if this gets fixed by upstream with the next release.
-  if (["edit", "copy"].indexOf(processType.value) !== -1) {
-    setTimeout(() => {
-      form.value.validate();
-    }, 100);
-  }
-});
 // Form
 const {
   form,

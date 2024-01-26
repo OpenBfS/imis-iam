@@ -19,5 +19,6 @@ const expUser = {
   bfsLocation: "",
   position: null,
   roles: [],
+  enabled: false,
 };
 export { expUser };

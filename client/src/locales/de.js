@@ -107,6 +107,7 @@ export default {
     lastname: "Nachname",
     name: "Name",
     username: "Benutzername",
+    enabled: "Aktiviert",
     required_telephone: "Telefon ist erforderlich",
     label_memberships: "Mitgliedschaften",
     label_positions: "Positionen",

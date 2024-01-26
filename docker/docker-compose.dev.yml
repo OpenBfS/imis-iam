@@ -1,0 +1,11 @@
+version: "3.5"
+services:
+  keycloak:
+    volumes:
+      - ./keycloak:/opt/src
+      - ../keycloak/iam_theme:/opt/keycloak/themes/iam_theme
+      - ../keycloak/iam_spi:/opt/iam_spi
+  client:
+    volumes:
+      - ./client:/usr/local/iamdocker
+      - ../client:/usr/local/iamclient

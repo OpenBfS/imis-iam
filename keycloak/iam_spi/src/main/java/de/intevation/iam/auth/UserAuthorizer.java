@@ -49,7 +49,9 @@ public class UserAuthorizer extends Authorizer<User> {
             case GET: return Role.USER.isRoleOf(requestingUser, session);
             case PUT: return authorizeUpdate(
                 data, session, requestingUser, client);
-            case POST: return Role.EDITOR.isRoleOf(requestingUser, session);
+            case POST:
+                return !data.isEnabled() && Role.EDITOR.isRoleOf(requestingUser, session)
+                    || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
     }
@@ -78,10 +80,14 @@ public class UserAuthorizer extends Authorizer<User> {
         ClientModel client
     ) {
         RealmModel realm = session.getContext().getRealm();
-        //If roles shall be changed:
-        //Check if user is chief editor or admin
         UserModel oldUserModel
             = session.users().getUserById(realm, user.getId());
+        if (user.isEnabled() != oldUserModel.isEnabled()
+            && !Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            return false;
+        }
+        //If roles shall be changed:
+        //Check if user is chief editor
         List<String> oldRoles = new ArrayList<String>();
         oldUserModel.getClientRoleMappingsStream(client)
                 .forEach(role -> oldRoles.add(role.getName()));

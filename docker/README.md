@@ -15,6 +15,11 @@ change the respective environment variables, e.g. using:
 KC_HOSTNAME=docker-host docker compose up -d
 ```
 
+To mount local repository checkouts into the containers for development use
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+```
 
 ## Keycloak
 

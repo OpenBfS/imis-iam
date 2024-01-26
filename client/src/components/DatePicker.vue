@@ -33,7 +33,7 @@
       }"
       :model-value="date"
       v-show="isDatePickerOpen"
-      :className="`date-picker-${id}`"
+      :id="`date-picker-${id}`"
       color="accent"
       elevation="6"
       position="absolute"
@@ -79,7 +79,7 @@ const dateString = ref("");
 const isDatePickerOpen = ref(false);
 
 onMounted(() => {
-  id.value = crypto.randomUUID();
+  id.value = Math.floor(Math.random() * 1000000).toString();
   if (props.date) {
     dateString.value = d(new Date(props.date));
     date.value = new Date(props.date);
@@ -113,7 +113,7 @@ const dateCloseConditional = () => {
 };
 const includedElements = () => {
   const elements = document.querySelectorAll(
-    `#date-textfield-${id.value} *, .date-picker-${id.value} *`
+    `#date-textfield-${id.value} *, #date-picker-${id.value} *`
   );
   const includedElements = [];
   for (let i = 0; i < elements.length; i++) {
