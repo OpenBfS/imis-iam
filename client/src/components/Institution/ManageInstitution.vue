@@ -185,6 +185,26 @@
                 ]"
                 v-model="institution.imisId"
               ></v-text-field>
+              <v-text-field
+                v-model="institution.imisUserGroupId"
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.imis_usergroup_Id')"
+                :disabled="
+                  !$store.state.profile.userData.roles.some(
+                    (e) => e === 'chief_editor'
+                  )
+                "
+                :rules="[
+                  (v) =>
+                    !v ||
+                    (v && v.length === 3) ||
+                    $t(
+                      'institution.imis_usergroup_Id_length_validation_message'
+                    ),
+                ]"
+              >
+              </v-text-field>
             </div>
             <div class="group_class align-center">
               <v-select
