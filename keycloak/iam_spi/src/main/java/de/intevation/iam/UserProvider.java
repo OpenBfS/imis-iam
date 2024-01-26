@@ -8,7 +8,11 @@ package de.intevation.iam;
 
 import static org.keycloak.userprofile.UserProfileContext.USER_API;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -118,10 +122,10 @@ public class UserProvider implements RealmResourceProvider {
         if (search != null && !search.isEmpty()) {
             attributes.put(UserModel.SEARCH, search);
         }
-        Stream<UserModel> userModels = session.users().searchForUserStream(realm, attributes);
-        List<User> userList = userModels.map(userEntity -> new User(
-                session.users().getUserById(realm, userEntity.getId()), session))
-                .collect(Collectors.toList());
+        List<User> userList = session.users()
+            .searchForUserStream(realm, attributes)
+            .map(userEntity -> new User(userEntity, session))
+            .collect(Collectors.toList());
         return Response.ok(auth.filter(userList, headers)).build();
     }
 
