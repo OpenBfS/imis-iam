@@ -247,6 +247,7 @@
       <v-btn
         v-if="processType === 'edit' && !isReadOnly"
         color="accent"
+        :disabled="hasNoChanges"
         @click="handleReset"
       >
         {{ $t("button.reset") }}
@@ -582,6 +583,8 @@ const createAndPrepare = () => {
   createUser(false);
 };
 const handleReset = () => {
+  applicationStore.httpErrorMessage = "";
+  hasRequestError.value = false;
   applicationStore.setManagedItem(cloneObject(applicationStore.savedItem));
   const keys = Object.keys(serverValidationRules);
   keys.forEach((key) => {
