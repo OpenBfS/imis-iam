@@ -121,7 +121,7 @@ import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
 
-const { hasLoadingError, hasRequestError } = useNotification();
+const { hasRequestError } = useNotification();
 const store = useStore();
 const event = ref(store.state.events.managedEvent);
 const originalEvent = { ...event.value };
@@ -131,19 +131,11 @@ const readonly = event.value.readonly || processType.value === "show";
 
 const { form, valid, reqField } = useForm();
 
-const getEvents = () => {
-  store
-    .dispatch("events/loadEvents")
-    .then()
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
 const createEvent = () => {
   let payload = { ...event.value };
   HTTP.post("/event", payload)
-    .then(() => {
-      getEvents();
+    .then((response) => {
+      store.commit("events/addEvent", response.data);
       store.commit("application/setShowManageEventDialog", false);
     })
     .catch(() => {
@@ -165,7 +157,7 @@ const updateEvent = () => {
 const deleteEvent = () => {
   HTTP.delete("event/" + event.value.id)
     .then(() => {
-      getEvents();
+      store.commit("events/removeEvent", event.value);
       store.commit("application/setShowManageEventDialog", false);
     })
     .catch(() => {

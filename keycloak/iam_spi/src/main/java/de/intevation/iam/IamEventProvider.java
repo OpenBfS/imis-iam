@@ -115,6 +115,7 @@ public class IamEventProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+        rep.setReadonly(false);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         em.persist(rep);
