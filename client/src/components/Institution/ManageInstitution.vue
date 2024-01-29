@@ -335,6 +335,14 @@ const getCategories = () => {
 };
 onMounted(() => {
   getCategories();
+
+  // Initialize dropdown for coordinates
+  const loc = institution.value.serviceBuildingLocation;
+  const poc = institution.value.serviceBuildingPostalCode;
+  const str = institution.value.serviceBuildingStreet;
+  if (loc || poc || str) {
+    triggerLoadCoordinates([loc, poc, str].join(" "));
+  }
 });
 const getInstitutions = () => {
   store
