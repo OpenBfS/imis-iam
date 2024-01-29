@@ -98,14 +98,14 @@
             </v-form>
             <div class="group_class">
               <v-text-field
-                :readonly="true"
+                :disabled="true"
                 variant="underlined"
                 density="compact"
                 :label="$t('institution.x_coordinate')"
                 v-model="institution.xCoordinate"
               ></v-text-field>
               <v-text-field
-                :readonly="true"
+                :disabled="true"
                 variant="underlined"
                 density="compact"
                 :label="$t('institution.y_coordinate')"
