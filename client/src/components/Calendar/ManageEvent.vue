@@ -81,7 +81,7 @@
         v-if="processType === 'edit' && $store.state.profile.isAllowedToManage"
         color="accent"
         :disabled="hasNoChange"
-        @click="reset"
+        @click="resetForm(originalEvent, event)"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -129,7 +129,7 @@ const processType = ref(store.state.application.processType);
 
 const readonly = event.value.readonly || processType.value === "show";
 
-const { form, valid, reqField } = useForm();
+const { form, valid, reqField, resetForm } = useForm();
 
 const createEvent = () => {
   let payload = { ...event.value };
@@ -168,11 +168,6 @@ const deleteEvent = () => {
 const hasNoChange = computed(() => {
   return JSON.stringify(originalEvent) === JSON.stringify(event.value);
 });
-const reset = () => {
-  store.commit("application/setHttpErrorMessage", "");
-  hasRequestError.value = false;
-  event.value = { ...originalEvent };
-};
 
 const startDateUpdatedCallback = (newDate) => {
   event.value.startDate = newDate;

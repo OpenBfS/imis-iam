@@ -235,7 +235,7 @@
         v-if="processType === 'edit' && !isReadOnly"
         color="accent"
         :disabled="hasNoChanges"
-        @click="reset"
+        @click="resetForm(cloneObject(originalUser), user)"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -388,11 +388,6 @@ const createAndPrepare = () => {
   resetNotification();
   createUser(false);
 };
-const reset = () => {
-  store.commit("application/setHttpErrorMessage", "");
-  hasRequestError.value = false;
-  user.value = cloneObject(originalUser.value);
-};
 // Form
 const {
   form,
@@ -401,6 +396,7 @@ const {
   reqValidPhone,
   reqValidmail,
   reqMultipleSelect,
+  resetForm,
 } = useForm();
 // Activate button only if some values are changed for "edit"
 // and username and email are changed for "copy"
