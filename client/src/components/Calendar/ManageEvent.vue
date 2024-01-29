@@ -80,7 +80,7 @@
       <v-btn
         v-if="processType === 'edit' && $store.state.profile.isAllowedToManage"
         color="accent"
-        @click="event = { ...originalEvnet }"
+        @click="event = { ...originalEvent }"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -123,6 +123,7 @@ import { useStore } from "vuex";
 const { hasLoadingError, hasRequestError } = useNotification();
 const store = useStore();
 const event = ref(store.state.events.managedEvent);
+const originalEvent = { ...event.value };
 const processType = ref(store.state.application.processType);
 
 const readonly = event.value.readonly || processType.value === "show";
