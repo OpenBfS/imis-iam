@@ -77,22 +77,26 @@
                 "
               ></v-text-field>
             </div>
+            <v-form
+              ><v-row>
+                <v-select
+                  :no-data-text="$t('label.no_data_text')"
+                  v-model="coordinates.coordinate"
+                  dense
+                  :label="$t('institution.coordinates')"
+                  :loading="coordinatesLoading"
+                  :error="coordinatesError"
+                  :errorMessages="coordinatesErrorMessages"
+                  :items="coordinates"
+                  item-title="properties.display"
+                  item-value="id"
+                  persistent-hint
+                  :return-object="coordinatesReturnObj"
+                  density="compact"
+                ></v-select>
+              </v-row>
+            </v-form>
             <div class="group_class">
-              <v-select
-                :no-data-text="$t('label.no_data_text')"
-                v-model="coordinates.coordinate"
-                dense
-                :label="$t('institution.coordinates')"
-                :loading="coordinatesLoading"
-                :error="coordinatesError"
-                :errorMessages="coordinatesErrorMessages"
-                :items="coordinates"
-                item-title="properties.display"
-                item-value="id"
-                persistent-hint
-                :return-object="coordinatesReturnObj"
-                density="compact"
-              ></v-select>
               <v-text-field
                 :readonly="true"
                 variant="underlined"
