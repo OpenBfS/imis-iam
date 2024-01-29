@@ -80,7 +80,8 @@
       <v-btn
         v-if="processType === 'edit' && $store.state.profile.isAllowedToManage"
         color="accent"
-        @click="event = { ...originalEvent }"
+        :disabled="hasNoChange"
+        @click="reset"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -115,7 +116,7 @@
 </template>
 <script setup>
 import { HTTP } from "@/lib/http";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
@@ -171,6 +172,16 @@ const deleteEvent = () => {
       hasRequestError.value = true;
     });
 };
+
+const hasNoChange = computed(() => {
+  return JSON.stringify(originalEvent) === JSON.stringify(event.value);
+});
+const reset = () => {
+  store.commit("application/setHttpErrorMessage", "");
+  hasRequestError.value = false;
+  event.value = { ...originalEvent };
+};
+
 const startDateUpdatedCallback = (newDate) => {
   event.value.startDate = newDate;
 };

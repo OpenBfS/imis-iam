@@ -245,7 +245,8 @@
       <v-btn
         v-if="processType === 'edit' && $store.state.profile.isAllowedToManage"
         color="accent"
-        @click="institution = { ...originalInstitution }"
+        :disabled="hasNoChange"
+        @click="reset"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -376,6 +377,12 @@ const hasNoChange = computed(() => {
     JSON.stringify(originalInstitution) === JSON.stringify(institution.value)
   );
 });
+
+const reset = () => {
+  store.commit("application/setHttpErrorMessage", "");
+  hasRequestError.value = false;
+  institution.value = { ...originalInstitution };
+};
 
 const coordinatesLoading = ref(false);
 const coordinatesError = ref(false);
