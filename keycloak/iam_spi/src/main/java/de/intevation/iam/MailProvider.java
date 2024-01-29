@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -64,6 +66,8 @@ import de.intevation.iam.util.RequestMethod;
  */
 @Produces(MediaType.APPLICATION_JSON)
 public class MailProvider implements RealmResourceProvider {
+
+    private static final Logger LOG = Logger.getLogger("MailProvider");
 
     private static final String FROM_ADDRESS = "from";
     private static final String USER_ID_HEADER = "X-SHIB-user";
@@ -570,8 +574,8 @@ public class MailProvider implements RealmResourceProvider {
                     smtpConfig, user, mail.getSubject(),
                     mail.getText(), mail.getText());
             } catch (EmailException e) {
-                e.printStackTrace();
-                return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+                LOG.log(Level.SEVERE,
+                    "Failed sending mail to user " + user.getUsername());
             }
         }
         em.persist(mail);

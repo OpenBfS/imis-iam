@@ -234,7 +234,8 @@
       <v-btn
         v-if="processType === 'edit' && !isReadOnly"
         color="accent"
-        @click="user = cloneObject(originalUser)"
+        :disabled="hasNoChanges"
+        @click="reset"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -386,6 +387,11 @@ const updateUser = () => {
 const createAndPrepare = () => {
   resetNotification();
   createUser(false);
+};
+const reset = () => {
+  store.commit("application/setHttpErrorMessage", "");
+  hasRequestError.value = false;
+  user.value = cloneObject(originalUser.value);
 };
 // Form
 const {

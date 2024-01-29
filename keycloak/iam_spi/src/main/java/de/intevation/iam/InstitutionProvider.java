@@ -192,6 +192,7 @@ public class InstitutionProvider implements RealmResourceProvider {
      *   centralFax: [String] Central fax
      *   centralMail: [String] Central mail, mandatory
      *   imisId: [String] Institution imis id,
+     *   imisUsergroupId: [String] Institution usergroup id,
      *   xCoordinate: [Float] X coordinate,
      *   yCoordinate: [Float] Y coordinate,
      *   active: [Boolean] True if institution is active
@@ -261,6 +262,7 @@ public class InstitutionProvider implements RealmResourceProvider {
      *   centralFax: [String] Central fax
      *   centralMail: [String] Central mail, mandatory
      *   imisId: [String] Institution imis id,
+     *   imisUsergroupId: [String] Institution usergroup id,
      *   xCoordinate: [Float] X coordinate,
      *   yCoordinate: [Float] Y coordinate,
      *   active: [Boolean] True if institution is active

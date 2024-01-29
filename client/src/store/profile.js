@@ -12,6 +12,11 @@ export const profile = {
     myMailingLists: [],
     isAllowedToManage: true,
   }),
+  getters: {
+    isChiefEditor: (state) => {
+      return state.userData.roles?.find((e) => e === "chief_editor");
+    },
+  },
   mutations: {
     setUserData: (state, data) => {
       state.userData = data;

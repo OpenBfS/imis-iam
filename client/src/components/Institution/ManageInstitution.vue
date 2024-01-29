@@ -185,6 +185,26 @@
                 ]"
                 v-model="institution.imisId"
               ></v-text-field>
+              <v-text-field
+                v-model="institution.imisUserGroupId"
+                variant="underlined"
+                density="compact"
+                :label="$t('institution.imis_usergroup_Id')"
+                :disabled="
+                  !$store.state.profile.userData.roles.some(
+                    (e) => e === 'chief_editor'
+                  )
+                "
+                :rules="[
+                  (v) =>
+                    !v ||
+                    (v && v.length === 3) ||
+                    $t(
+                      'institution.imis_usergroup_Id_length_validation_message'
+                    ),
+                ]"
+              >
+              </v-text-field>
             </div>
             <div class="group_class align-center">
               <v-select
@@ -225,7 +245,8 @@
       <v-btn
         v-if="processType === 'edit' && $store.state.profile.isAllowedToManage"
         color="accent"
-        @click="institution = { ...originalInstitution }"
+        :disabled="hasNoChange"
+        @click="reset"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -356,6 +377,12 @@ const hasNoChange = computed(() => {
     JSON.stringify(originalInstitution) === JSON.stringify(institution.value)
   );
 });
+
+const reset = () => {
+  store.commit("application/setHttpErrorMessage", "");
+  hasRequestError.value = false;
+  institution.value = { ...originalInstitution };
+};
 
 const coordinatesLoading = ref(false);
 const coordinatesError = ref(false);

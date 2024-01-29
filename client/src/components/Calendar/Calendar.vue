@@ -14,7 +14,7 @@
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
-            v-if="$store.state.profile.isAllowedToManage"
+            v-if="$store.getters['profile/isChiefEditor']"
             color="accent"
             class="mr-4"
             v-bind="props"

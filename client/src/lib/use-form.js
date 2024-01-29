@@ -13,7 +13,7 @@ export function useForm() {
   const form = ref(null);
   const valid = ref(false);
   const regExprPhone = /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/;
-  const regExprEmail = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
+  const regExprEmail = /^\S+@\S+\.\S+$/;
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
   // Validation rules
   const reqValidmail = (reqMsg, validMsg) => {
