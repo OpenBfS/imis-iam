@@ -8,6 +8,7 @@
 <template>
   <v-card
     width="80vw"
+    min-height="500pt"
     v-if="['add', 'edit', 'show'].indexOf(processType) !== -1"
   >
     <v-card-title v-if="processType === 'add'">

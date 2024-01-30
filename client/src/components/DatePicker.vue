@@ -25,37 +25,33 @@
         @input="handleInputForDate"
       ></v-text-field>
     </div>
-    <v-date-picker
-      v-click-outside="{
-        handler: toggleDatePicker,
-        closeConditional: dateCloseConditional,
-        include: includedElements,
-      }"
-      :model-value="date"
-      v-show="isDatePickerOpen"
-      :id="`date-picker-${id}`"
-      color="accent"
-      elevation="6"
-      position="absolute"
-      style="
-        position: absolute;
-        top: 70pt;
-        z-index: 20;
-        background-color: white;
-        box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
-      "
-      :show-adjacent-months="true"
-      :title="label"
-      @update:modelValue="handleDateUpdate"
-    >
-      <template v-slot:header>
-        <div class="v-date-picker-header bg-accent">
-          <div class="v-date-picker-header__content">
-            {{ $d(date, "short") }}
-          </div>
-        </div>
-      </template>
-    </v-date-picker>
+    <v-expand-transition>
+      <v-date-picker
+        v-click-outside="{
+          handler: toggleDatePicker,
+          closeConditional: dateCloseConditional,
+          include: includedElements,
+        }"
+        :hide-header="true"
+        :model-value="date"
+        v-show="isDatePickerOpen"
+        :id="`date-picker-${id}`"
+        landscape
+        color="accent"
+        elevation="6"
+        position="absolute"
+        style="
+          position: absolute;
+          top: 70pt;
+          z-index: 20;
+          background-color: white;
+          box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
+        "
+        :show-adjacent-months="true"
+        :title="label"
+        @update:modelValue="handleDateUpdate"
+      ></v-date-picker>
+    </v-expand-transition>
   </div>
 </template>
 
