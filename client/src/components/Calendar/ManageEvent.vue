@@ -94,26 +94,6 @@
       </v-btn>
     </v-card-actions>
   </v-card>
-  <v-card v-else width="50vw">
-    <v-card-text>
-      <span class="text-h5">{{
-        $t("label.confirm_deletion", { name: event.title })
-      }}</span>
-    </v-card-text>
-    <v-divider></v-divider>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="accent" @click="deleteEvent()">
-        {{ $t("button.delete") }}
-      </v-btn>
-      <v-btn
-        color="accent"
-        @click="$store.commit('application/setShowManageEventDialog', false)"
-      >
-        {{ $t("button.cancel") }}
-      </v-btn>
-    </v-card-actions>
-  </v-card>
 </template>
 <script setup>
 import { HTTP } from "@/lib/http";
@@ -152,16 +132,6 @@ const updateEvent = () => {
   store
     .dispatch("events/updateEvent", payload)
     .then(() => {
-      store.commit("application/setShowManageEventDialog", false);
-    })
-    .catch(() => {
-      hasRequestError.value = true;
-    });
-};
-const deleteEvent = () => {
-  HTTP.delete("event/" + event.value.id)
-    .then(() => {
-      store.commit("events/removeEvent", event.value);
       store.commit("application/setShowManageEventDialog", false);
     })
     .catch(() => {
