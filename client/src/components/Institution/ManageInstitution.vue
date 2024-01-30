@@ -81,6 +81,7 @@
                 <v-select
                   :no-data-text="$t('label.no_data_text')"
                   v-model="coordinates.coordinate"
+                  clearable
                   dense
                   :label="$t('institution.coordinates')"
                   :loading="coordinatesLoading"
@@ -383,9 +384,14 @@ const coordinatesReturnObj = ref(true);
 
 //Handle coordinates picked
 const coordinatesPicked = () => {
-  var geometry = coordinates.value.coordinate.geometry.coordinates;
-  institution.value.xCoordinate = geometry[0];
-  institution.value.yCoordinate = geometry[1];
+  if (!coordinates.value?.coordinate) {
+    institution.value.xCoordinate = null;
+    institution.value.yCoordinate = null;
+  } else {
+    var geometry = coordinates.value.coordinate.geometry.coordinates;
+    institution.value.xCoordinate = geometry[0];
+    institution.value.yCoordinate = geometry[1];
+  }
 };
 //Load coordinate store
 const loadCoordinates = (queryString) => {
