@@ -33,6 +33,7 @@
           <v-row>
             <v-col>
               <DatePicker
+                :required="true"
                 :dateUpdatedCallback="startDateUpdatedCallback"
                 :date="event.startDate"
                 :label="$t('label.from')"
@@ -41,6 +42,7 @@
             </v-col>
             <v-col>
               <DatePicker
+                :required="true"
                 :dateUpdatedCallback="endDateUpdatedCallback"
                 :date="event.endDate"
                 :label="$t('label.to')"
@@ -133,6 +135,8 @@ const { form, valid, reqField, resetForm, hasNoChangeWrapper } = useForm();
 
 const createEvent = () => {
   let payload = { ...event.value };
+  payload.startDate = payload.startDate.toISOString();
+  payload.endDate = payload.endDate.toISOString();
   HTTP.post("/event", payload)
     .then((response) => {
       store.commit("events/addEvent", response.data);

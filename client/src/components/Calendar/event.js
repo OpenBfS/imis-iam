@@ -6,8 +6,8 @@
  */
 
 const expEvent = {
-  startDate: 0,
-  endDate: 0,
+  startDate: null,
+  endDate: null,
   title: "",
   site: "",
   description: "",

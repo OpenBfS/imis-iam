@@ -9,13 +9,14 @@
   <div style="position: relative">
     <div :id="`date-textfield-${id}`">
       <v-text-field
+        ref="dateTextfield"
         v-model="dateString"
         :clearable="!props.readonly"
         prepend-inner-icon="mdi-calendar-blank"
         :hint="!props.readonly ? $t('form.date_format') : ''"
         :label="label"
         :readonly="props.readonly"
-        :rules="validGermanDate()"
+        :rules="rules"
         @click="
           if (!props.readonly) {
             isDatePickerOpen = true;
@@ -56,23 +57,31 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, ref } from "vue";
+import { computed, defineProps, onMounted, ref, watch } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
 
-const props = defineProps(["dateUpdatedCallback", "date", "label", "readonly"]);
+const props = defineProps([
+  "dateUpdatedCallback",
+  "date",
+  "label",
+  "readonly",
+  "required",
+]);
 
 const {
   dateStringToDate,
   validGermanDate,
   doesRegexMatchWholeString,
+  reqField,
   germanDateRegex,
 } = useForm();
-const { d } = useI18n();
+const { d, t } = useI18n();
 const id = ref();
 const date = ref(new Date());
-const dateString = ref("");
+const dateString = ref(null);
 const isDatePickerOpen = ref(false);
+const dateTextfield = ref(null);
 
 onMounted(() => {
   id.value = Math.floor(Math.random() * 1000000).toString();
@@ -80,6 +89,14 @@ onMounted(() => {
     dateString.value = d(new Date(props.date));
     date.value = new Date(props.date);
   }
+});
+
+const rules = computed(() => {
+  const tmpRules = validGermanDate();
+  if (props.required) {
+    tmpRules.push(...reqField(t("calendar.required_date")));
+  }
+  return tmpRules;
 });
 
 const toggleDatePicker = () => {
@@ -90,19 +107,24 @@ const handleInputForDate = (event) => {
   if (doesRegexMatchWholeString(germanDateRegex, input)) {
     const newDate = dateStringToDate(input);
     if (newDate) {
-      props.dateUpdatedCallback(
-        props.dateAsMilliseconds ? newDate.getTime() : newDate
-      );
+      props.dateUpdatedCallback(newDate);
     }
   }
 };
 const handleDateUpdate = (event) => {
   date.value = event;
-  dateString.value = d(event, "short");
-  props.dateUpdatedCallback(event.getTime());
+  setDateString(event);
+  props.dateUpdatedCallback(event);
+};
+const setDateString = (date) => {
+  dateString.value = d(date, "short");
 };
 const handleClearDateTextfield = () => {
   isDatePickerOpen.value = false;
+  dateString.value = null;
+  // Setting the value of the text field to null doesn't
+  // trigger validation so we do it ourself.
+  dateTextfield.value.validate();
 };
 const dateCloseConditional = () => {
   return isDatePickerOpen.value;
@@ -117,4 +139,13 @@ const includedElements = () => {
   }
   return includedElements;
 };
+
+// Need to watch to changes made by parent.
+watch(
+  () => props.date,
+  (newDate) => {
+    setDateString(newDate);
+    date.value = newDate;
+  }
+);
 </script>

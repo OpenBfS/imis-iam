@@ -21,7 +21,7 @@
             icon="mdi-calendar-plus"
             @click="
               resetNotification();
-              $store.commit('events/setManagedEvent', exampleEvent);
+              $store.commit('events/setManagedEvent', { ...exampleEvent });
               $store.commit('application/setProcessType', 'add');
               $store.commit('application/setShowManageEventDialog', true);
             "
