@@ -21,18 +21,18 @@
         <v-col cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
             <div class="two_group_class">
-              <v-text-field
-                density="compact"
+              <TextField
                 :variant="
                   ['add', 'copy'].indexOf(processType) !== -1
                     ? 'underlined'
                     : 'plain'
                 "
                 :label="$t('user.username')"
-                v-model="user.username"
-                :rules="reqField($t('user.required_username'))"
+                :modelValue="user.username"
                 :readonly="processType === 'edit'"
-              ></v-text-field>
+                :rules="reqField($t('user.required_username'))"
+                @update:modelValue="user.username = $event"
+              ></TextField>
               <v-checkbox
                 :label="$t('user.enabled')"
                 v-model="user.enabled"
@@ -42,72 +42,65 @@
               ></v-checkbox>
             </div>
             <div class="three_group_class">
-              <v-text-field
-                density="compact"
-                variant="underlined"
+              <TextField
                 :label="$t('user.title')"
-                v-model="user.title"
-              ></v-text-field>
-              <v-text-field
-                density="compact"
-                variant="underlined"
-                name="firstname"
+                :modelValue="user.title"
+                @update:modelValue="user.title = $event"
+              ></TextField>
+              <TextField
                 :label="$t('user.firstname')"
-                v-model="user.firstName"
+                :modelValue="user.firstName"
+                :name="'firstname'"
                 :rules="reqField($t('user.required_firstname'))"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                name="lastname"
+                @update:modelValue="user.firstName = $event"
+              ></TextField>
+              <TextField
                 :label="$t('user.lastname')"
+                :modelValue="user.lastName"
+                :name="'lastname'"
                 :rules="reqField($t('user.required_lastname'))"
-                v-model="user.lastName"
-              ></v-text-field>
+                @update:modelValue="user.lastName = $event"
+              ></TextField>
             </div>
             <div class="one_group_class">
-              <v-text-field
-                density="compact"
-                variant="underlined"
+              <TextField
                 :label="$t('label.email')"
-                v-model="user.email"
+                :modelValue="user.email"
                 :rules="
                   reqValidmail(
                     $t('form.required_email'),
                     $t('form.valid_email')
                   )
                 "
-              ></v-text-field>
+                @update:modelValue="user.email = $event"
+              ></TextField>
             </div>
 
             <div class="three_group_class">
-              <v-text-field
-                density="compact"
-                variant="underlined"
+              <TextField
                 :label="$t('user.phone')"
+                :modelValue="user.phone"
                 :rules="
                   reqValidPhone(
                     $t('form.required_phone'),
                     $t('form.valid_phone')
                   )
                 "
-                v-model="user.phone"
-              ></v-text-field>
+                @update:modelValue="user.phone = $event"
+              ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validPhone($t('form.valid_fax'))" -->
-              <v-text-field
-                density="compact"
-                variant="underlined"
+              <TextField
                 :label="$t('user.mobile')"
-                v-model="user.mobile"
-              ></v-text-field>
-              <v-text-field
-                density="compact"
-                variant="underlined"
+                :modelValue="user.mobile"
+                @update:modelValue="user.mobile = $event"
+              ></TextField>
+              <TextField
                 :label="$t('user.fax')"
-                v-model="user.fax"
-              ></v-text-field>
+                :modelValue="user.fax"
+                @update:modelValue="user.fax = $event"
+              ></TextField>
             </div>
             <div class="two_group_class">
               <v-select
@@ -281,6 +274,7 @@ import { HTTP } from "@/lib/http";
 import { useStore } from "vuex";
 import { useForm } from "@/lib/use-form";
 import { expUser } from "@/components/User/user";
+import TextField from "@/components/TextField.vue";
 
 const { t } = useI18n();
 const { hasLoadingError, hasRequestError, resetNotification } =

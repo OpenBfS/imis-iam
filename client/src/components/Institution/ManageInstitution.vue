@@ -25,20 +25,18 @@
             :readonly="!$store.state.profile.isAllowedToManage"
           >
             <div class="group_class">
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('label.name')"
-                v-model="institution.name"
+                :modelValue="institution.name"
                 :rules="reqField($t('institution.required_name'))"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                @update:modelValue="institution.name = $event"
+              ></TextField>
+              <TextField
                 :label="$t('institution.shortname')"
+                :modelValue="institution.shortName"
                 :rules="reqField($t('institution.required_shortname'))"
-                v-model="institution.shortName"
-              ></v-text-field>
+                @update:modelValue="institution.shortName = $event"
+              ></TextField>
               <v-checkbox
                 density="compact"
                 v-model="institution.active"
@@ -46,36 +44,37 @@
               ></v-checkbox>
             </div>
             <div class="group_class">
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('institution.service_building_location')"
+                :modelValue="institution.serviceBuildingLocation"
                 :rules="
                   reqField($t('institution.required_service_building_location'))
                 "
-                v-model="institution.serviceBuildingLocation"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                @update:modelValue="
+                  institution.serviceBuildingLocation = $event
+                "
+              ></TextField>
+              <TextField
                 :label="$t('institution.service_building_postalcode')"
+                :modelValue="institution.serviceBuildingPostalCode"
                 :rules="
                   reqValidPostalcode(
                     $t('institution.required_service_building_postalcode'),
                     $t('form.valid_postalcode')
                   )
                 "
-                v-model="institution.serviceBuildingPostalCode"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                @update:modelValue="
+                  institution.serviceBuildingPostalCode = $event
+                "
+              ></TextField>
+              <TextField
                 :label="$t('institution.service_building_street')"
-                v-model="institution.serviceBuildingStreet"
+                :modelValue="institution.serviceBuildingStreet"
                 :rules="
                   reqField($t('institution.required_service_building_street'))
                 "
-              ></v-text-field>
+                @update:modelValue="institution.serviceBuildingStreet = $event"
+              ></TextField>
             </div>
             <v-form
               ><v-row>
@@ -97,108 +96,97 @@
               </v-row>
             </v-form>
             <div class="group_class">
-              <v-text-field
-                :disabled="true"
-                variant="underlined"
-                density="compact"
+              <TextField
+                disabled
                 :label="$t('institution.x_coordinate')"
-                v-model="institution.xCoordinate"
-              ></v-text-field>
-              <v-text-field
-                :disabled="true"
-                variant="underlined"
-                density="compact"
+                :modelValue="institution.xCoordinate"
+                @update:modelValue="institution.xCoordinate = $event"
+              ></TextField>
+              <TextField
+                disabled
                 :label="$t('institution.y_coordinate')"
-                v-model="institution.yCoordinate"
-              ></v-text-field>
+                :modelValue="institution.yCoordinate"
+                @update:modelValue="institution.yCoordinate = $event"
+              ></TextField>
             </div>
 
             <div class="group_class">
               <!-- TODO: Add this rules once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validPostalcode($t('form.valid_postalcode'))" -->
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('institution.address_location')"
-                v-model="institution.addressLocation"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                :modelValue="institution.addressLocation"
+                @update:modelValue="institution.addressLocation = $event"
+              ></TextField>
+              <TextField
                 :label="$t('institution.address_postalcode')"
-                v-model="institution.addressPostalCode"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                :modelValue="institution.addressPostalCode"
+                @update:modelValue="institution.addressPostalCode = $event"
+              ></TextField>
+              <TextField
                 :label="$t('institution.address_street')"
-                v-model="institution.addressStreet"
-              ></v-text-field>
+                :modelValue="institution.addressStreet"
+                @update:modelValue="institution.addressStreet = $event"
+              ></TextField>
             </div>
             <div class="group_class">
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('institution.central_phone')"
+                :modelValue="institution.centralPhone"
                 :rules="
                   reqValidPhone(
                     $t('institution.required_central_phone'),
                     $t('form.valid_phone')
                   )
                 "
-                v-model="institution.centralPhone"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                @update:modelValue="institution.centralPhone = $event"
+              ></TextField>
+              <TextField
                 :label="$t('institution.central_email')"
+                :modelValue="institution.centralMail"
                 :rules="
                   reqValidmail(
                     $t('institution.required_central_email'),
                     $t('form.valid_email')
                   )
                 "
-                v-model="institution.centralMail"
-              ></v-text-field>
+                @update:modelValue="institution.centralMail = $event"
+              ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validPhone($t('form.valid_fax'))" -->
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('institution.central_fax')"
-                v-model="institution.centralFax"
-              ></v-text-field>
+                :modelValue="institution.centralFax"
+                @update:modelValue="institution.centralFax = $event"
+              ></TextField>
             </div>
             <div class="group_class">
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.imis_Id')"
+              <TextField
                 :disabled="
                   !$store.state.profile.userData.roles.some(
                     (e) => e === 'chief_editor'
                   )
                 "
+                :label="$t('institution.imis_Id')"
+                :modelValue="institution.imisId"
                 :rules="[
                   (v) =>
                     !v ||
                     (v && v.length === 5) ||
                     $t('institution.imis_Id_length_validation_message'),
                 ]"
-                v-model="institution.imisId"
-              ></v-text-field>
-              <v-text-field
-                v-model="institution.imisUserGroupId"
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.imis_usergroup_Id')"
+                @update:modelValue="institution.imisId = $event"
+              ></TextField>
+              <TextField
                 :disabled="
                   !$store.state.profile.userData.roles.some(
                     (e) => e === 'chief_editor'
                   )
                 "
+                :label="$t('institution.imis_usergroup_Id')"
+                :modelValue="institution.imisUserGroupId"
                 :rules="[
                   (v) =>
                     !v ||
@@ -207,8 +195,8 @@
                       'institution.imis_usergroup_Id_length_validation_message'
                     ),
                 ]"
-              >
-              </v-text-field>
+                @update:modelValue="institution.imisUserGroupId = $event"
+              ></TextField>
             </div>
             <div class="group_class align-center">
               <v-select
@@ -307,6 +295,7 @@ import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useStore } from "vuex";
 import { debounce } from "debounce";
+import TextField from "@/components/TextField.vue";
 
 const { hasLoadingError, hasRequestError } = useNotification();
 const store = useStore();

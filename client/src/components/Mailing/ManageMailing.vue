@@ -21,13 +21,12 @@
       <v-container>
         <v-row justify="center">
           <v-form v-model="valid" class="v-col v-col-10">
-            <v-text-field
-              variant="underlined"
-              density="compact"
+            <TextField
               :label="$t('mailinglist.name')"
-              v-model="listName"
+              :modelValue="listName"
               :rules="reqField($t('mailinglist.required_mailinglist_name'))"
-            ></v-text-field>
+              @update:modelValue="listName = $event"
+            ></TextField>
             <v-select
               :no-data-text="$t('label.no_data_text')"
               dense
@@ -139,6 +138,7 @@ import { HTTP } from "@/lib/http";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { useForm } from "@/lib/use-form";
+import TextField from "@/components/TextField.vue";
 const props = defineProps({
   processType: String,
   item: Object,

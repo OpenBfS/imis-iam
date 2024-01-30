@@ -23,13 +23,12 @@
     <v-row justify="center">
       <v-col cols="11">
         <v-form v-model="valid" ref="form" :readonly="readonly">
-          <v-text-field
-            variant="underlined"
-            density="compact"
+          <TextField
             :label="$t('label.title')"
-            v-model="event.title"
+            :modelValue="event.title"
             :rules="reqField($t('calendar.required_title'))"
-          ></v-text-field>
+            @update:modelValue="event.title = $event"
+          ></TextField>
           <v-row>
             <v-col>
               <DatePicker
@@ -48,13 +47,12 @@
               ></DatePicker>
             </v-col>
             <v-col>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('label.site')"
-                v-model="event.site"
+                :modelValue="event.site"
                 :rules="reqField($t('calendar.required_site'))"
-              ></v-text-field>
+                @update:modelValue="event.site = $event"
+              ></TextField>
             </v-col>
           </v-row>
           <v-textarea
@@ -120,6 +118,7 @@ import { ref } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
+import TextField from "@/components/TextField.vue";
 
 const { hasRequestError } = useNotification();
 const store = useStore();
