@@ -18,7 +18,7 @@
     <v-divider></v-divider>
     <v-container class="pa-1 mt-4">
       <v-row justify="center">
-        <v-col jsutify="start" cols="11">
+        <v-col cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
             <div class="two_group_class">
               <v-text-field

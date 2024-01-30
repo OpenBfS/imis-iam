@@ -21,7 +21,7 @@
     <v-divider></v-divider>
     <v-container class="pa-1 mt-4 mx-2"> </v-container>
     <v-row justify="center">
-      <v-col justify="start" cols="11">
+      <v-col cols="11">
         <v-form v-model="valid" ref="form" :readonly="readonly">
           <v-text-field
             variant="underlined"
