@@ -306,7 +306,6 @@ import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useStore } from "vuex";
-import { computed } from "@vue/reactivity";
 import { debounce } from "debounce";
 
 const { hasLoadingError, hasRequestError } = useNotification();
@@ -323,6 +322,7 @@ const {
   reqValidPhone,
   reqValidPostalcode,
   resetForm,
+  hasNoChangeWrapper,
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
@@ -385,11 +385,7 @@ const deleteInstitution = () => {
       hasRequestError.value = true;
     });
 };
-const hasNoChange = computed(() => {
-  return (
-    JSON.stringify(originalInstitution) === JSON.stringify(institution.value)
-  );
-});
+const hasNoChange = hasNoChangeWrapper(originalInstitution, institution.value);
 
 const coordinatesLoading = ref(false);
 const coordinatesError = ref(false);

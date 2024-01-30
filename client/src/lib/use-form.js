@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import store from "@/store";
 import { useNotification } from "@/lib/use-notification";
@@ -88,6 +88,13 @@ export function useForm() {
     Object.assign(changedObject, originalObject);
   };
 
+  const hasNoChangeWrapper = (originalObject, changedObject) => {
+    const hasNoChange = computed(
+      () => JSON.stringify(originalObject) === JSON.stringify(changedObject)
+    );
+    return hasNoChange;
+  };
+
   return {
     form,
     valid,
@@ -104,5 +111,6 @@ export function useForm() {
     doesRegexMatchWholeString,
     germanDateRegex,
     resetForm,
+    hasNoChangeWrapper,
   };
 }

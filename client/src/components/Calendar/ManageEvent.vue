@@ -116,7 +116,7 @@
 </template>
 <script setup>
 import { HTTP } from "@/lib/http";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
@@ -129,7 +129,7 @@ const processType = ref(store.state.application.processType);
 
 const readonly = event.value.readonly || processType.value === "show";
 
-const { form, valid, reqField, resetForm } = useForm();
+const { form, valid, reqField, resetForm, hasNoChangeWrapper } = useForm();
 
 const createEvent = () => {
   let payload = { ...event.value };
@@ -165,9 +165,7 @@ const deleteEvent = () => {
     });
 };
 
-const hasNoChange = computed(() => {
-  return JSON.stringify(originalEvent) === JSON.stringify(event.value);
-});
+const hasNoChange = hasNoChangeWrapper(originalEvent, event.value);
 
 const startDateUpdatedCallback = (newDate) => {
   event.value.startDate = newDate;

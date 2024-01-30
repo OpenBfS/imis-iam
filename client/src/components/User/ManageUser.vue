@@ -218,7 +218,7 @@
       <v-btn
         v-if="!isReadOnly"
         color="accent"
-        :disabled="!valid || hasNoChanges"
+        :disabled="!valid || hasNoChange"
         @click="
           ['add', 'copy'].indexOf(processType) !== -1
             ? createUser(true)
@@ -234,7 +234,7 @@
       <v-btn
         v-if="processType === 'edit' && !isReadOnly"
         color="accent"
-        :disabled="hasNoChanges"
+        :disabled="hasNoChange"
         @click="resetForm(cloneObject(originalUser), user)"
       >
         {{ $t("button.reset") }}
@@ -397,19 +397,9 @@ const {
   reqValidmail,
   reqMultipleSelect,
   resetForm,
+  hasNoChangeWrapper,
 } = useForm();
-// Activate button only if some values are changed for "edit"
-// and username and email are changed for "copy"
-// to avoid useless requests
-const hasNoChanges = computed(() => {
-  return (
-    (processType.value === "edit" &&
-      JSON.stringify(originalUser.value) === JSON.stringify(user.value)) ||
-    (processType.value === "copy" &&
-      (user.value.username === originalUser.value.username ||
-        user.value.email === originalUser.value.email))
-  );
-});
+const hasNoChange = hasNoChangeWrapper(originalUser.value, user.value);
 const isReadOnly = computed(() => {
   if (store.state.application.ownAccount) {
     return false;
