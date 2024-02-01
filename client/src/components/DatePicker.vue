@@ -88,6 +88,8 @@ onMounted(() => {
   if (props.date) {
     dateString.value = d(new Date(props.date));
     date.value = new Date(props.date);
+  } else {
+    dateString.value = d(date.value);
   }
 });
 
