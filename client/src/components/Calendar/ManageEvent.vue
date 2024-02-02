@@ -34,6 +34,7 @@
             <v-col>
               <DatePicker
                 :required="true"
+                :prefill="true"
                 :dateUpdatedCallback="startDateUpdatedCallback"
                 :date="event.startDate"
                 :label="$t('label.from')"
@@ -43,6 +44,7 @@
             <v-col>
               <DatePicker
                 :required="true"
+                :prefill="true"
                 :dateUpdatedCallback="endDateUpdatedCallback"
                 :date="event.endDate"
                 :label="$t('label.to')"

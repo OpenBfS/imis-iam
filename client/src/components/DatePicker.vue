@@ -65,6 +65,7 @@ const props = defineProps([
   "dateUpdatedCallback",
   "date",
   "label",
+  "prefill",
   "readonly",
   "required",
 ]);
@@ -88,8 +89,8 @@ onMounted(() => {
   if (props.date) {
     dateString.value = d(new Date(props.date));
     date.value = new Date(props.date);
-  } else {
-    dateString.value = d(date.value);
+  } else if (props.prefill) {
+    handleDateUpdate(date.value);
   }
 });
 

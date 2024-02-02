@@ -106,12 +106,9 @@ const formattedEvents = computed(() => {
   const newFormattedEvents = [];
   //Display dates as non repeating strings
   store.state.events.events.forEach((value, index) => {
-    const now = Date.now();
-    if (
-      store.state.profile.isAllowedToManage ||
-      value.startDate > now ||
-      value.endDate > now
-    ) {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    if (value.endDate > startOfToday.getTime()) {
       const date = new Date(value.startDate);
       var currentTimeString = date.toLocaleString("default", {
         month: "long",
