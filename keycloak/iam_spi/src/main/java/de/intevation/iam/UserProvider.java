@@ -198,7 +198,7 @@ public class UserProvider implements RealmResourceProvider {
         UserModel newUserModel
                 = session.users().addUser(realm, rep.getUsername());
 
-        newUserModel.setEnabled(rep.getEnabled());
+        newUserModel.setEnabled(rep.isEnabled());
         rep.setId(newUserModel.getId());
 
         //Create attributes
@@ -385,7 +385,7 @@ public class UserProvider implements RealmResourceProvider {
         }
         //Update user
         handleUserProfile(newUser.getAttributes(), oldUser);
-        oldUser.setEnabled(newUser.getEnabled());
+        oldUser.setEnabled(newUser.isEnabled());
 
         //Get new groups list and update
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
