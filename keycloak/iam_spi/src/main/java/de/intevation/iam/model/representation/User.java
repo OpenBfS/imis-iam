@@ -146,7 +146,7 @@ public class User {
         this.readonly = readonly;
     }
 
-    public Boolean isEnabled() {
+    public Boolean getEnabled() {
         return enabled;
     }
     public void setEnabled(Boolean enabled) {

@@ -50,7 +50,7 @@ public class UserAuthorizer extends Authorizer<User> {
             case PUT: return authorizeUpdate(
                 data, session, requestingUser, client);
             case POST:
-                return !data.isEnabled() && Role.EDITOR.isRoleOf(requestingUser, session)
+                return !data.getEnabled() && Role.EDITOR.isRoleOf(requestingUser, session)
                     || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
@@ -82,7 +82,7 @@ public class UserAuthorizer extends Authorizer<User> {
         RealmModel realm = session.getContext().getRealm();
         UserModel oldUserModel
             = session.users().getUserById(realm, user.getId());
-        if (user.isEnabled() != oldUserModel.isEnabled()
+        if (user.getEnabled() != oldUserModel.isEnabled()
             && !Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
             return false;
         }
