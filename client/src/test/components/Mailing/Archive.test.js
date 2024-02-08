@@ -13,6 +13,9 @@ import { describe, test, expect } from "vitest";
 import router from "../mockRouter.js";
 import { unref } from "vue";
 import { flushPromises } from "@vue/test-utils";
+import { setActivePinia, createPinia } from "pinia";
+
+setActivePinia(createPinia());
 
 describe("Testing Archive", async () => {
   const currentYear = new Date().getFullYear();

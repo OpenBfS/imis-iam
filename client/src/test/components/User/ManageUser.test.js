@@ -56,6 +56,7 @@ const userProfileMetadata = {
   ],
 };
 applicationStore.managedItem = user;
+profileStore.setUserData({ roles: ["chief_editor"] });
 profileStore.setUserProfileMetadata(userProfileMetadata);
 
 const wrapper = mount(ManageUser, {

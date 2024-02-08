@@ -68,7 +68,7 @@ export function useForm() {
         v.length === 0 ||
         (doesRegexMatchWholeString(germanDateRegex, v) &&
           dateStringToDate(v) !== undefined) ||
-        t("form.valid_date"),
+        t("error.valid_date"),
     ];
   };
   const reqValidPostalcode = (reqMsg, validMsg) => {
