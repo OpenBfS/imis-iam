@@ -37,7 +37,7 @@
                 :label="$t('user.enabled')"
                 v-model="user.enabled"
                 :disabled="
-                  !$store.state.profile.userData.roles.includes('chief_editor')
+                  !$store.state.profile.userData.roles?.includes('chief_editor')
                 "
               ></v-checkbox>
             </div>

@@ -278,33 +278,24 @@ const includeStartDatePicker = () => {
 const includeEndDatePicker = () => {
   return getIncludedElements(".endDatePicker *, #endDateTextfield *");
 };
-const resetMinutesSecondsMilliseconds = (date) => {
-  date.setMinutes(0);
-  date.setSeconds(0);
-  date.setMilliseconds(0);
-};
 const getMails = () => {
   if (!startDate.value) return;
   let date = "";
 
   if (startDateString.value?.length > 0) {
     const tmpStartDate = new Date(Date.parse(startDate.value));
-    tmpStartDate.setHours(0);
-    resetMinutesSecondsMilliseconds(tmpStartDate);
-
+    tmpStartDate.setHours(0, 0, 0, 0);
     if (startDate.value) {
-      date += `start=${tmpStartDate.getTime()}`;
+      date += `start=${tmpStartDate.toISOString()}`;
     }
   }
 
   if (endDateString.value?.length > 0) {
     const tmpEndDate = new Date(Date.parse(endDate.value));
-    tmpEndDate.setHours(24);
-    resetMinutesSecondsMilliseconds(tmpEndDate);
-
+    tmpEndDate.setHours(23, 59, 59, 999);
     if (endDate.value) {
       date = date != "" ? date + "&" : date;
-      date += `end=${tmpEndDate.getTime()}`;
+      date += `end=${tmpEndDate.toISOString()}`;
     }
   }
 
@@ -371,20 +362,25 @@ const currentYear = new Date().getFullYear();
 
 const setStartAndEndDate = () => {
   if (route.params.year !== "all") {
+    let newStartDate, newEndDate;
     switch (Number(route.params.year)) {
       case currentYear:
-        startDate.value = new Date(currentYear + "-01-01");
-        endDate.value = new Date(currentYear + "-12-31");
+        newStartDate = new Date(currentYear + "-01-01");
+        newEndDate = new Date(currentYear + "-12-31");
         break;
       case currentYear - 1:
-        startDate.value = new Date(currentYear - 1 + "-01-01");
-        endDate.value = new Date(currentYear - 1 + "-12-31");
+        newStartDate = new Date(currentYear - 1 + "-01-01");
+        newEndDate = new Date(currentYear - 1 + "-12-31");
         break;
       case currentYear - 2:
-        startDate.value = new Date(currentYear - 2 + "-01-01");
-        endDate.value = new Date(currentYear - 2 + "-12-31");
+        newStartDate = new Date(currentYear - 2 + "-01-01");
+        newEndDate = new Date(currentYear - 2 + "-12-31");
         break;
     }
+    startDate.value = newStartDate;
+    handleStartDateUpdate(newStartDate);
+    endDate.value = newEndDate;
+    handleEndDateUpdate(newEndDate);
   }
 };
 watch(
