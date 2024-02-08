@@ -7,10 +7,9 @@
 
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useApplicationStore } from "@/stores/application";
 import { useNotification } from "@/lib/use-notification";
 
-const { hasRequestError } = useNotification();
+const { resetNotification: resetNotification } = useNotification();
 
 export function useForm() {
   const { t } = useI18n();
@@ -111,9 +110,7 @@ export function useForm() {
     ];
   };
   const resetForm = (originalObject, changedObject) => {
-    const applicationStore = useApplicationStore();
-    applicationStore.setHttpErrorMessage("");
-    hasRequestError.value = false;
+    resetNotification();
     const changedKeys = Object.keys(changedObject);
     changedKeys.forEach((key) => {
       if (!originalObject[key]) {
