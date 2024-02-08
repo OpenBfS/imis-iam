@@ -8,6 +8,7 @@
 <template>
   <v-card
     width="80vw"
+    min-height="500pt"
     v-if="['add', 'edit', 'show'].indexOf(processType) !== -1"
   >
     <v-card-title v-if="processType === 'add'">
@@ -21,18 +22,18 @@
     <v-divider></v-divider>
     <v-container class="pa-1 mt-4 mx-2"> </v-container>
     <v-row justify="center">
-      <v-col justify="start" cols="11">
+      <v-col cols="11">
         <v-form v-model="valid" ref="form" :readonly="readonly">
-          <v-text-field
-            variant="underlined"
-            density="compact"
+          <TextField
             :label="$t('label.title')"
-            v-model="event.title"
+            :modelValue="event.title"
             :rules="reqField($t('calendar.required_title'))"
-          ></v-text-field>
+            @update:modelValue="event.title = $event"
+          ></TextField>
           <v-row>
             <v-col>
               <DatePicker
+                :required="true"
                 :dateUpdatedCallback="startDateUpdatedCallback"
                 :date="event.startDate"
                 :label="$t('label.from')"
@@ -41,6 +42,7 @@
             </v-col>
             <v-col>
               <DatePicker
+                :required="true"
                 :dateUpdatedCallback="endDateUpdatedCallback"
                 :date="event.endDate"
                 :label="$t('label.to')"
@@ -48,13 +50,12 @@
               ></DatePicker>
             </v-col>
             <v-col>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('label.site')"
-                v-model="event.site"
+                :modelValue="event.site"
                 :rules="reqField($t('calendar.required_site'))"
-              ></v-text-field>
+                @update:modelValue="event.site = $event"
+              ></TextField>
             </v-col>
           </v-row>
           <v-textarea
@@ -81,29 +82,9 @@
         v-if="processType === 'edit' && $store.state.profile.isAllowedToManage"
         color="accent"
         :disabled="hasNoChange"
-        @click="reset"
+        @click="resetForm(originalEvent, event)"
       >
         {{ $t("button.reset") }}
-      </v-btn>
-      <v-btn
-        color="accent"
-        @click="$store.commit('application/setShowManageEventDialog', false)"
-      >
-        {{ $t("button.cancel") }}
-      </v-btn>
-    </v-card-actions>
-  </v-card>
-  <v-card v-else width="50vw">
-    <v-card-text>
-      <span class="text-h5">{{
-        $t("label.confirm_deletion", { name: event.title })
-      }}</span>
-    </v-card-text>
-    <v-divider></v-divider>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="accent" @click="deleteEvent()">
-        {{ $t("button.delete") }}
       </v-btn>
       <v-btn
         color="accent"
@@ -116,12 +97,13 @@
 </template>
 <script setup>
 import { HTTP } from "@/lib/http";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
+import TextField from "@/components/TextField.vue";
 
-const { hasLoadingError, hasRequestError } = useNotification();
+const { hasRequestError } = useNotification();
 const store = useStore();
 const event = ref(store.state.events.managedEvent);
 const originalEvent = { ...event.value };
@@ -129,21 +111,15 @@ const processType = ref(store.state.application.processType);
 
 const readonly = event.value.readonly || processType.value === "show";
 
-const { form, valid, reqField } = useForm();
+const { form, valid, reqField, resetForm, hasNoChangeWrapper } = useForm();
 
-const getEvents = () => {
-  store
-    .dispatch("events/loadEvents")
-    .then()
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
 const createEvent = () => {
   let payload = { ...event.value };
+  payload.startDate = payload.startDate.toISOString();
+  payload.endDate = payload.endDate.toISOString();
   HTTP.post("/event", payload)
-    .then(() => {
-      getEvents();
+    .then((response) => {
+      store.commit("events/addEvent", response.data);
       store.commit("application/setShowManageEventDialog", false);
     })
     .catch(() => {
@@ -162,25 +138,8 @@ const updateEvent = () => {
       hasRequestError.value = true;
     });
 };
-const deleteEvent = () => {
-  HTTP.delete("event/" + event.value.id)
-    .then(() => {
-      getEvents();
-      store.commit("application/setShowManageEventDialog", false);
-    })
-    .catch(() => {
-      hasRequestError.value = true;
-    });
-};
 
-const hasNoChange = computed(() => {
-  return JSON.stringify(originalEvent) === JSON.stringify(event.value);
-});
-const reset = () => {
-  store.commit("application/setHttpErrorMessage", "");
-  hasRequestError.value = false;
-  event.value = { ...originalEvent };
-};
+const hasNoChange = hasNoChangeWrapper(originalEvent, event.value);
 
 const startDateUpdatedCallback = (newDate) => {
   event.value.startDate = newDate;

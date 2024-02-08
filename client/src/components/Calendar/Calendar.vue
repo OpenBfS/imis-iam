@@ -21,7 +21,7 @@
             icon="mdi-calendar-plus"
             @click="
               resetNotification();
-              $store.commit('events/setManagedEvent', exampleEvent);
+              $store.commit('events/setManagedEvent', { ...exampleEvent });
               $store.commit('application/setProcessType', 'add');
               $store.commit('application/setShowManageEventDialog', true);
             "
@@ -72,16 +72,7 @@
                     icon="mdi-calendar-remove"
                     variant="plain"
                     v-bind="props"
-                    @click="
-                      $store.commit('events/setManagedEvent', {
-                        ...event,
-                      });
-                      $store.commit('application/setProcessType', 'delete');
-                      $store.commit(
-                        'application/setShowManageEventDialog',
-                        true
-                      );
-                    "
+                    @click="deleteEvent(event)"
                   />
                 </template>
                 <span>{{ $t("label.delete") }}</span>
@@ -91,6 +82,10 @@
         </tbody>
       </v-table>
     </v-row>
+    <UIAlert
+      v-if="hasLoadingError || hasRequestError"
+      v-bind:message="$store.state.application.httpErrorMessage"
+    />
   </v-container>
 </template>
 <script setup>
@@ -98,10 +93,12 @@ import { expEvent } from "./event";
 import { computed, onMounted, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useStore } from "vuex";
+import { HTTP } from "@/lib/http";
 
 const hover = true;
 const store = useStore();
-const { hasLoadingError, resetNotification } = useNotification();
+const { hasLoadingError, hasRequestError, resetNotification } =
+  useNotification();
 
 const exampleEvent = ref({ ...expEvent });
 
@@ -144,6 +141,16 @@ const itemClicked = (id) => {
   });
   store.commit("application/setProcessType", "show");
   store.commit("application/setShowManageEventDialog", true);
+};
+
+const deleteEvent = (event) => {
+  HTTP.delete("event/" + event.id)
+    .then(() => {
+      store.commit("events/removeEvent", event);
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
 };
 
 onMounted(() => {

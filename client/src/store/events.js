@@ -25,6 +25,13 @@ export const events = {
         }
       });
     },
+    addEvent: (state, data) => {
+      state.events.push(data);
+    },
+    removeEvent: (state, data) => {
+      const index = state.events.findIndex((e) => e.id === data.id);
+      state.events.splice(index, 1);
+    },
   },
   actions: {
     loadEvents({ commit }, searchString) {

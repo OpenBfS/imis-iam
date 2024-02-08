@@ -34,6 +34,7 @@ export default {
     required_description: "Beschreibung ist erforderlich",
     required_startDate: "Beginn ist erforderlich",
     required_endDate: "Ende ist erforderlich",
+    required_date: "Datum ist erforderlich",
     required_site: "Ort ist erforderlich",
     required_title: "Titel ist erforderlich",
   },

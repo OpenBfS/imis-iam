@@ -115,6 +115,7 @@ public class IamEventProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+        rep.setReadonly(false);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         em.persist(rep);
@@ -142,6 +143,7 @@ public class IamEventProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         Event merged = em.merge(rep);
+        merged.setReadonly(false);
         return Response.ok(merged).build();
     }
 

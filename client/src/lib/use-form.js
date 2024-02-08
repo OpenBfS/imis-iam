@@ -5,8 +5,12 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import store from "@/store";
+import { useNotification } from "@/lib/use-notification";
+
+const { hasRequestError } = useNotification();
 
 export function useForm() {
   const { t } = useI18n();
@@ -71,6 +75,26 @@ export function useForm() {
   const reqMultipleSelect = (reqMsg) => {
     return [(v) => !!(v && v.length) || reqMsg];
   };
+
+  const resetForm = (originalObject, changedObject) => {
+    store.commit("application/setHttpErrorMessage", "");
+    hasRequestError.value = false;
+    const changedKeys = Object.keys(changedObject);
+    changedKeys.forEach((key) => {
+      if (!originalObject[key]) {
+        delete changedObject[key];
+      }
+    });
+    Object.assign(changedObject, originalObject);
+  };
+
+  const hasNoChangeWrapper = (originalObject, changedObject) => {
+    const hasNoChange = computed(
+      () => JSON.stringify(originalObject) === JSON.stringify(changedObject)
+    );
+    return hasNoChange;
+  };
+
   return {
     form,
     valid,
@@ -86,5 +110,7 @@ export function useForm() {
     dateStringToDate,
     doesRegexMatchWholeString,
     germanDateRegex,
+    resetForm,
+    hasNoChangeWrapper,
   };
 }
