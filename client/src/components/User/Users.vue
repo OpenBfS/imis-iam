@@ -14,7 +14,7 @@
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
-            v-if="$store.state.profile.isAllowedToManage"
+            v-if="profileStore.isAllowedToManage"
             color="accent"
             class="mr-4"
             v-bind="props"
@@ -22,9 +22,9 @@
             @click="
               resetUser();
               resetNotification();
-              $store.commit('application/setManagedItem', user);
-              $store.commit('application/setProcessType', 'add');
-              $store.commit('application/setShowManageUserDialog', true);
+              applicationStore.setManagedItem(user);
+              applicationStore.setProcessType('add');
+              applicationStore.setShowManageUserDialog(true);
             "
           >
           </v-btn>
@@ -39,8 +39,8 @@
             v-bind="props"
             icon="mdi-import"
             @click="
-              $store.commit('application/setlistToExport', 'users');
-              $store.commit('application/setShowExportDialog', true);
+              applicationStore.setlistToExport('users');
+              applicationStore.setShowExportDialog(true);
             "
           >
           </v-btn>
@@ -54,7 +54,7 @@
         <UIAlert
           v-if="hasLoadingError"
           v-bind:isSuccessful="!hasLoadingError"
-          v-bind:message="$store.state.application.httpErrorMessage"
+          v-bind:message="applicationStore.httpErrorMessage"
         />
       </v-col>
     </v-row>
@@ -63,14 +63,18 @@
 <script setup>
 import { onMounted, ref, defineAsyncComponent, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
+import { useUserStore } from "@/stores/user";
 import { expUser } from "@/components/User/user";
 
 const UserTable = defineAsyncComponent(() =>
   import("@/components/User/UserTable.vue")
 );
 
-const store = useStore();
+const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
+const userStore = useUserStore();
 const { hasLoadingError, resetNotification } = useNotification();
 // User
 // Deep Copy for objects
@@ -78,7 +82,7 @@ const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const users = computed(() => {
-  return store.state.user.users;
+  return userStore.users;
 });
 const user = ref(cloneObject(expUser));
 const resetUser = () => {
@@ -86,18 +90,18 @@ const resetUser = () => {
 };
 
 onMounted(() => {
-  store
-    .dispatch("user/loadUsers")
+  userStore
+    .loadUsers()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
     });
-  store
-    .dispatch("user/loadRoles")
+  userStore
+    .loadRoles()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
     });
-  store.dispatch("user/loadMemberships");
+  userStore.loadMemberships();
 });
 </script>

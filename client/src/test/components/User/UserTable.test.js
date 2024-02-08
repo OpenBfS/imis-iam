@@ -5,27 +5,36 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { vi } from "vitest";
-import store from "@/store";
+import { setActivePinia, createPinia } from "pinia";
+import { useUserStore } from "@/stores/user";
 import { mount } from "@vue/test-utils";
 import UserTable from "@/components/User/UserTable.vue";
 import global from "@/test/components/global";
 import { test, expect } from "vitest";
 
+setActivePinia(createPinia());
+
+const userStore = useUserStore();
+
 // Mock HTTP request/response
-vi.spyOn(store, "dispatch").mockResolvedValue({});
+vi.spyOn(userStore, "loadMemberships").mockResolvedValue({});
 
 // Test data
 const users = [
   {
     id: "1",
-    username: "one",
-    firstName: "One",
-    lastName: "Two",
+    attributes: {
+      username: ["one"],
+      firstName: ["One"],
+      lastName: ["Two"],
+    },
   },
   {
     id: "2",
-    username: "two",
-    lastName: "Three",
+    attributes: {
+      username: ["two"],
+      lastName: ["Three"],
+    },
   },
 ];
 
@@ -39,7 +48,7 @@ const wrapper = mount(UserTable, {
 
 test("Username is displayed in first column", () => {
   wrapper.findAll("tr").forEach((row, i) => {
-    expect(row.get("td").text()).toBe(users[i].username);
+    expect(row.get("td").text()).toBe(users[i].attributes.username[0]);
   });
 });
 

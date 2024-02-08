@@ -4,9 +4,11 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
+import { defineStore } from "pinia";
 import { Promise } from "core-js";
 import { HTTP } from "../lib/http";
-export const institution = {
+
+export const useInstitutionStore = defineStore("institution", {
   namespaced: true,
   state: () => ({
     //List of institutions
@@ -20,62 +22,60 @@ export const institution = {
     },
     foundInstitutions: [],
   }),
-  mutations: {
+  actions: {
     //Convert current institution attributes to string arrays
-    convertCurrentInstitutionAttributes: (state) => {
-      let attributes = state.institution.attributes;
+    convertCurrentInstitutionAttributes() {
+      let attributes = this.institution.attributes;
       for (let attribute in attributes) {
         if (typeof attributes[attribute] == "string") {
           attributes[attribute] = attributes[attribute].split(", ");
         }
       }
     },
-    setInstitutionList: (state, data) => {
-      state.institutions = data;
+    setInstitutionList(data) {
+      this.institutions = data;
     },
-    setFoundInstitutions: (state, data) => {
-      state.foundInstitutions = data;
+    setFoundInstitutions(data) {
+      this.foundInstitutions = data;
     },
-    setInstitutionNames: (state, data) => {
+    setInstitutionNames(data) {
       var names = [];
       data.forEach((institution) => {
         names.push(institution.name);
       });
-      state.institutionNames = names;
+      this.institutionNames = names;
     },
-    setInstitution: (state, data) => {
-      state.institution = data;
+    setInstitution(data) {
+      this.institution = data;
     },
-    updateInstitutionEntity: (state, data) => {
-      state.institutions.forEach((element, index) => {
+    updateInstitutionEntity(data) {
+      this.institutions.forEach((element, index) => {
         if (element.id === data.id) {
-          state.institutions[index] = data;
+          this.institutions[index] = data;
         }
       });
     },
-  },
-  actions: {
-    loadInstitutions({ commit }, searchString) {
+    loadInstitutions(searchString) {
       return new Promise((resolve, reject) => {
         HTTP.get("/institution", {
           params: { search: searchString },
         })
           .then((response) => {
-            commit("setInstitutionList", response.data);
+            this.setInstitutionList(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
-    updateInstitution({ commit }, institution) {
+    updateInstitution(institution) {
       return new Promise((resolve, reject) => {
         HTTP.put("/institution", institution)
           .then((response) => {
-            commit("updateInstitutionEntity", response.data);
+            this.updateInstitutionEntity(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
   },
-};
+});

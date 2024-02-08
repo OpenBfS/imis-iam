@@ -24,26 +24,23 @@
               <v-btn
                 variant="plain"
                 :icon="`${
-                  $store.state.profile.isAllowedToManage
+                  profileStore.isAllowedToManage
                     ? 'mdi-pencil'
                     : 'mdi-information-outline'
                 }`"
                 size="small"
                 v-bind="props"
                 @click="
-                  $store.commit('application/setManagedItem', {
+                  applicationStore.setManagedItem({
                     ...item,
                   });
-                  $store.commit('application/setProcessType', 'edit');
-                  $store.commit(
-                    'application/setShowManageInstitutionDialog',
-                    true
-                  );
+                  applicationStore.setProcessType('edit');
+                  applicationStore.setShowManageInstitutionDialog(true);
                 "
               ></v-btn>
             </template>
             <span>{{
-              $store.state.profile.isAllowedToManage
+              profileStore.isAllowedToManage
                 ? $t("label.edit")
                 : $t("label.show_info")
             }}</span>
@@ -51,20 +48,17 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
-                v-if="$store.state.profile.isAllowedToManage"
+                v-if="profileStore.isAllowedToManage"
                 variant="plain"
                 icon="mdi-delete"
                 size="small"
                 v-bind="props"
                 @click="
-                  $store.commit('application/setManagedItem', {
+                  applicationStore.setManagedItem({
                     ...item,
                   });
-                  $store.commit('application/setProcessType', 'delet');
-                  $store.commit(
-                    'application/setShowManageInstitutionDialog',
-                    true
-                  );
+                  applicationStore.setProcessType('delet');
+                  applicationStore.setShowManageInstitutionDialog(true);
                 "
               ></v-btn>
             </template>
@@ -82,6 +76,12 @@
 </template>
 
 <script setup>
+import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
+
+const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
+
 const props = defineProps({
   institutions: Array,
 });

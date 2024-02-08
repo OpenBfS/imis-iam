@@ -18,11 +18,11 @@
     </thead>
     <tbody>
       <tr v-for="user in props.users" :key="user.id">
-        <td>{{ user.username }}</td>
-        <td>{{ user.firstName }}</td>
-        <td>{{ user.lastName }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.phone }}</td>
+        <td>{{ getUserAttribute(user, "username") }}</td>
+        <td>{{ getUserAttribute(user, "firstName") }}</td>
+        <td>{{ getUserAttribute(user, "lastName") }}</td>
+        <td>{{ getUserAttribute(user, "email") }}</td>
+        <td>{{ getUserAttribute(user, "phone") }}</td>
         <td>{{ getMembershipNamesById(user.groups) }}</td>
         <td class="d-flex">
           <v-tooltip location="top">
@@ -30,7 +30,7 @@
               <v-btn
                 variant="plain"
                 :icon="`${
-                  $store.state.profile.isAllowedToManage
+                  profileStore.isAllowedToManage
                     ? 'mdi-account-edit-outline'
                     : 'mdi-information-outline'
                 }`"
@@ -40,7 +40,7 @@
               ></v-btn>
             </template>
             <span>{{
-              $store.state.profile.isAllowedToManage
+              profileStore.isAllowedToManage
                 ? $t("label.edit")
                 : $t("label.show_info")
             }}</span>
@@ -48,7 +48,7 @@
           <v-tooltip>
             <template
               v-slot:activator="{ props }"
-              v-if="$store.state.profile.isAllowedToManage"
+              v-if="profileStore.isAllowedToManage"
             >
               <v-btn
                 variant="plain"
@@ -67,7 +67,9 @@
 </template>
 
 <script setup>
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
+import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
 import { expUser } from "@/components/User/user";
 import { onMounted } from "vue";
@@ -75,11 +77,21 @@ const props = defineProps({
   users: Array,
 });
 
-const store = useStore();
+function getUserAttribute(user, attributeName) {
+  // Keycloak User Profile attributes are either missing (if no value is given)
+  // or an array expected to contain a single value
+  return user.attributes[attributeName]
+    ? user.attributes[attributeName][0]
+    : "";
+}
+
+const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
+const userStore = useUserStore();
 const savedUser = ref();
 
 onMounted(() => {
-  store.dispatch("user/loadMemberships");
+  userStore.loadMemberships();
 });
 
 // Deep Copy for objects
@@ -93,23 +105,23 @@ const user = ref(cloneObject(expUser));
 const onCopyClicked = (id) => {
   user.value = cloneObject(getUserById(id));
   savedUser.value = cloneObject(user.value);
-  user.value.email = "";
-  user.value.username = "";
+  user.value.attributes.username = "";
+  user.value.attributes.email = "";
   user.value.enabled = false;
   delete user.value["id"];
-  store.commit("application/setManagedItem", user.value);
-  store.commit("application/setSavedItem", savedUser.value);
-  store.commit("application/setProcessType", "copy");
-  store.commit("application/setShowManageUserDialog", true);
+  applicationStore.setManagedItem(user.value);
+  applicationStore.setSavedItem(savedUser.value);
+  applicationStore.setProcessType("copy");
+  applicationStore.setShowManageUserDialog(true);
 };
 const onEditClicked = (id) => {
   user.value = cloneObject(getUserById(id));
   // Save original user data for "reset" button
   savedUser.value = cloneObject(user.value);
-  store.commit("application/setManagedItem", user.value);
-  store.commit("application/setSavedItem", savedUser.value);
-  store.commit("application/setProcessType", "edit");
-  store.commit("application/setShowManageUserDialog", true);
+  applicationStore.setManagedItem(user.value);
+  applicationStore.setSavedItem(savedUser.value);
+  applicationStore.setProcessType("edit");
+  applicationStore.setShowManageUserDialog(true);
 };
 
 //Get the membership names as string using the given id array
@@ -118,7 +130,7 @@ const getMembershipNamesById = (ids) => {
     return;
   }
   var result = "";
-  var memberships = store.state.user.memberships;
+  var memberships = userStore.memberships;
   ids.forEach((id) => {
     var m = memberships.find((membership) => membership.id === id);
     if (result.length != 0) {

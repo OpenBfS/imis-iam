@@ -8,6 +8,7 @@ package de.intevation.iam.model.representation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
@@ -18,11 +19,15 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 
+import org.keycloak.connections.jpa.JpaConnectionProvider;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.jpa.entities.GroupEntity;
 import org.keycloak.models.jpa.entities.RoleEntity;
 import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 import org.keycloak.models.jpa.entities.UserRoleMappingEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.intevation.iam.auth.Role;
 import de.intevation.iam.model.jpa.Institution;
@@ -36,26 +41,15 @@ import de.intevation.iam.model.jpa.UserAttributes;
  */
 public class User {
 
-    //User entity attributes
     private String id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String username;
-    private Boolean enabled;
-    //IAM specific attributes
-    private String title;
-    private String phone;
-    private String mobile;
-    private String fax;
-    private String oe;
-    private String bfsLocation;
-    private Integer position;
+
+    private Map<String, List<String>> attributes;
 
     private List<String> groups;
     private List<Integer> institutions;
     private List<String> roles;
     private Boolean readonly;
+    private Boolean enabled;
 
     private static final String ID_PARAM = "id";
     private static final String USER_PARAM = "user";
@@ -68,38 +62,28 @@ public class User {
     /**
      * Generate user from given usermodel.
      * @param userModel Keycloak usermodel
-     * @param em EntityManager
+     * @param session KeycloakSession
      * @return Generated user
      */
-    public User(UserModel userModel, EntityManager em) {
-        //Get attributes from user entity model
+    public User(UserModel userModel, KeycloakSession session) {
         this.id = userModel.getId();
-        this.firstName = userModel.getFirstName();
-        this.lastName = userModel.getLastName();
-        this.username = userModel.getUsername();
-        this.email = userModel.getEmail();
         this.enabled = userModel.isEnabled();
 
+        // Contains custom attributes defined via User Profile config,
+        // but only if actually a value is set.
+        this.attributes = userModel.getAttributes();
+
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
         UserAttributes jpaModel = em.find(
             UserAttributes.class, userModel.getId());
         if (jpaModel != null) {
-            //Get attributes from iam attributes model
-            this.title = jpaModel.getTitle();
-            this.phone = jpaModel.getPhone();
-            this.mobile = jpaModel.getMobile();
-            this.fax = jpaModel.getFax();
-            this.oe = jpaModel.getOe();
-            this.bfsLocation = jpaModel.getOe();
-            this.position = jpaModel.getPosition();
-
             //Set institutions
             List<Institution> instList = jpaModel.getInstitutions();
             if (instList != null) {
                 this.institutions = new ArrayList<Integer>();
                 instList.forEach(inst -> institutions.add(inst.getId()));
             }
-
-            CriteriaBuilder cb = em.getCriteriaBuilder();
 
             // Get user-role mappings
             TypedQuery<UserRoleMappingEntity> roleMappingQuery =
@@ -110,6 +94,7 @@ public class User {
                 = roleMappingQuery.getResultList();
 
             //Query role entities as mapping models only contain role ids
+            CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<RoleEntity> roleQuery = cb.createQuery(
                 RoleEntity.class);
             Root<RoleEntity> root = roleQuery.from(RoleEntity.class);
@@ -160,103 +145,53 @@ public class User {
     public void setReadonly(Boolean readonly) {
         this.readonly = readonly;
     }
+
     public Boolean isEnabled() {
         return enabled;
     }
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
+
     public String getId() {
         return id;
     }
     public void setId(String id) {
         this.id = id;
     }
-    public String getFirstName() {
-        return firstName;
-    }
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-    public String getLastName() {
-        return lastName;
-    }
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
+
+    @JsonIgnore
     public String getUsername() {
-        return username;
+        return attributes.get("username").get(0);
     }
-    public void setUsername(String username) {
-        this.username = username;
+
+    public Map<String, List<String>> getAttributes() {
+        return attributes;
     }
-    public String getTitle() {
-        return title;
+    public void setAttributes(Map<String, List<String>> attributes) {
+        this.attributes = attributes;
     }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    public String getPhone() {
-        return phone;
-    }
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-    public String getMobile() {
-        return mobile;
-    }
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-    public String getFax() {
-        return fax;
-    }
-    public void setFax(String fax) {
-        this.fax = fax;
-    }
-    public String getOe() {
-        return oe;
-    }
-    public void setOe(String oe) {
-        this.oe = oe;
-    }
-    public String getBfsLocation() {
-        return bfsLocation;
-    }
-    public void setBfsLocation(String bfsLocation) {
-        this.bfsLocation = bfsLocation;
-    }
-    public Integer getPosition() {
-        return position;
-    }
-    public void setPosition(Integer position) {
-        this.position = position;
-    }
+
     public List<String> getGroups() {
         return groups;
     }
     public void setGroups(List<String> groups) {
         this.groups = groups;
     }
+
     public List<Integer> getInstitutions() {
         return institutions;
     }
     public void setInstitutions(List<Integer> institutions) {
         this.institutions = institutions;
     }
+
     public List<String> getRoles() {
         return roles;
     }
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }
-
 
     /**
      * Get institutions by a list of ids.
@@ -287,21 +222,12 @@ public class User {
      * @return Jpa model
      */
     public UserAttributes createOrUpdateJpaModel(EntityManager em) {
-        UserAttributes attributes = em.find(
-                UserAttributes.class, getId());
-        if (attributes == null) {
-            attributes = new UserAttributes();
+        UserAttributes jpaUser = em.find(UserAttributes.class, getId());
+        if (jpaUser == null) {
+            jpaUser = new UserAttributes();
         }
-        attributes.setId(getId());
-        attributes.setTitle(getTitle());
-        attributes.setPhone(getPhone());
-        attributes.setMobile(getMobile());
-        attributes.setFax(getFax());
-        attributes.setOe(getOe());
-        attributes.setBfsLocation(getBfsLocation());
-        attributes.setPosition(getPosition());
-        attributes.setInstitutions(
-                getInstitutionsByIds(getInstitutions(), em));
-        return attributes;
+        jpaUser.setId(getId());
+        jpaUser.setInstitutions(getInstitutionsByIds(getInstitutions(), em));
+        return jpaUser;
     }
 }

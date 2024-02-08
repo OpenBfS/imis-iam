@@ -4,7 +4,7 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
-import store from "@/store";
+import { useApplicationStore } from "@/stores/application";
 import axios from "axios";
 
 const HTTP = axios.create({
@@ -12,20 +12,25 @@ const HTTP = axios.create({
 });
 
 function handleError(error) {
+  const applicationStore = useApplicationStore();
+  // If the error has status 400 and contains at least one message it is probably
+  // a validation error from keycloak which is handled in ManageUser.vue. In that
+  // case we don't want to set the httpErrorMessage because we show the error right
+  // below the text field in the form.
+  if (error.response?.status === 400 && error.response.data?.[0]?.message) {
+    return;
+  }
   if (error.response) {
     if (error.response.data) {
-      store.commit("application/setHttpErrorMessage", error.response.data);
+      applicationStore.setHttpErrorMessage(JSON.stringify(error.response.data));
     } else {
-      store.commit(
-        "application/setHttpErrorMessage",
-        error.response.statusText
-      );
+      applicationStore.setHttpErrorMessage(error.response.statusText);
     }
     // Handle other type of errors.
   } else if (error.request) {
-    store.commit("application/setHttpErrorMessage", error.request);
+    applicationStore.setHttpErrorMessage(error.request);
   } else {
-    store.commit("application/setHttpErrorMessage", "Error" + error.message);
+    applicationStore.setHttpErrorMessage("Error" + error.message);
   }
 }
 

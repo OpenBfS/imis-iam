@@ -98,13 +98,13 @@
 
 <script>
 import { computed } from "vue";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
 export default {
   setup() {
     const currentYear = new Date().getFullYear();
-    const store = useStore();
+    const applicationStore = useApplicationStore();
     const reportMail = computed(() => {
-      return store.state.application.reportMail;
+      return applicationStore.reportMail;
     });
     return {
       reportMail,

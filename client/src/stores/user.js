@@ -4,83 +4,79 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
+import { defineStore } from "pinia";
 import { HTTP } from "../lib/http";
-export const user = {
+
+export const useUserStore = defineStore("user", {
   namespaced: true,
   state: () => ({
     users: [],
     memberships: [],
-    positions: [],
     roles: [],
     foundUsers: [],
   }),
-  mutations: {
-    setFoundUsers: (state, data) => {
-      state.foundUsers = data;
+  actions: {
+    setFoundUsers(data) {
+      this.foundUsers = data;
     },
-    setUsers: (state, data) => {
-      state.users = data;
+    setUsers(data) {
+      this.users = data;
     },
-    setMemberships: (state, data) => {
-      state.memberships = data;
+    setMemberships(data) {
+      this.memberships = data;
     },
-    setPositions: (state, data) => {
-      state.positions = data;
+    setRoles(data) {
+      this.roles = data;
     },
-    setRoles: (state, data) => {
-      state.roles = data;
-    },
-    updateUserEntity: (state, data) => {
-      state.users.forEach((element, index) => {
+    updateUserEntity(data) {
+      this.users.forEach((element, index) => {
         if (element.id === data.id) {
-          state.users[index] = data;
+          this.users[index] = data;
         }
       });
     },
-  },
-  actions: {
-    loadMemberships({ commit }) {
+    loadMemberships() {
       return new Promise((resolve, reject) => {
         HTTP.get("iamuser/membership")
           .then((response) => {
-            commit("setMemberships", response.data);
+            this.setMemberships(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
-    loadUsers({ commit }, searchString) {
+    loadUsers(searchString) {
       return new Promise((resolve, reject) => {
         HTTP.get("/iamuser", {
           params: { search: searchString },
         })
           .then((response) => {
-            commit("setUsers", response.data);
+            this.setUsers(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
-    loadRoles({ commit }) {
+    loadRoles() {
       return new Promise((resolve, reject) => {
         HTTP.get("iamuser/roles")
           .then((response) => {
-            commit("setRoles", response.data);
+            this.setRoles(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
-    updateUser({ commit }, user) {
+    updateUser(user) {
       return new Promise((resolve, reject) => {
         HTTP.put("iamuser", user)
           .then((response) => {
             //Update the stored entity using repsonse data
-            commit("updateUserEntity", response.data);
+            this.updateUserEntity(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
   },
-};
+});

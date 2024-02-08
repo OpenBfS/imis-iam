@@ -5,14 +5,15 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { ref } from "vue";
-import store from "@/store";
+import { useApplicationStore } from "@/stores/application";
 
 export function useNotification() {
   const hasRequestError = ref(false);
   const hasLoadingError = ref(false);
 
   const resetNotification = () => {
-    store.commit("application/setHttpErrorMessage", "");
+    const applicationStore = useApplicationStore();
+    applicationStore.setHttpErrorMessage("");
     hasRequestError.value = false;
     hasLoadingError.value = false;
   };

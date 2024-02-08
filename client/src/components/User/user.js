@@ -5,19 +5,9 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 const expUser = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  username: "",
+  attributes: {},
   groups: [],
   institutions: [],
-  title: "",
-  phone: "",
-  mobile: "",
-  fax: "",
-  oe: "",
-  bfsLocation: "",
-  position: null,
   roles: [],
   enabled: false,
 };

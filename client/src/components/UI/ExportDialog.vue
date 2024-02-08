@@ -55,7 +55,7 @@
         <UIAlert
           v-if="hasRequestError"
           v-bind:isSuccessful="!hasRequestError"
-          v-bind:message="$store.state.application.httpErrorMessage"
+          v-bind:message="applicationStore.httpErrorMessage"
         />
       </v-row>
     </v-container>
@@ -67,7 +67,7 @@
       </v-btn>
       <v-btn
         color="accent"
-        @click="$store.commit('application/setShowExportDialog', false)"
+        @click="applicationStore.setShowExportDialog(false)"
       >
         {{ $t("button.cancel") }}
       </v-btn>
@@ -78,10 +78,10 @@
 <script setup>
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
 import { useNotification } from "@/lib/use-notification";
 
-const store = useStore();
+const applicationStore = useApplicationStore();
 const { t } = useI18n();
 const { hasRequestError } = useNotification();
 // Use array of objects to enable translation of the itemes in <v-select> element
@@ -149,15 +149,15 @@ const exportRequest = (itemsName) => {
       link.download = "export.csv";
       link.click();
       URL.revokeObjectURL(link.href);
-      store.state.application.showExportDialog = false;
+      applicationStore.showExportDialog = false;
     })
     .catch((error) => {
       hasRequestError.value = true;
-      store.commit("application/setHttpErrorMessage", error.message);
+      applicationStore.setHttpErrorMessage(error.message);
     });
 };
 const exportFile = () => {
-  switch (store.state.application.listToExport) {
+  switch (applicationStore.listToExport) {
     case "users":
       exportRequest("user");
       break;

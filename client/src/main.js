@@ -14,8 +14,10 @@ import vuetify from "./plugins/vuetify";
 
 import App from "./App.vue";
 import router from "./router";
-import store from "./store";
+import { createPinia } from "pinia";
 import i18n from "./i18n";
+
+const pinia = createPinia();
 
 const UIAlert = defineAsyncComponent(() =>
   import("@/components/UI/UIAlert.vue")
@@ -24,8 +26,8 @@ const UIAlert = defineAsyncComponent(() =>
 vuetify.locale = createVueI18nAdapter({ i18n, useI18n });
 
 createApp(App)
+  .use(pinia)
   .use(router)
-  .use(store)
   .use(i18n)
   .use(vuetify)
   .component("UIHeader", UIHeader)

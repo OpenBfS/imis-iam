@@ -1,0 +1,163 @@
+{
+  "attributes" : [ {
+    "name" : "email",
+    "displayName" : "${email}",
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "annotations": {
+      "inputType": "html5-email"
+    },
+    "validations" : {
+      "email" : { },
+      "length" : {
+        "max" : 255
+      },
+      "pattern": {
+        "pattern": "[a-z0-9]+@[a-z]+\\.[a-z]{2,3}",
+        "error-message": "error.valid_email"
+      }
+    },
+    "group": "contact"
+  }, {
+    "name" : "title",
+    "displayName" : "${title}",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { },
+    "group": "name"
+  }, {
+    "name" : "firstName",
+    "displayName" : "${firstname}",
+    "required" : {
+      "roles" : [ "user" ]
+    },
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "validations" : {
+      "length" : {
+        "min": 3,
+        "max" : 255
+      },
+      "person-name-prohibited-characters" : { }
+    },
+    "group": "name"
+  }, {
+    "name" : "lastName",
+    "displayName" : "${lastname}",
+    "required" : {
+      "roles" : [ "user" ]
+    },
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "validations" : {
+      "length" : {
+        "max" : 255
+      },
+      "person-name-prohibited-characters" : { }
+    },
+    "group": "name"
+  }, {
+    "name" : "phone",
+    "displayName" : "${phone}",
+    "required" : {
+      "roles" : [ "admin", "user" ]
+    },
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations": {
+      "inputType": "html5-tel"
+    },
+    "validations" : {
+      "pattern": {
+        "pattern": "(\\(?([\\d \\-)–+/(]+){6,}\\)?([ .\\-–/]?)([\\d]+))",
+        "error-message": "error.valid_phone"
+      }
+    },
+    "group": "contact"
+  }, {
+    "name" : "mobile",
+    "displayName" : "${mobile}",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations": {
+      "inputType": "html5-tel"
+    },
+    "validations" : { },
+    "group": "contact"
+  }, {
+    "name" : "fax",
+    "displayName" : "${fax}",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations": {
+      "inputType": "html5-tel"
+    },
+    "validations" : { },
+    "group": "contact"
+  }, {
+    "name" : "oe",
+    "displayName" : "${oe}",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { }
+  }, {
+    "name" : "bfslocation",
+    "displayName" : "${bfslocation}",
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : { },
+    "validations" : { }
+  }, {
+    "name" : "position",
+    "displayName" : "${position}",
+    "required" : {
+      "roles" : [ "admin", "user" ]
+    },
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : {
+      "inputType" : "multiselect"
+    },
+    "validations" : {
+      "options" : {
+        "options" : [ "Leiter", "Vertreter", "Radiologischer Ansprechpartner", "Mitarbeiter", "IT-Ansprechperson", "Störplatz" ]
+      }
+    }
+  } ],
+  "groups": [
+    {
+      "name": "name",
+      "displayHeader": "",
+      "displayDescription": "",
+      "annotations": {}
+    },
+    {
+      "name": "contact",
+      "displayHeader": "",
+      "displayDescription": "",
+      "annotations": {}
+    }
+  ]
+}

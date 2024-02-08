@@ -14,16 +14,16 @@
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
-            v-if="$store.getters['profile/isChiefEditor']"
+            v-if="profileStore.isChiefEditor"
             color="accent"
             class="mr-4"
             v-bind="props"
             icon="mdi-calendar-plus"
             @click="
               resetNotification();
-              $store.commit('events/setManagedEvent', { ...exampleEvent });
-              $store.commit('application/setProcessType', 'add');
-              $store.commit('application/setShowManageEventDialog', true);
+              eventsStore.setManagedEvent({ ...exampleEvent });
+              applicationStore.setProcessType('add');
+              applicationStore.setShowManageEventDialog(true);
             "
           >
           </v-btn>
@@ -50,14 +50,11 @@
                     variant="plain"
                     v-bind="props"
                     @click="
-                      $store.commit('events/setManagedEvent', {
-                        ...$store.getters['events/getEvent'](event.id),
+                      eventsStore.setManagedEvent({
+                        ...eventsStore.getEvent(event.id),
                       });
-                      $store.commit('application/setProcessType', 'edit');
-                      $store.commit(
-                        'application/setShowManageEventDialog',
-                        true
-                      );
+                      applicationStore.setProcessType('edit');
+                      applicationStore.setShowManageEventDialog(true);
                     "
                   />
                 </template>
@@ -84,7 +81,7 @@
     </v-row>
     <UIAlert
       v-if="hasLoadingError || hasRequestError"
-      v-bind:message="$store.state.application.httpErrorMessage"
+      v-bind:message="applicationStore.httpErrorMessage"
     />
   </v-container>
 </template>
@@ -92,11 +89,15 @@
 import { expEvent } from "./event";
 import { computed, onMounted, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useEventsStore } from "@/stores/events";
+import { useProfileStore } from "@/stores/profile";
 import { HTTP } from "@/lib/http";
 
 const hover = true;
-const store = useStore();
+const applicationStore = useApplicationStore();
+const eventsStore = useEventsStore();
+const profileStore = useProfileStore();
 const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
 
@@ -105,7 +106,7 @@ const exampleEvent = ref({ ...expEvent });
 const formattedEvents = computed(() => {
   const newFormattedEvents = [];
   //Display dates as non repeating strings
-  store.state.events.events.forEach((value, index) => {
+  eventsStore.events.forEach((value, index) => {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
     if (value.endDate > startOfToday.getTime()) {
@@ -116,7 +117,7 @@ const formattedEvents = computed(() => {
       });
       var lastTimeString = "";
       if (index > 0) {
-        lastTimeString = store.state.events.events[index - 1].date;
+        lastTimeString = eventsStore.events[index - 1].date;
       }
       let title = value.title;
       let site = value.site ? `(${value.site})` : "";
@@ -133,17 +134,17 @@ const formattedEvents = computed(() => {
 });
 
 const itemClicked = (id) => {
-  store.commit("events/setManagedEvent", {
-    ...store.getters["events/getEvent"](id),
+  eventsStore.setManagedEvent({
+    ...eventsStore.getEvent(id),
   });
-  store.commit("application/setProcessType", "show");
-  store.commit("application/setShowManageEventDialog", true);
+  applicationStore.setProcessType("show");
+  applicationStore.setShowManageEventDialog(true);
 };
 
 const deleteEvent = (event) => {
   HTTP.delete("event/" + event.id)
     .then(() => {
-      store.commit("events/removeEvent", event);
+      eventsStore.removeEvent(event);
     })
     .catch(() => {
       hasRequestError.value = true;
@@ -151,7 +152,7 @@ const deleteEvent = (event) => {
 };
 
 onMounted(() => {
-  store.dispatch("events/loadEvents").catch(() => {
+  eventsStore.loadEvents().catch(() => {
     hasLoadingError.value = true;
   });
 });

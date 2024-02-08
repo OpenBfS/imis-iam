@@ -73,7 +73,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn
-        v-if="$store.state.profile.isAllowedToManage && processType !== 'show'"
+        v-if="profileStore.isAllowedToManage && processType !== 'show'"
         color="accent"
         :disabled="!valid || hasNoChange"
         @click="processType == 'add' ? createEvent() : updateEvent()"
@@ -81,7 +81,7 @@
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
       </v-btn>
       <v-btn
-        v-if="processType === 'edit' && $store.state.profile.isAllowedToManage"
+        v-if="processType === 'edit' && profileStore.isAllowedToManage"
         color="accent"
         :disabled="hasNoChange"
         @click="resetForm(originalEvent, event)"
@@ -90,7 +90,7 @@
       </v-btn>
       <v-btn
         color="accent"
-        @click="$store.commit('application/setShowManageEventDialog', false)"
+        @click="applicationStore.setShowManageEventDialog(false)"
       >
         {{ $t("button.cancel") }}
       </v-btn>
@@ -102,14 +102,18 @@ import { HTTP } from "@/lib/http";
 import { ref } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useEventsStore } from "@/stores/events";
+import { useProfileStore } from "@/stores/profile";
 import TextField from "@/components/TextField.vue";
 
 const { hasRequestError } = useNotification();
-const store = useStore();
-const event = ref(store.state.events.managedEvent);
+const applicationStore = useApplicationStore();
+const eventsStore = useEventsStore();
+const profileStore = useProfileStore();
+const event = ref(eventsStore.managedEvent);
 const originalEvent = { ...event.value };
-const processType = ref(store.state.application.processType);
+const processType = ref(applicationStore.processType);
 
 const readonly = event.value.readonly || processType.value === "show";
 
@@ -121,8 +125,8 @@ const createEvent = () => {
   payload.endDate = payload.endDate.toISOString();
   HTTP.post("/event", payload)
     .then((response) => {
-      store.commit("events/addEvent", response.data);
-      store.commit("application/setShowManageEventDialog", false);
+      eventsStore.addEvent(response.data);
+      applicationStore.setShowManageEventDialog(false);
     })
     .catch(() => {
       hasRequestError.value = true;
@@ -131,10 +135,10 @@ const createEvent = () => {
 const updateEvent = () => {
   let payload = { ...event.value };
   delete payload.date;
-  store
-    .dispatch("events/updateEvent", payload)
+  eventsStore
+    .updateEvent(payload)
     .then(() => {
-      store.commit("application/setShowManageEventDialog", false);
+      applicationStore.setShowManageEventDialog(false);
     })
     .catch(() => {
       hasRequestError.value = true;

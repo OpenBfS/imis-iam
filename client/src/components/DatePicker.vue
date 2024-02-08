@@ -13,7 +13,7 @@
         v-model="dateString"
         :clearable="!props.readonly"
         prepend-inner-icon="mdi-calendar-blank"
-        :hint="!props.readonly ? $t('form.date_format') : ''"
+        :hint="!props.readonly ? $t('hints.date_format') : ''"
         :label="label"
         :readonly="props.readonly"
         :rules="rules"

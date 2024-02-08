@@ -34,7 +34,7 @@
               :label="$t('mailinglist.recipient')"
               :items="users"
               v-model="selectedUsers"
-              item-title="username"
+              item-title="attributes.username"
               item-value="id"
               persistent-hint
               multiple
@@ -44,7 +44,7 @@
             <UIAlert
               v-if="hasRequestError"
               v-bind:isSuccessful="!hasRequestError"
-              v-bind:message="$store.state.application.httpErrorMessage"
+              v-bind:message="applicationStore.httpErrorMessage"
             />
           </v-form>
         </v-row>
@@ -100,7 +100,7 @@
             <UIAlert
               v-if="hasRequestError"
               v-bind:isSuccessful="!hasRequestError"
-              v-bind:message="$store.state.application.httpErrorMessage"
+              v-bind:message="applicationStore.httpErrorMessage"
             />
           </v-col>
         </v-row>
@@ -136,7 +136,8 @@ import { ref, onMounted, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useI18n } from "vue-i18n";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import TextField from "@/components/TextField.vue";
 const props = defineProps({
@@ -145,7 +146,8 @@ const props = defineProps({
 });
 const emit = defineEmits(["child-object"]);
 
-const store = useStore();
+const applicationStore = useApplicationStore();
+const userStore = useUserStore();
 const show = true;
 
 const { valid, reqField, reqMultipleSelect } = useForm();
@@ -154,12 +156,12 @@ const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
 const listName = ref("");
 const users = computed(() => {
-  return store.state.user.users;
+  return userStore.users;
 });
 const selectedUsers = ref([]);
 const getUsers = () => {
-  store
-    .dispatch("user/loadUsers")
+  userStore
+    .loadUsers()
     .then()
     .catch(() => {
       hasLoadingError.value = true;

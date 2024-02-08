@@ -13,18 +13,18 @@
       <router-view />
       <UIAlert
         v-if="hasLoadingError"
-        v-bind:message="$store.state.application.httpErrorMessage"
+        v-bind:message="applicationStore.httpErrorMessage"
       />
-      <v-dialog v-model="$store.state.application.showExportDialog">
+      <v-dialog v-model="applicationStore.showExportDialog">
         <ExportDialog />
       </v-dialog>
-      <v-dialog v-model="$store.state.application.showManageUserDialog">
+      <v-dialog v-model="applicationStore.showManageUserDialog">
         <ManageUser />
       </v-dialog>
-      <v-dialog v-model="$store.state.application.showManageInstitutionDialog">
+      <v-dialog v-model="applicationStore.showManageInstitutionDialog">
         <ManageInstitution />
       </v-dialog>
-      <v-dialog v-model="$store.state.application.showManageEventDialog">
+      <v-dialog v-model="applicationStore.showManageEventDialog">
         <ManageEvent />
       </v-dialog>
     </v-main>
@@ -38,46 +38,43 @@
 }
 </style>
 
-<script>
+<script setup>
 import { defineAsyncComponent, onMounted } from "vue";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
 import { useNotification } from "./lib/use-notification";
 
-export default {
-  components: {
-    ManageUser: defineAsyncComponent(() =>
-      import("@/components/User/ManageUser.vue")
-    ),
-    ManageInstitution: defineAsyncComponent(() =>
-      import("@/components/Institution/ManageInstitution.vue")
-    ),
-    ManageEvent: defineAsyncComponent(() =>
-      import("@/components/Calendar/ManageEvent.vue")
-    ),
-    Sidebar: defineAsyncComponent(() => import("@/components/UI/Sidebar.vue")),
-    Appbar: defineAsyncComponent(() => import("@/components/UI/Appbar.vue")),
-    Appfooter: defineAsyncComponent(() =>
-      import("@/components/UI/Appfooter.vue")
-    ),
-    ExportDialog: defineAsyncComponent(() =>
-      import("@/components/UI/ExportDialog.vue")
-    ),
-  },
-  name: "App",
-  setup() {
-    const store = useStore();
-    const { hasLoadingError } = useNotification();
-    onMounted(() => {
-      store
-        .dispatch("profile/loadProfile")
-        .then(() => {})
-        .catch(() => {
-          hasLoadingError.value = true;
-        });
-    });
-    return {
-      hasLoadingError,
-    };
-  },
-};
+const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
+
+const ManageUser = defineAsyncComponent(() =>
+  import("@/components/User/ManageUser.vue")
+);
+const ManageInstitution = defineAsyncComponent(() =>
+  import("@/components/Institution/ManageInstitution.vue")
+);
+const ManageEvent = defineAsyncComponent(() =>
+  import("@/components/Calendar/ManageEvent.vue")
+);
+const Sidebar = defineAsyncComponent(() =>
+  import("@/components/UI/Sidebar.vue")
+);
+const Appbar = defineAsyncComponent(() => import("@/components/UI/Appbar.vue"));
+const Appfooter = defineAsyncComponent(() =>
+  import("@/components/UI/Appfooter.vue")
+);
+const ExportDialog = defineAsyncComponent(() =>
+  import("@/components/UI/ExportDialog.vue")
+);
+
+const { hasLoadingError } = useNotification();
+
+onMounted(() => {
+  profileStore.loadUserProfileMetadata().catch(() => {
+    hasLoadingError.value = true;
+  });
+  profileStore.loadProfile().catch(() => {
+    hasLoadingError.value = true;
+  });
+});
 </script>

@@ -5,6 +5,8 @@
  This file is Free Software under the GNU GPL (v>=3)
  and comes with ABSOLUTELY NO WARRANTY!
  -->
+
+<!-- eslint-disable vue/no-v-for-template-key -->
 <template>
   <v-card width="80vw">
     <v-card-title v-if="['add', 'copy'].indexOf(processType) !== -1">
@@ -12,7 +14,7 @@
     </v-card-title>
     <v-card-title v-if="processType === 'edit'">
       <span class="text-h5">{{
-        $t("user.edit_title", { name: user.username })
+        $t("user.edit_title", { name: user.attributes.username[0] })
       }}</span>
     </v-card-title>
     <v-divider></v-divider>
@@ -20,121 +22,154 @@
       <v-row justify="center">
         <v-col cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
-            <div class="two_group_class">
-              <TextField
-                :variant="
-                  ['add', 'copy'].indexOf(processType) !== -1
-                    ? 'underlined'
-                    : 'plain'
-                "
-                :label="$t('user.username')"
-                :modelValue="user.username"
-                :readonly="processType === 'edit'"
-                :rules="reqField($t('user.required_username'))"
-                @update:modelValue="user.username = $event"
-              ></TextField>
-              <v-checkbox
-                :label="$t('user.enabled')"
-                v-model="user.enabled"
-                :disabled="
-                  !$store.state.profile.userData.roles?.includes('chief_editor')
-                "
-              ></v-checkbox>
-            </div>
-            <div class="three_group_class">
-              <TextField
-                :label="$t('user.title')"
-                :modelValue="user.title"
-                @update:modelValue="user.title = $event"
-              ></TextField>
-              <TextField
-                :label="$t('user.firstname')"
-                :modelValue="user.firstName"
-                :name="'firstname'"
-                :rules="reqField($t('user.required_firstname'))"
-                @update:modelValue="user.firstName = $event"
-              ></TextField>
-              <TextField
-                :label="$t('user.lastname')"
-                :modelValue="user.lastName"
-                :name="'lastname'"
-                :rules="reqField($t('user.required_lastname'))"
-                @update:modelValue="user.lastName = $event"
-              ></TextField>
-            </div>
-            <div class="one_group_class">
-              <TextField
-                :label="$t('label.email')"
-                :modelValue="user.email"
-                :rules="
-                  reqValidmail(
-                    $t('form.required_email'),
-                    $t('form.valid_email')
-                  )
-                "
-                @update:modelValue="user.email = $event"
-              ></TextField>
-            </div>
+            <v-row>
+              <v-col v-if="processType !== 'edit'">
+                <TextField
+                  density="compact"
+                  :ref="'username'"
+                  :variant="
+                    ['add', 'copy'].indexOf(processType) !== -1
+                      ? 'underlined'
+                      : 'plain'
+                  "
+                  :label="$t('user.username')"
+                  :model-value="user.attributes.username"
+                  :rules="
+                    reqField(
+                      $t('error.user_attribute_required', [t('user.username')])
+                    )
+                  "
+                  @update:model-value="setUserAttribute('username', $event)"
+                ></TextField>
+              </v-col>
+              <v-col>
+                <v-checkbox
+                  :label="$t('user.enabled')"
+                  v-model="user.enabled"
+                  :disabled="
+                    !profileStore.userData.roles.includes('chief_editor')
+                  "
+                ></v-checkbox>
+              </v-col>
+            </v-row>
+            <template
+              v-for="group in profileStore.attributeGroups"
+              :key="group.name"
+            >
+              <v-row>
+                <v-label>{{ $t(`user.${group.name}`) }}</v-label>
+              </v-row>
+              <v-row>
+                <template
+                  v-for="attribute in profileStore.attributesOfGroup(
+                    group.name
+                  )"
+                  :key="attribute.name"
+                >
+                  <v-col cols="6">
+                    <TextField
+                      v-if="isTextField(attribute.annotations?.inputType)"
+                      density="compact"
+                      variant="underlined"
+                      :label="handleDisplayName(attribute.displayName)"
+                      :name="attribute.name"
+                      :model-value="user.attributes[attribute.name]"
+                      @update:model-value="
+                        setUserAttribute(attribute.name, $event);
+                        clearValidationError(attribute.name);
+                      "
+                      :type="getTextFieldType(attribute.name)"
+                      :rules="rules[attribute.name]"
+                    ></TextField>
+                    <v-select
+                      v-else-if="isSelection(attribute.annotations?.inputType)"
+                      density="compact"
+                      :label="handleDisplayName(attribute.displayName)"
+                      item-title="name"
+                      item-value="id"
+                      :name="attribute.name"
+                      :items="attribute.validations.options.options"
+                      :model-value="user.attributes[attribute.name]"
+                      :clearable="
+                        attribute.annotations.inputType === 'multiselect'
+                      "
+                      :multiple="
+                        attribute.annotations.inputType === 'multiselect'
+                      "
+                      @update:model-value="
+                        setUserAttribute(attribute.name, $event);
+                        clearValidationError(attribute.name);
+                      "
+                      :rules="rules[attribute.name]"
+                    ></v-select>
+                  </v-col>
+                </template>
+              </v-row>
+            </template>
 
-            <div class="three_group_class">
-              <TextField
-                :label="$t('user.phone')"
-                :modelValue="user.phone"
-                :rules="
-                  reqValidPhone(
-                    $t('form.required_phone'),
-                    $t('form.valid_phone')
-                  )
-                "
-                @update:modelValue="user.phone = $event"
-              ></TextField>
-              <!--TODO: Add this rule once the validation for
-                    optional fields gets implemented by upstream.
-                    :rules="validPhone($t('form.valid_fax'))" -->
-              <TextField
-                :label="$t('user.mobile')"
-                :modelValue="user.mobile"
-                @update:modelValue="user.mobile = $event"
-              ></TextField>
-              <TextField
-                :label="$t('user.fax')"
-                :modelValue="user.fax"
-                @update:modelValue="user.fax = $event"
-              ></TextField>
-            </div>
+            <v-row>
+              <v-label>{{ $t("user.misc") }}</v-label>
+            </v-row>
+            <v-row>
+              <template
+                v-for="attribute in profileStore.attributesWithoutGroup"
+                :key="attribute.name"
+              >
+                <v-col cols="6">
+                  <TextField
+                    v-if="isTextField(attribute.annotations?.inputType)"
+                    density="compact"
+                    variant="underlined"
+                    :label="handleDisplayName(attribute.displayName)"
+                    :name="attribute.name"
+                    :model-value="user.attributes[attribute.name]"
+                    @update:model-value="
+                      setUserAttribute(attribute.name, $event);
+                      clearValidationError(attribute.name);
+                    "
+                    :type="getTextFieldType(attribute.name)"
+                    :rules="rules[attribute.name]"
+                  ></TextField>
+                  <v-select
+                    v-else-if="
+                      ['select', 'multiselect'].includes(
+                        attribute.annotations.inputType
+                      )
+                    "
+                    density="compact"
+                    :label="handleDisplayName(attribute.displayName)"
+                    item-title="name"
+                    item-value="id"
+                    :items="attribute.validations.options.options"
+                    :name="attribute.name"
+                    :model-value="user.attributes[attribute.name]"
+                    :clearable="
+                      attribute.annotations.inputType === 'multiselect'
+                    "
+                    :multiple="
+                      attribute.annotations.inputType === 'multiselect'
+                    "
+                    @update:model-value="
+                      setUserAttribute(attribute.name, $event);
+                      clearValidationError(attribute.name);
+                    "
+                    :rules="rules[attribute.name]"
+                  ></v-select>
+                  <p
+                    :id="`${attribute.name}-validation-error`"
+                    class="validation-error"
+                  ></p>
+                </v-col>
+              </template>
+            </v-row>
+
             <div class="two_group_class">
               <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
-                :no-data-text="$t('label.no_data_text')"
-                dense
-                :label="$t('user.oe')"
-                :items="[]"
-                v-model="user.oe"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-              >
-              </v-select>
-              <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
-                :no-data-text="$t('label.no_data_text')"
-                dense
-                :label="$t('user.bfslocation')"
-                :items="[]"
-                v-model="user.bfslocation"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-              >
-              </v-select>
-            </div>
-            <div class="two_group_class">
-              <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
+                :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
                 dense
                 :label="$t('user.label_institutions')"
-                :items="institutions"
+                :items="institutionStore.institutions"
                 v-model="user.institutions"
                 item-title="name"
                 item-value="id"
@@ -144,11 +179,11 @@
               >
               </v-select>
               <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
+                :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
                 dense
                 :label="$t('user.label_memberships')"
-                :items="memeberships"
+                :items="userStore.memberships"
                 v-model="user.groups"
                 item-title="name"
                 item-value="id"
@@ -160,9 +195,9 @@
               >
               </v-select>
             </div>
-            <div class="two_group_class">
+            <div class="one_group_class">
               <v-select
-                :clearable="$store.state.profile.isAllowedToManage"
+                :clearable="profileStore.isAllowedToManage"
                 dense
                 :label="$t('user.label_roles')"
                 :items="userRoles"
@@ -173,26 +208,11 @@
                 :rules="reqMultipleSelect($t('user.required_roles'))"
               >
               </v-select>
-              <!-- TODO: Add this rule once the validation for
-                    optional fields gets implemented by upstream.
-                    :rules="validPostalcode($t('form.valid_postalcode'))" -->
-              <v-select
-                :no-data-text="$t('label.no_data_text')"
-                dense
-                :label="$t('user.label_positions')"
-                :items="positions"
-                v-model="user.position"
-                item-title="position"
-                item-value="id"
-                persistent-hint
-                :rules="reqField($t('user.required_position'))"
-              >
-              </v-select>
             </div>
           </v-form>
           <UIAlert
             v-if="hasLoadingError || hasRequestError"
-            v-bind:message="$store.state.application.httpErrorMessage"
+            v-bind:message="applicationStore.httpErrorMessage"
           />
         </v-col>
       </v-row>
@@ -235,8 +255,8 @@
       <v-btn
         color="accent"
         @click="
-          $store.commit('application/setOwnAccount', false);
-          $store.commit('application/setShowManageUserDialog', false);
+          applicationStore.setOwnAccount(false);
+          applicationStore.setShowManageUserDialog(false);
         "
       >
         {{ $t("button.cancel") }}
@@ -267,11 +287,14 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onMounted, ref, nextTick } from "vue";
+import { computed, onBeforeMount, onMounted, nextTick, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
-import { useStore } from "vuex";
+import { useApplicationStore } from "@/stores/application";
+import { useInstitutionStore } from "@/stores/institution";
+import { useProfileStore } from "@/stores/profile";
+import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import { expUser } from "@/components/User/user";
 import TextField from "@/components/TextField.vue";
@@ -279,49 +302,182 @@ import TextField from "@/components/TextField.vue";
 const { t } = useI18n();
 const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
-const store = useStore();
-const user = ref(store.state.application.managedItem);
-const originalUser = ref(store.state.application.savedItem);
-const processType = ref(store.state.application.processType);
 
+const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
+const profileStore = useProfileStore();
+const userStore = useUserStore();
+
+const rules = ref({});
+
+// Object that contains maximal one rule per user attribute.
+// These rules always return a message so they always lead to an
+// error message for the attribute. That's why they are only added then
+// the keycloak server returns a validation error.
+const serverValidationRules = {};
+
+function setUserAttribute(name, value) {
+  const attrs = user.value.attributes;
+  if (
+    typeof value !== "string" &&
+    (value?.length === 0 || value?.[0]?.length)
+  ) {
+    attrs[name] = value;
+  } else if (value) {
+    // Keycloak User Profile attributes are arrays expected to
+    // contain a single value
+    attrs[name] = [value];
+  } else {
+    delete attrs[name];
+  }
+}
+
+const getMetaDataAttribute = (nameOfAttribute) => {
+  return profileStore.attributes.find(
+    (attribute) => attribute.name === nameOfAttribute
+  );
+};
+const isTextField = (inputType) => {
+  if (
+    !inputType ||
+    ["text", "html5-email", "html5-tel", "html5-url", "html5-number"].includes(
+      inputType
+    )
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+};
+const isSelection = (inputType) => {
+  if (inputType && ["select", "multiselect"].includes(inputType)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+// Convert the input type that Keycloak uses to a type that can be used by Vuetify.
+const getTextFieldType = (nameOfAttribute) => {
+  const attribute = getMetaDataAttribute(nameOfAttribute);
+  if (attribute.annotations?.inputType === "html5-email") {
+    return "email";
+  } else if (attribute.annotations?.inputType === "html5-tel") {
+    return "tel";
+  } else {
+    return "text";
+  }
+};
+const handleDisplayName = (displayName) => {
+  if (displayName.startsWith("${") && displayName.endsWith("}")) {
+    return t(`user.${displayName.replace("${", "").slice(0, -1)}`);
+  }
+  return displayName;
+};
+
+// Creating rules for the validation of form components.
+const getRules = (attribute) => {
+  const tmpRules = [];
+  // Rules for text field components
+  if (!attribute.validations?.options) {
+    if (
+      // In Keycloak it is not possible to choose if email
+      // is a required attribute so it won't appear in the
+      // UserProfileMetadata. That's why we can't handle it the "generic"
+      // way.
+      attribute.name === "email" ||
+      attribute.required?.roles?.includes("user")
+    ) {
+      tmpRules.push(
+        ...reqField(
+          t("error.user_attribute_required", [
+            handleDisplayName(attribute.displayName),
+          ])
+        )
+      );
+
+      if (attribute.validations?.pattern) {
+        const pattern = attribute.validations.pattern.pattern;
+        const errorMessage = attribute.validations.pattern["error-message"];
+        tmpRules.push(...validRegex(pattern, t(errorMessage)));
+      }
+
+      if (attribute.validations?.length) {
+        const length = attribute.validations.length;
+        let message;
+        const displayName = handleDisplayName(attribute.displayName);
+        if (length.min && length.max) {
+          message = t("error.invalid_length", [
+            displayName,
+            length.min,
+            length.max,
+          ]);
+        } else if (length.min) {
+          message = t("error.invalid_length_too_short", [
+            displayName,
+            length.min,
+          ]);
+        } else {
+          message = t("error.invalid_length_too_long", [
+            displayName,
+            length.max,
+          ]);
+        }
+        tmpRules.push(...validLength(length.min, length.max, message));
+      }
+    }
+  }
+  // Rules for select components
+  else {
+    tmpRules.push(
+      ...reqField(t("error.user_attribute_required", [attribute.name]))
+    );
+  }
+  if (serverValidationRules[attribute.name]) {
+    tmpRules.push(serverValidationRules[attribute.name]);
+  }
+  return tmpRules;
+};
+const updateRule = (nameOfAttribute) => {
+  const attribute = getMetaDataAttribute(nameOfAttribute);
+  rules.value[nameOfAttribute] = attribute ? getRules(attribute) : [];
+};
+const updateRules = () => {
+  profileStore.attributes.forEach((attribute) => {
+    rules.value[attribute.name] = getRules(attribute);
+  });
+};
 const getUserMemberships = () => {
-  store.dispatch("user/loadMemberships").catch(() => {
+  userStore.loadMemberships().catch(() => {
     hasLoadingError.value = false;
   });
 };
-const getUserPsositions = () => {
-  HTTP.get("iamuser/position")
-    .then((response) => {
-      store.commit("user/setPositions", response.data);
-    })
-    .catch(() => {
-      hasLoadingError.value = false;
-    });
-};
 const getInstitutions = () => {
-  store
-    .dispatch("institution/loadInstitutions")
+  institutionStore
+    .loadInstitutions()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
     });
 };
+onBeforeMount(() => {
+  updateRules();
+});
 onMounted(() => {
   getUserMemberships();
-  getUserPsositions();
   getInstitutions();
 });
-const positions = computed(() => {
-  return store.state.user.positions;
+const user = computed(() => {
+  return applicationStore.managedItem;
 });
-const memeberships = computed(() => {
-  return store.state.user.memberships;
+const originalUser = computed(() => {
+  return applicationStore.savedItem;
 });
-const institutions = computed(() => {
-  return store.state.institution.institutions;
+const processType = computed(() => {
+  return applicationStore.processType;
 });
 const userRoles = computed(() => {
-  var roles = store.state.user.roles;
+  var roles = userStore.roles;
   // If available, use description field for localization
   roles.forEach(
     (item) => (item.title = item.description ? t(item.description) : item.name)
@@ -333,8 +489,8 @@ const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const getUsers = () => {
-  store
-    .dispatch("user/loadUsers")
+  userStore
+    .loadUsers()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
@@ -345,8 +501,8 @@ const createUser = (shouldClose) => {
     .then(() => {
       getUsers();
       if (shouldClose) {
-        store.commit("application/setOwnAccount", true);
-        store.commit("application/setShowManageUserDialog", false);
+        applicationStore.setOwnAccount(true);
+        applicationStore.setShowManageUserDialog(false);
       } else {
         // Use the same roles of the last created user.
         const usedRoles = user.value.roles;
@@ -357,26 +513,71 @@ const createUser = (shouldClose) => {
         });
       }
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.[0]?.message
+      ) {
+        handleValidationErrorFromServer(error.response.data);
+      } else {
+        hasRequestError.value = true;
+      }
     });
 };
 
 const updateUser = () => {
   resetNotification();
-  store
-    .dispatch("user/updateUser", user.value)
+  userStore
+    .updateUser(user.value)
     .then(() => {
       // Update current user Profile and thus the data in App bar.
-      if (store.state.profile.userData.id === user.value.id) {
-        store.dispatch("profile/loadProfile");
+      if (profileStore.userData.id === user.value.id) {
+        profileStore.loadProfile();
       }
-      store.commit("application/setOwnAccount", false);
-      store.commit("application/setShowManageUserDialog", false);
+      applicationStore.setOwnAccount(false);
+      applicationStore.setShowManageUserDialog(false);
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.[0]?.message
+      ) {
+        handleValidationErrorFromServer(error.response.data);
+      } else {
+        hasRequestError.value = true;
+      }
+      console.error(error);
     });
+};
+
+const handleValidationErrorFromServer = (error) => {
+  for (let i = 0; i < error.length; i++) {
+    const errorObject = error[i];
+    const message = errorObject.message;
+    const stringToTranslate = message.startsWith("error-")
+      ? message.replace("error-", "error.").replaceAll("-", "_")
+      : message;
+    const attributeName = errorObject.messageParameters[0];
+    errorObject.messageParameters[0] = t(
+      `user.${errorObject.messageParameters[0].toLowerCase()}`
+    );
+    const translatedString = t(
+      stringToTranslate,
+      errorObject.messageParameters
+    );
+
+    // Create rules that can be used by the validation mechanism of Vuetify.
+    serverValidationRules[attributeName] = () => {
+      return translatedString;
+    };
+    form.value.validate();
+    updateRules();
+  }
+};
+
+const clearValidationError = (attributeName) => {
+  delete serverValidationRules[attributeName];
+  updateRule(attributeName);
 };
 const createAndPrepare = () => {
   resetNotification();
@@ -387,17 +588,18 @@ const {
   form,
   valid,
   reqField,
-  reqValidPhone,
-  reqValidmail,
   reqMultipleSelect,
+  validRegex,
+  validLength,
   resetForm,
   hasNoChangeWrapper,
 } = useForm();
 const hasNoChange = hasNoChangeWrapper(originalUser.value, user.value);
+
 const isReadOnly = computed(() => {
-  if (store.state.application.ownAccount) {
+  if (applicationStore.ownAccount) {
     return false;
   }
-  return !store.state.profile.isAllowedToManage;
+  return !profileStore.isAllowedToManage;
 });
 </script>

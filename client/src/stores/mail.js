@@ -4,41 +4,41 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
+import { defineStore } from "pinia";
 import { HTTP } from "../lib/http";
-export const mail = {
+
+export const useMailStore = defineStore("mail", {
   namespaced: true,
   state: () => ({
     mailTypes: [],
     mailingLists: [],
   }),
-  mutations: {
-    setMailTypes: (state, data) => {
-      state.mailTypes = data;
-    },
-    setMailinglists: (state, data) => {
-      state.mailingLists = data;
-    },
-  },
   actions: {
-    loadMailTypes({ commit }) {
+    setMailTypes(data) {
+      this.mailTypes = data;
+    },
+    setMailinglists(data) {
+      this.mailingLists = data;
+    },
+    loadMailTypes() {
       return new Promise((resolve, reject) => {
         HTTP.get("mail/type")
           .then((response) => {
-            commit("setMailTypes", response.data);
+            this.setMailTypes(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
-    loadMailinglists({ commit }) {
+    loadMailinglists() {
       return new Promise((resolve, reject) => {
         HTTP.get("mail/list")
           .then((response) => {
-            commit("setMailinglists", response.data);
+            this.setMailinglists(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
   },
-};
+});

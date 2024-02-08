@@ -7,7 +7,7 @@
 
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import store from "@/store";
+import { useApplicationStore } from "@/stores/application";
 import { useNotification } from "@/lib/use-notification";
 
 const { hasRequestError } = useNotification();
@@ -32,7 +32,15 @@ export function useForm() {
     ];
   };
   const reqValidPhone = (reqMsg, validMsg) => {
-    return [(v) => !!v || reqMsg, (v) => regExprPhone.test(v) || validMsg];
+    return [
+      (v) => !!v || reqMsg,
+      (v) =>
+        (v &&
+          v.toString().match(regExprPhone)?.[0] === v.toString() &&
+          v.toString().match(regExprPhone)?.[0].length ===
+            v.toString().length) ||
+        validMsg,
+    ];
   };
   const validPhone = (validMsg) => {
     (v) => doesRegexMatchWholeString(regExprPhone, v) || validMsg;
@@ -70,14 +78,41 @@ export function useForm() {
     ];
   };
   const reqField = (reqMsg) => {
-    return [(v) => !!v || reqMsg];
+    return [(v) => (v && Boolean(v.toString())) || reqMsg];
   };
   const reqMultipleSelect = (reqMsg) => {
     return [(v) => !!(v && v.length) || reqMsg];
   };
 
+  const validRegex = (regex, validMsg) => {
+    return [
+      (v) =>
+        // Make sure that the whole string has to be a match and that this
+        // match is the only one.
+        // Otherwise a string could be valid even if it had two or more
+        // matches.
+        (v &&
+          v.toString().match(regex)?.[0] === v.toString() &&
+          v.toString().match(regex)?.[0].length === v.toString().length) ||
+        validMsg,
+    ];
+  };
+  const validLength = (minLength, maxLength, validMsg) => {
+    return [
+      (v) => {
+        return (
+          !v ||
+          (v &&
+            (!minLength || (minLength && v.toString().length >= minLength)) &&
+            (!maxLength || (maxLength && v.toString().length <= maxLength))) ||
+          validMsg
+        );
+      },
+    ];
+  };
   const resetForm = (originalObject, changedObject) => {
-    store.commit("application/setHttpErrorMessage", "");
+    const applicationStore = useApplicationStore();
+    applicationStore.setHttpErrorMessage("");
     hasRequestError.value = false;
     const changedKeys = Object.keys(changedObject);
     changedKeys.forEach((key) => {
@@ -94,7 +129,6 @@ export function useForm() {
     );
     return hasNoChange;
   };
-
   return {
     form,
     valid,
@@ -110,6 +144,8 @@ export function useForm() {
     dateStringToDate,
     doesRegexMatchWholeString,
     germanDateRegex,
+    validRegex,
+    validLength,
     resetForm,
     hasNoChangeWrapper,
   };
