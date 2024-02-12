@@ -17,6 +17,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -48,17 +53,43 @@ public class CSVExporter<T> {
             return null;
         }
         StringBuffer result = new StringBuffer();
-        String[] header = getHeader(objects.get(0));
+        String[] properties = getHeader(objects.get(0));
+        String[] attributes = getAttributes(objects.toArray());
+        ArrayList<String> header = new ArrayList<>();
+        header.addAll(Arrays.asList(attributes));
+        header.addAll(Arrays.asList(properties));
         CSVFormat format = CSVFormat.DEFAULT
             .withDelimiter(fieldSeparator)
             .withQuote(quoteType)
             .withRecordSeparator(rowDelimiter)
-            .withHeader(header);
+            .withHeader(header.toArray(String[]::new));
         try (CSVPrinter printer = new CSVPrinter(result, format)) {
             for (T object: objects) {
                 ArrayList<String> row = new ArrayList<String>();
+                // Add User attributes
+                Field field;
+                Map<String, List<String>> objectAttributes = new HashMap<>();
+                try {
+                    field = object.getClass().getDeclaredField("attributes");
+                    field.setAccessible(true);
+                    objectAttributes = (Map<String, List<String>>) field.get(object);
+                } catch (NoSuchFieldException e) {
+                    // Skip if object has no attributes
+                }
+                for (String attribute : attributes) {
+                    String values = "";
+                    if (objectAttributes.containsKey(attribute)) {
+                        for (String value : objectAttributes.get(attribute)) {
+                            values += value;
+                        }
+                    }
+                    row.add(values);
+                }
                 for (PropertyDescriptor propertyDescriptor
                         : getPropertyDescriptors(object)) {
+                    if (propertyDescriptor.getName().equals("attributes")) {
+                        continue;
+                    }
                     Object value = propertyDescriptor.getReadMethod()
                         .invoke(object);
                     row.add(value != null ? value.toString() : "");
@@ -74,13 +105,34 @@ public class CSVExporter<T> {
         return getHeader(object, false);
     }
 
+    private String[] getAttributes(Object[] objects) {
+        Set<String> attributes = new HashSet<String>();
+        for (Object object : objects) {
+            Field field;
+            try {
+                field = object.getClass().getDeclaredField("attributes");
+                field.setAccessible(true);
+                Map<String, List<String>> objectAttributes = (Map<String, List<String>>) field.get(object);
+                for (String key : objectAttributes.keySet()) {
+                    attributes.add(key);
+                }
+            } catch (NoSuchFieldException e) {
+                // Ignore objects with no attributes
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return attributes.toArray(String[]::new);
+    }
+
     private String[] getHeader(Object object, boolean skipId) throws IntrospectionException {
         ArrayList<String> fields = new ArrayList<String>();
 
         for (
             PropertyDescriptor propertyDescriptor
             : getPropertyDescriptors(object)) {
-            if (skipId && propertyDescriptor.getName().equals("id")) {
+            if (skipId && propertyDescriptor.getName().equals("id")
+                || propertyDescriptor.getName().equals("attributes")) {
                 continue;
             }
             fields.add(propertyDescriptor.getName());
