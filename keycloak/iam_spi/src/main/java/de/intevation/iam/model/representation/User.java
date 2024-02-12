@@ -49,7 +49,7 @@ public class User {
     private List<Integer> institutions;
     private List<String> roles;
     private Boolean readonly;
-    private Boolean enabled;
+    private boolean enabled;
 
     private static final String ID_PARAM = "id";
     private static final String USER_PARAM = "user";
@@ -146,10 +146,10 @@ public class User {
         this.readonly = readonly;
     }
 
-    public Boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
