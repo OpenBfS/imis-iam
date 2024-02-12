@@ -24,6 +24,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
 public class Institution {
