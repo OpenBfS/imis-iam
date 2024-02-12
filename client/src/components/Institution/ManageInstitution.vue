@@ -201,12 +201,13 @@
                 dense
                 :label="$t('institution.categories')"
                 :items="categories"
-                v-model="institution.categoryName"
+                v-model="institution.categoryNames"
                 item-title="name"
                 item-value="id"
                 persistent-hint
                 density="compact"
                 :rules="reqField($t('error.required_category'))"
+                multiple
               >
               </v-select>
             </div>
