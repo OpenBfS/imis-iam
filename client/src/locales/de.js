@@ -5,6 +5,8 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 export default {
+  // For re-use
+  user_term: "IMIS-Nutzer",
   // Role names
   role_iam_user: "Nutzer",
   role_iam_editor: "Redakteur",
@@ -125,30 +127,30 @@ export default {
   main: {
     title: "Integriertes Mess- und Informationssystem IMIS",
     institutions: "Institutionen",
-    users: "Benutzer",
+    users: "@:user_term",
   },
   // Users component
   user: {
-    export: "Benutzer-Liste exportieren",
-    user_title: "Benutzer",
-    create_title: "Neuen Benutzer erstellen",
-    edit_title: "Benutzer {name}",
+    export: "@:user_term-Liste exportieren",
+    user_title: "@:user_term",
+    create_title: "Neuen @:user_term erstellen",
+    edit_title: "@:user_term {name}",
     label_institutions: "Institutionen",
-    add_user: "Benutzer Hinzufügen",
+    add_user: "@:user_term Hinzufügen",
     edit_my_profile: "Mein Profil bearbeiten",
     contact: "Kontakt",
     phone: "Telefon",
     fax: "Fax",
     mobile: "Handy",
     email: "E-Mail",
-    oe: "OE",
-    bfslocation: "Standort BfS",
+    oe: "Organisationseinheit",
+    bfslocation: "Standort",
     title: "Titel",
     firstname: "Vorname",
     id: "ID",
     lastname: "Nachname",
     name: "Name",
-    username: "Benutzername",
+    username: "IMIS-Kennung",
     enabled: "Aktiviert",
     position: "Position",
     misc: "Weiteres",
@@ -157,7 +159,7 @@ export default {
     required_membership: "Mitgliedschaft ist erforderlich",
     required_position: "Position ist erforderlich",
     required_institution: "Institution ist erforderlich",
-    label_roles: "Rollen",
+    label_roles: "Rollen im IdM",
     required_roles: "Rolle ist erforderlich",
   },
   // Shared button texts
