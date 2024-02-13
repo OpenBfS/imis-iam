@@ -198,6 +198,7 @@
             <div class="one_group_class">
               <v-select
                 :clearable="profileStore.isAllowedToManage"
+                :disabled="!profileStore.isAllowedToManage"
                 dense
                 :label="$t('user.label_roles')"
                 :items="userRoles"
