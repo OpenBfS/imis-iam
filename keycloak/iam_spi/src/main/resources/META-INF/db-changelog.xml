@@ -64,10 +64,11 @@
                 y_coordinate FLOAT,
                 active BOOLEAN DEFAULT true
             );
-            
+
             CREATE TABLE iam_institution_categories (
                 institution_id INTEGER REFERENCES iam_institution(id),
-                category_name VARCHAR REFERENCES iam_institution_category
+                category_name VARCHAR REFERENCES iam_institution_category,
+                PRIMARY KEY (institution_id, category_name)
             );
 
             CREATE TABLE iam_institution_user (
