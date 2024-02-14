@@ -80,7 +80,7 @@
               ><v-row>
                 <v-select
                   :no-data-text="$t('label.no_data_text')"
-                  v-model="coordinates.coordinate"
+                  v-model="selectedCoordinates"
                   clearable
                   dense
                   :label="$t('institution.coordinates')"
@@ -93,6 +93,7 @@
                   persistent-hint
                   :return-object="coordinatesReturnObj"
                   density="compact"
+                  @update:modelValue="coordinatesPicked"
                 ></v-select>
               </v-row>
             </v-form>
@@ -305,6 +306,7 @@ const institution = ref(applicationStore.managedItem);
 const originalInstitution = { ...institution.value };
 const processType = ref(applicationStore.processType);
 const coordinates = ref(coordinatesStore.coordinates);
+const selectedCoordinates = ref(null);
 const {
   form,
   valid,
@@ -326,6 +328,7 @@ const getCategories = () => {
     });
 };
 onMounted(() => {
+  coordinatesStore.coordinates.length = 0;
   getCategories();
 
   // Initialize dropdown for coordinates
@@ -385,11 +388,11 @@ const coordinatesReturnObj = ref(true);
 
 //Handle coordinates picked
 const coordinatesPicked = () => {
-  if (!coordinates.value?.coordinate) {
+  if (!selectedCoordinates.value?.geometry) {
     institution.value.xCoordinate = null;
     institution.value.yCoordinate = null;
   } else {
-    var geometry = coordinates.value.coordinate.geometry.coordinates;
+    var geometry = selectedCoordinates.value.geometry.coordinates;
     institution.value.xCoordinate = geometry[0];
     institution.value.yCoordinate = geometry[1];
   }
@@ -413,12 +416,6 @@ const triggerLoadCoordinates = debounce((queryString) => {
     }
   );
 }, 500);
-watch(
-  () => coordinates.value.coordinate,
-  () => {
-    coordinatesPicked();
-  }
-);
 watch(
   [
     () => institution.value.serviceBuildingLocation,
