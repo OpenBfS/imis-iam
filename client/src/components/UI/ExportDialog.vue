@@ -11,7 +11,7 @@
     <v-divider></v-divider>
     <v-container class="mt-4">
       <v-row justify="center">
-        <v-col justify="center" cols="10">
+        <v-col cols="10">
           <v-select
             :no-data-text="$t('label.no_data_text')"
             :label="$t('label.field_seperator')"

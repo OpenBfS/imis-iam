@@ -14,14 +14,14 @@
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
           <v-btn
-            v-if="profileStore.isAllowedToManage"
+            v-if="profileStore.isChiefEditor"
             color="accent"
             class="mr-4"
             v-bind="props"
             icon="mdi-calendar-plus"
             @click="
               resetNotification();
-              eventsStore.setManagedEvent(exampleEvent);
+              eventsStore.setManagedEvent({ ...exampleEvent });
               applicationStore.setProcessType('add');
               applicationStore.setShowManageEventDialog(true);
             "
@@ -69,13 +69,7 @@
                     icon="mdi-calendar-remove"
                     variant="plain"
                     v-bind="props"
-                    @click="
-                      eventsStore.setManagedEvent({
-                        ...event,
-                      });
-                      applicationStore.setProcessType('delete');
-                      applicationStore.setShowManageEventDialog(true);
-                    "
+                    @click="deleteEvent(event)"
                   />
                 </template>
                 <span>{{ $t("label.delete") }}</span>
@@ -85,6 +79,10 @@
         </tbody>
       </v-table>
     </v-row>
+    <UIAlert
+      v-if="hasLoadingError || hasRequestError"
+      v-bind:message="applicationStore.httpErrorMessage"
+    />
   </v-container>
 </template>
 <script setup>
@@ -94,12 +92,14 @@ import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
 import { useEventsStore } from "@/stores/events";
 import { useProfileStore } from "@/stores/profile";
+import { HTTP } from "@/lib/http";
 
 const hover = true;
 const applicationStore = useApplicationStore();
 const eventsStore = useEventsStore();
 const profileStore = useProfileStore();
-const { hasLoadingError, resetNotification } = useNotification();
+const { hasLoadingError, hasRequestError, resetNotification } =
+  useNotification();
 
 const exampleEvent = ref({ ...expEvent });
 
@@ -107,12 +107,9 @@ const formattedEvents = computed(() => {
   const newFormattedEvents = [];
   //Display dates as non repeating strings
   eventsStore.events.forEach((value, index) => {
-    const now = Date.now();
-    if (
-      profileStore.isAllowedToManage ||
-      value.startDate > now ||
-      value.endDate > now
-    ) {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    if (value.endDate > startOfToday.getTime()) {
       const date = new Date(value.startDate);
       var currentTimeString = date.toLocaleString("default", {
         month: "long",
@@ -142,6 +139,16 @@ const itemClicked = (id) => {
   });
   applicationStore.setProcessType("show");
   applicationStore.setShowManageEventDialog(true);
+};
+
+const deleteEvent = (event) => {
+  HTTP.delete("event/" + event.id)
+    .then(() => {
+      eventsStore.removeEvent(event);
+    })
+    .catch(() => {
+      hasRequestError.value = true;
+    });
 };
 
 onMounted(() => {

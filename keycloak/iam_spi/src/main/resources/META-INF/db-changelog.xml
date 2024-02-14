@@ -49,7 +49,6 @@
                 id SERIAL PRIMARY KEY,
                 name VARCHAR NOT NULL UNIQUE,
                 short_name VARCHAR NOT NULL UNIQUE,
-                category_name VARCHAR REFERENCES iam_institution_category,
                 service_building_street VARCHAR NOT NULL,
                 service_building_postal_code VARCHAR NOT NULL,
                 service_building_location VARCHAR NOT NULL,
@@ -60,9 +59,16 @@
                 central_fax VARCHAR,
                 central_mail VARCHAR NOT NULL,
                 imis_id VARCHAR,
+                imis_usergroup_id VARCHAR(3),
                 x_coordinate FLOAT,
                 y_coordinate FLOAT,
                 active BOOLEAN DEFAULT true
+            );
+
+            CREATE TABLE iam_institution_categories (
+                institution_id INTEGER REFERENCES iam_institution(id),
+                category_name VARCHAR REFERENCES iam_institution_category,
+                PRIMARY KEY (institution_id, category_name)
             );
 
             CREATE TABLE iam_institution_user (

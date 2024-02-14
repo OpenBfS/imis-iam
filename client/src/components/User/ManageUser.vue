@@ -20,11 +20,11 @@
     <v-divider></v-divider>
     <v-container class="pa-1 mt-4">
       <v-row justify="center">
-        <v-col jsutify="start" cols="11">
+        <v-col cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
             <v-row>
               <v-col v-if="processType !== 'edit'">
-                <v-text-field
+                <TextField
                   density="compact"
                   :ref="'username'"
                   :variant="
@@ -40,7 +40,7 @@
                     )
                   "
                   @update:model-value="setUserAttribute('username', $event)"
-                ></v-text-field>
+                ></TextField>
               </v-col>
               <v-col>
                 <v-checkbox
@@ -67,7 +67,7 @@
                   :key="attribute.name"
                 >
                   <v-col cols="6">
-                    <v-text-field
+                    <TextField
                       v-if="isTextField(attribute.annotations?.inputType)"
                       density="compact"
                       variant="underlined"
@@ -80,7 +80,7 @@
                       "
                       :type="getTextFieldType(attribute.name)"
                       :rules="rules[attribute.name]"
-                    ></v-text-field>
+                    ></TextField>
                     <v-select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
                       density="compact"
@@ -116,7 +116,7 @@
                 :key="attribute.name"
               >
                 <v-col cols="6">
-                  <v-text-field
+                  <TextField
                     v-if="isTextField(attribute.annotations?.inputType)"
                     density="compact"
                     variant="underlined"
@@ -129,7 +129,7 @@
                     "
                     :type="getTextFieldType(attribute.name)"
                     :rules="rules[attribute.name]"
-                  ></v-text-field>
+                  ></TextField>
                   <v-select
                     v-else-if="
                       ['select', 'multiselect'].includes(
@@ -198,6 +198,7 @@
             <div class="one_group_class">
               <v-select
                 :clearable="profileStore.isAllowedToManage"
+                :disabled="!profileStore.isAllowedToManage"
                 dense
                 :label="$t('user.label_roles')"
                 :items="userRoles"
@@ -231,7 +232,7 @@
       <v-btn
         v-if="!isReadOnly"
         color="accent"
-        :disabled="!valid || hasNoChanges"
+        :disabled="!valid || hasNoChange"
         @click="
           ['add', 'copy'].indexOf(processType) !== -1
             ? createUser(true)
@@ -247,8 +248,8 @@
       <v-btn
         v-if="processType === 'edit' && !isReadOnly"
         color="accent"
-        :disabled="hasNoChanges"
-        @click="handleReset"
+        :disabled="hasNoChange"
+        @click="resetForm(cloneObject(originalUser), user)"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -297,6 +298,7 @@ import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import { expUser } from "@/components/User/user";
+import TextField from "@/components/TextField.vue";
 
 const { t } = useI18n();
 const { hasLoadingError, hasRequestError, resetNotification } =
@@ -582,32 +584,19 @@ const createAndPrepare = () => {
   resetNotification();
   createUser(false);
 };
-const handleReset = () => {
-  applicationStore.httpErrorMessage = "";
-  hasRequestError.value = false;
-  applicationStore.setManagedItem(cloneObject(applicationStore.savedItem));
-  const keys = Object.keys(serverValidationRules);
-  keys.forEach((key) => {
-    delete serverValidationRules[key];
-  });
-  updateRules();
-};
 // Form
-const { form, valid, reqField, reqMultipleSelect, validRegex, validLength } =
-  useForm();
-// Activate button only if some values are changed for "edit"
-// and username and email are changed for "copy"
-// to avoid useless requests
-const hasNoChanges = computed(() => {
-  return (
-    (processType.value === "edit" &&
-      JSON.stringify(originalUser.value) === JSON.stringify(user.value)) ||
-    (processType.value === "copy" &&
-      user.value.attributes.username ===
-        originalUser.value.attributes.username) ||
-    user.value.attributes.email === originalUser.value.attributes.email
-  );
-});
+const {
+  form,
+  valid,
+  reqField,
+  reqMultipleSelect,
+  validRegex,
+  validLength,
+  resetForm,
+  hasNoChangeWrapper,
+} = useForm();
+const hasNoChange = hasNoChangeWrapper(originalUser.value, user.value);
+
 const isReadOnly = computed(() => {
   if (applicationStore.ownAccount) {
     return false;

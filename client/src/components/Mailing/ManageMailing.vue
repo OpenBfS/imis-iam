@@ -21,13 +21,12 @@
       <v-container>
         <v-row justify="center">
           <v-form v-model="valid" class="v-col v-col-10">
-            <v-text-field
-              variant="underlined"
-              density="compact"
+            <TextField
               :label="$t('mailinglist.name')"
-              v-model="listName"
+              :modelValue="listName"
               :rules="reqField($t('mailinglist.required_mailinglist_name'))"
-            ></v-text-field>
+              @update:modelValue="listName = $event"
+            ></TextField>
             <v-select
               :no-data-text="$t('label.no_data_text')"
               dense
@@ -35,7 +34,7 @@
               :label="$t('mailinglist.recipient')"
               :items="users"
               v-model="selectedUsers"
-              item-title="username"
+              item-title="attributes.username"
               item-value="id"
               persistent-hint
               multiple
@@ -140,6 +139,7 @@ import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application";
 import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
+import TextField from "@/components/TextField.vue";
 const props = defineProps({
   processType: String,
   item: Object,

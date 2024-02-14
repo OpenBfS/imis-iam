@@ -214,7 +214,11 @@ const expiryDateString = ref("");
 const isExpiryDatePickerOpen = ref(false);
 const userData = profileStore.userData;
 const senderList = ref([
-  [userData.firstName, userData.lastName, "<" + userData.email + ">"].join(" "),
+  [
+    userData.attributes.firstName,
+    userData.attributes.lastName,
+    "<" + userData.attributes.email + ">",
+  ].join(" "),
   applicationStore.reportMail,
 ]);
 const selectedSender = ref(senderList.value[0] || senderList.value[0] || "");

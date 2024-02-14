@@ -7,15 +7,23 @@
 package de.intevation.iam.model.jpa;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
@@ -31,8 +39,13 @@ public class Institution {
     @Column(name = "short_name", nullable = false)
     private String shortName;
 
-    @Column(name = "category_name")
-    private String categoryName;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "iam_institution_categories",
+        joinColumns = {@JoinColumn(name = "institution_id")},
+        inverseJoinColumns = {@JoinColumn(name = "category_name")}
+    )
+    private List<InstitutionCategory> categoryNames;
 
     @Column(name = "service_building_street", nullable = false)
     private String serviceBuildingStreet;
@@ -63,6 +76,9 @@ public class Institution {
 
     @Column(name = "imis_id")
     private String imisId;
+
+    @Column(name = "imis_usergroup_id")
+    private String imisUserGroupId;
 
     @Column(name = "x_coordinate")
     @JsonProperty("xCoordinate")
@@ -110,12 +126,22 @@ public class Institution {
         this.shortName = shortName;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public List<String> getCategoryNames() {
+        ArrayList<String> categories = new ArrayList<>();
+        for (InstitutionCategory category : categoryNames) {
+            categories.add(category.getName());
+        }
+        return categories;
     }
 
-    public void setCategory(String categoryName) {
-        this.categoryName = categoryName;
+    public void setCategoryNames(List<String> categoryNames) {
+        ArrayList<InstitutionCategory> categories = new ArrayList<>();
+        for (String category : categoryNames) {
+            InstitutionCategory institutionCategory = new InstitutionCategory();
+            institutionCategory.setName(category);
+            categories.add(institutionCategory);
+        }
+        this.categoryNames = categories;
     }
 
     public String getServiceBuildingStreet() {
@@ -196,6 +222,14 @@ public class Institution {
 
     public void setImisId(String imisId) {
         this.imisId = imisId;
+    }
+
+    public String getImisUserGroupId() {
+        return imisUserGroupId;
+    }
+
+    public void setImisUserGroupId(String imisUserGroupId) {
+        this.imisUserGroupId = imisUserGroupId;
     }
 
     public Float getXCoordinate() {

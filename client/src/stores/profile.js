@@ -33,6 +33,9 @@ export const useProfileStore = defineStore("profile", {
           (attribute) => attribute.group === groupName
         );
     },
+    isChiefEditor: (state) => {
+      return state.userData.roles?.find((e) => e === "chief_editor");
+    },
   },
   actions: {
     setUserData(data) {

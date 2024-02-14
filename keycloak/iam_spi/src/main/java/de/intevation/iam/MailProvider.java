@@ -7,11 +7,14 @@
 package de.intevation.iam;
 
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -63,6 +66,8 @@ import de.intevation.iam.util.RequestMethod;
  */
 @Produces(MediaType.APPLICATION_JSON)
 public class MailProvider implements RealmResourceProvider {
+
+    private static final Logger LOG = Logger.getLogger("MailProvider");
 
     private static final String FROM_ADDRESS = "from";
     private static final String USER_ID_HEADER = "X-SHIB-user";
@@ -432,8 +437,8 @@ public class MailProvider implements RealmResourceProvider {
         @QueryParam("type") List<Integer> types,
         @QueryParam("count") Integer count,
         @QueryParam("archived") boolean archived,
-        @QueryParam("start") Timestamp start,
-        @QueryParam("end") Timestamp end,
+        @QueryParam("start") OffsetDateTime start,
+        @QueryParam("end") OffsetDateTime end,
         @QueryParam("sender") String sender,
         @QueryParam("list") List<Integer> lists
     ) {
@@ -484,13 +489,15 @@ public class MailProvider implements RealmResourceProvider {
 
         //Filter mails by start and end date
         if (start != null) {
+            Timestamp startTimestamp = Timestamp.from(start.toInstant());
             Predicate dateFilter = cb.greaterThanOrEqualTo(
-                root.<Timestamp>get("sendDate"), start);
+                root.<Timestamp>get("sendDate"), startTimestamp);
             filter = cb.and(filter, dateFilter);
         }
         if (end != null) {
+            Timestamp endTimestamp = Timestamp.from(end.toInstant());
             Predicate dateFilter = cb.lessThanOrEqualTo(
-                root.<Timestamp>get("sendDate"), end);
+                root.<Timestamp>get("sendDate"), endTimestamp);
             filter = cb.and(filter, dateFilter);
         }
 
@@ -567,8 +574,8 @@ public class MailProvider implements RealmResourceProvider {
                     smtpConfig, user, mail.getSubject(),
                     mail.getText(), mail.getText());
             } catch (EmailException e) {
-                e.printStackTrace();
-                return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+                LOG.log(Level.SEVERE,
+                    "Failed sending mail to user " + user.getUsername());
             }
         }
         em.persist(mail);

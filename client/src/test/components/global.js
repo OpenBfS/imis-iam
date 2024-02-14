@@ -9,6 +9,8 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import i18n from "@/i18n";
 import UIAlert from "@/components/UI/UIAlert.vue";
+import UIHeader from "@/components/UI/UIHeader.vue";
+import router from "./mockRouter.js";
 
 const vuetify = createVuetify({
   components,
@@ -16,11 +18,8 @@ const vuetify = createVuetify({
 });
 
 const global = {
-  plugins: [
-    vuetify,
-    i18n,
-  ],
-  components: { UIAlert },
+  plugins: [vuetify, i18n, router],
+  components: { UIAlert, UIHeader },
 };
 
 export default global;

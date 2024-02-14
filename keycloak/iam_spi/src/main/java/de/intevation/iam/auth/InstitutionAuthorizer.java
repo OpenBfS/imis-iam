@@ -8,6 +8,7 @@ package de.intevation.iam.auth;
 
 import java.util.List;
 
+import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.core.HttpHeaders;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
@@ -40,16 +41,18 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
 
         switch (requestMethod) {
             case GET: return Role.USER.isRoleOf(requestingUser, session);
-            // Only Role.CHIEF_EDITOR is allowed to set/edit imisId:
+            // Only Role.CHIEF_EDITOR is allowed to set/edit imisId and imisUserGroupId:
             case PUT:
-                if (data.getImisId() != session.getProvider(
-                        JpaConnectionProvider.class).getEntityManager().find(
-                            Institution.class, data.getId()).getImisId()) {
-                    return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
-                }
-                return Role.EDITOR.isRoleOf(requestingUser, session);
+                EntityManager em = session.getProvider(
+                    JpaConnectionProvider.class).getEntityManager();
+                return data.getImisId() == em.find(
+                        Institution.class, data.getId()).getImisId()
+                    && data.getImisUserGroupId() == em.find(
+                        Institution.class, data.getId()).getImisUserGroupId()
+                    && Role.EDITOR.isRoleOf(requestingUser, session)
+                    || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             case POST:
-                if (data.getImisId() != null) {
+                if (data.getImisId() != null || data.getImisUserGroupId() != null) {
                     return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
                 }
             case DELETE: return Role.EDITOR.isRoleOf(requestingUser, session);

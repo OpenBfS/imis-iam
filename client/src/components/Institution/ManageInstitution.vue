@@ -18,27 +18,25 @@
     <v-divider></v-divider>
     <v-container class="pa-1 mt-4 mx-2">
       <v-row justify="center">
-        <v-col jsutify="start" cols="11">
+        <v-col cols="11">
           <v-form
             v-model="valid"
             ref="form"
             :readonly="!profileStore.isAllowedToManage"
           >
             <div class="group_class">
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('label.name')"
-                v-model="institution.name"
+                :modelValue="institution.name"
                 :rules="reqField($t('institution.required_name'))"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                @update:modelValue="institution.name = $event"
+              ></TextField>
+              <TextField
                 :label="$t('institution.shortname')"
+                :modelValue="institution.shortName"
                 :rules="reqField($t('institution.required_shortname'))"
-                v-model="institution.shortName"
-              ></v-text-field>
+                @update:modelValue="institution.shortName = $event"
+              ></TextField>
               <v-checkbox
                 density="compact"
                 v-model="institution.active"
@@ -46,42 +44,44 @@
               ></v-checkbox>
             </div>
             <div class="group_class">
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('institution.service_building_location')"
+                :modelValue="institution.serviceBuildingLocation"
                 :rules="
                   reqField($t('institution.required_service_building_location'))
                 "
-                v-model="institution.serviceBuildingLocation"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                @update:modelValue="
+                  institution.serviceBuildingLocation = $event
+                "
+              ></TextField>
+              <TextField
                 :label="$t('institution.service_building_postalcode')"
+                :modelValue="institution.serviceBuildingPostalCode"
                 :rules="
                   reqValidPostalcode(
                     $t('institution.required_service_building_postalcode'),
                     $t('error.valid_postalcode')
                   )
                 "
-                v-model="institution.serviceBuildingPostalCode"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                @update:modelValue="
+                  institution.serviceBuildingPostalCode = $event
+                "
+              ></TextField>
+              <TextField
                 :label="$t('institution.service_building_street')"
-                v-model="institution.serviceBuildingStreet"
+                :modelValue="institution.serviceBuildingStreet"
                 :rules="
                   reqField($t('institution.required_service_building_street'))
                 "
-              ></v-text-field>
+                @update:modelValue="institution.serviceBuildingStreet = $event"
+              ></TextField>
             </div>
             <v-form
               ><v-row>
                 <v-select
                   :no-data-text="$t('label.no_data_text')"
                   v-model="coordinates.coordinate"
+                  clearable
                   dense
                   :label="$t('institution.coordinates')"
                   :loading="coordinatesLoading"
@@ -97,96 +97,103 @@
               </v-row>
             </v-form>
             <div class="group_class">
-              <v-text-field
-                :readonly="true"
-                variant="underlined"
-                density="compact"
+              <TextField
+                disabled
                 :label="$t('institution.x_coordinate')"
-                v-model="institution.xCoordinate"
-              ></v-text-field>
-              <v-text-field
-                :readonly="true"
-                variant="underlined"
-                density="compact"
+                :modelValue="institution.xCoordinate"
+                @update:modelValue="institution.xCoordinate = $event"
+              ></TextField>
+              <TextField
+                disabled
                 :label="$t('institution.y_coordinate')"
-                v-model="institution.yCoordinate"
-              ></v-text-field>
+                :modelValue="institution.yCoordinate"
+                @update:modelValue="institution.yCoordinate = $event"
+              ></TextField>
             </div>
 
             <div class="group_class">
               <!-- TODO: Add this rules once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validPostalcode($t('error.valid_postalcode'))" -->
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('institution.address_location')"
-                v-model="institution.addressLocation"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                :modelValue="institution.addressLocation"
+                @update:modelValue="institution.addressLocation = $event"
+              ></TextField>
+              <TextField
                 :label="$t('institution.address_postalcode')"
-                v-model="institution.addressPostalCode"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                :modelValue="institution.addressPostalCode"
+                @update:modelValue="institution.addressPostalCode = $event"
+              ></TextField>
+              <TextField
                 :label="$t('institution.address_street')"
-                v-model="institution.addressStreet"
-              ></v-text-field>
+                :modelValue="institution.addressStreet"
+                @update:modelValue="institution.addressStreet = $event"
+              ></TextField>
             </div>
             <div class="group_class">
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('institution.central_phone')"
+                :modelValue="institution.centralPhone"
                 :rules="
                   reqValidPhone(
                     $t('institution.required_central_phone'),
                     $t('error.valid_phone')
                   )
                 "
-                v-model="institution.centralPhone"
-              ></v-text-field>
-              <v-text-field
-                variant="underlined"
-                density="compact"
+                @update:modelValue="institution.centralPhone = $event"
+              ></TextField>
+              <TextField
                 :label="$t('institution.central_email')"
+                :modelValue="institution.centralMail"
                 :rules="
                   reqValidmail(
                     $t('institution.required_central_email'),
                     $t('error.valid_email')
                   )
                 "
-                v-model="institution.centralMail"
-              ></v-text-field>
+                @update:modelValue="institution.centralMail = $event"
+              ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validPhone($t('error.valid_fax'))" -->
-              <v-text-field
-                variant="underlined"
-                density="compact"
+              <TextField
                 :label="$t('institution.central_fax')"
-                v-model="institution.centralFax"
-              ></v-text-field>
+                :modelValue="institution.centralFax"
+                @update:modelValue="institution.centralFax = $event"
+              ></TextField>
             </div>
             <div class="group_class">
-              <v-text-field
-                variant="underlined"
-                density="compact"
-                :label="$t('institution.imis_Id')"
+              <TextField
                 :disabled="
                   !profileStore.userData.roles.some((e) => e === 'chief_editor')
                 "
+                :label="$t('institution.imis_Id')"
+                :modelValue="institution.imisId"
                 :rules="[
                   (v) =>
                     !v ||
                     (v && v.length === 5) ||
                     $t('institution.imis_Id_length_validation_message'),
                 ]"
-                v-model="institution.imisId"
-              ></v-text-field>
+                @update:modelValue="institution.imisId = $event"
+              ></TextField>
+              <TextField
+                :disabled="
+                  !profileStore.userData.roles.some((e) => e === 'chief_editor')
+                "
+                :label="$t('institution.imis_usergroup_Id')"
+                :modelValue="institution.imisUserGroupId"
+                :rules="[
+                  (v) =>
+                    !v ||
+                    (v && v.length === 3) ||
+                    $t(
+                      'institution.imis_usergroup_Id_length_validation_message'
+                    ),
+                ]"
+                @update:modelValue="institution.imisUserGroupId = $event"
+              ></TextField>
             </div>
             <div class="group_class align-center">
               <v-select
@@ -194,12 +201,13 @@
                 dense
                 :label="$t('institution.categories')"
                 :items="categories"
-                v-model="institution.categoryName"
+                v-model="institution.categoryNames"
                 item-title="name"
                 item-value="id"
                 persistent-hint
                 density="compact"
                 :rules="reqField($t('error.required_category'))"
+                multiple
               >
               </v-select>
             </div>
@@ -227,7 +235,8 @@
       <v-btn
         v-if="processType === 'edit' && profileStore.isAllowedToManage"
         color="accent"
-        @click="institution = { ...originalInstitution }"
+        :disabled="hasNoChange"
+        @click="resetForm(originalInstitution, institution)"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -282,8 +291,8 @@ import { useApplicationStore } from "@/stores/application";
 import { useCoordinatesStore } from "@/stores/coordinates";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
-import { computed } from "@vue/reactivity";
 import { debounce } from "debounce";
+import TextField from "@/components/TextField.vue";
 
 const { hasLoadingError, hasRequestError } = useNotification();
 
@@ -303,6 +312,8 @@ const {
   reqField,
   reqValidPhone,
   reqValidPostalcode,
+  resetForm,
+  hasNoChangeWrapper,
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
@@ -316,6 +327,14 @@ const getCategories = () => {
 };
 onMounted(() => {
   getCategories();
+
+  // Initialize dropdown for coordinates
+  const loc = institution.value.serviceBuildingLocation;
+  const poc = institution.value.serviceBuildingPostalCode;
+  const str = institution.value.serviceBuildingStreet;
+  if (loc || poc || str) {
+    triggerLoadCoordinates([loc, poc, str].join(" "));
+  }
 });
 const getInstitutions = () => {
   institutionStore
@@ -357,11 +376,7 @@ const deleteInstitution = () => {
       hasRequestError.value = true;
     });
 };
-const hasNoChange = computed(() => {
-  return (
-    JSON.stringify(originalInstitution) === JSON.stringify(institution.value)
-  );
-});
+const hasNoChange = hasNoChangeWrapper(originalInstitution, institution.value);
 
 const coordinatesLoading = ref(false);
 const coordinatesError = ref(false);
@@ -370,9 +385,14 @@ const coordinatesReturnObj = ref(true);
 
 //Handle coordinates picked
 const coordinatesPicked = () => {
-  var geometry = coordinates.value.coordinate.geometry.coordinates;
-  institution.value.xCoordinate = geometry[0];
-  institution.value.yCoordinate = geometry[1];
+  if (!coordinates.value?.coordinate) {
+    institution.value.xCoordinate = null;
+    institution.value.yCoordinate = null;
+  } else {
+    var geometry = coordinates.value.coordinate.geometry.coordinates;
+    institution.value.xCoordinate = geometry[0];
+    institution.value.yCoordinate = geometry[1];
+  }
 };
 //Load coordinate store
 const loadCoordinates = (queryString) => {

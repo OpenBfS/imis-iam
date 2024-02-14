@@ -5,15 +5,18 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useNotification } from "@/lib/use-notification";
+
+const { resetNotification: resetNotification } = useNotification();
 
 export function useForm() {
   const { t } = useI18n();
   const form = ref(null);
   const valid = ref(false);
   const regExprPhone = /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/;
-  const regExprEmail = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/;
+  const regExprEmail = /^\S+@\S+\.\S+$/;
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
   // Validation rules
   const reqValidmail = (reqMsg, validMsg) => {
@@ -64,7 +67,7 @@ export function useForm() {
         v.length === 0 ||
         (doesRegexMatchWholeString(germanDateRegex, v) &&
           dateStringToDate(v) !== undefined) ||
-        t("form.valid_date"),
+        t("error.valid_date"),
     ];
   };
   const reqValidPostalcode = (reqMsg, validMsg) => {
@@ -79,6 +82,7 @@ export function useForm() {
   const reqMultipleSelect = (reqMsg) => {
     return [(v) => !!(v && v.length) || reqMsg];
   };
+
   const validRegex = (regex, validMsg) => {
     return [
       (v) =>
@@ -105,6 +109,23 @@ export function useForm() {
       },
     ];
   };
+  const resetForm = (originalObject, changedObject) => {
+    resetNotification();
+    const changedKeys = Object.keys(changedObject);
+    changedKeys.forEach((key) => {
+      if (!originalObject[key]) {
+        delete changedObject[key];
+      }
+    });
+    Object.assign(changedObject, originalObject);
+  };
+
+  const hasNoChangeWrapper = (originalObject, changedObject) => {
+    const hasNoChange = computed(
+      () => JSON.stringify(originalObject) === JSON.stringify(changedObject)
+    );
+    return hasNoChange;
+  };
   return {
     form,
     valid,
@@ -122,5 +143,7 @@ export function useForm() {
     germanDateRegex,
     validRegex,
     validLength,
+    resetForm,
+    hasNoChangeWrapper,
   };
 }

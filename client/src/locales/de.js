@@ -5,6 +5,8 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 export default {
+  // For re-use
+  user_term: "IMIS-Nutzer",
   // Role names
   role_iam_user: "Nutzer",
   role_iam_editor: "Redakteur",
@@ -34,6 +36,7 @@ export default {
     required_description: "Beschreibung ist erforderlich",
     required_startDate: "Beginn ist erforderlich",
     required_endDate: "Ende ist erforderlich",
+    required_date: "Datum ist erforderlich",
     required_site: "Ort ist erforderlich",
     required_title: "Titel ist erforderlich",
   },
@@ -79,7 +82,7 @@ export default {
     export: "Institutionen-Liste exportieren",
     title: "Institutionen",
     create_title: "Neue Institution erstellen",
-    edit_title: "Institution {name} bearbeiten",
+    edit_title: "Institution {name}",
     add_institution: "Institution Hinzufügen",
     no_institutions_available: "Es sind keine Institutionen vorhanden",
     fax: "Fax",
@@ -111,6 +114,9 @@ export default {
     imis_Id: "Messstellen-ID",
     imis_Id_length_validation_message:
       "Die Messstellen-ID muss exakt 5 Zeichen beinhalten",
+    imis_usergroup_Id: "Kürzel für IMIS-Kennung/Nutzer",
+    imis_usergroup_Id_length_validation_message:
+      "Das Kürzel muss eine Länge von 3 Zeichen haben.",
     active: "Aktiv",
     category_name: "Kategorienname",
     coordinates: "Koordinaten",
@@ -121,30 +127,30 @@ export default {
   main: {
     title: "Integriertes Mess- und Informationssystem IMIS",
     institutions: "Institutionen",
-    users: "Benutzer",
+    users: "@:user_term",
   },
   // Users component
   user: {
-    export: "Benutzer-Liste exportieren",
-    user_title: "Benutzer",
-    create_title: "Neuen Benutzer erstellen",
-    edit_title: "Benutzer {name} bearbeiten",
+    export: "@:user_term-Liste exportieren",
+    user_title: "@:user_term",
+    create_title: "Neuen @:user_term erstellen",
+    edit_title: "@:user_term {name}",
     label_institutions: "Institutionen",
-    add_user: "Benutzer Hinzufügen",
+    add_user: "@:user_term Hinzufügen",
     edit_my_profile: "Mein Profil bearbeiten",
     contact: "Kontakt",
     phone: "Telefon",
     fax: "Fax",
     mobile: "Handy",
     email: "E-Mail",
-    oe: "OE",
-    bfslocation: "Standort BfS",
+    oe: "Organisationseinheit",
+    bfslocation: "Standort",
     title: "Titel",
     firstname: "Vorname",
     id: "ID",
     lastname: "Nachname",
     name: "Name",
-    username: "Benutzername",
+    username: "IMIS-Kennung",
     enabled: "Aktiviert",
     position: "Position",
     misc: "Weiteres",
@@ -153,7 +159,7 @@ export default {
     required_membership: "Mitgliedschaft ist erforderlich",
     required_position: "Position ist erforderlich",
     required_institution: "Institution ist erforderlich",
-    label_roles: "Rollen",
+    label_roles: "Rollen im IdM",
     required_roles: "Rolle ist erforderlich",
   },
   // Shared button texts

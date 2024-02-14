@@ -26,6 +26,13 @@ export const useEventsStore = defineStore("events", {
         }
       });
     },
+    addEvent(data) {
+      this.events.push(data);
+    },
+    removeEvent(data) {
+      const index = this.events.findIndex((e) => e.id === data.id);
+      this.events.splice(index, 1);
+    },
     loadEvents(searchString) {
       return new Promise((resolve, reject) => {
         HTTP.get("/event", {
