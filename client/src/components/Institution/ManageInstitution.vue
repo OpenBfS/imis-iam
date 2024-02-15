@@ -112,7 +112,11 @@
               ></TextField>
             </div>
 
-            <div class="group_class">
+            <v-checkbox
+              v-model="showPostalAddress"
+              :label="$t('institution.differing_postal_address')"
+            ></v-checkbox>
+            <div v-if="showPostalAddress" class="group_class">
               <!-- TODO: Add this rules once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validPostalcode($t('error.valid_postalcode'))" -->
@@ -307,6 +311,7 @@ const originalInstitution = { ...institution.value };
 const processType = ref(applicationStore.processType);
 const coordinates = ref(coordinatesStore.coordinates);
 const selectedCoordinates = ref(null);
+const showPostalAddress = ref(false);
 const {
   form,
   valid,
@@ -330,6 +335,14 @@ const getCategories = () => {
 onMounted(() => {
   coordinatesStore.coordinates.length = 0;
   getCategories();
+
+  if (
+    institution.value.addressLocation?.length > 0 &&
+    institution.value.addressPostalCode?.length > 0 &&
+    institution.value.addressStreet?.length > 0
+  ) {
+    showPostalAddress.value = true;
+  }
 
   // Initialize dropdown for coordinates
   const loc = institution.value.serviceBuildingLocation;

@@ -108,6 +108,7 @@ export default {
     postal_code: "PLZ",
     categories: "Kategorien",
     central_fax: "Zentrales Fax",
+    differing_postal_address: "Abweichende Postanschrift",
     address_street: "Postanschrift: Straße/Hausnummer",
     address_postalcode: "Postanschrift: PLZ",
     address_location: "Postanschrift: Ort",
