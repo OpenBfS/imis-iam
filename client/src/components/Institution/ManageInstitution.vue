@@ -173,13 +173,13 @@
                 :disabled="
                   !profileStore.userData.roles.some((e) => e === 'chief_editor')
                 "
-                :label="$t('institution.imis_Id')"
+                :label="$t('institution.imis_id')"
                 :modelValue="institution.imisId"
                 :rules="[
                   (v) =>
                     !v ||
                     (v && v.length === 5) ||
-                    $t('institution.imis_Id_length_validation_message'),
+                    $t('institution.imis_id_length_validation_message'),
                 ]"
                 @update:modelValue="institution.imisId = $event"
               ></TextField>
@@ -187,14 +187,14 @@
                 :disabled="
                   !profileStore.userData.roles.some((e) => e === 'chief_editor')
                 "
-                :label="$t('institution.imis_usergroup_Id')"
+                :label="$t('institution.imis_usergroup_id')"
                 :modelValue="institution.imisUserGroupId"
                 :rules="[
-                  (v) => !!v || $t('institution.required_imis_usergroup_Id'),
+                  (v) => !!v || $t('institution.required_imis_usergroup_id'),
                   (v) =>
                     (v && v.length === 3) ||
                     $t(
-                      'institution.imis_usergroup_Id_length_validation_message'
+                      'institution.imis_usergroup_id_length_validation_message'
                     ),
                 ]"
                 @update:modelValue="institution.imisUserGroupId = $event"

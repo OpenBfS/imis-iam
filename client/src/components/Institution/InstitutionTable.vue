@@ -10,7 +10,7 @@
     <thead>
       <th class="text-left">{{ $t("label.name") }}</th>
       <th class="text-left">{{ $t("institution.shortname") }}</th>
-      <th class="text-left">{{ $t("institution.imis_Id") }}</th>
+      <th class="text-left">{{ $t("institution.imis_id") }}</th>
       <th class="text-left">{{ $t("label.actions") }}</th>
     </thead>
     <tbody>

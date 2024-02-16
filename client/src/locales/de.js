@@ -7,6 +7,8 @@
 export default {
   // For re-use
   user_term: "IMIS-Nutzer",
+  usergroup_id_term: "IMIS-Kennung/Nutzer",
+  imis_id_term: "Messstellen-ID",
   // Role names
   role_iam_user: "Nutzer",
   role_iam_editor: "Redakteur",
@@ -112,13 +114,13 @@ export default {
     address_street: "Postanschrift: Straße/Hausnummer",
     address_postalcode: "Postanschrift: PLZ",
     address_location: "Postanschrift: Ort",
-    imis_Id: "Messstellen-ID",
-    imis_Id_length_validation_message:
-      "Die Messstellen-ID muss exakt 5 Zeichen beinhalten",
-    imis_usergroup_Id: "Kürzel für IMIS-Kennung/Nutzer",
-    required_imis_usergroup_Id:
-      "Kürzel für IMIS-Kennung/Nutzer ist erforderlich",
-    imis_usergroup_Id_length_validation_message:
+    imis_id: "@:imis_id_term",
+    imis_id_length_validation_message:
+      "Die @:imis_id_term muss exakt 5 Zeichen beinhalten",
+    imis_usergroup_id: "Kürzel für @:usergroup_id_term",
+    required_imis_usergroup_id:
+      "Kürzel für @:usergroup_id_term ist erforderlich",
+    imis_usergroup_id_length_validation_message:
       "Das Kürzel muss eine Länge von 3 Zeichen haben.",
     active: "Aktiv",
     category_name: "Kategorienname",
