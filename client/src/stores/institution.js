@@ -77,5 +77,12 @@ export const useInstitutionStore = defineStore("institution", {
           .catch((error) => reject(error));
       });
     },
+    addInstitution(data) {
+      this.institutions.push(data);
+    },
+    removeInstitution(data) {
+      const index = this.institutions.findIndex((inst) => inst.id === data.id);
+      this.institutions.splice(index, 1);
+    },
   },
 });

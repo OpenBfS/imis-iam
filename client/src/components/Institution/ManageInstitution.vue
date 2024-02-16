@@ -362,19 +362,11 @@ onMounted(() => {
     triggerLoadCoordinates([loc, poc, str].join(" "));
   }
 });
-const getInstitutions = () => {
-  institutionStore
-    .loadInstitutions()
-    .then()
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
 const createInstitution = () => {
   let payload = { ...institution.value };
   HTTP.post("/institution", payload)
-    .then(() => {
-      getInstitutions();
+    .then((response) => {
+      institutionStore.addInstitution(response.data);
       applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch(() => {
@@ -400,7 +392,7 @@ const updateInstitution = () => {
 const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)
     .then(() => {
-      getInstitutions();
+      institutionStore.removeInstitution(institution.value);
       applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch(() => {
