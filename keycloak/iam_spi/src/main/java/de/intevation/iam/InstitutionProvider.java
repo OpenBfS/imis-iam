@@ -208,7 +208,7 @@ public class InstitutionProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createInstitution(final Institution rep,
             @Context HttpHeaders headers) {
-        if (rep == null) {
+        if (rep == null || rep.getImisUserGroupId() == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
@@ -281,7 +281,8 @@ public class InstitutionProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         if (rep == null || rep.getId() == null
-               || em.find(Institution.class, rep.getId()) == null) {
+               || em.find(Institution.class, rep.getId()) == null
+               || rep.getImisUserGroupId() == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
         if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
