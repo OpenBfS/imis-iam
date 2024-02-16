@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { computed, defineProps, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
 
