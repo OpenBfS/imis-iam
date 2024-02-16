@@ -230,7 +230,10 @@
       <v-btn
         v-if="profileStore.isAllowedToManage"
         color="accent"
-        :disabled="!valid || hasNoChange"
+        :disabled="
+          !valid ||
+          (hasNoChange && initialShowPostalAddress && showPostalAddress)
+        "
         @click="
           processType == 'add' ? createInstitution() : updateInstitution()
         "
@@ -240,8 +243,13 @@
       <v-btn
         v-if="processType === 'edit' && profileStore.isAllowedToManage"
         color="accent"
-        :disabled="hasNoChange"
-        @click="resetForm(originalInstitution, institution)"
+        :disabled="
+          hasNoChange && initialShowPostalAddress === showPostalAddress
+        "
+        @click="
+          resetForm(originalInstitution, institution);
+          showPostalAddress = initialShowPostalAddress;
+        "
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -312,6 +320,7 @@ const processType = ref(applicationStore.processType);
 const coordinates = ref(coordinatesStore.coordinates);
 const selectedCoordinates = ref(null);
 const showPostalAddress = ref(false);
+const initialShowPostalAddress = ref(false);
 const {
   form,
   valid,
@@ -342,6 +351,7 @@ onMounted(() => {
     institution.value.addressStreet?.length > 0
   ) {
     showPostalAddress.value = true;
+    initialShowPostalAddress.value = true;
   }
 
   // Initialize dropdown for coordinates
@@ -373,6 +383,11 @@ const createInstitution = () => {
 };
 const updateInstitution = () => {
   let payload = { ...institution.value };
+  if (!showPostalAddress.value) {
+    delete payload.addressLocation;
+    delete payload.addressPostalCode;
+    delete payload.addressStreet;
+  }
   institutionStore
     .updateInstitution(payload)
     .then(() => {
