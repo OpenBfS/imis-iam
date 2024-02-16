@@ -190,8 +190,8 @@
                 :label="$t('institution.imis_usergroup_Id')"
                 :modelValue="institution.imisUserGroupId"
                 :rules="[
+                  (v) => !!v || $t('institution.required_imis_usergroup_Id'),
                   (v) =>
-                    !v ||
                     (v && v.length === 3) ||
                     $t(
                       'institution.imis_usergroup_Id_length_validation_message'

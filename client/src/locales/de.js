@@ -116,6 +116,8 @@ export default {
     imis_Id_length_validation_message:
       "Die Messstellen-ID muss exakt 5 Zeichen beinhalten",
     imis_usergroup_Id: "Kürzel für IMIS-Kennung/Nutzer",
+    required_imis_usergroup_Id:
+      "Kürzel für IMIS-Kennung/Nutzer ist erforderlich",
     imis_usergroup_Id_length_validation_message:
       "Das Kürzel muss eine Länge von 3 Zeichen haben.",
     active: "Aktiv",
