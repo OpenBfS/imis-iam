@@ -59,7 +59,7 @@
                 central_fax VARCHAR,
                 central_mail VARCHAR NOT NULL,
                 imis_id VARCHAR,
-                imis_usergroup_id NOT NULL VARCHAR(3),
+                imis_usergroup_id VARCHAR(3) NOT NULL,
                 x_coordinate FLOAT,
                 y_coordinate FLOAT,
                 active BOOLEAN DEFAULT true
