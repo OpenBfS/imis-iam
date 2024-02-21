@@ -232,7 +232,7 @@
         color="accent"
         :disabled="
           !valid ||
-          (hasNoChange && initialShowPostalAddress && showPostalAddress)
+          (hasNoChange && initialShowPostalAddress === showPostalAddress)
         "
         @click="
           processType == 'add' ? createInstitution() : updateInstitution()
