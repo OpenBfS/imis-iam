@@ -346,8 +346,8 @@ onMounted(() => {
   getCategories();
 
   if (
-    institution.value.addressLocation?.length > 0 &&
-    institution.value.addressPostalCode?.length > 0 &&
+    institution.value.addressLocation?.length > 0 ||
+    institution.value.addressPostalCode?.length > 0 ||
     institution.value.addressStreet?.length > 0
   ) {
     showPostalAddress.value = true;
