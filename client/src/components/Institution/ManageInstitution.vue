@@ -230,10 +230,7 @@
       <v-btn
         v-if="profileStore.isAllowedToManage"
         color="accent"
-        :disabled="
-          !valid ||
-          (hasNoChange && initialShowPostalAddress === showPostalAddress)
-        "
+        :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
         @click="
           processType == 'add' ? createInstitution() : updateInstitution()
         "
@@ -296,7 +293,7 @@ form > div {
 }
 </style>
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
@@ -345,11 +342,7 @@ onMounted(() => {
   coordinatesStore.coordinates.length = 0;
   getCategories();
 
-  if (
-    institution.value.addressLocation?.length > 0 ||
-    institution.value.addressPostalCode?.length > 0 ||
-    institution.value.addressStreet?.length > 0
-  ) {
+  if (hasPostalAddress()) {
     showPostalAddress.value = true;
     initialShowPostalAddress.value = true;
   }
@@ -399,7 +392,19 @@ const deleteInstitution = () => {
       hasRequestError.value = true;
     });
 };
+
 const hasNoChange = hasNoChangeWrapper(originalInstitution, institution.value);
+
+function hasPostalAddress() {
+  return (
+    institution.value.addressLocation?.length > 0 ||
+    institution.value.addressPostalCode?.length > 0 ||
+    institution.value.addressStreet?.length > 0
+  );
+}
+const isPostalAddressToBeDeleted = computed(() => {
+  return hasPostalAddress() && !showPostalAddress.value;
+});
 
 const coordinatesLoading = ref(false);
 const coordinatesError = ref(false);
