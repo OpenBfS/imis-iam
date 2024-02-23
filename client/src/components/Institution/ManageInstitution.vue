@@ -244,7 +244,7 @@
           hasNoChange && initialShowPostalAddress === showPostalAddress
         "
         @click="
-          resetForm(originalInstitution, institution);
+          resetForm(originalInstitution, institution, resetNotification);
           showPostalAddress = initialShowPostalAddress;
         "
       >
@@ -304,7 +304,8 @@ import { useProfileStore } from "@/stores/profile";
 import { debounce } from "debounce";
 import TextField from "@/components/TextField.vue";
 
-const { hasLoadingError, hasRequestError } = useNotification();
+const { hasLoadingError, hasRequestError, resetNotification } =
+  useNotification();
 
 const applicationStore = useApplicationStore();
 const coordinatesStore = useCoordinatesStore();

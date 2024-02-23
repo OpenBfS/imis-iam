@@ -249,7 +249,7 @@
         v-if="processType === 'edit' && !isReadOnly"
         color="accent"
         :disabled="hasNoChange"
-        @click="resetForm(cloneObject(originalUser), user)"
+        @click="resetForm(cloneObject(originalUser), user, resetNotification)"
       >
         {{ $t("button.reset") }}
       </v-btn>

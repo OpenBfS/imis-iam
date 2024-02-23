@@ -84,7 +84,7 @@
         v-if="processType === 'edit' && profileStore.isAllowedToManage"
         color="accent"
         :disabled="hasNoChange"
-        @click="resetForm(originalEvent, event)"
+        @click="resetForm(originalEvent, event, resetNotification)"
       >
         {{ $t("button.reset") }}
       </v-btn>
@@ -107,7 +107,7 @@ import { useEventsStore } from "@/stores/events";
 import { useProfileStore } from "@/stores/profile";
 import TextField from "@/components/TextField.vue";
 
-const { hasRequestError } = useNotification();
+const { hasRequestError, resetNotification } = useNotification();
 const applicationStore = useApplicationStore();
 const eventsStore = useEventsStore();
 const profileStore = useProfileStore();

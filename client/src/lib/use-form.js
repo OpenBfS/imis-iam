@@ -7,9 +7,6 @@
 
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useNotification } from "@/lib/use-notification";
-
-const { resetNotification: resetNotification } = useNotification();
 
 export function useForm() {
   const { t } = useI18n();
@@ -109,8 +106,12 @@ export function useForm() {
       },
     ];
   };
-  const resetForm = (originalObject, changedObject) => {
-    resetNotification();
+  const resetForm = (
+    originalObject,
+    changedObject,
+    resetNotificationCallback
+  ) => {
+    if (resetNotificationCallback) resetNotificationCallback();
     const changedKeys = Object.keys(changedObject);
     changedKeys.forEach((key) => {
       if (!originalObject[key]) {
