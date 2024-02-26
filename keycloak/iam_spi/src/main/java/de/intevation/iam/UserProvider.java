@@ -217,10 +217,10 @@ public class UserProvider implements RealmResourceProvider {
         //Update groups
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
             item -> {
-                return rep.getGroups().contains(item.getId());
+                return rep.getGroups().contains(item.getName());
             });
         Map<String, GroupModel> groupMap = groupsStream.collect(
-            Collectors.toMap(GroupModel::getId, Function.identity()));
+            Collectors.toMap(GroupModel::getName, Function.identity()));
         updateGroups(groupMap, newUserModel);
         if (attributes.getId() == null) {
             attributes.setId(newUserModel.getId());
@@ -326,7 +326,7 @@ public class UserProvider implements RealmResourceProvider {
 
     /**
      * Update groups of the given user.
-     * @param newGroups Map of new groups: Map<{id},{Group}>
+     * @param newGroups Map of new groups: Map<{name},{Group}>
      * @param user User to modifiy
      */
     private void updateGroups(
@@ -334,14 +334,14 @@ public class UserProvider implements RealmResourceProvider {
         UserModel user
     ) {
         //Join new groups
-        newGroups.forEach((id, group) -> {
+        newGroups.forEach((name, group) -> {
             if (!user.isMemberOf(group)) {
                 user.joinGroup(group);
             }
         });
         //Leave groups if necessary
         user.getGroupsStream().forEach(group -> {
-            if (!newGroups.containsKey(group.getId())) {
+            if (!newGroups.containsKey(group.getName())) {
                 user.leaveGroup(group);
             }
         });
@@ -390,10 +390,10 @@ public class UserProvider implements RealmResourceProvider {
         //Get new groups list and update
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
             item -> {
-                return newUser.getGroups().contains(item.getId());
+                return newUser.getGroups().contains(item.getName());
             });
         Map<String, GroupModel> groupMap = groupsStream.collect(
-            Collectors.toMap(GroupModel::getId, Function.identity()));
+            Collectors.toMap(GroupModel::getName, Function.identity()));
         updateGroups(groupMap, oldUser);
 
         //Update roles

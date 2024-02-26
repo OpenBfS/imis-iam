@@ -46,13 +46,14 @@ public class User {
     private Map<String, List<String>> attributes;
 
     private List<String> groups;
-    private List<Integer> institutions;
+    private List<String> institutions;
     private List<String> roles;
     private Boolean readonly;
     private boolean enabled;
 
     private static final String ID_PARAM = "id";
     private static final String USER_PARAM = "user";
+    private static final String NAME_PARAM = "name";
 
     /**
      * Empty constructor used by JSON de-/serialization.
@@ -81,8 +82,8 @@ public class User {
             //Set institutions
             List<Institution> instList = jpaModel.getInstitutions();
             if (instList != null) {
-                this.institutions = new ArrayList<Integer>();
-                instList.forEach(inst -> institutions.add(inst.getId()));
+                this.institutions = new ArrayList<String>();
+                instList.forEach(inst -> institutions.add(inst.getName()));
             }
 
             // Get user-role mappings
@@ -104,7 +105,7 @@ public class User {
                 roleMapping -> idFilter.value(roleMapping.getRoleId()));
 
             // Query only roles known in this application
-            In<String> nameFilter = cb.in(root.get("name"));
+            In<String> nameFilter = cb.in(root.get(NAME_PARAM));
             for (Role role: Role.values()) {
                 nameFilter.value(role.toString());
             }
@@ -135,7 +136,7 @@ public class User {
             query.setParameter("ids", idList);
             List<GroupEntity> groupEntities = query.getResultList();
             this.groups = new ArrayList<String>();
-            groupEntities.forEach(groupEnt -> groups.add(groupEnt.getId()));
+            groupEntities.forEach(groupEnt -> groups.add(groupEnt.getName()));
         }
     }
 
@@ -179,10 +180,10 @@ public class User {
         this.groups = groups;
     }
 
-    public List<Integer> getInstitutions() {
+    public List<String> getInstitutions() {
         return institutions;
     }
-    public void setInstitutions(List<Integer> institutions) {
+    public void setInstitutions(List<String> institutions) {
         this.institutions = institutions;
     }
 
@@ -195,12 +196,12 @@ public class User {
 
     /**
      * Get institutions by a list of ids.
-     * @param institutionIds List of new institution ids
+     * @param institutionNames List of new institution names
      * @param em Entity manager
      * @return List of institutions
      */
-    private List<Institution> getInstitutionsByIds(
-        List<Integer> institutionIds,
+    private List<Institution> getInstitutionsByNames(
+        List<String> institutionNames,
         EntityManager em
     ) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -208,9 +209,9 @@ public class User {
             = cb.createQuery(Institution.class);
         Root<Institution> root = query.from(Institution.class);
         query.select(root);
-        In<Integer> idFilter = cb.in(root.get(ID_PARAM));
-        institutionIds.forEach(instId -> idFilter.value(instId));
-        query.where(idFilter);
+        In<String> nameFilter = cb.in(root.get(NAME_PARAM));
+        institutionNames.forEach(instName -> nameFilter.value(instName));
+        query.where(nameFilter);
         List<Institution> newInstitutions
             = em.createQuery(query).getResultList();
         return newInstitutions;
@@ -227,7 +228,7 @@ public class User {
             jpaUser = new UserAttributes();
         }
         jpaUser.setId(getId());
-        jpaUser.setInstitutions(getInstitutionsByIds(getInstitutions(), em));
+        jpaUser.setInstitutions(getInstitutionsByNames(getInstitutions(), em));
         return jpaUser;
     }
 }

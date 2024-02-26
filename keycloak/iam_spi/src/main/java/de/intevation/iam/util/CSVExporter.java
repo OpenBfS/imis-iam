@@ -87,7 +87,8 @@ public class CSVExporter<T> {
                 }
                 for (PropertyDescriptor propertyDescriptor
                         : getPropertyDescriptors(object)) {
-                    if (propertyDescriptor.getName().equals("attributes")) {
+                    String name = propertyDescriptor.getName();
+                    if (name.equals("attributes") || name.equals("id")) {
                         continue;
                     }
                     Object value = propertyDescriptor.getReadMethod()
@@ -102,7 +103,7 @@ public class CSVExporter<T> {
     }
 
     private String[] getHeader(Object object) throws IntrospectionException {
-        return getHeader(object, false);
+        return getHeader(object, true);
     }
 
     private String[] getAttributes(Object[] objects) {
@@ -114,6 +115,9 @@ public class CSVExporter<T> {
                 field.setAccessible(true);
                 Map<String, List<String>> objectAttributes = (Map<String, List<String>>) field.get(object);
                 for (String key : objectAttributes.keySet()) {
+                    if (key.startsWith("LDAP")) {
+                        continue;
+                    }
                     attributes.add(key);
                 }
             } catch (NoSuchFieldException e) {

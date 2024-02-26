@@ -172,7 +172,7 @@
                 :items="institutionStore.institutions"
                 v-model="user.institutions"
                 item-title="name"
-                item-value="id"
+                item-value="name"
                 persistent-hint
                 multiple
                 :rules="reqMultipleSelect($t('user.required_institution'))"
@@ -186,7 +186,7 @@
                 :items="userStore.memberships"
                 v-model="user.groups"
                 item-title="name"
-                item-value="id"
+                item-value="name"
                 persistent-hint
                 multiple
                 :rules="[

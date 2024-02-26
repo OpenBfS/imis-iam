@@ -23,7 +23,7 @@
         <td>{{ getUserAttribute(user, "lastName") }}</td>
         <td>{{ getUserAttribute(user, "email") }}</td>
         <td>{{ getUserAttribute(user, "phone") }}</td>
-        <td>{{ getMembershipNamesById(user.groups) }}</td>
+        <td>{{ user.groups?.join(", ") }}</td>
         <td class="d-flex">
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
@@ -124,22 +124,5 @@ const onEditClicked = (id) => {
   applicationStore.setSavedItem(savedUser.value);
   applicationStore.setProcessType("edit");
   applicationStore.setShowManageUserDialog(true);
-};
-
-//Get the membership names as string using the given id array
-const getMembershipNamesById = (ids) => {
-  if (!ids) {
-    return;
-  }
-  var result = "";
-  var memberships = userStore.memberships;
-  ids.forEach((id) => {
-    var m = memberships.find((membership) => membership.id === id);
-    if (result.length != 0) {
-      result += ", ";
-    }
-    result += m.name;
-  });
-  return result;
 };
 </script>
