@@ -30,4 +30,8 @@ const expInstitution = {
   yCoordinate: "",
 };
 
-export { expInstitution };
+function getExpInstitution() {
+  return structuredClone(expInstitution);
+}
+
+export { getExpInstitution };

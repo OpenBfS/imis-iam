@@ -5,6 +5,8 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { defineStore } from "pinia";
+import { useInstitutionStore } from "@/stores/institution";
+import { useUserStore } from "@/stores/user";
 
 export const useApplicationStore = defineStore("application", {
   namespaced: true,
@@ -63,6 +65,17 @@ export const useApplicationStore = defineStore("application", {
     },
     setlistToExport(message) {
       this.listToExport = message;
+    },
+    searchRequest() {
+      const institutionStore = useInstitutionStore();
+      const userStore = useUserStore();
+      Promise.all([
+        userStore.loadUsers(this.searchString),
+        institutionStore.loadInstitutions(this.searchString),
+      ]).then(() => {
+        userStore.setFoundUsers(userStore.users);
+        institutionStore.setFoundInstitutions(institutionStore.institutions);
+      });
     },
   },
 });

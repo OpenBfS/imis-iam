@@ -11,4 +11,9 @@ const expUser = {
   roles: [],
   enabled: false,
 };
-export { expUser };
+
+function getExpUser() {
+  return structuredClone(expUser);
+}
+
+export { getExpUser };

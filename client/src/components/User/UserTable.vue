@@ -31,7 +31,7 @@
                 variant="plain"
                 :icon="`${
                   profileStore.isAllowedToManage
-                    ? 'mdi-account-edit-outline'
+                    ? 'mdi-pencil'
                     : 'mdi-information-outline'
                 }`"
                 size="small"
@@ -71,7 +71,7 @@ import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
-import { expUser } from "@/components/User/user";
+import { getExpUser } from "@/components/User/user";
 import { onMounted } from "vue";
 const props = defineProps({
   users: Array,
@@ -101,7 +101,7 @@ const cloneObject = (obj) => {
 const getUserById = (id) => {
   return props.users.filter((u) => id === u.id)[0];
 };
-const user = ref(cloneObject(expUser));
+const user = ref(getExpUser());
 const onCopyClicked = (id) => {
   user.value = cloneObject(getUserById(id));
   savedUser.value = cloneObject(user.value);

@@ -297,7 +297,7 @@ import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
-import { expUser } from "@/components/User/user";
+import { getExpUser } from "@/components/User/user";
 import TextField from "@/components/TextField.vue";
 
 const { t } = useI18n();
@@ -507,12 +507,13 @@ const createUser = (shouldClose) => {
       } else {
         // Use the same roles of the last created user.
         const usedRoles = user.value.roles;
-        user.value = cloneObject(expUser);
+        user.value = getExpUser();
         nextTick(() => {
           form.value.resetValidation();
           user.value.roles = usedRoles;
         });
       }
+      applicationStore.searchRequest();
     })
     .catch((error) => {
       if (
@@ -537,6 +538,7 @@ const updateUser = () => {
       }
       applicationStore.setOwnAccount(false);
       applicationStore.setShowManageUserDialog(false);
+      applicationStore.searchRequest();
     })
     .catch((error) => {
       if (

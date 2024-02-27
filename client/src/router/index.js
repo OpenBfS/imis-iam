@@ -20,16 +20,6 @@ const routes = [
     component: () => import("@/components/Search/Search.vue"),
   },
   {
-    path: "/institutions",
-    name: "Institution",
-    component: () => import("@/components/Institution/Institutions.vue"),
-  },
-  {
-    path: "/users",
-    name: "User",
-    component: () => import("@/components/User/Users.vue"),
-  },
-  {
     path: "/mailinglists",
     name: "MailingList",
     component: () => import("@/components/Mailing/MailingLists.vue"),

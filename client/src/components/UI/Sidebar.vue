@@ -33,18 +33,6 @@
       </v-list-item>
       <v-list-item
         link
-        @click="$route.path == '/users' ? '' : $router.push('/users')"
-        :title="$t('main.users')"
-      ></v-list-item>
-      <v-list-item
-        link
-        @click="
-          $route.path == '/institutions' ? '' : $router.push('/institutions')
-        "
-        :title="$t('main.institutions')"
-      ></v-list-item>
-      <v-list-item
-        link
         :title="$t('archive.title')"
         @click="
           $route.path == '/archive/all' ? '' : $router.push('/archive/all')

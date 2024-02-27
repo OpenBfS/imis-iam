@@ -7,7 +7,12 @@
  -->
 <template>
   <v-card flat>
-    <v-tabs density="compact" v-model="tab" grow>
+    <v-tabs
+      density="compact"
+      v-model="tab"
+      grow
+      @update:modelValue="emit('onSelectedTab', $event)"
+    >
       <v-tab value="users"
         >{{ $t("main.users") }} ({{ userStore.foundUsers.length }})</v-tab
       >
@@ -42,4 +47,6 @@ const ResultTable = defineAsyncComponent(() =>
   import("@/components/Search/ResultTable.vue")
 );
 const tab = ref(null);
+
+const emit = defineEmits(["onSelectedTab"]);
 </script>
