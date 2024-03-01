@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import jakarta.ws.rs.GET;
@@ -101,7 +101,6 @@ public class ExportProvider implements RealmResourceProvider {
      */
     @GET
     @Path("/user")
-    // TODO: Adapt to UserProfile attributes
     public Response exportUsers(
             @QueryParam("fieldSeparator") String fieldSeparator,
             @QueryParam("quoteType") String quoteType,
@@ -109,7 +108,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("encoding") String encoding,
             @Context HttpHeaders headers
     ) {
-        CSVExporter<User> exporter = new CSVExporter<User>();
+        CSVExporter<User> exporter = new CSVExporter<>();
         try {
             setCsvOptions(
                 exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
@@ -123,7 +122,7 @@ public class ExportProvider implements RealmResourceProvider {
         UserProvider userProvider = new UserProvider(session);
         Response userResponse = userProvider.getUsers(headers, null);
         @SuppressWarnings("unchecked")
-        ArrayList<User> users = userResponse.readEntity(ArrayList.class);
+        List<User> users = userResponse.readEntity(List.class);
         return doExport(exporter, users, i18n);
     }
 
@@ -146,7 +145,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("encoding") String encoding,
             @Context HttpHeaders headers
     ) {
-        CSVExporter<Institution> exporter = new CSVExporter<Institution>();
+        CSVExporter<Institution> exporter = new CSVExporter<>();
         try {
             setCsvOptions(
                 exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
@@ -160,8 +159,7 @@ public class ExportProvider implements RealmResourceProvider {
         InstitutionProvider instProvider = new InstitutionProvider(session);
         Response instResponse = instProvider.getInstitutions(headers, null);
         @SuppressWarnings("unchecked")
-        ArrayList<Institution> institutions
-            = instResponse.readEntity(ArrayList.class);
+        List<Institution> institutions = instResponse.readEntity(List.class);
         return doExport(exporter, institutions, i18n);
     }
 
@@ -185,8 +183,11 @@ public class ExportProvider implements RealmResourceProvider {
         exporter.setEncoding(Charset.forName(encoding));
     }
 
-    private <T> Response doExport(CSVExporter<T> exporter,
-            ArrayList<T> objects, ResourceBundle i18n) {
+    private <T> Response doExport(
+        CSVExporter<T> exporter,
+        List<T> objects,
+        ResourceBundle i18n
+    ) {
         InputStream result;
         try {
             result = exporter.export(objects);

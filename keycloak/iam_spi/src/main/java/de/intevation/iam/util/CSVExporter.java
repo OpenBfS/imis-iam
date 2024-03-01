@@ -18,7 +18,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +29,9 @@ import org.apache.commons.csv.CSVPrinter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class CSVExporter<T> {
+
+    // Name of property that contains attributes defined in User Profile
+    private static final String ATTRIBUTES_PROPERTY_NAME = "attributes";
 
     private char fieldSeparator = ',';
     private char quoteType = '\"';
@@ -45,7 +48,7 @@ public class CSVExporter<T> {
      * @throws IllegalAccessException Thrown if attributes could not be read
      * @throws IntrospectionException
      */
-    public InputStream export(ArrayList<T> objects)
+    public InputStream export(List<T> objects)
             throws IOException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException,
             IntrospectionException {
@@ -53,11 +56,10 @@ public class CSVExporter<T> {
             return null;
         }
         StringBuffer result = new StringBuffer();
-        String[] properties = getHeader(objects.get(0));
-        String[] attributes = getAttributes(objects.toArray());
-        ArrayList<String> header = new ArrayList<>();
-        header.addAll(Arrays.asList(attributes));
-        header.addAll(Arrays.asList(properties));
+        Set<String> attributes = getAttributeNames(objects);
+        List<String> header = new ArrayList<>();
+        header.addAll(attributes);
+        header.addAll(getHeader(objects.get(0)));
         CSVFormat format = CSVFormat.DEFAULT
             .withDelimiter(fieldSeparator)
             .withQuote(quoteType)
@@ -65,35 +67,25 @@ public class CSVExporter<T> {
             .withHeader(header.toArray(String[]::new));
         try (CSVPrinter printer = new CSVPrinter(result, format)) {
             for (T object: objects) {
-                ArrayList<String> row = new ArrayList<String>();
+                List<String> row = new ArrayList<String>();
                 // Add User attributes
-                Field field;
-                Map<String, List<String>> objectAttributes = new HashMap<>();
-                try {
-                    field = object.getClass().getDeclaredField("attributes");
-                    field.setAccessible(true);
-                    objectAttributes = (Map<String, List<String>>) field.get(object);
-                } catch (NoSuchFieldException e) {
-                    // Skip if object has no attributes
-                }
+                Map<String, List<String>> objectAttributes =
+                    getObjectAttributes(object);
                 for (String attribute : attributes) {
                     String values = "";
                     if (objectAttributes.containsKey(attribute)) {
-                            List<String> attributeList = objectAttributes.get(attribute);
-                            if (attributeList.size() > 1) {
-                                values += attributeList.toString();
-                            } else if (!attributeList.isEmpty()) {
-                                values += attributeList.get(0);
-                            }
+                        List<String> attributeList =
+                            objectAttributes.get(attribute);
+                        if (attributeList.size() > 1) {
+                            values += attributeList.toString();
+                        } else if (!attributeList.isEmpty()) {
+                            values += attributeList.get(0);
+                        }
                     }
                     row.add(values);
                 }
                 for (PropertyDescriptor propertyDescriptor
                         : getPropertyDescriptors(object)) {
-                    String name = propertyDescriptor.getName();
-                    if (name.equals("attributes") || name.equals("id")) {
-                        continue;
-                    }
                     Object value = propertyDescriptor.getReadMethod()
                         .invoke(object);
                     row.add(value != null ? value.toString() : "");
@@ -105,74 +97,72 @@ public class CSVExporter<T> {
             encoding.encode(result.toString()).array());
     }
 
-    private String[] getHeader(Object object) throws IntrospectionException {
-        return getHeader(object, true);
-    }
-
-    private String[] getAttributes(Object[] objects) {
-        Set<String> attributes = new HashSet<String>();
-        for (Object object : objects) {
-            Field field;
-            try {
-                field = object.getClass().getDeclaredField("attributes");
-                field.setAccessible(true);
-                Map<String, List<String>> objectAttributes = (Map<String, List<String>>) field.get(object);
-                for (String key : objectAttributes.keySet()) {
-                    if (key.startsWith("LDAP")) {
-                        continue;
-                    }
-                    attributes.add(key);
+    private Set<String> getAttributeNames(List<T> objects)
+        throws IllegalAccessException {
+        Set<String> attributes = new LinkedHashSet<>();
+        for (T object : objects) {
+            for (String key : getObjectAttributes(object).keySet()) {
+                if (key.startsWith("LDAP")) {
+                    continue;
                 }
-            } catch (NoSuchFieldException e) {
-                // Ignore objects with no attributes
-            } catch (Exception e) {
-                e.printStackTrace();
+                attributes.add(key);
             }
         }
-        return attributes.toArray(String[]::new);
+        return attributes;
     }
 
-    private String[] getHeader(Object object, boolean skipId) throws IntrospectionException {
-        ArrayList<String> fields = new ArrayList<String>();
-
-        for (
-            PropertyDescriptor propertyDescriptor
-            : getPropertyDescriptors(object)) {
-            if (skipId && propertyDescriptor.getName().equals("id")
-                || propertyDescriptor.getName().equals("attributes")) {
-                continue;
-            }
+    private List<String> getHeader(
+        Object object
+    ) throws IntrospectionException {
+        List<String> fields = new ArrayList<>();
+        for (PropertyDescriptor propertyDescriptor
+            : getPropertyDescriptors(object)
+        ) {
             fields.add(propertyDescriptor.getName());
         }
-        return fields.toArray(new String[0]);
+        return fields;
     }
 
-    private PropertyDescriptor[] getPropertyDescriptors(Object object)
+    @SuppressWarnings("unchecked")
+    private Map<String, List<String>> getObjectAttributes(Object object)
+        throws IllegalAccessException {
+        Map<String, List<String>> objectAttributes = new HashMap<>();
+        try {
+            Field field = object.getClass().getDeclaredField(
+                ATTRIBUTES_PROPERTY_NAME);
+            field.setAccessible(true);
+            objectAttributes = (Map<String, List<String>>) field.get(object);
+        } catch (NoSuchFieldException e) {
+            // Skip if object has no attributes
+        }
+        return objectAttributes;
+    }
+
+    private List<PropertyDescriptor> getPropertyDescriptors(Object object)
             throws IntrospectionException {
-        PropertyDescriptor[] propertyDescriptorArray
-            = Introspector.getBeanInfo(
-                object.getClass()).getPropertyDescriptors();
-        ArrayList<PropertyDescriptor> propertyDescriptors
-            = new ArrayList<PropertyDescriptor>(
-                Arrays.asList(propertyDescriptorArray));
+        List<PropertyDescriptor> propertyDescriptors
+            = new ArrayList<>(Arrays.asList(Introspector.getBeanInfo(
+                        object.getClass()).getPropertyDescriptors()));
+
+        // User Profile attribures are handled separately,
+        // database IDs should not be exported
+        final Set<String> skipAttrs = Set.of(
+            "class", ATTRIBUTES_PROPERTY_NAME, "id");
         propertyDescriptors.removeIf(entry -> {
-            if (entry.getName().equals("class")) {
+            if (skipAttrs.contains(entry.getName())) {
                 return true;
             }
             Field field;
             try {
                 field = object.getClass().getDeclaredField(entry.getName());
-            } catch (NoSuchFieldException | SecurityException e) {
-                e.printStackTrace();
+            } catch (NoSuchFieldException e) {
+                // Skip properties not backed by a field
                 return true;
             }
             return field.getAnnotationsByType(JsonIgnore.class).length > 0;
         });
 
-        PropertyDescriptor[] array
-            = new PropertyDescriptor[propertyDescriptors.size()];
-        array = propertyDescriptors.toArray(array);
-        return array;
+        return propertyDescriptors;
     }
 
     public char getFieldSeparator() {
