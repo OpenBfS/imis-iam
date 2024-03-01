@@ -79,9 +79,12 @@ public class CSVExporter<T> {
                 for (String attribute : attributes) {
                     String values = "";
                     if (objectAttributes.containsKey(attribute)) {
-                        for (String value : objectAttributes.get(attribute)) {
-                            values += value;
-                        }
+                            List<String> attributeList = objectAttributes.get(attribute);
+                            if (attributeList.size() > 1) {
+                                values += attributeList.toString();
+                            } else if (!attributeList.isEmpty()) {
+                                values += attributeList.get(0);
+                            }
                     }
                     row.add(values);
                 }
