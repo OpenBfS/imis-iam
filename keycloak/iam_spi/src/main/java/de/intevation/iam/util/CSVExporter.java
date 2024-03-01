@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -56,10 +57,13 @@ public class CSVExporter<T> {
             return null;
         }
         StringBuffer result = new StringBuffer();
+        List<PropertyDescriptor> propertyDescriptors =
+            getPropertyDescriptors(objects.get(0));
         Set<String> attributes = getAttributeNames(objects);
         List<String> header = new ArrayList<>();
         header.addAll(attributes);
-        header.addAll(getHeader(objects.get(0)));
+        header.addAll(propertyDescriptors.stream().map(d -> d.getName())
+            .collect(Collectors.toList()));
         CSVFormat format = CSVFormat.DEFAULT
             .withDelimiter(fieldSeparator)
             .withQuote(quoteType)
@@ -84,8 +88,9 @@ public class CSVExporter<T> {
                     }
                     row.add(values);
                 }
-                for (PropertyDescriptor propertyDescriptor
-                        : getPropertyDescriptors(object)) {
+                for (
+                    PropertyDescriptor propertyDescriptor : propertyDescriptors
+                ) {
                     Object value = propertyDescriptor.getReadMethod()
                         .invoke(object);
                     row.add(value != null ? value.toString() : "");
@@ -111,18 +116,6 @@ public class CSVExporter<T> {
         return attributes;
     }
 
-    private List<String> getHeader(
-        Object object
-    ) throws IntrospectionException {
-        List<String> fields = new ArrayList<>();
-        for (PropertyDescriptor propertyDescriptor
-            : getPropertyDescriptors(object)
-        ) {
-            fields.add(propertyDescriptor.getName());
-        }
-        return fields;
-    }
-
     @SuppressWarnings("unchecked")
     private Map<String, List<String>> getObjectAttributes(Object object)
         throws IllegalAccessException {
@@ -138,7 +131,7 @@ public class CSVExporter<T> {
         return objectAttributes;
     }
 
-    private List<PropertyDescriptor> getPropertyDescriptors(Object object)
+    private List<PropertyDescriptor> getPropertyDescriptors(T object)
             throws IntrospectionException {
         List<PropertyDescriptor> propertyDescriptors
             = new ArrayList<>(Arrays.asList(Introspector.getBeanInfo(
