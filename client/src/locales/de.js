@@ -166,6 +166,7 @@ export default {
     required_institution: "Institution ist erforderlich",
     label_roles: "Rollen im IdM",
     required_roles: "Rolle ist erforderlich",
+    no_users_available: "Es sind keine @:user_term vorhanden",
   },
   // Shared button texts
   button: {
@@ -222,6 +223,7 @@ export default {
     title: "Titel",
     site: "Ort",
     description: "Beschreibung",
+    items_per_page: "Einträge pro Seite",
   },
   // MailingList
   mailinglist: {

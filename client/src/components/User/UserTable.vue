@@ -6,64 +6,54 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-table class="ma-2 pa-2">
-    <thead>
-      <th class="text-left">{{ $t("user.username") }}</th>
-      <th class="text-left">{{ $t("user.firstname") }}</th>
-      <th class="text-left">{{ $t("user.lastname") }}</th>
-      <th class="text-left">{{ $t("label.email") }}</th>
-      <th class="text-left">{{ $t("user.phone") }}</th>
-      <th class="text-left">{{ $t("user.label_memberships") }}</th>
-      <th class="text-left">{{ $t("label.actions") }}</th>
-    </thead>
-    <tbody>
-      <tr v-for="user in props.users" :key="user.id">
-        <td>{{ getUserAttribute(user, "username") }}</td>
-        <td>{{ getUserAttribute(user, "firstName") }}</td>
-        <td>{{ getUserAttribute(user, "lastName") }}</td>
-        <td>{{ getUserAttribute(user, "email") }}</td>
-        <td>{{ getUserAttribute(user, "phone") }}</td>
-        <td>{{ user.groups?.join(", ") }}</td>
-        <td class="d-flex">
-          <v-tooltip location="top">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                variant="plain"
-                :icon="`${
-                  profileStore.isAllowedToManage
-                    ? 'mdi-pencil'
-                    : 'mdi-information-outline'
-                }`"
-                size="small"
-                v-bind="props"
-                @click="onEditClicked(user.id)"
-              ></v-btn>
-            </template>
-            <span>{{
+  <v-data-table-server
+    v-model:items-per-page="itemsPerPage"
+    class="ma-2 pa-2"
+    :headers="tableHeaders"
+    :items="props.users"
+    :items-length="props.users.length"
+    :items-per-page-text="$t('label.items_per_page')"
+    :loading="isLoading"
+    :no-data-text="$t('user.no_users_available')"
+  >
+    <template v-slot:[`item.actions`]="{ item }">
+      <v-tooltip location="top">
+        <template v-slot:activator="{ props }">
+          <v-btn
+            variant="plain"
+            :icon="`${
               profileStore.isAllowedToManage
-                ? $t("label.edit")
-                : $t("label.show_info")
-            }}</span>
-          </v-tooltip>
-          <v-tooltip>
-            <template
-              v-slot:activator="{ props }"
-              v-if="profileStore.isAllowedToManage"
-            >
-              <v-btn
-                variant="plain"
-                icon="mdi-content-copy"
-                size="small"
-                v-bind="props"
-                @click="onCopyClicked(user.id)"
-              ></v-btn>
-            </template>
-            <span>{{ $t("label.copy") }}</span>
-          </v-tooltip>
-        </td>
-      </tr>
-    </tbody>
-  </v-table>
+                ? 'mdi-pencil'
+                : 'mdi-information-outline'
+            }`"
+            size="small"
+            v-bind="props"
+            @click="onEditClicked(item.id)"
+          ></v-btn>
+        </template>
+        <span>{{
+          profileStore.isAllowedToManage
+            ? $t("label.edit")
+            : $t("label.show_info")
+        }}</span>
+      </v-tooltip>
+      <v-tooltip>
+        <template
+          v-slot:activator="{ props }"
+          v-if="profileStore.isAllowedToManage"
+        >
+          <v-btn
+            variant="plain"
+            icon="mdi-content-copy"
+            size="small"
+            v-bind="props"
+            @click="onCopyClicked(item.id)"
+          ></v-btn>
+        </template>
+        <span>{{ $t("label.copy") }}</span>
+      </v-tooltip>
+    </template>
+  </v-data-table-server>
 </template>
 
 <script setup>
@@ -71,6 +61,10 @@ import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
 import { ref } from "vue";
 import { getExpUser } from "@/components/User/user";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+
 const props = defineProps({
   users: Array,
 });
@@ -86,6 +80,48 @@ function getUserAttribute(user, attributeName) {
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
 const savedUser = ref();
+const isLoading = ref(false);
+const itemsPerPage = ref(25);
+
+const tableHeaders = [
+  {
+    title: t("user.username"),
+    key: "username",
+    value: (item) => getUserAttribute(item, "username"),
+    sortable: false,
+  },
+  {
+    title: t("user.firstname"),
+    key: "firstName",
+    value: (item) => getUserAttribute(item, "firstName"),
+    sortable: false,
+  },
+  {
+    title: t("user.lastname"),
+    key: "firstName",
+    value: (item) => getUserAttribute(item, "firstName"),
+    sortable: false,
+  },
+  {
+    title: t("user.email"),
+    key: "email",
+    value: (item) => getUserAttribute(item, "email"),
+    sortable: false,
+  },
+  {
+    title: t("user.phone"),
+    key: "phone",
+    value: (item) => getUserAttribute(item, "phone"),
+    sortable: false,
+  },
+  {
+    title: t("user.label_memberships"),
+    key: "label_memberships",
+    value: (item) => item.groups?.join(", "),
+    sortable: false,
+  },
+  { title: t("label.actions"), key: "actions", sortable: false },
+];
 
 // Deep Copy for objects
 const cloneObject = (obj) => {
