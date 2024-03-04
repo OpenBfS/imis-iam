@@ -361,7 +361,7 @@ const createInstitution = () => {
   HTTP.post("/institution", payload)
     .then((response) => {
       institutionStore.addInstitution(response.data);
-      applicationStore.searchRequest();
+      applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch(() => {
@@ -378,7 +378,7 @@ const updateInstitution = () => {
   institutionStore
     .updateInstitution(payload)
     .then(() => {
-      applicationStore.searchRequest();
+      applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch(() => {
@@ -389,7 +389,7 @@ const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)
     .then(() => {
       institutionStore.removeInstitution(institution.value);
-      applicationStore.searchRequest();
+      applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch(() => {

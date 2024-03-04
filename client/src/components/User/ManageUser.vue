@@ -288,7 +288,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, nextTick, ref } from "vue";
+import { computed, onBeforeMount, nextTick, ref } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
@@ -448,25 +448,8 @@ const updateRules = () => {
     rules.value[attribute.name] = getRules(attribute);
   });
 };
-const getUserMemberships = () => {
-  userStore.loadMemberships().catch(() => {
-    hasLoadingError.value = false;
-  });
-};
-const getInstitutions = () => {
-  institutionStore
-    .loadInstitutions()
-    .then()
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
 onBeforeMount(() => {
   updateRules();
-});
-onMounted(() => {
-  getUserMemberships();
-  getInstitutions();
 });
 const user = computed(() => {
   return applicationStore.managedItem;
@@ -489,18 +472,10 @@ const userRoles = computed(() => {
 const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
-const getUsers = () => {
-  userStore
-    .loadUsers()
-    .then()
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
 const createUser = (shouldClose) => {
   HTTP.post("/iamuser", user.value)
-    .then(() => {
-      getUsers();
+    .then((response) => {
+      userStore.addUser(response.data);
       if (shouldClose) {
         applicationStore.setOwnAccount(true);
         applicationStore.setShowManageUserDialog(false);
@@ -513,7 +488,7 @@ const createUser = (shouldClose) => {
           user.value.roles = usedRoles;
         });
       }
-      applicationStore.searchRequest();
+      applicationStore.searchRequest(["users"]);
     })
     .catch((error) => {
       if (
@@ -538,7 +513,7 @@ const updateUser = () => {
       }
       applicationStore.setOwnAccount(false);
       applicationStore.setShowManageUserDialog(false);
-      applicationStore.searchRequest();
+      applicationStore.searchRequest(["users"]);
     })
     .catch((error) => {
       if (

@@ -66,15 +66,37 @@ export const useApplicationStore = defineStore("application", {
     setlistToExport(message) {
       this.listToExport = message;
     },
-    searchRequest() {
-      const institutionStore = useInstitutionStore();
+
+    /**
+     *
+     * @param {*} listOfTypes Array of strings with types to load, e.g. ["users", "institutions"]
+     * @param {*} force Force search request even if the searchString is empty
+     * @returns Promise
+     */
+    searchRequest(listOfTypes, force = false) {
       const userStore = useUserStore();
-      Promise.all([
-        userStore.loadUsers(this.searchString),
-        institutionStore.loadInstitutions(this.searchString),
-      ]).then(() => {
-        userStore.setFoundUsers(userStore.users);
-        institutionStore.setFoundInstitutions(institutionStore.institutions);
+      const institutionStore = useInstitutionStore();
+      return new Promise((resolve, reject) => {
+        const promises = [];
+        if (force || this.searchSting?.length > 0) {
+          if (listOfTypes.includes("users")) {
+            promises.push(userStore.loadUsers(this.searchString));
+          }
+          if (listOfTypes.includes("institutions")) {
+            promises.push(institutionStore.loadInstitutions(this.searchString));
+          }
+        }
+        Promise.all(promises)
+          .then(() => {
+            userStore.setFoundUsers(userStore.users);
+            institutionStore.setFoundInstitutions(
+              institutionStore.institutions
+            );
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
       });
     },
   },

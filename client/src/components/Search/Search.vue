@@ -77,22 +77,31 @@
     <v-row>
       <Results @onSelectedTab="onSelectedTab" class="v-col v-col-11" />
     </v-row>
+    <UIAlert
+      v-if="hasLoadingError || hasRequestError"
+      v-bind:message="applicationStore.httpErrorMessage"
+    />
   </v-container>
 </template>
 
 <script setup>
 import { computed, ref, defineAsyncComponent, onMounted, watch } from "vue";
 import { debounce } from "debounce";
+import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
+import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
 import { useProfileStore } from "@/stores/profile";
 import { getExpInstitution } from "@/components/Institution/institution";
 import { getExpUser } from "@/components/User/user";
 
+const { hasLoadingError, hasRequestError } = useNotification();
+
 const Results = defineAsyncComponent(() =>
   import("@/components/Search/Results.vue")
 );
 const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
 const userStore = useUserStore();
 const profileStore = useProfileStore();
 const isAllowedToAdd = computed(() => {
@@ -100,7 +109,7 @@ const isAllowedToAdd = computed(() => {
 });
 const selectedTab = ref("users");
 const triggerSearch = debounce(() => {
-  applicationStore.searchRequest();
+  applicationStore.searchRequest(["users", "institutions"], true);
 }, 500);
 watch(
   () => applicationStore.searchString,
@@ -110,19 +119,17 @@ watch(
     }
   }
 );
-watch(
-  () => userStore.users,
-  (newUsers, oldUsers) => {
-    if (newUsers.length !== oldUsers.length) {
-      triggerSearch();
-    }
-  }
-);
 onMounted(() => {
-  userStore.loadMemberships().then(() => {
-    applicationStore.searchRequest();
-  });
   userStore.loadRoles();
+  userStore.loadMemberships();
+  Promise.all([userStore.loadUsers(), institutionStore.loadInstitutions()])
+    .then(() => {
+      userStore.setFoundUsers(userStore.users);
+      institutionStore.setFoundInstitutions(institutionStore.institutions);
+    })
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
 });
 function onSelectedTab(tab) {
   selectedTab.value = tab;

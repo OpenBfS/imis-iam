@@ -78,5 +78,12 @@ export const useUserStore = defineStore("user", {
           .catch((error) => reject(error));
       });
     },
+    addUser(data) {
+      this.users.push(data);
+    },
+    removeUser(data) {
+      const index = this.users.findIndex((user) => user.id === data.id);
+      this.users.splice(index, 1);
+    },
   },
 });

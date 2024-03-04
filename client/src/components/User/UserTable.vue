@@ -69,10 +69,8 @@
 <script setup>
 import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
-import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
 import { getExpUser } from "@/components/User/user";
-import { onMounted } from "vue";
 const props = defineProps({
   users: Array,
 });
@@ -87,12 +85,7 @@ function getUserAttribute(user, attributeName) {
 
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
-const userStore = useUserStore();
 const savedUser = ref();
-
-onMounted(() => {
-  userStore.loadMemberships();
-});
 
 // Deep Copy for objects
 const cloneObject = (obj) => {
