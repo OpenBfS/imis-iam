@@ -322,12 +322,13 @@ const initialShowPostalAddress = ref(false);
 const {
   form,
   valid,
+  hasNoChange,
   reqValidmail,
   reqField,
   reqValidPhone,
   reqValidPostalcode,
   resetForm,
-  hasNoChangeWrapper,
+  watchChange,
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
@@ -397,7 +398,7 @@ const deleteInstitution = () => {
     });
 };
 
-const hasNoChange = hasNoChangeWrapper(originalInstitution, institution.value);
+watchChange(originalInstitution, institution.value);
 
 function hasPostalAddress() {
   return (

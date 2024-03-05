@@ -565,14 +565,15 @@ const createAndPrepare = () => {
 const {
   form,
   valid,
+  hasNoChange,
   reqField,
   reqMultipleSelect,
   validRegex,
   validLength,
   resetForm,
-  hasNoChangeWrapper,
+  watchChange,
 } = useForm();
-const hasNoChange = hasNoChangeWrapper(originalUser.value, user.value);
+watchChange(originalUser.value, user.value);
 
 const isReadOnly = computed(() => {
   if (applicationStore.ownAccount) {

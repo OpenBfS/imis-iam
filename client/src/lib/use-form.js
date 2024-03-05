@@ -5,13 +5,14 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { computed, ref } from "vue";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 export function useForm() {
   const { t } = useI18n();
   const form = ref(null);
   const valid = ref(false);
+  const hasNoChange = ref(true);
   const regExprPhone = /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/;
   const regExprEmail = /^\S+@\S+\.\S+$/;
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
@@ -121,15 +122,46 @@ export function useForm() {
     Object.assign(changedObject, originalObject);
   };
 
-  const hasNoChangeWrapper = (originalObject, changedObject) => {
-    const hasNoChange = computed(
-      () => JSON.stringify(originalObject) === JSON.stringify(changedObject)
-    );
-    return hasNoChange;
+  const areObjectsDifferent = (a, b) => {
+    for (let i = 0; i < Object.keys(a).length; i++) {
+      const key = Object.keys(a)[i];
+      if (
+        a[key] === null ||
+        (b[key] === null &&
+          ((a[key] === null && b[key] !== null) ||
+            (a[key] !== null && b[key] === null)))
+      ) {
+        return true;
+      } else if (typeof a[key] === "object" && typeof b[key] === "object") {
+        // Compare arrays
+        if (a[key].length && b[key].length && a[key].length === b[key].length) {
+          for (let j = 0; j < a[key].length; j++) {
+            if (!b[key].includes(a[key][j])) {
+              return true;
+            }
+          }
+        } else {
+          // Compare nested objects
+          if (areObjectsDifferent(a[key], b[key])) {
+            return true;
+          }
+        }
+      } else if (a[key] !== b[key]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const watchChange = (originalObject, changedObject) => {
+    watch(changedObject, () => {
+      hasNoChange.value = !areObjectsDifferent(originalObject, changedObject);
+    });
   };
   return {
     form,
     valid,
+    hasNoChange,
     reqValidmail,
     validMail,
     reqField,
@@ -145,6 +177,6 @@ export function useForm() {
     validRegex,
     validLength,
     resetForm,
-    hasNoChangeWrapper,
+    watchChange,
   };
 }

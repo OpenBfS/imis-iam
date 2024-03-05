@@ -117,7 +117,8 @@ const processType = ref(applicationStore.processType);
 
 const readonly = event.value.readonly || processType.value === "show";
 
-const { form, valid, reqField, resetForm, hasNoChangeWrapper } = useForm();
+const { form, valid, hasNoChange, reqField, resetForm, watchChange } =
+  useForm();
 
 const createEvent = () => {
   let payload = { ...event.value };
@@ -145,7 +146,7 @@ const updateEvent = () => {
     });
 };
 
-const hasNoChange = hasNoChangeWrapper(originalEvent, event.value);
+watchChange(originalEvent, event.value);
 
 const startDateUpdatedCallback = (newDate) => {
   event.value.startDate = newDate;
