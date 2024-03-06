@@ -36,4 +36,9 @@ export default createVuetify({
       iamLight,
     },
   },
+  defaults: {
+    VDialog: {
+      persistent: true,
+    },
+  },
 });
