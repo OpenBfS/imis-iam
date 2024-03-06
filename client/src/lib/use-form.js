@@ -13,6 +13,7 @@ export function useForm() {
   const form = ref(null);
   const valid = ref(false);
   const hasNoChange = ref(true);
+  const showConfirmCancelDialog = ref(false);
   const regExprPhone = /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/;
   const regExprEmail = /^\S+@\S+\.\S+$/;
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
@@ -158,6 +159,14 @@ export function useForm() {
       hasNoChange.value = !areObjectsDifferent(originalObject, changedObject);
     });
   };
+
+  const onCancel = (cancelCallback) => {
+    showConfirmCancelDialog.value = !hasNoChange.value;
+    if (!showConfirmCancelDialog.value) cancelCallback();
+  };
+  const closeConfirmCancelDialog = () => {
+    showConfirmCancelDialog.value = false;
+  };
   return {
     form,
     valid,
@@ -178,5 +187,8 @@ export function useForm() {
     validLength,
     resetForm,
     watchChange,
+    onCancel,
+    showConfirmCancelDialog,
+    closeConfirmCancelDialog,
   };
 }

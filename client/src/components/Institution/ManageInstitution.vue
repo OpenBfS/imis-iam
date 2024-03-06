@@ -252,7 +252,9 @@
       </v-btn>
       <v-btn
         color="accent"
-        @click="applicationStore.setShowManageInstitutionDialog(false)"
+        @click="
+          onCancel(() => applicationStore.setShowManageInstitutionDialog(false))
+        "
       >
         {{ $t("button.cancel") }}
       </v-btn>
@@ -278,6 +280,11 @@
       </v-btn>
     </v-card-actions>
   </v-card>
+  <ConfirmCancelDialog
+    :isActive="showConfirmCancelDialog"
+    :onConfirm="() => applicationStore.setShowManageInstitutionDialog(false)"
+    :onCancel="() => closeConfirmCancelDialog()"
+  ></ConfirmCancelDialog>
 </template>
 <style lang="scss" scoped>
 form > div {
@@ -303,6 +310,7 @@ import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { debounce } from "debounce";
 import TextField from "@/components/TextField.vue";
+import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 
 const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
@@ -329,6 +337,9 @@ const {
   reqValidPostalcode,
   resetForm,
   watchChange,
+  onCancel,
+  showConfirmCancelDialog,
+  closeConfirmCancelDialog,
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {

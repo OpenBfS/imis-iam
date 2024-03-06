@@ -90,12 +90,19 @@
       </v-btn>
       <v-btn
         color="accent"
-        @click="applicationStore.setShowManageEventDialog(false)"
+        @click="
+          onCancel(() => applicationStore.setShowManageEventDialog(false))
+        "
       >
         {{ $t("button.cancel") }}
       </v-btn>
     </v-card-actions>
   </v-card>
+  <ConfirmCancelDialog
+    :isActive="showConfirmCancelDialog"
+    :onConfirm="() => applicationStore.setShowManageEventDialog(false)"
+    :onCancel="() => closeConfirmCancelDialog()"
+  ></ConfirmCancelDialog>
 </template>
 <script setup>
 import { HTTP } from "@/lib/http";
@@ -106,6 +113,7 @@ import { useApplicationStore } from "@/stores/application";
 import { useEventsStore } from "@/stores/events";
 import { useProfileStore } from "@/stores/profile";
 import TextField from "@/components/TextField.vue";
+import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 
 const { hasRequestError, resetNotification } = useNotification();
 const applicationStore = useApplicationStore();
@@ -117,8 +125,17 @@ const processType = ref(applicationStore.processType);
 
 const readonly = event.value.readonly || processType.value === "show";
 
-const { form, valid, hasNoChange, reqField, resetForm, watchChange } =
-  useForm();
+const {
+  form,
+  valid,
+  hasNoChange,
+  reqField,
+  resetForm,
+  watchChange,
+  onCancel,
+  showConfirmCancelDialog,
+  closeConfirmCancelDialog,
+} = useForm();
 
 const createEvent = () => {
   let payload = { ...event.value };

@@ -256,14 +256,26 @@
       <v-btn
         color="accent"
         @click="
-          applicationStore.setOwnAccount(false);
-          applicationStore.setShowManageUserDialog(false);
+          onCancel(() => {
+            applicationStore.setOwnAccount(false);
+            applicationStore.setShowManageUserDialog(false);
+          })
         "
       >
         {{ $t("button.cancel") }}
       </v-btn>
     </v-card-actions>
   </v-card>
+  <ConfirmCancelDialog
+    :isActive="showConfirmCancelDialog"
+    :onConfirm="
+      () => {
+        applicationStore.setOwnAccount(false);
+        applicationStore.setShowManageUserDialog(false);
+      }
+    "
+    :onCancel="() => closeConfirmCancelDialog()"
+  ></ConfirmCancelDialog>
 </template>
 <style lang="scss" scoped>
 form > div {
@@ -299,6 +311,7 @@ import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import { getExpUser } from "@/components/User/user";
 import TextField from "@/components/TextField.vue";
+import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 
 const { t } = useI18n();
 const { hasLoadingError, hasRequestError, resetNotification } =
@@ -572,6 +585,9 @@ const {
   validLength,
   resetForm,
   watchChange,
+  onCancel,
+  showConfirmCancelDialog,
+  closeConfirmCancelDialog,
 } = useForm();
 watchChange(originalUser.value, user.value);
 
