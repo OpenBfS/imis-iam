@@ -124,8 +124,6 @@ export function useForm() {
   };
 
   const areObjectsDifferent = (a, b) => {
-    console.log("a", a);
-    console.log("b", b);
     const allKeys = [...Object.keys(a), ...Object.keys(b)];
     for (let i = 0; i < allKeys.length; i++) {
       const key = allKeys[i];
