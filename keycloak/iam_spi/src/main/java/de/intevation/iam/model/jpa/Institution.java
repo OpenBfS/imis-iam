@@ -23,6 +23,11 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 
 @Entity
@@ -33,9 +38,11 @@ public class Institution {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotBlank
     @Column(name = "short_name", nullable = false)
     private String shortName;
 
@@ -45,14 +52,19 @@ public class Institution {
         joinColumns = {@JoinColumn(name = "institution_id")},
         inverseJoinColumns = {@JoinColumn(name = "category_name")}
     )
+    @NotEmpty
     private List<InstitutionCategory> categoryNames;
 
+    @NotBlank
     @Column(name = "service_building_street", nullable = false)
     private String serviceBuildingStreet;
 
+    @Pattern(regexp = "[0-9]*")
+    @Size(min = 5, max = 5)
     @Column(name = "service_building_postal_code", nullable = false)
     private String serviceBuildingPostalCode;
 
+    @NotBlank
     @Column(name = "service_building_location", nullable = false)
     private String serviceBuildingLocation;
 
@@ -65,12 +77,14 @@ public class Institution {
     @Column(name = "address_location")
     private String addressLocation;
 
+    @Size(min = 7)
     @Column(name = "central_phone", nullable = false)
     private String centralPhone;
 
     @Column(name = "central_fax")
     private String centralFax;
 
+    @NotNull
     @Column(name = "central_mail", nullable = false)
     private String centralMail;
 

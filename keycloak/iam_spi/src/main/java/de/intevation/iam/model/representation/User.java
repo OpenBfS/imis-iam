@@ -18,6 +18,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.validation.constraints.NotEmpty;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
@@ -45,8 +46,11 @@ public class User {
 
     private Map<String, List<String>> attributes;
 
+    @NotEmpty
     private List<String> groups;
+    @NotEmpty
     private List<String> institutions;
+    @NotEmpty
     private List<String> roles;
     private Boolean readonly;
     private boolean enabled;

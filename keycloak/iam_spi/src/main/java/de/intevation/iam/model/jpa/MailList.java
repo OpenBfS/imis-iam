@@ -25,6 +25,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 import org.keycloak.models.jpa.entities.UserEntity;
 
@@ -37,9 +39,11 @@ public class MailList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotEmpty
     @Transient
     private List<String> users;
 

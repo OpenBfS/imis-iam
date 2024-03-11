@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -59,6 +60,7 @@ import de.intevation.iam.model.jpa.MailType;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
+import de.intevation.iam.validation.Validator;
 
 /**
  * Class providing rest interfaces for mails, mail types and mailing lists.
@@ -81,6 +83,8 @@ public class MailProvider implements RealmResourceProvider {
     private Authorizer<Mail> auth;
     private Authorizer<MailList> authList;
 
+    private Validator validator;
+
     /**
      * Constructor.
      * @param session Keycloak session
@@ -89,6 +93,7 @@ public class MailProvider implements RealmResourceProvider {
         this.session = session;
         this.auth = new MailAuthorizer(session);
         this.authList = new MailListAuthorizer(session);
+        this.validator = new Validator();
     }
 
     @Override
@@ -232,6 +237,8 @@ public class MailProvider implements RealmResourceProvider {
     @Path("/list")
     public Response createList(final MailList list,
             @Context HttpHeaders headers) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(list, languages.get(0));
         if (list == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -295,6 +302,8 @@ public class MailProvider implements RealmResourceProvider {
     @Path("/list")
     public Response updateList(final MailList list,
             @Context HttpHeaders headers) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(list, languages.get(0));
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         MailList originalList = em.find(MailList.class, list.getId());
@@ -539,6 +548,8 @@ public class MailProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final Mail mail
     ) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(mail, languages.get(0));
         String userId = headers.getHeaderString(USER_ID_HEADER);
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();

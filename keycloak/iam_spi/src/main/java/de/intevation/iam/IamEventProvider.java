@@ -7,6 +7,7 @@
 package de.intevation.iam;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
@@ -15,6 +16,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import de.intevation.iam.auth.EventAuthorizer;
 import de.intevation.iam.model.jpa.Event;
 import de.intevation.iam.util.RequestMethod;
+import de.intevation.iam.validation.Validator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -32,10 +34,13 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+
 public class IamEventProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
     private EventAuthorizer auth;
+
+    private Validator validator;
 
     @Override
     public void close() { }
@@ -52,6 +57,7 @@ public class IamEventProvider implements RealmResourceProvider {
     public IamEventProvider(KeycloakSession session) {
         this.session = session;
         this.auth = new EventAuthorizer(session);
+        this.validator = new Validator();
     }
 
     /**
@@ -109,6 +115,8 @@ public class IamEventProvider implements RealmResourceProvider {
         final Event rep,
         @Context HttpHeaders headers
     ) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(rep, languages.get(0));
         if (rep == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -134,6 +142,8 @@ public class IamEventProvider implements RealmResourceProvider {
         final Event rep,
         @Context HttpHeaders headers
     ) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(rep, languages.get(0));
         if (rep == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }

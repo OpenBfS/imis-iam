@@ -175,7 +175,7 @@
                 item-value="name"
                 persistent-hint
                 multiple
-                :rules="reqMultipleSelect($t('user.required_institution'))"
+                :rules="rules['institutions']"
               >
               </v-select>
               <v-select
@@ -189,9 +189,7 @@
                 item-value="name"
                 persistent-hint
                 multiple
-                :rules="[
-                  (v) => !!(v && v.length) || $t('user.required_membership'),
-                ]"
+                :rules="rules['groups']"
               >
               </v-select>
             </div>
@@ -460,6 +458,18 @@ const updateRules = () => {
   profileStore.attributes.forEach((attribute) => {
     rules.value[attribute.name] = getRules(attribute);
   });
+  rules.value["groups"] = [
+    (v) => !!(v && v.length) || t("user.required_membership"),
+  ];
+  if (serverValidationRules["groups"]) {
+    rules.value["groups"].push(serverValidationRules["groups"]);
+  }
+  rules.value["institutions"] = [
+    ...reqMultipleSelect(t("user.required_institution")),
+  ];
+  if (serverValidationRules["institutions"]) {
+    rules.value["institutions"].push(serverValidationRules["institutions"]);
+  }
 };
 onBeforeMount(() => {
   updateRules();

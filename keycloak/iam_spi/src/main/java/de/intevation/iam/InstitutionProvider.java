@@ -7,6 +7,7 @@
 package de.intevation.iam;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import jakarta.persistence.EntityManager;
@@ -42,6 +43,7 @@ import de.intevation.iam.model.jpa.InstitutionCategory;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
+import de.intevation.iam.validation.Validator;
 
 /**
  * Class providing rest interfaces to create, get and delete Institutions.
@@ -59,6 +61,8 @@ public class InstitutionProvider implements RealmResourceProvider {
     private static final String SHORT_NAME_ALREADY_USED_KEY
         = "error_short_name_already_used";
 
+    private Validator validator;
+
     /**
      * Constructor.
      * @param session Keycloak session
@@ -66,6 +70,7 @@ public class InstitutionProvider implements RealmResourceProvider {
     public InstitutionProvider(KeycloakSession session) {
         this.session = session;
         this.auth = new InstitutionAuthorizer(session);
+        this.validator = new Validator();
     }
 
     /**
@@ -208,6 +213,8 @@ public class InstitutionProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createInstitution(final Institution rep,
             @Context HttpHeaders headers) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(rep, languages.get(0));
         if (rep == null || rep.getImisUserGroupId() == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -278,6 +285,8 @@ public class InstitutionProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateInstitution(
             final Institution rep, @Context HttpHeaders headers) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(rep, languages.get(0));
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         if (rep == null || rep.getId() == null

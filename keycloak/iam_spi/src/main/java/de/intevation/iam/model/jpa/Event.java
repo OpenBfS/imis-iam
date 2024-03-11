@@ -15,6 +15,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "iam_event", schema = "keycloak")
@@ -22,12 +24,17 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @NotNull
     @Column(name = "start_date")
     private Timestamp startDate;
+    @NotNull
     @Column(name = "end_date")
     private Timestamp endDate;
+    @NotBlank
     private String title;
+    @NotBlank
     private String site;
+    @NotBlank
     private String description;
     @Transient
     private Boolean readonly;

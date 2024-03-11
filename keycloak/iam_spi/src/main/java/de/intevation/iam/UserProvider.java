@@ -11,6 +11,7 @@ import static org.keycloak.userprofile.UserProfileContext.USER_API;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Function;
@@ -54,7 +55,7 @@ import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
-
+import de.intevation.iam.validation.Validator;
 public class UserProvider implements RealmResourceProvider {
 
     private static final String MAIL_ALREADY_USED_KEY
@@ -64,6 +65,7 @@ public class UserProvider implements RealmResourceProvider {
 
     private Authorizer<User> auth;
 
+    private Validator validator;
     private UserProfileProvider userProfileProvider;
 
     /**
@@ -75,6 +77,7 @@ public class UserProvider implements RealmResourceProvider {
         this.auth = new UserAuthorizer(session);
         this.userProfileProvider =
             session.getProvider(UserProfileProvider.class);
+        this.validator = new Validator();
     }
 
     /**
@@ -166,6 +169,8 @@ public class UserProvider implements RealmResourceProvider {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(@Context HttpHeaders headers, final User rep) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(rep, languages.get(0));
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -251,6 +256,8 @@ public class UserProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final User rep
     ) {
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(rep, languages.get(0));
         if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }

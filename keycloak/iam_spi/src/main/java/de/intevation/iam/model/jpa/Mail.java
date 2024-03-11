@@ -14,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -30,21 +32,27 @@ public class Mail {
     @Column(name = "expiry_date")
     private Timestamp expiryDate;
 
+    @NotBlank
     @Column(name = "sender", nullable = false)
     private String sender;
 
+    @NotBlank
     @Column(name = "text", nullable = false)
     private String text;
 
+    @NotBlank
     @Column(name = "subject", nullable = false)
     private String subject;
 
+    @NotNull
     @Column(name = "archived", nullable = false)
     private Boolean archived;
 
+    @NotNull
     @Column(name = "type", nullable = false)
     private Integer type;
 
+    @NotNull
     @Column(name = "recipient", nullable = false)
     private Integer recipient;
 

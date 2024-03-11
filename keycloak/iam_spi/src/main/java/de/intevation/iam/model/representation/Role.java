@@ -8,6 +8,7 @@ package de.intevation.iam.model.representation;
 
 import org.keycloak.models.RoleModel;
 
+
 /**
  * Readonly representation of a user role.
  */
