@@ -98,8 +98,7 @@ public class CSVExporter<T> {
                 printer.printRecord(row);
             }
         }
-        return new ByteArrayInputStream(
-            encoding.encode(result.toString()).array());
+        return new ByteArrayInputStream(result.toString().getBytes(encoding));
     }
 
     private Set<String> getAttributeNames(List<T> objects)
