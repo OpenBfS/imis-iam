@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.hibernate.validator.HibernateValidator;
-import org.keycloak.validation.ValidationError;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -29,9 +28,26 @@ import jakarta.ws.rs.core.Response.Status;
  */
 public class Validator {
 
-    private HashMap<Locale, jakarta.validation.Validator> beanValidators = new HashMap<>();
+    public class ValidationError {
+        private static final Object[] EMPTY_PARAMETERS = {};
+        private final String message;
+        private final Object[] messageParameters;
 
-    private static final String ID = "bean-validation";
+        ValidationError(String message, Object... messageParameters) {
+            this.message = message;
+            this.messageParameters = messageParameters == null ? EMPTY_PARAMETERS : messageParameters.clone();
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public Object[] getMessageParameters() {
+            return messageParameters;
+        }
+    }
+
+    private HashMap<Locale, jakarta.validation.Validator> beanValidators = new HashMap<>();
 
     public Validator() { }
 
@@ -58,6 +74,7 @@ public class Validator {
      * Validate objects with bean validation.
      *
      * @param object The object to be validated
+     * @param locale The language of the validation message
      * @throws BadRequestException in case validation fails
      */
     public void validate(Object object, Locale locale) {
@@ -70,10 +87,8 @@ public class Validator {
 
             for (ConstraintViolation<Object> violation: beanViolations) {
                 validationErrors.add(new ValidationError(
-                    ID,
                     violation.getMessage(),
-                    violation.getPropertyPath().toString(),
-                    null));
+                    violation.getPropertyPath().toString()));
             }
             throw new BadRequestException(
                 Response.status(Status.BAD_REQUEST)
