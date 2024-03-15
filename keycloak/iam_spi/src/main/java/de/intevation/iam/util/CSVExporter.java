@@ -106,7 +106,9 @@ public class CSVExporter<T> {
         Set<String> attributes = new LinkedHashSet<>();
         for (T object : objects) {
             for (String key : getObjectAttributes(object).keySet()) {
-                if (key.startsWith("LDAP")) {
+                if (key.startsWith("LDAP")
+                    || key.equals("modifyTimestamp")
+                    || key.equals("createTimestamp")) {
                     continue;
                 }
                 attributes.add(key);
