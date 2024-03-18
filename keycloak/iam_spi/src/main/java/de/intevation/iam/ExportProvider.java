@@ -120,10 +120,7 @@ public class ExportProvider implements RealmResourceProvider {
             headers.getHeaderString(Constants.SHIB_USER_HEADER));
 
         UserProvider userProvider = new UserProvider(session);
-        Response userResponse = userProvider.getUsers(headers, null);
-        @SuppressWarnings("unchecked")
-        List<User> users = userResponse.readEntity(List.class);
-        return doExport(exporter, users, i18n);
+        return doExport(exporter, userProvider.getUsers(headers, null), i18n);
     }
 
     /**
@@ -157,10 +154,8 @@ public class ExportProvider implements RealmResourceProvider {
                 headers.getHeaderString(Constants.SHIB_USER_HEADER));
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
-        Response instResponse = instProvider.getInstitutions(headers, null);
-        @SuppressWarnings("unchecked")
-        List<Institution> institutions = instResponse.readEntity(List.class);
-        return doExport(exporter, institutions, i18n);
+        return doExport(
+            exporter, instProvider.getInstitutions(headers, null), i18n);
     }
 
     private <T> void setCsvOptions(

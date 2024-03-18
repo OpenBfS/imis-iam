@@ -105,7 +105,7 @@ public class InstitutionProvider implements RealmResourceProvider {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getInstitutions(@Context HttpHeaders headers,
+    public List<Institution> getInstitutions(@Context HttpHeaders headers,
             @QueryParam("search") String search) {
         String filter = search != null && !search.isEmpty()
             ? "%" + search.toLowerCase() + "%" : "";
@@ -121,9 +121,7 @@ public class InstitutionProvider implements RealmResourceProvider {
                 filter
             ));
         }
-        List<Institution> institutions = auth.filter(
-            em.createQuery(query).getResultList(), headers);
-        return Response.ok(institutions).build();
+        return auth.filter(em.createQuery(query).getResultList(), headers);
     }
 
     /**
