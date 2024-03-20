@@ -29,7 +29,7 @@ export const useApplicationStore = defineStore("application", {
       socialMedia: process.env.VUE_APP_FOOTER_SOCIALMEDIA,
     },
     reportMail: process.env.VUE_APP_REPORT_MAIL,
-    searchSting: "",
+    searchString: "",
     ownAccount: false,
   }),
   actions: {
@@ -43,7 +43,7 @@ export const useApplicationStore = defineStore("application", {
       this.showManageEventDialog = data;
     },
     setSearchString(data) {
-      this.searchSting = data;
+      this.searchString = data;
     },
     setSavedItem(data) {
       this.savedItem = data;
@@ -78,7 +78,7 @@ export const useApplicationStore = defineStore("application", {
       const institutionStore = useInstitutionStore();
       return new Promise((resolve, reject) => {
         const promises = [];
-        if (force || this.searchSting?.length > 0) {
+        if (force || this.searchString?.length > 0) {
           if (listOfTypes.includes("users")) {
             promises.push(userStore.loadUsers(this.searchString));
           }
