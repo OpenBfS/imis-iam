@@ -122,14 +122,12 @@ watch(
 onMounted(() => {
   userStore.loadRoles();
   userStore.loadMemberships();
-  Promise.all([userStore.loadUsers(), institutionStore.loadInstitutions()])
-    .then(() => {
-      userStore.setFoundUsers(userStore.users);
-      institutionStore.setFoundInstitutions(institutionStore.institutions);
-    })
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
+  Promise.all([
+    userStore.loadUsers(),
+    institutionStore.loadInstitutions(),
+  ]).catch(() => {
+    hasLoadingError.value = true;
+  });
 });
 function onSelectedTab(tab) {
   selectedTab.value = tab;

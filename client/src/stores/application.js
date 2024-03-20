@@ -87,13 +87,7 @@ export const useApplicationStore = defineStore("application", {
           }
         }
         Promise.all(promises)
-          .then(() => {
-            userStore.setFoundUsers(userStore.users);
-            institutionStore.setFoundInstitutions(
-              institutionStore.institutions
-            );
-            resolve();
-          })
+          .then(() => resolve())
           .catch((error) => {
             reject(error);
           });

@@ -51,7 +51,12 @@ export const useUserStore = defineStore("user", {
           params: { search: searchString },
         })
           .then((response) => {
-            this.setUsers(response.data);
+            if (searchString) {
+              this.setFoundUsers(response.data);
+            } else {
+              this.setUsers(response.data);
+              this.setFoundUsers(response.data);
+            }
             resolve(response);
           })
           .catch((error) => reject(error));
