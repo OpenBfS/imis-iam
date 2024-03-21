@@ -98,8 +98,7 @@ public class CSVExporter<T> {
                 printer.printRecord(row);
             }
         }
-        return new ByteArrayInputStream(
-            encoding.encode(result.toString()).array());
+        return new ByteArrayInputStream(result.toString().getBytes(encoding));
     }
 
     private Set<String> getAttributeNames(List<T> objects)
@@ -107,7 +106,9 @@ public class CSVExporter<T> {
         Set<String> attributes = new LinkedHashSet<>();
         for (T object : objects) {
             for (String key : getObjectAttributes(object).keySet()) {
-                if (key.startsWith("LDAP")) {
+                if (key.startsWith("LDAP")
+                    || key.equals("modifyTimestamp")
+                    || key.equals("createTimestamp")) {
                     continue;
                 }
                 attributes.add(key);

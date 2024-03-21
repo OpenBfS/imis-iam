@@ -96,6 +96,7 @@ public class ExportProvider implements RealmResourceProvider {
      * @param quoteType Char used for quotes
      * @param rowDelimiter Char used as row delimiter
      * @param encoding Encoding to use
+     * @param search Optional search parameter
      * @param headers Request headers
      * @return Resulting csv data
      */
@@ -106,6 +107,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
             @QueryParam("encoding") String encoding,
+            @QueryParam("search") String search,
             @Context HttpHeaders headers
     ) {
         CSVExporter<User> exporter = new CSVExporter<>();
@@ -120,10 +122,7 @@ public class ExportProvider implements RealmResourceProvider {
             headers.getHeaderString(Constants.SHIB_USER_HEADER));
 
         UserProvider userProvider = new UserProvider(session);
-        Response userResponse = userProvider.getUsers(headers, null);
-        @SuppressWarnings("unchecked")
-        List<User> users = userResponse.readEntity(List.class);
-        return doExport(exporter, users, i18n);
+        return doExport(exporter, userProvider.getUsers(headers, search), i18n);
     }
 
     /**
@@ -133,6 +132,7 @@ public class ExportProvider implements RealmResourceProvider {
      * @param quoteType Char used for quotes
      * @param rowDelimiter Char used as row delimiter
      * @param encoding Encoding to use
+     * @param search Optional search parameter
      * @param headers Request headers
      * @return Institutions as CSV
      */
@@ -143,6 +143,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
             @QueryParam("encoding") String encoding,
+            @QueryParam("search") String search,
             @Context HttpHeaders headers
     ) {
         CSVExporter<Institution> exporter = new CSVExporter<>();
@@ -157,10 +158,8 @@ public class ExportProvider implements RealmResourceProvider {
                 headers.getHeaderString(Constants.SHIB_USER_HEADER));
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
-        Response instResponse = instProvider.getInstitutions(headers, null);
-        @SuppressWarnings("unchecked")
-        List<Institution> institutions = instResponse.readEntity(List.class);
-        return doExport(exporter, institutions, i18n);
+        return doExport(
+            exporter, instProvider.getInstitutions(headers, search), i18n);
     }
 
     private <T> void setCsvOptions(

@@ -61,7 +61,12 @@ export const useInstitutionStore = defineStore("institution", {
           params: { search: searchString },
         })
           .then((response) => {
-            this.setInstitutionList(response.data);
+            if (searchString) {
+              this.setFoundInstitutions(response.data);
+            } else {
+              this.setInstitutionList(response.data);
+              this.setFoundInstitutions(response.data);
+            }
             resolve(response);
           })
           .catch((error) => reject(error));

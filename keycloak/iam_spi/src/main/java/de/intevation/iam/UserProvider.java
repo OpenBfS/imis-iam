@@ -117,7 +117,7 @@ public class UserProvider implements RealmResourceProvider {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsers(@Context HttpHeaders headers,
+    public List<User> getUsers(@Context HttpHeaders headers,
             @QueryParam("search") String search) {
         RealmModel realm = session.getContext().getRealm();
 
@@ -129,7 +129,7 @@ public class UserProvider implements RealmResourceProvider {
             .searchForUserStream(realm, attributes)
             .map(userEntity -> new User(userEntity, session))
             .collect(Collectors.toList());
-        return Response.ok(auth.filter(userList, headers)).build();
+        return auth.filter(userList, headers);
     }
 
     /**
