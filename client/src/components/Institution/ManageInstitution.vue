@@ -28,14 +28,20 @@
               <TextField
                 :label="$t('label.name')"
                 :modelValue="institution.name"
-                :rules="reqField($t('institution.required_name'))"
-                @update:modelValue="institution.name = $event"
+                :rules="clientAndServerRules['name']"
+                @update:modelValue="
+                  clearValidationError('name');
+                  institution.name = $event;
+                "
               ></TextField>
               <TextField
                 :label="$t('institution.shortname')"
                 :modelValue="institution.shortName"
-                :rules="reqField($t('institution.required_shortname'))"
-                @update:modelValue="institution.shortName = $event"
+                :rules="clientAndServerRules['shortName']"
+                @update:modelValue="
+                  clearValidationError('shortName');
+                  institution.shortName = $event;
+                "
               ></TextField>
               <v-checkbox
                 density="compact"
@@ -47,33 +53,29 @@
               <TextField
                 :label="$t('institution.service_building_location')"
                 :modelValue="institution.serviceBuildingLocation"
-                :rules="
-                  reqField($t('institution.required_service_building_location'))
-                "
+                :rules="clientAndServerRules['serviceBuildingLocation']"
                 @update:modelValue="
-                  institution.serviceBuildingLocation = $event
+                  clearValidationError('serviceBuildingLocation');
+                  institution.serviceBuildingLocation = $event;
                 "
               ></TextField>
               <TextField
                 :label="$t('institution.service_building_postalcode')"
                 :modelValue="institution.serviceBuildingPostalCode"
-                :rules="
-                  reqValidPostalcode(
-                    $t('institution.required_service_building_postalcode'),
-                    $t('error.valid_postalcode')
-                  )
-                "
+                :rules="clientAndServerRules['serviceBuildingPostalCode']"
                 @update:modelValue="
-                  institution.serviceBuildingPostalCode = $event
+                  clearValidationError('serviceBuildingPostalCode');
+                  institution.serviceBuildingPostalCode = $event;
                 "
               ></TextField>
               <TextField
                 :label="$t('institution.service_building_street')"
                 :modelValue="institution.serviceBuildingStreet"
-                :rules="
-                  reqField($t('institution.required_service_building_street'))
+                :rules="clientAndServerRules['serviceBuildingStreet']"
+                @update:modelValue="
+                  clearValidationError('serviceBuildingStreet');
+                  institution.serviceBuildingStreet = $event;
                 "
-                @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
             <v-form
@@ -140,24 +142,20 @@
               <TextField
                 :label="$t('institution.central_phone')"
                 :modelValue="institution.centralPhone"
-                :rules="
-                  reqValidPhone(
-                    $t('institution.required_central_phone'),
-                    $t('error.valid_phone')
-                  )
+                :rules="clientAndServerRules['centralPhone']"
+                @update:modelValue="
+                  clearValidationError('centralPhone');
+                  institution.centralPhone = $event;
                 "
-                @update:modelValue="institution.centralPhone = $event"
               ></TextField>
               <TextField
                 :label="$t('institution.central_email')"
                 :modelValue="institution.centralMail"
-                :rules="
-                  reqValidmail(
-                    $t('institution.required_central_email'),
-                    $t('error.valid_email')
-                  )
+                :rules="clientAndServerRules['centralMail']"
+                @update:modelValue="
+                  clearValidationError('centralMail');
+                  institution.centralMail = $event;
                 "
-                @update:modelValue="institution.centralMail = $event"
               ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
@@ -175,13 +173,11 @@
                 "
                 :label="$t('institution.imis_id')"
                 :modelValue="institution.imisId"
-                :rules="[
-                  (v) =>
-                    !v ||
-                    (v && v.length === 5) ||
-                    $t('institution.imis_id_length_validation_message'),
-                ]"
-                @update:modelValue="institution.imisId = $event"
+                :rules="clientAndServerRules['imisId']"
+                @update:modelValue="
+                  clearValidationError('imisId');
+                  institution.imisId = $event;
+                "
               ></TextField>
               <TextField
                 :disabled="
@@ -189,15 +185,11 @@
                 "
                 :label="$t('institution.imis_usergroup_id')"
                 :modelValue="institution.imisUserGroupId"
-                :rules="[
-                  (v) => !!v || $t('institution.required_imis_usergroup_id'),
-                  (v) =>
-                    (v && v.length === 3) ||
-                    $t(
-                      'institution.imis_usergroup_id_length_validation_message'
-                    ),
-                ]"
-                @update:modelValue="institution.imisUserGroupId = $event"
+                :rules="clientAndServerRules['imisUserGroupId']"
+                @update:modelValue="
+                  clearValidationError('imisUserGroupId');
+                  institution.imisUserGroupId = $event;
+                "
               ></TextField>
             </div>
             <div class="group_class align-center">
@@ -211,8 +203,9 @@
                 item-value="id"
                 persistent-hint
                 density="compact"
-                :rules="reqField($t('error.required_category'))"
+                :rules="clientAndServerRules['categoryNames']"
                 multiple
+                @update:model-value="clearValidationError('imisUserGroupId')"
               >
               </v-select>
             </div>
@@ -311,6 +304,9 @@ import { useProfileStore } from "@/stores/profile";
 import { debounce } from "debounce";
 import TextField from "@/components/TextField.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
@@ -340,6 +336,11 @@ const {
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
+  initClientRules,
+  clientAndServerRules,
+  handleValidationErrorFromServer,
+  clearValidationError,
+  isServerValidationError,
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
@@ -352,6 +353,41 @@ const getCategories = () => {
     });
 };
 onMounted(() => {
+  initClientRules({
+    name: reqField(t("institution.required_name")),
+    shortName: reqField(t("institution.required_shortname")),
+    serviceBuildingLocation: reqField(
+      t("institution.required_service_building_location")
+    ),
+    serviceBuildingPostalCode: reqValidPostalcode(
+      t("institution.required_service_building_postalcode"),
+      t("error.valid_postalcode")
+    ),
+    serviceBuildingStreet: reqField(
+      t("institution.required_service_building_street")
+    ),
+    centralPhone: reqValidPhone(
+      t("institution.required_central_phone"),
+      t("error.valid_phone")
+    ),
+    centralMail: reqValidmail(
+      t("institution.required_central_email"),
+      t("error.valid_email")
+    ),
+    imisId: [
+      (v) =>
+        !v ||
+        (v && v.length === 5) ||
+        t("institution.imis_id_length_validation_message"),
+    ],
+    imisUserGroupId: [
+      (v) => !!v || t("institution.required_imis_usergroup_id"),
+      (v) =>
+        (v && v.length === 3) ||
+        t("institution.imis_usergroup_id_length_validation_message"),
+    ],
+    categoryNames: reqField(t("error.required_category")),
+  });
   coordinatesStore.coordinates.length = 0;
   getCategories();
 
@@ -376,8 +412,10 @@ const createInstitution = () => {
       applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
     });
 };
 const updateInstitution = () => {
@@ -393,8 +431,10 @@ const updateInstitution = () => {
       applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
     });
 };
 const deleteInstitution = () => {

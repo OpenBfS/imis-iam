@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 export function useForm() {
@@ -168,6 +168,109 @@ export function useForm() {
   const closeConfirmCancelDialog = () => {
     showConfirmCancelDialog.value = false;
   };
+
+  const clientRules = ref({});
+  const initClientRules = (rules) => {
+    clientRules.value = rules;
+    Object.keys(clientRules.value).forEach((key) => {
+      clientAndServerRules.value[key] = clientRules.value[key];
+    });
+  };
+  const clientAndServerRules = ref({});
+  // Object with fake rules. It contains maximal one rule per input field.
+  // These rules always return a message so they always lead to an
+  // error message for the attribute. This way we can use Vuetify's internal
+  // mechanism to show error messages. We use it to show validation errors
+  // coming from keycloak.
+  const serverValidationRules = {};
+
+  /**
+   * @param {object} error:
+   * {
+   *   "message": "<error message>",
+   *   "messageParameters": [
+   *      "<attribute of the validated input field>"
+   *   ]
+   * }
+   */
+  const handleValidationErrorFromServer = async (error) => {
+    for (let i = 0; i < error.length; i++) {
+      const errorObject = error[i];
+      const message = errorObject.message;
+      let translatedString;
+      // Keycloak error is not translated
+      if (message.startsWith("error-")) {
+        const stringToTranslate = message.startsWith("error-")
+          ? message.replace("error-", "error.").replaceAll("-", "_")
+          : message;
+        errorObject.messageParameters[0] = t(
+          `user.${errorObject.messageParameters[0].toLowerCase()}`
+        );
+        translatedString = t(stringToTranslate, errorObject.messageParameters);
+      }
+      // Keycloak error is already translated
+      else {
+        translatedString = message;
+      }
+      const attribute = errorObject.messageParameters[0];
+      // Create rules that can be used by the validation mechanism of Vuetify.
+      serverValidationRules[attribute] = () => {
+        return translatedString;
+      };
+      aggregateRules();
+      // Need to wait for the DOM. Otherwise the error messages are not automatically shown.
+      await nextTick();
+      form.value.validate();
+    }
+  };
+
+  const aggregateRules = () => {
+    Object.keys(clientAndServerRules.value).forEach((key) => {
+      delete clientAndServerRules.value[key];
+      clientAndServerRules.value[key] = [];
+    });
+    Object.keys(clientRules.value).forEach((key) => {
+      clientAndServerRules.value[key].push(...clientRules.value[key]);
+    });
+    Object.keys(serverValidationRules).forEach((key) => {
+      if (!clientAndServerRules.value[key]) {
+        // Necessary because it could be that the backend returns errors
+        // for text fields which have no rules on the client side.
+        // Therefore, rules and their keys of client and server might differ.
+        clientAndServerRules.value[key] = [];
+      }
+      clientAndServerRules.value[key].push(serverValidationRules[key]);
+    });
+  };
+
+  const aggregateRulesForSingleAttribute = (attribute) => {
+    delete clientAndServerRules.value[attribute];
+    clientAndServerRules.value[attribute] = [];
+    if (clientRules.value[attribute]) {
+      clientAndServerRules.value[attribute].push(
+        ...clientRules.value[attribute]
+      );
+    }
+    if (serverValidationRules[attribute]) {
+      clientAndServerRules.value[attribute].push(
+        serverValidationRules[attribute]
+      );
+    }
+  };
+
+  const clearValidationError = async (attribute) => {
+    if (serverValidationRules[attribute]) {
+      delete serverValidationRules[attribute];
+      aggregateRulesForSingleAttribute(attribute);
+      await nextTick();
+      form.value.validate();
+    }
+  };
+
+  const isServerValidationError = (error) => {
+    return error.response?.status === 400 && error.response?.data?.[0]?.message;
+  };
+
   return {
     form,
     valid,
@@ -191,5 +294,11 @@ export function useForm() {
     onCancel,
     showConfirmCancelDialog,
     closeConfirmCancelDialog,
+    clientRules,
+    initClientRules,
+    clientAndServerRules,
+    handleValidationErrorFromServer,
+    clearValidationError,
+    isServerValidationError,
   };
 }

@@ -27,8 +27,11 @@
           <TextField
             :label="$t('label.title')"
             :modelValue="event.title"
-            :rules="reqField($t('calendar.required_title'))"
-            @update:modelValue="event.title = $event"
+            :rules="clientAndServerRules['title']"
+            @update:modelValue="
+              clearValidationError('title');
+              event.title = $event;
+            "
           ></TextField>
           <v-row>
             <v-col>
@@ -55,8 +58,11 @@
               <TextField
                 :label="$t('label.site')"
                 :modelValue="event.site"
-                :rules="reqField($t('calendar.required_site'))"
-                @update:modelValue="event.site = $event"
+                :rules="clientAndServerRules['site']"
+                @update:modelValue="
+                  clearValidationError('site');
+                  event.site = $event;
+                "
               ></TextField>
             </v-col>
           </v-row>
@@ -65,7 +71,8 @@
             :label="$t('label.description')"
             auto-grow
             v-model="event.description"
-            :rules="reqField($t('calendar.required_description'))"
+            :rules="clientAndServerRules['description']"
+            @update:model-value="clearValidationError('description')"
           ></v-textarea>
         </v-form>
       </v-col>
@@ -106,7 +113,7 @@
 </template>
 <script setup>
 import { HTTP } from "@/lib/http";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
@@ -114,6 +121,9 @@ import { useEventsStore } from "@/stores/events";
 import { useProfileStore } from "@/stores/profile";
 import TextField from "@/components/TextField.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const { hasRequestError, resetNotification } = useNotification();
 const applicationStore = useApplicationStore();
@@ -135,7 +145,20 @@ const {
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
+  initClientRules,
+  clientAndServerRules,
+  handleValidationErrorFromServer,
+  clearValidationError,
+  isServerValidationError,
 } = useForm();
+
+onMounted(() => {
+  initClientRules({
+    description: reqField(t("calendar.required_description")),
+    site: reqField(t("calendar.required_site")),
+    title: reqField(t("calendar.required_title")),
+  });
+});
 
 const createEvent = () => {
   let payload = { ...event.value };
@@ -146,8 +169,10 @@ const createEvent = () => {
       eventsStore.addEvent(response.data);
       applicationStore.setShowManageEventDialog(false);
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
     });
 };
 const updateEvent = () => {
@@ -158,8 +183,10 @@ const updateEvent = () => {
     .then(() => {
       applicationStore.setShowManageEventDialog(false);
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
     });
 };
 

@@ -34,12 +34,11 @@
                   "
                   :label="$t('user.username')"
                   :model-value="user.attributes.username"
-                  :rules="
-                    reqField(
-                      $t('error.user_attribute_required', [t('user.username')])
-                    )
+                  :rules="clientAndServerRules['username']"
+                  @update:model-value="
+                    clearValidationError('username');
+                    setUserAttribute('username', $event);
                   "
-                  @update:model-value="setUserAttribute('username', $event)"
                 ></TextField>
               </v-col>
               <v-col>
@@ -79,7 +78,7 @@
                         clearValidationError(attribute.name);
                       "
                       :type="getTextFieldType(attribute.name)"
-                      :rules="rules[attribute.name]"
+                      :rules="clientAndServerRules[attribute.name]"
                     ></TextField>
                     <v-select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
@@ -100,7 +99,7 @@
                         setUserAttribute(attribute.name, $event);
                         clearValidationError(attribute.name);
                       "
-                      :rules="rules[attribute.name]"
+                      :rules="clientAndServerRules[attribute.name]"
                     ></v-select>
                   </v-col>
                 </template>
@@ -128,7 +127,7 @@
                       clearValidationError(attribute.name);
                     "
                     :type="getTextFieldType(attribute.name)"
-                    :rules="rules[attribute.name]"
+                    :rules="clientAndServerRules[attribute.name]"
                   ></TextField>
                   <v-select
                     v-else-if="
@@ -153,7 +152,7 @@
                       setUserAttribute(attribute.name, $event);
                       clearValidationError(attribute.name);
                     "
-                    :rules="rules[attribute.name]"
+                    :rules="clientAndServerRules[attribute.name]"
                   ></v-select>
                   <p
                     :id="`${attribute.name}-validation-error`"
@@ -175,7 +174,8 @@
                 item-value="name"
                 persistent-hint
                 multiple
-                :rules="rules['institutions']"
+                :rules="clientAndServerRules['institutions']"
+                @update:model-value="clearValidationError('institutions')"
               >
               </v-select>
               <v-select
@@ -189,7 +189,8 @@
                 item-value="name"
                 persistent-hint
                 multiple
-                :rules="rules['groups']"
+                :rules="clientAndServerRules['groups']"
+                @update:model-value="clearValidationError('groups')"
               >
               </v-select>
             </div>
@@ -204,7 +205,8 @@
                 v-model="user.roles"
                 multiple
                 persistent-hint
-                :rules="reqMultipleSelect($t('user.required_roles'))"
+                :rules="clientAndServerRules['roles']"
+                @update:model-value="clearValidationError('roles')"
               >
               </v-select>
             </div>
@@ -298,7 +300,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, nextTick, ref } from "vue";
+import { computed, onMounted, nextTick } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
@@ -319,14 +321,6 @@ const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
-
-const rules = ref({});
-
-// Object that contains maximal one rule per user attribute.
-// These rules always return a message so they always lead to an
-// error message for the attribute. That's why they are only added then
-// the keycloak server returns a validation error.
-const serverValidationRules = {};
 
 function setUserAttribute(name, value) {
   const attrs = user.value.attributes;
@@ -388,36 +382,36 @@ const handleDisplayName = (displayName) => {
 };
 
 // Creating rules for the validation of form components.
-const getRules = (attribute) => {
+const getUserAttributeRules = (userAttribute) => {
   const tmpRules = [];
   // Rules for text field components
-  if (!attribute.validations?.options) {
+  if (!userAttribute.validations?.options) {
     if (
       // In Keycloak it is not possible to choose if email
       // is a required attribute so it won't appear in the
       // UserProfileMetadata. That's why we can't handle it the "generic"
       // way.
-      attribute.name === "email" ||
-      attribute.required?.roles?.includes("user")
+      userAttribute.name === "email" ||
+      userAttribute.required?.roles?.includes("user")
     ) {
       tmpRules.push(
         ...reqField(
           t("error.user_attribute_required", [
-            handleDisplayName(attribute.displayName),
+            handleDisplayName(userAttribute.displayName),
           ])
         )
       );
 
-      if (attribute.validations?.pattern) {
-        const pattern = attribute.validations.pattern.pattern;
-        const errorMessage = attribute.validations.pattern["error-message"];
+      if (userAttribute.validations?.pattern) {
+        const pattern = userAttribute.validations.pattern.pattern;
+        const errorMessage = userAttribute.validations.pattern["error-message"];
         tmpRules.push(...validRegex(pattern, t(errorMessage)));
       }
 
-      if (attribute.validations?.length) {
-        const length = attribute.validations.length;
+      if (userAttribute.validations?.length) {
+        const length = userAttribute.validations.length;
         let message;
-        const displayName = handleDisplayName(attribute.displayName);
+        const displayName = handleDisplayName(userAttribute.displayName);
         if (length.min && length.max) {
           message = t("error.invalid_length", [
             displayName,
@@ -442,37 +436,28 @@ const getRules = (attribute) => {
   // Rules for select components
   else {
     tmpRules.push(
-      ...reqField(t("error.user_attribute_required", [attribute.name]))
+      ...reqField(t("error.user_attribute_required", [userAttribute.name]))
     );
-  }
-  if (serverValidationRules[attribute.name]) {
-    tmpRules.push(serverValidationRules[attribute.name]);
   }
   return tmpRules;
 };
-const updateRule = (nameOfAttribute) => {
-  const attribute = getMetaDataAttribute(nameOfAttribute);
-  rules.value[nameOfAttribute] = attribute ? getRules(attribute) : [];
-};
-const updateRules = () => {
-  profileStore.attributes.forEach((attribute) => {
-    rules.value[attribute.name] = getRules(attribute);
+
+onMounted(() => {
+  clientRules.value = {
+    groups: [(v) => !!(v && v.length) || t("user.required_membership")],
+    institutions: reqMultipleSelect(t("user.required_institution")),
+    roles: reqMultipleSelect(t("user.required_roles")),
+    username: reqField(
+      t("error.user_attribute_required", [t("user.username")])
+    ),
+  };
+  profileStore.attributes.forEach((userAttribute) => {
+    clientRules.value[userAttribute.name] =
+      getUserAttributeRules(userAttribute);
   });
-  rules.value["groups"] = [
-    (v) => !!(v && v.length) || t("user.required_membership"),
-  ];
-  if (serverValidationRules["groups"]) {
-    rules.value["groups"].push(serverValidationRules["groups"]);
-  }
-  rules.value["institutions"] = [
-    ...reqMultipleSelect(t("user.required_institution")),
-  ];
-  if (serverValidationRules["institutions"]) {
-    rules.value["institutions"].push(serverValidationRules["institutions"]);
-  }
-};
-onBeforeMount(() => {
-  updateRules();
+  Object.keys(clientRules.value).forEach((key) => {
+    clientAndServerRules.value[key] = clientRules.value[key];
+  });
 });
 const user = computed(() => {
   return applicationStore.managedItem;
@@ -514,14 +499,9 @@ const createUser = (shouldClose) => {
       applicationStore.searchRequest(["users"]);
     })
     .catch((error) => {
-      if (
-        error.response?.status === 400 &&
-        error.response?.data?.[0]?.message
-      ) {
-        handleValidationErrorFromServer(error.response.data);
-      } else {
-        hasRequestError.value = true;
-      }
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
     });
 };
 
@@ -539,47 +519,13 @@ const updateUser = () => {
       applicationStore.searchRequest(["users"]);
     })
     .catch((error) => {
-      if (
-        error.response?.status === 400 &&
-        error.response?.data?.[0]?.message
-      ) {
-        handleValidationErrorFromServer(error.response.data);
-      } else {
-        hasRequestError.value = true;
-      }
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
       console.error(error);
     });
 };
 
-const handleValidationErrorFromServer = (error) => {
-  for (let i = 0; i < error.length; i++) {
-    const errorObject = error[i];
-    const message = errorObject.message;
-    const stringToTranslate = message.startsWith("error-")
-      ? message.replace("error-", "error.").replaceAll("-", "_")
-      : message;
-    const attributeName = errorObject.messageParameters[0];
-    errorObject.messageParameters[0] = t(
-      `user.${errorObject.messageParameters[0].toLowerCase()}`
-    );
-    const translatedString = t(
-      stringToTranslate,
-      errorObject.messageParameters
-    );
-
-    // Create rules that can be used by the validation mechanism of Vuetify.
-    serverValidationRules[attributeName] = () => {
-      return translatedString;
-    };
-    form.value.validate();
-    updateRules();
-  }
-};
-
-const clearValidationError = (attributeName) => {
-  delete serverValidationRules[attributeName];
-  updateRule(attributeName);
-};
 const createAndPrepare = () => {
   resetNotification();
   createUser(false);
@@ -598,6 +544,11 @@ const {
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
+  clientRules,
+  clientAndServerRules,
+  handleValidationErrorFromServer,
+  clearValidationError,
+  isServerValidationError,
 } = useForm();
 watchChange(originalUser.value, user.value);
 

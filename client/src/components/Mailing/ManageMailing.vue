@@ -20,12 +20,15 @@
       <v-divider></v-divider>
       <v-container>
         <v-row justify="center">
-          <v-form v-model="valid" class="v-col v-col-10">
+          <v-form v-model="valid" ref="form" class="v-col v-col-10">
             <TextField
               :label="$t('mailinglist.name')"
               :modelValue="listName"
-              :rules="reqField($t('mailinglist.required_mailinglist_name'))"
-              @update:modelValue="listName = $event"
+              :rules="clientAndServerRules['name']"
+              @update:modelValue="
+                clearValidationError('name');
+                listName = $event;
+              "
             ></TextField>
             <v-select
               :no-data-text="$t('label.no_data_text')"
@@ -38,7 +41,8 @@
               item-value="id"
               persistent-hint
               multiple
-              :rules="reqMultipleSelect($t('mailinglist.required_user'))"
+              :rules="clientAndServerRules['users']"
+              @update:modelValue="clearValidationError('users')"
             >
             </v-select>
             <UIAlert
@@ -150,7 +154,17 @@ const applicationStore = useApplicationStore();
 const userStore = useUserStore();
 const show = true;
 
-const { valid, reqField, reqMultipleSelect } = useForm();
+const {
+  form,
+  valid,
+  reqField,
+  reqMultipleSelect,
+  initClientRules,
+  clientAndServerRules,
+  handleValidationErrorFromServer,
+  clearValidationError,
+  isServerValidationError,
+} = useForm();
 const { t } = useI18n();
 const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
@@ -177,8 +191,10 @@ const createMailList = () => {
       emit("child-object", { closeDialog: true, hasChanges: true });
       listName.value = "";
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
     });
 };
 const deleteList = () => {
@@ -192,6 +208,10 @@ const deleteList = () => {
 };
 // Edit
 onMounted(() => {
+  initClientRules({
+    name: reqField(t("mailinglist.required_mailinglist_name")),
+    users: reqMultipleSelect(t("mailinglist.required_user")),
+  });
   getUsers();
   if (props.processType === "edit") {
     listName.value = props.item.name;
@@ -207,8 +227,10 @@ const editMailList = () => {
     .then(() => {
       emit("child-object", { closeDialog: true, hasChanges: true });
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
     });
 };
 // Enter/Exit Mailing-list

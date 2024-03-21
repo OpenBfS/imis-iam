@@ -36,7 +36,8 @@
                     item-value="id"
                     :no-data-text="$t('mailinglist.no_mailing_list')"
                     v-model="selectedList"
-                    :rules="reqField($t('mailinglist.required_mailing_list'))"
+                    :rules="clientAndServerRules['recipient']"
+                    @update:model-value="clearValidationError('recipient')"
                   >
                   </v-select>
                   <v-select
@@ -50,7 +51,8 @@
                     item-title="name"
                     item-value="id"
                     v-model="selectedType"
-                    :rules="reqField($t('mailinglist.required_type'))"
+                    :rules="clientAndServerRules['type']"
+                    @update:model-value="clearValidationError('type')"
                   >
                   </v-select>
                 </v-row>
@@ -68,12 +70,13 @@
                         v-model="expiryDateString"
                         clearable
                         prepend-inner-icon="mdi-calendar-blank"
-                        :hint="$t('form.date_format')"
+                        :hint="$t('hints.date_format')"
                         :label="$t('mailinglist.expiry_date')"
-                        :rules="validGermanDate()"
+                        :rules="clientAndServerRules['expiryDate']"
                         @click="isExpiryDatePickerOpen = true"
                         @click:clear="isExpiryDatePickerOpen = false"
                         @input="handleInputForExpiryDate"
+                        @update:model-value="clearValidationError('expiryDate')"
                       >
                         <template v-slot:details></template>
                       </v-text-field>
@@ -122,7 +125,8 @@
                     :label="$t('mailinglist.subject')"
                     density="compact"
                     v-model="subject"
-                    :rules="reqField($t('mailinglist.required_subject'))"
+                    :rules="clientAndServerRules['subject']"
+                    @update:model-value="clearValidationError('subject')"
                   ></v-text-field>
                 </v-row>
               </v-col>
@@ -134,7 +138,8 @@
                   variant="outlined"
                   name="input-7-1"
                   v-model="mailText"
-                  :rules="reqField($t('mailinglist.required_content'))"
+                  :rules="clientAndServerRules['text']"
+                  @update:model-value="clearValidationError('text')"
                 ></v-textarea>
               </v-col>
             </v-row>
@@ -192,7 +197,7 @@ const applicationStore = useApplicationStore();
 const mailStore = useMailStore();
 const profileStore = useProfileStore();
 
-const { d } = useI18n();
+const { d, t } = useI18n();
 const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
 // Mail
@@ -204,6 +209,11 @@ const {
   validGermanDate,
   doesRegexMatchWholeString,
   germanDateRegex,
+  initClientRules,
+  clientAndServerRules,
+  handleValidationErrorFromServer,
+  clearValidationError,
+  isServerValidationError,
 } = useForm();
 const selectedList = ref(null);
 const mailText = ref("");
@@ -267,8 +277,10 @@ const sendMail = () => {
         closeDialog: true,
       });
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
     });
 };
 // type
@@ -285,6 +297,13 @@ const getTypes = () => {
     });
 };
 onMounted(() => {
+  initClientRules({
+    expiryDate: validGermanDate(),
+    recipient: reqField(t("mailinglist.required_mailing_list")),
+    subject: reqField(t("mailinglist.required_subject")),
+    text: reqField(t("mailinglist.required_content")),
+    type: reqField(t("mailinglist.required_type")),
+  });
   getTypes();
 });
 </script>
