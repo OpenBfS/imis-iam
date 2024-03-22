@@ -195,29 +195,6 @@ public class User {
     }
 
     /**
-     * Get institutions by a list of ids.
-     * @param institutionNames List of new institution names
-     * @param em Entity manager
-     * @return List of institutions
-     */
-    private List<Institution> getInstitutionsByNames(
-        List<String> institutionNames,
-        EntityManager em
-    ) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Institution> query
-            = cb.createQuery(Institution.class);
-        Root<Institution> root = query.from(Institution.class);
-        query.select(root);
-        In<String> nameFilter = cb.in(root.get(NAME_PARAM));
-        institutionNames.forEach(instName -> nameFilter.value(instName));
-        query.where(nameFilter);
-        List<Institution> newInstitutions
-            = em.createQuery(query).getResultList();
-        return newInstitutions;
-    }
-
-    /**
      * Create or update the user attributes jpa model for this representation.
      * @param em Entity manager used for queries
      * @return Jpa model
@@ -228,7 +205,17 @@ public class User {
             jpaUser = new UserAttributes();
         }
         jpaUser.setId(getId());
-        jpaUser.setInstitutions(getInstitutionsByNames(getInstitutions(), em));
+        if (this.institutions != null && !this.institutions.isEmpty()) {
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Institution> query
+                = cb.createQuery(Institution.class);
+            Root<Institution> root = query.from(Institution.class);
+            query.select(root);
+            In<String> nameFilter = cb.in(root.get(NAME_PARAM));
+            this.institutions.forEach(instName -> nameFilter.value(instName));
+            query.where(nameFilter);
+            jpaUser.setInstitutions(em.createQuery(query).getResultList());
+        }
         return jpaUser;
     }
 }
