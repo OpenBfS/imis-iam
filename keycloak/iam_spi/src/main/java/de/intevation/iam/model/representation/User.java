@@ -9,6 +9,8 @@ package de.intevation.iam.model.representation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
@@ -80,10 +82,12 @@ public class User {
             UserAttributes.class, userModel.getId());
         if (jpaModel != null) {
             //Set institutions
-            List<Institution> instList = jpaModel.getInstitutions();
+            Map<Boolean, Institution> instList = jpaModel.getInstitutions();
             if (instList != null) {
+                // TODO: send boolean keys to client
                 this.institutions = new ArrayList<String>();
-                instList.forEach(inst -> institutions.add(inst.getName()));
+                instList.forEach((isPrimary, inst) -> institutions.add(
+                        inst.getName()));
             }
 
             // Get user-role mappings
@@ -214,7 +218,14 @@ public class User {
             In<String> nameFilter = cb.in(root.get(NAME_PARAM));
             this.institutions.forEach(instName -> nameFilter.value(instName));
             query.where(nameFilter);
-            jpaUser.setInstitutions(em.createQuery(query).getResultList());
+            List<Institution> insts = em.createQuery(query).getResultList();
+            SortedMap<Boolean, Institution> newInstitutions = new TreeMap<>(
+                new UserAttributes.CompareBooleanWithNulls());
+            for (Institution inst: insts) {
+                // TODO: Get boolean key from client
+                newInstitutions.put(null, inst);
+            }
+            jpaUser.setInstitutions(newInstitutions);
         }
         return jpaUser;
     }

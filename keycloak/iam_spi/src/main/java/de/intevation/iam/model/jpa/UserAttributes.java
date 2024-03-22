@@ -7,7 +7,8 @@
 package de.intevation.iam.model.jpa;
 
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.Comparator;
+import java.util.SortedMap;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +16,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.SortComparator;
 import org.keycloak.models.jpa.entities.UserEntity;
 
 /**
@@ -51,7 +54,20 @@ public class UserAttributes {
         joinColumns = {@JoinColumn(name = "user_id")},
         inverseJoinColumns = {@JoinColumn(name = "institution_id")}
     )
-    private List<Institution> institutions;
+    @MapKeyColumn(name = "is_primary_institution")
+    @SortComparator(CompareBooleanWithNulls.class)
+    private SortedMap<Boolean, Institution> institutions;
+
+    /**
+     * Comparator to be used in a SortedMap that should allow any number
+     * of null-valued keys.
+     */
+    public static class CompareBooleanWithNulls implements Comparator<Boolean> {
+        @Override
+        public int compare(Boolean b1, Boolean b2) {
+            return b1 == null || b2 == null ? -1 : b1.compareTo(b2);
+        }
+    }
 
     public String getId() {
         return id;
@@ -94,11 +110,11 @@ public class UserAttributes {
         this.userEntity = userEntity;
     }
 
-    public List<Institution> getInstitutions() {
+    public SortedMap<Boolean, Institution> getInstitutions() {
         return institutions;
     }
 
-    public void setInstitutions(List<Institution> institutions) {
+    public void setInstitutions(SortedMap<Boolean, Institution> institutions) {
         this.institutions = institutions;
     }
 }
