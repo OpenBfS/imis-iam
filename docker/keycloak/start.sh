@@ -155,10 +155,8 @@ curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId/
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN"
 
-#Insert attributes for exampleuser
-psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_user_attributes.sql -w
-#Insert and assign example institutions
-psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_example_institutions.sql -w
+# Add example data
+psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_example_data.sql -w
 
 echo "... done"
 

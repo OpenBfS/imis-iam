@@ -85,29 +85,6 @@
                 site VARCHAR NOT NULL,
                 description VARCHAR NOT NULL
             );
-
-            INSERT INTO iam_institution_category (name) VALUES
-                ('Bundesministerium'),
-                ('Leitstelle'),
-                ('Bundesbehörde'),
-                ('Landesministerium'),
-                ('Landesdatenzentrale'),
-                ('Landesmessstelle'),
-                ('Landesmessstelle REI'),
-                ('Betreiber KTA'),
-                ('Aufsichtsbehörde'),
-                ('Sonstige'),
-                ('Alle');
-
-            INSERT INTO iam_mail_type (id, name) VALUES
-                (1, 'Einladung'),
-                (2, 'Umfrage'),
-                (3, 'Störung'),
-                (4, 'Wartung'),
-                (5, 'Sprechstunde'),
-                (6, 'Release Note'),
-                (7, 'Soll/Ist-Vergleich'),
-                (8, 'Hinweis');
         </sql>
     </changeSet>
 </databaseChangeLog>
