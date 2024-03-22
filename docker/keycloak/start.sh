@@ -83,7 +83,7 @@ ${KEYCLOAK_HOME}/bin/kcadm.sh update realms/$IMIS_REALM/users/profile \
     -f ${DIR}/user_profile.json
 
 echo "Creating example users"
-for user in "iam_user.json" "iam_redakteur.json" "iam_chefredakteur.json" "iam_admin.json"
+for user in "iam_user.json" "iam_redakteur.json" "iam_chefredakteur.json"
 do
     ${KEYCLOAK_HOME}/bin/kcadm.sh create users -r $IMIS_REALM -f ${DIR}/${user}
 done
