@@ -27,21 +27,13 @@
             <div class="group_class">
               <TextField
                 :label="$t('label.name')"
-                :modelValue="institution.name"
-                :rules="clientAndServerRules['name']"
-                @update:modelValue="
-                  clearValidationError('name');
-                  institution.name = $event;
-                "
+                :attribute="'name'"
+                @update:modelValue="institution.name = $event"
               ></TextField>
               <TextField
                 :label="$t('institution.shortname')"
-                :modelValue="institution.shortName"
-                :rules="clientAndServerRules['shortName']"
-                @update:modelValue="
-                  clearValidationError('shortName');
-                  institution.shortName = $event;
-                "
+                :attribute="'shortName'"
+                @update:modelValue="institution.shortName = $event"
               ></TextField>
               <v-checkbox
                 density="compact"
@@ -52,30 +44,22 @@
             <div class="group_class">
               <TextField
                 :label="$t('institution.service_building_location')"
-                :modelValue="institution.serviceBuildingLocation"
-                :rules="clientAndServerRules['serviceBuildingLocation']"
+                :attribute="'serviceBuildingLocation'"
                 @update:modelValue="
-                  clearValidationError('serviceBuildingLocation');
-                  institution.serviceBuildingLocation = $event;
+                  institution.serviceBuildingLocation = $event
                 "
               ></TextField>
               <TextField
                 :label="$t('institution.service_building_postalcode')"
-                :modelValue="institution.serviceBuildingPostalCode"
-                :rules="clientAndServerRules['serviceBuildingPostalCode']"
+                :attribute="'serviceBuildingPostalCode'"
                 @update:modelValue="
-                  clearValidationError('serviceBuildingPostalCode');
-                  institution.serviceBuildingPostalCode = $event;
+                  institution.serviceBuildingPostalCode = $event
                 "
               ></TextField>
               <TextField
                 :label="$t('institution.service_building_street')"
-                :modelValue="institution.serviceBuildingStreet"
-                :rules="clientAndServerRules['serviceBuildingStreet']"
-                @update:modelValue="
-                  clearValidationError('serviceBuildingStreet');
-                  institution.serviceBuildingStreet = $event;
-                "
+                :attribute="'serviceBuildingStreet'"
+                @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
             <v-form
@@ -124,46 +108,38 @@
                     :rules="validPostalcode($t('error.valid_postalcode'))" -->
               <TextField
                 :label="$t('institution.address_location')"
-                :modelValue="institution.addressLocation"
+                :attribute="'addressLocation'"
                 @update:modelValue="institution.addressLocation = $event"
               ></TextField>
               <TextField
                 :label="$t('institution.address_postalcode')"
-                :modelValue="institution.addressPostalCode"
+                :attribute="'addressPostalCode'"
                 @update:modelValue="institution.addressPostalCode = $event"
               ></TextField>
               <TextField
                 :label="$t('institution.address_street')"
-                :modelValue="institution.addressStreet"
+                :attribute="'addressStreet'"
                 @update:modelValue="institution.addressStreet = $event"
               ></TextField>
             </div>
             <div class="group_class">
               <TextField
                 :label="$t('institution.central_phone')"
-                :modelValue="institution.centralPhone"
-                :rules="clientAndServerRules['centralPhone']"
-                @update:modelValue="
-                  clearValidationError('centralPhone');
-                  institution.centralPhone = $event;
-                "
+                @update:modelValue="institution.centralPhone = $event"
+                :attribute="'centralPhone'"
               ></TextField>
               <TextField
                 :label="$t('institution.central_email')"
-                :modelValue="institution.centralMail"
-                :rules="clientAndServerRules['centralMail']"
-                @update:modelValue="
-                  clearValidationError('centralMail');
-                  institution.centralMail = $event;
-                "
+                :attribute="'centralMail'"
+                @update:modelValue="institution.centralMail = $event"
               ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
                     :rules="validPhone($t('error.valid_fax'))" -->
               <TextField
                 :label="$t('institution.central_fax')"
-                :modelValue="institution.centralFax"
                 @update:modelValue="institution.centralFax = $event"
+                :attribute="'centralFax'"
               ></TextField>
             </div>
             <div class="group_class">
@@ -172,24 +148,16 @@
                   !profileStore.userData.roles.some((e) => e === 'chief_editor')
                 "
                 :label="$t('institution.imis_id')"
-                :modelValue="institution.imisId"
-                :rules="clientAndServerRules['imisId']"
-                @update:modelValue="
-                  clearValidationError('imisId');
-                  institution.imisId = $event;
-                "
+                :attribute="'imisId'"
+                @update:modelValue="institution.imisId = $event"
               ></TextField>
               <TextField
                 :disabled="
                   !profileStore.userData.roles.some((e) => e === 'chief_editor')
                 "
                 :label="$t('institution.imis_usergroup_id')"
-                :modelValue="institution.imisUserGroupId"
-                :rules="clientAndServerRules['imisUserGroupId']"
-                @update:modelValue="
-                  clearValidationError('imisUserGroupId');
-                  institution.imisUserGroupId = $event;
-                "
+                :attribute="'imisUserGroupId'"
+                @update:modelValue="institution.imisUserGroupId = $event"
               ></TextField>
             </div>
             <div class="group_class align-center">
@@ -203,9 +171,11 @@
                 item-value="id"
                 persistent-hint
                 density="compact"
-                :rules="clientAndServerRules['categoryNames']"
+                :rules="applicationStore.clientAndServerRules['categoryNames']"
                 multiple
-                @update:model-value="clearValidationError('imisUserGroupId')"
+                @update:model-value="
+                  applicationStore.clearValidationError('imisUserGroupId')
+                "
               >
               </v-select>
             </div>
@@ -336,10 +306,7 @@ const {
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
-  initClientRules,
-  clientAndServerRules,
   handleValidationErrorFromServer,
-  clearValidationError,
   isServerValidationError,
 } = useForm();
 const categories = ref([]);
@@ -353,7 +320,8 @@ const getCategories = () => {
     });
 };
 onMounted(() => {
-  initClientRules({
+  applicationStore.setForm(form);
+  applicationStore.initClientRules({
     name: reqField(t("institution.required_name")),
     shortName: reqField(t("institution.required_shortname")),
     serviceBuildingLocation: reqField(

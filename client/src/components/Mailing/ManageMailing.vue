@@ -24,11 +24,8 @@
             <TextField
               :label="$t('mailinglist.name')"
               :modelValue="listName"
-              :rules="clientAndServerRules['name']"
-              @update:modelValue="
-                clearValidationError('name');
-                listName = $event;
-              "
+              :attribute="'name'"
+              @update:modelValue="listName = $event"
             ></TextField>
             <v-select
               :no-data-text="$t('label.no_data_text')"
@@ -41,8 +38,10 @@
               item-value="id"
               persistent-hint
               multiple
-              :rules="clientAndServerRules['users']"
-              @update:modelValue="clearValidationError('users')"
+              :rules="applicationStore.clientAndServerRules['users']"
+              @update:modelValue="
+                applicationStore.clearValidationError('users')
+              "
             >
             </v-select>
             <UIAlert
@@ -160,9 +159,7 @@ const {
   reqField,
   reqMultipleSelect,
   initClientRules,
-  clientAndServerRules,
   handleValidationErrorFromServer,
-  clearValidationError,
   isServerValidationError,
 } = useForm();
 const { t } = useI18n();
@@ -208,6 +205,7 @@ const deleteList = () => {
 };
 // Edit
 onMounted(() => {
+  applicationStore.setForm(form);
   initClientRules({
     name: reqField(t("mailinglist.required_mailinglist_name")),
     users: reqMultipleSelect(t("mailinglist.required_user")),

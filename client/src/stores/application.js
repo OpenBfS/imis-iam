@@ -7,6 +7,7 @@
 import { defineStore } from "pinia";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
+import { nextTick } from "vue";
 
 export const useApplicationStore = defineStore("application", {
   namespaced: true,
@@ -16,6 +17,15 @@ export const useApplicationStore = defineStore("application", {
     listToExport: "",
     isAllowedToManageUser: false,
     managedItem: {},
+    clientAndServerRules: {},
+    clientRules: {},
+    // Object with fake rules. It contains maximal one rule per input field.
+    // These rules always return a message so they always lead to an
+    // error message for the attribute. This way we can use Vuetify's internal
+    // mechanism to show error messages. We use it to show validation errors
+    // coming from keycloak.
+    serverValidationRules: {},
+    form: undefined,
     savedItem: {},
     showManageEventDialog: false,
     showManageUserDialog: false,
@@ -92,6 +102,38 @@ export const useApplicationStore = defineStore("application", {
             reject(error);
           });
       });
+    },
+    setForm(newForm) {
+      this.form = newForm;
+    },
+    async clearValidationError(attribute) {
+      if (this.serverValidationRules[attribute]) {
+        delete this.serverValidationRules[attribute];
+        this.aggregateRulesForSingleAttribute(attribute);
+        await nextTick();
+        this.form.validate();
+      }
+    },
+    initClientRules(rules) {
+      this.clientRules = {};
+      this.serverValidationRules = {};
+      this.clientAndServerRules = {};
+      this.clientRules = rules;
+      this.clientAndServerRules = Object.assign({}, rules);
+    },
+    aggregateRulesForSingleAttribute(attribute) {
+      delete this.clientAndServerRules[attribute];
+      this.clientAndServerRules[attribute] = [];
+      if (this.clientRules[attribute]) {
+        this.clientAndServerRules[attribute].push(
+          ...this.clientRules[attribute]
+        );
+      }
+      if (this.serverValidationRules[attribute]) {
+        this.clientAndServerRules[attribute].push(
+          this.serverValidationRules[attribute]
+        );
+      }
     },
   },
 });

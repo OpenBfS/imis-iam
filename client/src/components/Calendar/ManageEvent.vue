@@ -26,12 +26,8 @@
         <v-form v-model="valid" ref="form" :readonly="readonly">
           <TextField
             :label="$t('label.title')"
-            :modelValue="event.title"
-            :rules="clientAndServerRules['title']"
-            @update:modelValue="
-              clearValidationError('title');
-              event.title = $event;
-            "
+            :attribute="'title'"
+            @update:modelValue="event.title = $event"
           ></TextField>
           <v-row>
             <v-col>
@@ -57,12 +53,8 @@
             <v-col>
               <TextField
                 :label="$t('label.site')"
-                :modelValue="event.site"
-                :rules="clientAndServerRules['site']"
-                @update:modelValue="
-                  clearValidationError('site');
-                  event.site = $event;
-                "
+                :attribute="'site'"
+                @update:modelValue="event.site = $event"
               ></TextField>
             </v-col>
           </v-row>
@@ -70,9 +62,7 @@
             variant="underlined"
             :label="$t('label.description')"
             auto-grow
-            v-model="event.description"
-            :rules="clientAndServerRules['description']"
-            @update:model-value="clearValidationError('description')"
+            :attribute="'description'"
           ></v-textarea>
         </v-form>
       </v-col>
@@ -146,13 +136,12 @@ const {
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
   initClientRules,
-  clientAndServerRules,
   handleValidationErrorFromServer,
-  clearValidationError,
   isServerValidationError,
 } = useForm();
 
 onMounted(() => {
+  applicationStore.setForm(form);
   initClientRules({
     description: reqField(t("calendar.required_description")),
     site: reqField(t("calendar.required_site")),

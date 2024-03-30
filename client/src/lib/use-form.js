@@ -7,6 +7,7 @@
 
 import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { useApplicationStore } from "@/stores/application";
 
 export function useForm() {
   const { t } = useI18n();
@@ -169,20 +170,14 @@ export function useForm() {
     showConfirmCancelDialog.value = false;
   };
 
-  const clientRules = ref({});
   const initClientRules = (rules) => {
-    clientRules.value = rules;
-    Object.keys(clientRules.value).forEach((key) => {
-      clientAndServerRules.value[key] = clientRules.value[key];
+    const applicationStore = useApplicationStore();
+    applicationStore.clientRules = rules;
+    Object.keys(applicationStore.clientRules).forEach((key) => {
+      applicationStore.clientAndServerRules[key] =
+        applicationStore.clientRules[key];
     });
   };
-  const clientAndServerRules = ref({});
-  // Object with fake rules. It contains maximal one rule per input field.
-  // These rules always return a message so they always lead to an
-  // error message for the attribute. This way we can use Vuetify's internal
-  // mechanism to show error messages. We use it to show validation errors
-  // coming from keycloak.
-  const serverValidationRules = {};
 
   /**
    * @param {object} error:
@@ -194,6 +189,7 @@ export function useForm() {
    * }
    */
   const handleValidationErrorFromServer = async (error) => {
+    const applicationStore = useApplicationStore();
     for (let i = 0; i < error.length; i++) {
       const errorObject = error[i];
       const message = errorObject.message;
@@ -214,7 +210,7 @@ export function useForm() {
       }
       const attribute = errorObject.messageParameters[0];
       // Create rules that can be used by the validation mechanism of Vuetify.
-      serverValidationRules[attribute] = () => {
+      applicationStore.serverValidationRules[attribute] = () => {
         return translatedString;
       };
       aggregateRules();
@@ -225,42 +221,49 @@ export function useForm() {
   };
 
   const aggregateRules = () => {
-    Object.keys(clientAndServerRules.value).forEach((key) => {
-      delete clientAndServerRules.value[key];
-      clientAndServerRules.value[key] = [];
+    const applicationStore = useApplicationStore();
+    Object.keys(applicationStore.clientAndServerRules).forEach((key) => {
+      delete applicationStore.clientAndServerRules[key];
+      applicationStore.clientAndServerRules[key] = [];
     });
-    Object.keys(clientRules.value).forEach((key) => {
-      clientAndServerRules.value[key].push(...clientRules.value[key]);
+    Object.keys(applicationStore.clientRules).forEach((key) => {
+      applicationStore.clientAndServerRules[key].push(
+        ...applicationStore.clientRules[key]
+      );
     });
-    Object.keys(serverValidationRules).forEach((key) => {
-      if (!clientAndServerRules.value[key]) {
+    Object.keys(applicationStore.serverValidationRules).forEach((key) => {
+      if (!applicationStore.clientAndServerRules[key]) {
         // Necessary because it could be that the backend returns errors
         // for text fields which have no rules on the client side.
         // Therefore, rules and their keys of client and server might differ.
-        clientAndServerRules.value[key] = [];
+        applicationStore.clientAndServerRules[key] = [];
       }
-      clientAndServerRules.value[key].push(serverValidationRules[key]);
+      applicationStore.clientAndServerRules[key].push(
+        applicationStore.serverValidationRules[key]
+      );
     });
   };
 
   const aggregateRulesForSingleAttribute = (attribute) => {
-    delete clientAndServerRules.value[attribute];
-    clientAndServerRules.value[attribute] = [];
-    if (clientRules.value[attribute]) {
-      clientAndServerRules.value[attribute].push(
-        ...clientRules.value[attribute]
+    const applicationStore = useApplicationStore();
+    delete applicationStore.clientAndServerRules[attribute];
+    applicationStore.clientAndServerRules[attribute] = [];
+    if (applicationStore.clientRules[attribute]) {
+      applicationStore.clientAndServerRules[attribute].push(
+        ...applicationStore.clientRules[attribute]
       );
     }
-    if (serverValidationRules[attribute]) {
-      clientAndServerRules.value[attribute].push(
-        serverValidationRules[attribute]
+    if (applicationStore.serverValidationRules[attribute]) {
+      applicationStore.clientAndServerRules[attribute].push(
+        applicationStore.serverValidationRules[attribute]
       );
     }
   };
 
   const clearValidationError = async (attribute) => {
-    if (serverValidationRules[attribute]) {
-      delete serverValidationRules[attribute];
+    const applicationStore = useApplicationStore();
+    if (applicationStore.serverValidationRules[attribute]) {
+      delete applicationStore.serverValidationRules[attribute];
       aggregateRulesForSingleAttribute(attribute);
       await nextTick();
       form.value.validate();
@@ -294,9 +297,7 @@ export function useForm() {
     onCancel,
     showConfirmCancelDialog,
     closeConfirmCancelDialog,
-    clientRules,
     initClientRules,
-    clientAndServerRules,
     handleValidationErrorFromServer,
     clearValidationError,
     isServerValidationError,
