@@ -234,7 +234,7 @@ const senderList = ref([
     "<" + userData.attributes.email + ">",
   ].join(" "),
 ]);
-const selectedSender = ref(senderList.value[0] || senderList.value[0] || "");
+const selectedSender = ref("");
 const toggleExpiryDatePicker = () => {
   isExpiryDatePickerOpen.value = !isExpiryDatePickerOpen.value;
 };
@@ -309,5 +309,10 @@ onMounted(() => {
     type: reqField(t("mailinglist.required_type")),
   });
   getTypes();
+
+  // Without reset the send button is enabled the first time the user opens this
+  // dialog although the users didn't enter anything.
+  form.value.reset();
+  selectedSender.value = senderList.value[0] ?? "";
 });
 </script>
