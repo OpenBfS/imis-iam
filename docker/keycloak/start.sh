@@ -83,7 +83,7 @@ ${KEYCLOAK_HOME}/bin/kcadm.sh update realms/$IMIS_REALM/users/profile \
     -f ${DIR}/user_profile.json
 
 echo "Creating example users"
-for user in "iam_user.json" "iam_redakteur.json" "iam_chefredakteur.json" "iam_admin.json"
+for user in "iam_user.json" "iam_redakteur.json" "iam_chefredakteur.json"
 do
     ${KEYCLOAK_HOME}/bin/kcadm.sh create users -r $IMIS_REALM -f ${DIR}/${user}
 done
@@ -155,10 +155,8 @@ curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId/
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN"
 
-#Insert attributes for exampleuser
-psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_user_attributes.sql -w
-#Insert and assign example institutions
-psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_example_institutions.sql -w
+# Add example data
+psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_example_data.sql -w
 
 echo "... done"
 
