@@ -74,9 +74,10 @@
                     style="position: relative"
                   >
                     <div id="expiryDateTextfield">
-                      <v-text-field
+                      <TextField
                         v-model="expiryDateString"
                         clearable
+                        variant="filled"
                         prepend-inner-icon="mdi-calendar-blank"
                         :hint="$t('hints.date_format')"
                         :label="$t('mailinglist.expiry_date')"
@@ -86,7 +87,7 @@
                         @input="handleInputForExpiryDate"
                       >
                         <template v-slot:details></template>
-                      </v-text-field>
+                      </TextField>
                     </div>
                     <v-date-picker
                       v-click-outside="{
@@ -101,7 +102,7 @@
                       elevation="6"
                       style="
                         position: absolute;
-                        top: 80pt;
+                        top: 70pt;
                         z-index: 20;
                         background-color: white;
                         box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
@@ -127,14 +128,10 @@
                 </v-row>
               </v-col>
               <v-col cols="10">
-                <v-row>
-                  <v-text-field
-                    :label="$t('mailinglist.subject')"
-                    density="compact"
-                    v-model="subject"
-                    :attribute="'subject'"
-                  ></v-text-field>
-                </v-row>
+                <TextField
+                  :label="$t('mailinglist.subject')"
+                  :attribute="'subject'"
+                ></TextField>
               </v-col>
             </v-row>
             <v-row>
@@ -191,6 +188,7 @@ import { useProfileStore } from "@/stores/profile";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
+import TextField from "../TextField.vue";
 
 const props = defineProps({
   mailingLists: Array,
