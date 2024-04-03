@@ -34,7 +34,7 @@
                   "
                   :label="$t('user.username')"
                   :model-value="user.attributes.username"
-                  :rules="clientAndServerRules['username']"
+                  :rules="applicationStore.clientAndServerRules['username']"
                   @update:model-value="
                     clearValidationError('username');
                     setUserAttribute('username', $event);
@@ -78,7 +78,9 @@
                         clearValidationError(attribute.name);
                       "
                       :type="getTextFieldType(attribute.name)"
-                      :rules="clientAndServerRules[attribute.name]"
+                      :rules="
+                        applicationStore.clientAndServerRules[attribute.name]
+                      "
                     ></TextField>
                     <v-select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
@@ -99,7 +101,9 @@
                         setUserAttribute(attribute.name, $event);
                         clearValidationError(attribute.name);
                       "
-                      :rules="clientAndServerRules[attribute.name]"
+                      :rules="
+                        applicationStore.clientAndServerRules[attribute.name]
+                      "
                     ></v-select>
                   </v-col>
                 </template>
@@ -127,7 +131,9 @@
                       clearValidationError(attribute.name);
                     "
                     :type="getTextFieldType(attribute.name)"
-                    :rules="clientAndServerRules[attribute.name]"
+                    :rules="
+                      applicationStore.clientAndServerRules[attribute.name]
+                    "
                   ></TextField>
                   <v-select
                     v-else-if="
@@ -152,7 +158,9 @@
                       setUserAttribute(attribute.name, $event);
                       clearValidationError(attribute.name);
                     "
-                    :rules="clientAndServerRules[attribute.name]"
+                    :rules="
+                      applicationStore.clientAndServerRules[attribute.name]
+                    "
                   ></v-select>
                   <p
                     :id="`${attribute.name}-validation-error`"
@@ -174,7 +182,7 @@
                 item-value="name"
                 persistent-hint
                 multiple
-                :rules="clientAndServerRules['institutions']"
+                :rules="applicationStore.clientAndServerRules['institutions']"
                 @update:model-value="clearValidationError('institutions')"
               >
               </v-select>
@@ -189,7 +197,7 @@
                 item-value="name"
                 persistent-hint
                 multiple
-                :rules="clientAndServerRules['groups']"
+                :rules="applicationStore.clientAndServerRules['groups']"
                 @update:model-value="clearValidationError('groups')"
               >
               </v-select>
@@ -205,7 +213,7 @@
                 v-model="user.roles"
                 multiple
                 persistent-hint
-                :rules="clientAndServerRules['roles']"
+                :rules="applicationStore.clientAndServerRules['roles']"
                 @update:model-value="clearValidationError('roles')"
               >
               </v-select>
@@ -443,20 +451,21 @@ const getUserAttributeRules = (userAttribute) => {
 };
 
 onMounted(() => {
-  clientRules.value = {
+  applicationStore.initClientRules({
     groups: [(v) => !!(v && v.length) || t("user.required_membership")],
     institutions: reqMultipleSelect(t("user.required_institution")),
     roles: reqMultipleSelect(t("user.required_roles")),
     username: reqField(
       t("error.user_attribute_required", [t("user.username")])
     ),
-  };
+  });
   profileStore.attributes.forEach((userAttribute) => {
-    clientRules.value[userAttribute.name] =
+    applicationStore.clientRules[userAttribute.name] =
       getUserAttributeRules(userAttribute);
   });
-  Object.keys(clientRules.value).forEach((key) => {
-    clientAndServerRules.value[key] = clientRules.value[key];
+  Object.keys(applicationStore.clientRules).forEach((key) => {
+    applicationStore.clientAndServerRules[key] =
+      applicationStore.clientRules[key];
   });
 });
 const user = computed(() => {
@@ -544,8 +553,6 @@ const {
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
-  clientRules,
-  clientAndServerRules,
   handleValidationErrorFromServer,
   clearValidationError,
   isServerValidationError,
