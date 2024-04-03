@@ -130,6 +130,7 @@
               <v-col cols="10">
                 <TextField
                   :label="$t('mailinglist.subject')"
+                  v-model="subject"
                   :attribute="'subject'"
                 ></TextField>
               </v-col>
@@ -141,7 +142,8 @@
                   variant="outlined"
                   name="input-7-1"
                   v-model="mailText"
-                  :attribute="'text'"
+                  :rules="applicationStore.clientAndServerRules['text']"
+                  @update:model-value="clearValidationError('text')"
                 ></v-textarea>
               </v-col>
             </v-row>
@@ -215,6 +217,7 @@ const {
   initClientRules,
   handleValidationErrorFromServer,
   isServerValidationError,
+  clearValidationError,
 } = useForm();
 const selectedList = ref(null);
 const mailText = ref("");
