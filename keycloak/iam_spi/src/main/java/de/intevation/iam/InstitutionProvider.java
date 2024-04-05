@@ -42,6 +42,7 @@ import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionCategory;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
+import de.intevation.iam.util.Range;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 
@@ -51,6 +52,11 @@ import de.intevation.iam.validation.Validator;
  */
 @Produces(MediaType.APPLICATION_JSON)
 public class InstitutionProvider implements RealmResourceProvider {
+
+    enum SortOrder {
+        asc,
+        desc
+    }
 
     private KeycloakSession session;
 
@@ -106,12 +112,18 @@ public class InstitutionProvider implements RealmResourceProvider {
      * </pre>
      * @param headers Request headers
      * @param search Optional search parameter
+     * @param range Optional range
+     * @param sortBy Attribute to sort for
+     * @param order Sort order: ascending and descending
      * @return Array of institutions
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Institution> getInstitutions(@Context HttpHeaders headers,
-            @QueryParam("search") String search) {
+            @QueryParam("search") String search,
+            @QueryParam("range") Range range,
+            @QueryParam("sortBy") String sortBy,
+            @QueryParam("order") SortOrder order) {
         String filter = search != null && !search.isEmpty()
             ? "%" + search.toLowerCase() + "%" : "";
         EntityManager em = session.getProvider(
@@ -120,13 +132,44 @@ public class InstitutionProvider implements RealmResourceProvider {
         CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
         Root<Institution> root = query.from(Institution.class);
         query.select(root);
-        if (!filter.isEmpty()) {
-            query.where(cb.like(
-                cb.lower(root.get("name")),
-                filter
-            ));
+
+        int firstResult = 0;
+        int maxResults = Integer.MAX_VALUE;
+        if (range != null) {
+            firstResult = range.getLow();
+            maxResults = range.getHigh() - range.getLow();
         }
-        return auth.filter(em.createQuery(query).getResultList(), headers);
+
+        String sortByAttribute = "name";
+        if (sortBy != null) {
+            sortByAttribute = sortBy;
+        }
+
+        if (order == null) {
+            order = SortOrder.asc;
+        }
+
+        if (!filter.isEmpty()) {
+            query.where(cb.or(
+                cb.like(
+                    cb.lower(root.get("name")),
+                    filter),
+                cb.like(
+                    cb.lower(root.get("imisId")),
+                    filter)
+                )
+            );
+        }
+        if (order == SortOrder.asc) {
+            query.orderBy(cb.asc(root.get(sortByAttribute)));
+        } else {
+            query.orderBy(cb.asc(root.get(sortByAttribute)));
+        }
+
+        TypedQuery<Institution> result = em.createQuery(query)
+            .setFirstResult(firstResult)
+            .setMaxResults(maxResults);
+        return auth.filter(result.getResultList(), headers);
     }
 
     /**
