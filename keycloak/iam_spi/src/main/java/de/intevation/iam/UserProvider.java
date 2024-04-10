@@ -8,25 +8,16 @@ package de.intevation.iam;
 
 import static org.keycloak.userprofile.UserProfileContext.USER_API;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.From;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
@@ -49,13 +40,10 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.jpa.entities.UserEntity;
-import org.keycloak.models.jpa.entities.UserAttributeEntity;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.keycloak.userprofile.UserProfileProvider;
 import org.keycloak.userprofile.ValidationException;
-import static org.keycloak.utils.StreamsUtil.closing;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.UserAuthorizer;
@@ -66,7 +54,6 @@ import de.intevation.iam.model.representation.UserMembership;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;
-import de.intevation.iam.util.Range;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 public class UserProvider implements RealmResourceProvider {
@@ -131,163 +118,29 @@ public class UserProvider implements RealmResourceProvider {
      * Get all users.
      * @param headers Request headers
      * @param search Optional search parameter
-     * @param range Optional range
-     * @param sortBy Attribute to sort for
-     * @param order Sort order: ascending and descending
+     * @param firstResult First result to return
+     * @param maxResults Maximum numbers of results to return
      * @return List of user json objects
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<User> getUsers(@Context HttpHeaders headers,
             @QueryParam("search") String search,
-            @QueryParam("range") Range range,
-            @QueryParam("sortBy") String sortBy,
-            @QueryParam("order") SortOrder order) {
+            @QueryParam("firstResult") Integer firstResult,
+            @QueryParam("maxResults") Integer maxResults) {
         RealmModel realm = session.getContext().getRealm();
 
-        int firstResult = 0;
-        int maxResults = Integer.MAX_VALUE;
-        if (range != null) {
-            firstResult = range.getLow();
-            maxResults = range.getHigh() - range.getLow();
+        Map<String, String> attributes = new HashMap<>();
+        if (search != null && !search.isEmpty()) {
+            attributes.put(UserModel.SEARCH, search);
         }
-
-        if (order == null) {
-            order = SortOrder.asc;
-        }
-
-        List<User> userList = searchAndSortForUserStream(
-            realm, search, sortBy, order, firstResult, maxResults)
-            .map(userEntity -> new User(userEntity, session))
-            .collect(Collectors.toList());
+        Stream<UserModel> userModels = session.users()
+            .searchForUserStream(realm, attributes, firstResult, maxResults);
+        List<User> userList = userModels.map(userEntity -> new User(
+                session.users()
+                .getUserById(realm, userEntity.getId()), session))
+                .collect(Collectors.toList());
         return auth.filter(userList, headers);
-    }
-
-    private Stream<UserModel> searchAndSortForUserStream(
-            RealmModel realm,
-            String searchString,
-            String sortByAttribute,
-            SortOrder sortOrder,
-            Integer firstResult,
-            Integer maxResults) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<UserEntity> queryBuilder = builder.createQuery(
-            UserEntity.class);
-        Root<UserEntity> root = queryBuilder.from(UserEntity.class);
-
-        List<Predicate> predicates = new ArrayList<Predicate>();
-        if (searchString != null) {
-            predicates = predicates(em, root, searchString);
-        }
-
-        predicates.add(builder.equal(root.get("realmId"), realm.getId()));
-
-        if (sortByAttribute == null) {
-            sortByAttribute = UserModel.USERNAME;
-        }
-
-        queryBuilder.where(predicates.toArray(Predicate[]::new));
-        if (sortOrder == SortOrder.asc) {
-            queryBuilder.orderBy(builder.asc(root.get(sortByAttribute)));
-        } else {
-            queryBuilder.orderBy(builder.desc(root.get(sortByAttribute)));
-        }
-        queryBuilder.groupBy(root.get("id"));
-
-        TypedQuery<UserEntity> query = em.createQuery(queryBuilder);
-        query = query.setFirstResult(firstResult).setMaxResults(maxResults);
-
-        org.keycloak.models.UserProvider users = session.users();
-        return closing(query.getResultStream()
-            .map(userEntity -> users.getUserById(realm, userEntity.getId())))
-            .filter(Objects::nonNull);
-    }
-
-    private List<Predicate> predicates(
-            EntityManager em, Root<UserEntity> root, String searchString) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-
-        List<Predicate> predicates = new ArrayList<>();
-
-
-        for (String stringToSearch : searchString.trim().split("\\s+")) {
-            List<Predicate> tokenPredicates = new ArrayList<>();
-            tokenPredicates.addAll(Arrays.asList(getSearchPredicates(
-                    stringToSearch, builder, root)));
-            tokenPredicates.add(builder.or(getAttributeSearchPredicates(stringToSearch, "phone", builder, root)));
-
-            predicates.add(builder.or(tokenPredicates.toArray(new Predicate[0])));
-        }
-
-        return predicates;
-    }
-
-    private Predicate[] getAttributeSearchPredicates(
-            String value,
-            String attributeName,
-            CriteriaBuilder builder,
-            Root<UserEntity> from) {
-        Join<UserEntity, UserAttributeEntity> attributesJoin = from.join(
-        "attributes", JoinType.LEFT);
-
-        List<Predicate> attributePredicates = new ArrayList<>();
-        if (value.length() >= 2 && value.charAt(0) == '"'
-            && value.charAt(value.length() - 1) == '"') {
-            // exact search
-            attributePredicates.add(builder.and(
-                builder.equal(attributesJoin.get("name"), attributeName),
-                builder.equal(builder.lower(attributesJoin.get("value")), value.toLowerCase())
-            ));
-        } else {
-            attributePredicates.add(builder.and(
-                builder.equal(attributesJoin.get("name"), attributeName),
-                builder.like(builder.lower(attributesJoin.get("value")), value.toLowerCase())
-            ));
-        }
-
-        return attributePredicates.toArray(new Predicate[0]);
-    }
-
-    private Predicate[] getSearchPredicates(
-            String value, CriteriaBuilder builder, From<?, UserEntity> from) {
-        List<Predicate> orPredicates = new ArrayList<>();
-        value = value.toLowerCase();
-
-        if (value.length() >= 2 && value.charAt(0) == '"'
-            && value.charAt(value.length() - 1) == '"') {
-            // exact search
-            value = value.substring(1, value.length() - 1);
-
-            orPredicates.add(builder.equal(from.get(
-                "username"), value));
-            orPredicates.add(builder.equal(from.get(
-                "email"), value));
-            orPredicates.add(builder.equal(builder.lower(from.get(
-                "firstName")), value));
-            orPredicates.add(builder.equal(builder.lower(from.get(
-                "lastName")), value));
-        } else {
-            value = value.replace("\\", "\\\\")
-                .replace("%", "\\%")
-                .replace("_", "\\_");
-            value = value.replace("*", "%");
-            if (value.isEmpty() || value.charAt(value.length() - 1) != '%') {
-                value += "%";
-            }
-
-            orPredicates.add(builder.like(from.get(
-                "username"), value, '\\'));
-            orPredicates.add(builder.like(from.get(
-                "email"), value, '\\'));
-            orPredicates.add(builder.like(builder.lower(from.get(
-                "firstName")), value, '\\'));
-            orPredicates.add(builder.like(builder.lower(from.get(
-                "lastName")), value, '\\'));
-        }
-
-        return orPredicates.toArray(new Predicate[0]);
     }
 
     /**

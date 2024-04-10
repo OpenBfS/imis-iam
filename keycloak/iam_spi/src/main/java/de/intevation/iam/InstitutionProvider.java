@@ -42,7 +42,6 @@ import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionCategory;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
-import de.intevation.iam.util.Range;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 
@@ -112,7 +111,8 @@ public class InstitutionProvider implements RealmResourceProvider {
      * </pre>
      * @param headers Request headers
      * @param search Optional search parameter
-     * @param range Optional range
+     * @param firstResult First result to return
+     * @param maxResults Maximum numbers of results to return
      * @param sortBy Attribute to sort for
      * @param order Sort order: ascending and descending
      * @return Array of institutions
@@ -121,7 +121,8 @@ public class InstitutionProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Institution> getInstitutions(@Context HttpHeaders headers,
             @QueryParam("search") String search,
-            @QueryParam("range") Range range,
+            @QueryParam("firstResult") Integer firstResult,
+            @QueryParam("maxResults") Integer maxResults,
             @QueryParam("sortBy") String sortBy,
             @QueryParam("order") SortOrder order) {
         String filter = search != null && !search.isEmpty()
@@ -133,11 +134,11 @@ public class InstitutionProvider implements RealmResourceProvider {
         Root<Institution> root = query.from(Institution.class);
         query.select(root);
 
-        int firstResult = 0;
-        int maxResults = Integer.MAX_VALUE;
-        if (range != null) {
-            firstResult = range.getLow();
-            maxResults = range.getHigh() - range.getLow();
+        if (firstResult == null || firstResult < 0) {
+            firstResult = 0;
+        }
+        if (maxResults == null || maxResults < 0) {
+            maxResults = Integer.MAX_VALUE;
         }
 
         String sortByAttribute = "name";
