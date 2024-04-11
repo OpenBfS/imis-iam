@@ -42,13 +42,14 @@
                 ></TextField>
               </v-col>
               <v-col>
-                <v-checkbox
+                <Checkbox
+                  attribute="enabled"
                   :label="$t('user.enabled')"
                   v-model="user.enabled"
                   :disabled="
                     !profileStore.userData.roles.includes('chief_editor')
                   "
-                ></v-checkbox>
+                ></Checkbox>
               </v-col>
             </v-row>
             <template
@@ -296,6 +297,7 @@ import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import { getExpUser } from "@/components/User/user";
+import Checkbox from "@/components/Form/Checkbox.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";

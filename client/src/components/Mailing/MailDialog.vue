@@ -101,12 +101,12 @@
                       </template>
                     </v-date-picker>
                   </div>
-                  <v-checkbox
-                    density="compact"
+                  <Checkbox
+                    attribute="archived"
                     class="v-col-6"
                     :label="$t('mailinglist.publish')"
                     v-model="archived"
-                  ></v-checkbox>
+                  ></Checkbox>
                 </v-row>
               </v-col>
               <v-col cols="10">
@@ -119,14 +119,12 @@
             </v-row>
             <v-row>
               <v-col cols="12" class="mt-4">
-                <v-textarea
+                <Textarea
                   :label="$t('mailinglist.message')"
-                  variant="outlined"
                   name="input-7-1"
                   v-model="mailText"
-                  :rules="applicationStore.clientAndServerRules['text']"
-                  @update:model-value="clearValidationError('text')"
-                ></v-textarea>
+                  attribute="text"
+                ></Textarea>
               </v-col>
             </v-row>
           </v-form>
@@ -172,6 +170,8 @@ import { useProfileStore } from "@/stores/profile";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
+import Checkbox from "@/components/Form/Checkbox.vue";
+import Textarea from "@/components/Form/Textarea.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 
@@ -200,7 +200,6 @@ const {
   initClientRules,
   handleValidationErrorFromServer,
   isServerValidationError,
-  clearValidationError,
 } = useForm();
 const selectedList = ref(null);
 const mailText = ref("");

@@ -58,12 +58,12 @@
               ></TextField>
             </v-col>
           </v-row>
-          <v-textarea
-            variant="underlined"
+          <Textarea
             :label="$t('label.description')"
             auto-grow
             :attribute="'description'"
-          ></v-textarea>
+            @update:modelValue="event.description = $event"
+          ></Textarea>
         </v-form>
       </v-col>
     </v-row>
@@ -109,6 +109,7 @@ import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
 import { useEventsStore } from "@/stores/events";
 import { useProfileStore } from "@/stores/profile";
+import Textarea from "@/components/Form/Textarea.vue";
 import TextField from "@/components/Form/TextField.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 import { useI18n } from "vue-i18n";

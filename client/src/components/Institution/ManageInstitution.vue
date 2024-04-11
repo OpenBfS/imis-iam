@@ -35,11 +35,11 @@
                 :attribute="'shortName'"
                 @update:modelValue="institution.shortName = $event"
               ></TextField>
-              <v-checkbox
-                density="compact"
+              <Checkbox
+                attribute="active"
                 v-model="institution.active"
                 :label="$t('institution.active')"
-              ></v-checkbox>
+              ></Checkbox>
             </div>
             <div class="group_class">
               <TextField
@@ -266,6 +266,7 @@ import { useCoordinatesStore } from "@/stores/coordinates";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { debounce } from "debounce";
+import Checkbox from "@/components/Form/Checkbox.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";

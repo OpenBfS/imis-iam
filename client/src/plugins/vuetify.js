@@ -37,6 +37,9 @@ export default createVuetify({
     },
   },
   defaults: {
+    VCheckbox: {
+      density: "compact",
+    },
     VDialog: {
       persistent: true,
     },
