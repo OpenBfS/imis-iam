@@ -172,7 +172,7 @@ import { useProfileStore } from "@/stores/profile";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
-import TextField from "../TextField.vue";
+import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 
 const props = defineProps({

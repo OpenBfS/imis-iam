@@ -296,7 +296,7 @@ import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import { getExpUser } from "@/components/User/user";
-import TextField from "@/components/TextField.vue";
+import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 

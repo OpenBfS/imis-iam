@@ -8,7 +8,7 @@ import { createApp, defineAsyncComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { createVueI18nAdapter } from "vuetify/locale/adapters/vue-i18n";
 import UIHeader from "@/components/UI/UIHeader.vue";
-import DatePicker from "@/components/DatePicker.vue";
+import DatePicker from "@/components/Form/DatePicker.vue";
 
 import vuetify from "./plugins/vuetify";
 

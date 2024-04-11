@@ -109,7 +109,7 @@ import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
 import { useEventsStore } from "@/stores/events";
 import { useProfileStore } from "@/stores/profile";
-import TextField from "@/components/TextField.vue";
+import TextField from "@/components/Form/TextField.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 import { useI18n } from "vue-i18n";
 
