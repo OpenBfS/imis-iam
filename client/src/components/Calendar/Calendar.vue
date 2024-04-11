@@ -21,7 +21,7 @@
             icon="mdi-calendar-plus"
             @click="
               resetNotification();
-              eventsStore.setManagedEvent({ ...exampleEvent });
+              applicationStore.setManagedItem({ ...exampleEvent });
               applicationStore.setProcessType('add');
               applicationStore.setShowManageEventDialog(true);
             "
@@ -50,7 +50,7 @@
                     variant="plain"
                     v-bind="props"
                     @click="
-                      eventsStore.setManagedEvent({
+                      applicationStore.setManagedItem({
                         ...eventsStore.getEvent(event.id),
                       });
                       applicationStore.setProcessType('edit');
@@ -134,7 +134,7 @@ const formattedEvents = computed(() => {
 });
 
 const itemClicked = (id) => {
-  eventsStore.setManagedEvent({
+  applicationStore.setManagedItem({
     ...eventsStore.getEvent(id),
   });
   applicationStore.setProcessType("show");

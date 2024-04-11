@@ -10,12 +10,8 @@ export const useEventsStore = defineStore("events", {
   namespaced: true,
   state: () => ({
     events: [],
-    managedEvent: {},
   }),
   actions: {
-    setManagedEvent(data) {
-      this.managedEvent = data;
-    },
     setEvents(data) {
       this.events = data;
     },

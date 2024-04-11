@@ -119,7 +119,7 @@ const { hasRequestError, resetNotification } = useNotification();
 const applicationStore = useApplicationStore();
 const eventsStore = useEventsStore();
 const profileStore = useProfileStore();
-const event = ref(eventsStore.managedEvent);
+const event = ref(applicationStore.managedItem);
 const originalEvent = { ...event.value };
 const processType = ref(applicationStore.processType);
 
