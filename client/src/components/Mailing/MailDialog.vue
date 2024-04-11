@@ -16,21 +16,14 @@
             <v-row>
               <v-col cols="10">
                 <v-row>
-                  <v-select
-                    density="compact"
+                  <Select
                     class="v-col-6"
                     :no-data-text="$t('label.no_data_text')"
                     :items="senderList"
                     :label="$t('mailinglist.sender')"
                     v-model="selectedSender"
-                    :rules="applicationStore.clientAndServerRules['sender']"
-                    @update:model-value="
-                      applicationStore.clearValidationError('sender')
-                    "
-                  >
-                  </v-select>
-                  <v-select
-                    density="compact"
+                  ></Select>
+                  <Select
                     class="v-col-6"
                     return-object
                     clearable
@@ -40,14 +33,8 @@
                     item-value="id"
                     :no-data-text="$t('mailinglist.no_mailing_list')"
                     v-model="selectedList"
-                    :rules="applicationStore.clientAndServerRules['recipient']"
-                    @update:model-value="
-                      applicationStore.clearValidationError('recipient')
-                    "
-                  >
-                  </v-select>
-                  <v-select
-                    density="compact"
+                  ></Select>
+                  <Select
                     class="v-col-6"
                     :no-data-text="$t('label.no_data_text')"
                     return-object
@@ -57,12 +44,7 @@
                     item-title="name"
                     item-value="id"
                     v-model="selectedType"
-                    :rules="applicationStore.clientAndServerRules['type']"
-                    @update:model-value="
-                      applicationStore.clearValidationError('type')
-                    "
-                  >
-                  </v-select>
+                  ></Select>
                 </v-row>
               </v-col>
             </v-row>
@@ -191,6 +173,7 @@ import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
 import TextField from "../TextField.vue";
+import Select from "@/components/Form/Select.vue";
 
 const props = defineProps({
   mailingLists: Array,

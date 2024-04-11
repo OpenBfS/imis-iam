@@ -161,23 +161,17 @@
               ></TextField>
             </div>
             <div class="group_class align-center">
-              <v-select
+              <Select
+                attribute="categoryNames"
                 :no-data-text="$t('label.no_data_text')"
-                dense
                 :label="$t('institution.categories')"
                 :items="categories"
                 v-model="institution.categoryNames"
                 item-title="name"
                 item-value="id"
                 persistent-hint
-                density="compact"
-                :rules="applicationStore.clientAndServerRules['categoryNames']"
                 multiple
-                @update:model-value="
-                  applicationStore.clearValidationError('imisUserGroupId')
-                "
-              >
-              </v-select>
+              ></Select>
             </div>
           </v-form>
         </v-col>
@@ -273,6 +267,7 @@ import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { debounce } from "debounce";
 import TextField from "@/components/TextField.vue";
+import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 import { useI18n } from "vue-i18n";
 

@@ -82,9 +82,8 @@
                         applicationStore.clientAndServerRules[attribute.name]
                       "
                     ></TextField>
-                    <v-select
+                    <Select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
-                      density="compact"
                       :label="handleDisplayName(attribute.displayName)"
                       item-title="name"
                       item-value="id"
@@ -98,13 +97,9 @@
                         attribute.annotations.inputType === 'multiselect'
                       "
                       @update:model-value="
-                        setUserAttribute(attribute.name, $event);
-                        clearValidationError(attribute.name);
+                        setUserAttribute(attribute.name, $event)
                       "
-                      :rules="
-                        applicationStore.clientAndServerRules[attribute.name]
-                      "
-                    ></v-select>
+                    ></Select>
                   </v-col>
                 </template>
               </v-row>
@@ -135,13 +130,12 @@
                       applicationStore.clientAndServerRules[attribute.name]
                     "
                   ></TextField>
-                  <v-select
+                  <Select
                     v-else-if="
                       ['select', 'multiselect'].includes(
                         attribute.annotations.inputType
                       )
                     "
-                    density="compact"
                     :label="handleDisplayName(attribute.displayName)"
                     item-title="name"
                     item-value="id"
@@ -155,13 +149,9 @@
                       attribute.annotations.inputType === 'multiselect'
                     "
                     @update:model-value="
-                      setUserAttribute(attribute.name, $event);
-                      clearValidationError(attribute.name);
+                      setUserAttribute(attribute.name, $event)
                     "
-                    :rules="
-                      applicationStore.clientAndServerRules[attribute.name]
-                    "
-                  ></v-select>
+                  ></Select>
                   <p
                     :id="`${attribute.name}-validation-error`"
                     class="validation-error"
@@ -171,10 +161,9 @@
             </v-row>
 
             <div class="two_group_class">
-              <v-select
+              <Select
                 :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
-                dense
                 :label="$t('user.label_institutions')"
                 :items="institutionStore.institutions"
                 v-model="user.institutions"
@@ -182,14 +171,10 @@
                 item-value="name"
                 persistent-hint
                 multiple
-                :rules="applicationStore.clientAndServerRules['institutions']"
-                @update:model-value="clearValidationError('institutions')"
-              >
-              </v-select>
-              <v-select
+              ></Select>
+              <Select
                 :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
-                dense
                 :label="$t('user.label_memberships')"
                 :items="userStore.memberships"
                 v-model="user.groups"
@@ -197,26 +182,19 @@
                 item-value="name"
                 persistent-hint
                 multiple
-                :rules="applicationStore.clientAndServerRules['groups']"
-                @update:model-value="clearValidationError('groups')"
-              >
-              </v-select>
+              ></Select>
             </div>
             <div class="one_group_class">
-              <v-select
+              <Select
                 :clearable="profileStore.isAllowedToManage"
                 :disabled="!profileStore.isAllowedToManage"
-                dense
                 :label="$t('user.label_roles')"
                 :items="userRoles"
                 item-value="name"
                 v-model="user.roles"
                 multiple
                 persistent-hint
-                :rules="applicationStore.clientAndServerRules['roles']"
-                @update:model-value="clearValidationError('roles')"
-              >
-              </v-select>
+              ></Select>
             </div>
           </v-form>
           <UIAlert
@@ -319,6 +297,7 @@ import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import { getExpUser } from "@/components/User/user";
 import TextField from "@/components/TextField.vue";
+import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 
 const { t } = useI18n();

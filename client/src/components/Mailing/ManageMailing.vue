@@ -27,9 +27,9 @@
               :attribute="'name'"
               @update:modelValue="listName = $event"
             ></TextField>
-            <v-select
+            <Select
+              attribute="users"
               :no-data-text="$t('label.no_data_text')"
-              dense
               clearable
               :label="$t('mailinglist.recipient')"
               :items="users"
@@ -38,12 +38,7 @@
               item-value="id"
               persistent-hint
               multiple
-              :rules="applicationStore.clientAndServerRules['users']"
-              @update:modelValue="
-                applicationStore.clearValidationError('users')
-              "
-            >
-            </v-select>
+            ></Select>
             <UIAlert
               v-if="hasRequestError"
               v-bind:isSuccessful="!hasRequestError"
@@ -143,6 +138,7 @@ import { useApplicationStore } from "@/stores/application";
 import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
 import TextField from "@/components/TextField.vue";
+import Select from "@/components/Form/Select.vue";
 const props = defineProps({
   processType: String,
   item: Object,

@@ -40,5 +40,9 @@ export default createVuetify({
     VDialog: {
       persistent: true,
     },
+    VSelect: {
+      density: "compact",
+      variant: "filled",
+    },
   },
 });
