@@ -44,5 +44,8 @@ export default createVuetify({
       density: "compact",
       variant: "filled",
     },
+    VTextarea: {
+      variant: "outlined",
+    },
   },
 });
