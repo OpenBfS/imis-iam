@@ -287,7 +287,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onMounted, nextTick } from "vue";
+import { computed, onBeforeMount, onMounted, nextTick } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
@@ -431,7 +431,7 @@ const getUserAttributeRules = (userAttribute) => {
   return tmpRules;
 };
 
-onMounted(() => {
+onBeforeMount(() => {
   applicationStore.initClientRules({
     groups: [(v) => !!(v && v.length) || t("user.required_membership")],
     institutions: reqMultipleSelect(t("user.required_institution")),
@@ -440,6 +440,9 @@ onMounted(() => {
       t("error.user_attribute_required", [t("user.username")])
     ),
   });
+});
+
+onMounted(() => {
   profileStore.attributes.forEach((userAttribute) => {
     applicationStore.clientRules[userAttribute.name] =
       getUserAttributeRules(userAttribute);

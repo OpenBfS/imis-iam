@@ -257,7 +257,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onBeforeMount, onMounted, ref, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
@@ -315,7 +315,7 @@ const getCategories = () => {
       hasLoadingError.value = true;
     });
 };
-onMounted(() => {
+onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
     name: reqField(t("institution.required_name")),
@@ -352,6 +352,8 @@ onMounted(() => {
     ],
     categoryNames: reqField(t("error.required_category")),
   });
+});
+onMounted(() => {
   coordinatesStore.coordinates.length = 0;
   getCategories();
 

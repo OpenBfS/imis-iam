@@ -162,7 +162,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { onBeforeMount, onMounted, ref, computed } from "vue";
 import { HTTP } from "@/lib/http";
 import { useApplicationStore } from "@/stores/application";
 import { useMailStore } from "@/stores/mail";
@@ -282,7 +282,7 @@ const getTypes = () => {
       hasLoadingError.value = true;
     });
 };
-onMounted(() => {
+onBeforeMount(() => {
   applicationStore.setForm(form);
   initClientRules({
     expiryDate: validGermanDate(),
@@ -291,6 +291,8 @@ onMounted(() => {
     text: reqField(t("mailinglist.required_content")),
     type: reqField(t("mailinglist.required_type")),
   });
+});
+onMounted(() => {
   getTypes();
 });
 </script>

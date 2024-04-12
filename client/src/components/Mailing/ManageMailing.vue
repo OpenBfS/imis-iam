@@ -130,7 +130,7 @@
 }
 </style>
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onBeforeMount, onMounted, computed } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { HTTP } from "@/lib/http";
 import { useI18n } from "vue-i18n";
@@ -199,13 +199,16 @@ const deleteList = () => {
       hasRequestError.value = true;
     });
 };
-// Edit
-onMounted(() => {
+onBeforeMount(() => {
   applicationStore.setForm(form);
   initClientRules({
     name: reqField(t("mailinglist.required_mailinglist_name")),
     users: reqMultipleSelect(t("mailinglist.required_user")),
   });
+});
+
+// Edit
+onMounted(() => {
   getUsers();
   if (props.processType === "edit") {
     listName.value = props.item.name;

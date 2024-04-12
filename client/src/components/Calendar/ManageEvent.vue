@@ -103,7 +103,7 @@
 </template>
 <script setup>
 import { HTTP } from "@/lib/http";
-import { onMounted, ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
@@ -140,8 +140,7 @@ const {
   handleValidationErrorFromServer,
   isServerValidationError,
 } = useForm();
-
-onMounted(() => {
+onBeforeMount(() => {
   applicationStore.setForm(form);
   initClientRules({
     description: reqField(t("calendar.required_description")),
