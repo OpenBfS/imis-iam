@@ -34,7 +34,7 @@
               :label="$t('mailinglist.recipient')"
               :items="users"
               v-model="selectedUsers"
-              item-title="attributes.username"
+              item-title="attributes.username[0]"
               item-value="id"
               persistent-hint
               multiple
