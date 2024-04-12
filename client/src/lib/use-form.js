@@ -274,6 +274,14 @@ export function useForm() {
     return error.response?.status === 400 && error.response?.data?.[0]?.message;
   };
 
+  const onUpdateModelValue = (event, emit, attribute) => {
+    const applicationStore = useApplicationStore();
+    if (applicationStore.clientAndServerRules) {
+      applicationStore.clearValidationError(attribute);
+    }
+    emit("update:modelValue", event);
+  };
+
   return {
     form,
     valid,
@@ -301,5 +309,6 @@ export function useForm() {
     handleValidationErrorFromServer,
     clearValidationError,
     isServerValidationError,
+    onUpdateModelValue,
   };
 }

@@ -13,7 +13,7 @@
     :label="props.label"
     :model-value="
       props.attribute && !props.modelValue
-        ? managedItem[props.attribute]
+        ? applicationStore.managedItem[props.attribute]
         : props.modelValue
     "
     :name="props.name"
@@ -24,13 +24,17 @@
         ? applicationStore.clientAndServerRules[props.attribute]
         : props.rules
     "
-    @update:model-value="onUpdateModelValue"
+    @update:model-value="
+      (event) => onUpdateModelValue(event, emit, props.attribute)
+    "
   ></v-checkbox>
 </template>
 
 <script setup>
-import { ref } from "vue";
 import { useApplicationStore } from "@/stores/application";
+import { useForm } from "@/lib/use-form";
+
+const { onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
@@ -50,13 +54,4 @@ const props = defineProps([
   "attribute",
 ]);
 const emit = defineEmits(["update:modelValue"]);
-
-const managedItem = ref(applicationStore.managedItem);
-
-const onUpdateModelValue = (event) => {
-  if (applicationStore.clientAndServerRules) {
-    applicationStore.clearValidationError(props.attribute);
-  }
-  emit("update:modelValue", event);
-};
 </script>
