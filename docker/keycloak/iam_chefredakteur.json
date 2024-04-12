@@ -5,12 +5,12 @@
     "attributes": {
         "firstName": "Example",
         "lastName": "Chefredakteur",
-        "position": ["Leiter"],
-        "phone": ["01234 123456"],
-        "mobile": ["0654-321"],
-        "fax": ["0123-654"],
-        "oe": ["oe"],
-        "bfslocation": ["location"]
+        "position": "Leiter",
+        "phone": "01234 123456",
+        "mobile": "0654-321",
+        "fax": "0123-654",
+        "oe": "oe",
+        "bfslocation": "location"
     },
     "credentials": [
         {
