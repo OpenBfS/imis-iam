@@ -21,6 +21,8 @@ export const useInstitutionStore = defineStore("institution", {
       name: "",
     },
     foundInstitutions: [],
+    offset: 0,
+    itemsPerPage: 25,
   }),
   actions: {
     //Convert current institution attributes to string arrays
@@ -58,7 +60,11 @@ export const useInstitutionStore = defineStore("institution", {
     loadInstitutions(searchString) {
       return new Promise((resolve, reject) => {
         HTTP.get("/institution", {
-          params: { search: searchString },
+          params: {
+            search: searchString,
+            firstResult: this.offset,
+            maxResults: this.itemsPerPage,
+          },
         })
           .then((response) => {
             if (searchString) {

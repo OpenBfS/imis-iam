@@ -6,15 +6,11 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-data-table-server
-    v-model:items-per-page="itemsPerPage"
-    class="ma-2 pa-2"
+  <DataTableServer
     :headers="tableHeaders"
     :items="props.users"
-    :items-length="props.users.length"
-    :items-per-page-text="$t('label.items_per_page')"
-    :loading="isLoading"
     :no-data-text="$t('user.no_users_available')"
+    type="users"
   >
     <template v-slot:[`item.actions`]="{ item }">
       <v-tooltip location="top">
@@ -53,7 +49,7 @@
         <span>{{ $t("label.copy") }}</span>
       </v-tooltip>
     </template>
-  </v-data-table-server>
+  </DataTableServer>
 </template>
 
 <script setup>
@@ -62,6 +58,7 @@ import { useProfileStore } from "@/stores/profile";
 import { ref } from "vue";
 import { getExpUser } from "@/components/User/user";
 import { useI18n } from "vue-i18n";
+import DataTableServer from "@/components/DataTableServer.vue";
 
 const { t } = useI18n();
 
@@ -80,8 +77,6 @@ function getUserAttribute(user, attributeName) {
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
 const savedUser = ref();
-const isLoading = ref(false);
-const itemsPerPage = ref(25);
 
 const tableHeaders = [
   {

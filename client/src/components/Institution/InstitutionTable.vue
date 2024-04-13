@@ -6,14 +6,11 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-data-table-server
-    v-model:items-per-page="itemsPerPage"
-    class="ma-2 pa-2"
+  <DataTableServer
     :headers="tableHeaders"
     :items="props.institutions"
-    :items-length="props.institutions.length"
-    :loading="isLoading"
     :no-data-text="$t('institution.no_institutions_available')"
+    type="institutions"
   >
     <template v-slot:[`item.actions`]="{ item }">
       <v-tooltip location="top">
@@ -62,21 +59,19 @@
         <span>{{ $t("label.delete") }}</span>
       </v-tooltip>
     </template>
-  </v-data-table-server>
+  </DataTableServer>
 </template>
 
 <script setup>
 import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
 import { useI18n } from "vue-i18n";
-import { ref } from "vue";
+import DataTableServer from "@/components/DataTableServer.vue";
 
 const { t } = useI18n();
 
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
-const isLoading = ref(false);
-const itemsPerPage = ref(25);
 
 const tableHeaders = [
   { title: t("label.name"), key: "name", sortable: false },

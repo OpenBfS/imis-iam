@@ -14,6 +14,8 @@ export const useUserStore = defineStore("user", {
     memberships: [],
     roles: [],
     foundUsers: [],
+    offset: 0,
+    itemsPerPage: 25,
   }),
   actions: {
     setFoundUsers(data) {
@@ -48,7 +50,11 @@ export const useUserStore = defineStore("user", {
     loadUsers(searchString) {
       return new Promise((resolve, reject) => {
         HTTP.get("/iamuser", {
-          params: { search: searchString },
+          params: {
+            search: searchString,
+            firstResult: this.offset,
+            maxResults: this.itemsPerPage,
+          },
         })
           .then((response) => {
             if (searchString) {

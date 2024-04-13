@@ -41,6 +41,7 @@ export const useApplicationStore = defineStore("application", {
     reportMail: process.env.VUE_APP_REPORT_MAIL,
     searchString: "",
     ownAccount: false,
+    isLoading: false,
   }),
   actions: {
     setOwnAccount(data) {
@@ -84,6 +85,7 @@ export const useApplicationStore = defineStore("application", {
      * @returns Promise
      */
     searchRequest(listOfTypes, force = false) {
+      this.isLoading = true;
       const userStore = useUserStore();
       const institutionStore = useInstitutionStore();
       return new Promise((resolve, reject) => {
@@ -100,7 +102,8 @@ export const useApplicationStore = defineStore("application", {
           .then(() => resolve())
           .catch((error) => {
             reject(error);
-          });
+          })
+          .finally(() => (this.isLoading = false));
       });
     },
     setForm(newForm) {
