@@ -20,7 +20,11 @@
     :loading="applicationStore.isLoading"
     :no-data-text="props.noDataText"
     @update:options="updateTable"
-  ></v-data-table-server>
+  >
+    <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
+      ><slot :name="slot" v-bind="scope"
+    /></template>
+  </v-data-table-server>
 </template>
 
 <script setup>
