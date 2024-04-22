@@ -56,14 +56,10 @@ const itemsLength = ref(
 
 const updateTable = (event) => {
   const offset = (event.page - 1) * event.itemsPerPage;
-  if (props.type === "users") {
-    userStore.offset = offset;
-    userStore.itemsPerPage = event.itemsPerPage;
-    applicationStore.searchRequest(["users"], true);
-  } else {
-    institutionStore.offset = offset;
-    institutionStore.itemsPerPage = event.itemsPerPage;
-    applicationStore.searchRequest(["institutions"], true);
-  }
+  const store = props.type === "users" ? userStore : institutionStore;
+  store.offset = offset;
+  store.itemsPerPage = event.itemsPerPage;
+  store.sortBy = event.sortBy.length ? event.sortBy[0] : null;
+  applicationStore.searchRequest([props.type], true);
 };
 </script>

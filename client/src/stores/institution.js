@@ -23,6 +23,8 @@ export const useInstitutionStore = defineStore("institution", {
     foundInstitutions: [],
     offset: 0,
     itemsPerPage: 25,
+    // Object with keys "key" and "order"
+    sortBy: null,
   }),
   actions: {
     //Convert current institution attributes to string arrays
@@ -64,6 +66,8 @@ export const useInstitutionStore = defineStore("institution", {
             search: searchString,
             firstResult: this.offset,
             maxResults: this.itemsPerPage,
+            sortBy: this.sortBy?.key,
+            order: this.sortBy?.order,
           },
         })
           .then((response) => {

@@ -74,9 +74,9 @@ const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
 
 const tableHeaders = [
-  { title: t("label.name"), key: "name", sortable: false },
-  { title: t("institution.shortname"), key: "shortName", sortable: false },
-  { title: t("institution.imis_id"), key: "imisId", sortable: false },
+  { title: t("label.name"), key: "name", sortable: true },
+  { title: t("institution.shortname"), key: "shortName", sortable: true },
+  { title: t("institution.imis_id"), key: "imisId", sortable: true },
   { title: t("label.actions"), key: "actions", sortable: false },
 ];
 

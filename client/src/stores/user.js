@@ -16,6 +16,8 @@ export const useUserStore = defineStore("user", {
     foundUsers: [],
     offset: 0,
     itemsPerPage: 25,
+    // Object with keys "key" and "order"
+    sortBy: null,
   }),
   actions: {
     setFoundUsers(data) {
@@ -54,6 +56,8 @@ export const useUserStore = defineStore("user", {
             search: searchString,
             firstResult: this.offset,
             maxResults: this.itemsPerPage,
+            sortBy: this.sortBy?.key,
+            order: this.sortBy?.order,
           },
         })
           .then((response) => {
