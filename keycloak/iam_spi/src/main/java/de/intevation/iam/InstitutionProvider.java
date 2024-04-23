@@ -164,7 +164,7 @@ public class InstitutionProvider implements RealmResourceProvider {
         if (order == SortOrder.asc) {
             query.orderBy(cb.asc(root.get(sortByAttribute)));
         } else {
-            query.orderBy(cb.asc(root.get(sortByAttribute)));
+            query.orderBy(cb.desc(root.get(sortByAttribute)));
         }
 
         TypedQuery<Institution> result = em.createQuery(query)
