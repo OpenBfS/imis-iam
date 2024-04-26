@@ -48,6 +48,7 @@ import org.keycloak.userprofile.ValidationException;
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.UserAuthorizer;
 import de.intevation.iam.model.jpa.UserAttributes;
+import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.model.representation.Role;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.model.representation.UserMembership;
@@ -124,7 +125,7 @@ public class UserProvider implements RealmResourceProvider {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<User> getUsers(@Context HttpHeaders headers,
+    public ObjectList<User> getUsers(@Context HttpHeaders headers,
             @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults) {
@@ -134,13 +135,31 @@ public class UserProvider implements RealmResourceProvider {
         if (search != null && !search.isEmpty()) {
             attributes.put(UserModel.SEARCH, search);
         }
-        Stream<UserModel> userModels = session.users()
-            .searchForUserStream(realm, attributes, firstResult, maxResults);
+        long size = 0;
+        Stream<UserModel> userModels;
+        if (firstResult != null || maxResults != null) {
+            size = session.users()
+                .searchForUserStream(realm, attributes).count();
+            userModels = session.users()
+                .searchForUserStream(
+                    realm,
+                    attributes,
+                    firstResult,
+                    maxResults);
+        } else {
+            userModels = session.users()
+                .searchForUserStream(realm, attributes);
+        }
         List<User> userList = userModels.map(userEntity -> new User(
                 session.users()
                 .getUserById(realm, userEntity.getId()), session))
                 .collect(Collectors.toList());
-        return auth.filter(userList, headers);
+        if (size == 0) {
+            size = userList.size();
+        }
+        return auth.filterObjectList(
+            new ObjectList<User>(size, userList),
+            headers);
     }
 
     /**

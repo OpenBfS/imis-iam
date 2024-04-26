@@ -124,7 +124,7 @@ public class ExportProvider implements RealmResourceProvider {
         UserProvider userProvider = new UserProvider(session);
         return doExport(exporter,
                         userProvider.getUsers(
-                            headers, search, null, null),
+                            headers, search, null, null).getList(),
                         i18n);
     }
 
@@ -163,7 +163,7 @@ public class ExportProvider implements RealmResourceProvider {
         InstitutionProvider instProvider = new InstitutionProvider(session);
         return doExport(
             exporter, instProvider.getInstitutions(
-                headers, search, null, null, null, null), i18n);
+                headers, search, null, null, null, null).getList(), i18n);
     }
 
     private <T> void setCsvOptions(
