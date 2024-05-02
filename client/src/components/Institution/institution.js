@@ -17,7 +17,7 @@ const addressPlace = {
 };
 const imis = { imisId: null, imisUserGroupId: null };
 const central = { centralMail: "", centralPhone: "", centralFax: "" };
-const alarm = { centralAlarmMail: [], centralAlarmPhone: [] };
+const alarm = { centralAlarmEmailAddresses: [], centralAlarmPhoneNumbers: [] };
 const expInstitution = {
   name: "",
   shortName: "",

@@ -38,3 +38,12 @@ INSERT INTO keycloak.iam_institution_user(user_id, institution_id) VALUES
 INSERT INTO keycloak.iam_institution_categories(institution_id, category_name) VALUES
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), 'Bundesministerium'),
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), 'Bundesbehörde');
+
+INSERT INTO keycloak.iam_institution_central_alarm_mail_addresses(institution_id, mail) VALUES
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), 'inst1_alert@example.test'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), 'inst2_alert@example.test');
+
+INSERT INTO keycloak.iam_institution_central_alarm_phone_numbers(institution_id, phone) VALUES
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/111111'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/101010'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), '0123/222222');

@@ -65,6 +65,20 @@
                 active BOOLEAN DEFAULT true
             );
 
+            CREATE TABLE iam_institution_central_alarm_mail_addresses (
+                institution_id INTEGER,
+                mail VARCHAR,
+                FOREIGN KEY (institution_id) REFERENCES iam_institution(id),
+                PRIMARY KEY(institution_id, mail)
+            );
+
+            CREATE TABLE iam_institution_central_alarm_phone_numbers (
+                institution_id INTEGER,
+                phone VARCHAR,
+                FOREIGN KEY (institution_id) REFERENCES iam_institution(id),
+                PRIMARY KEY(institution_id, phone)
+            );
+
             CREATE TABLE iam_institution_categories (
                 institution_id INTEGER REFERENCES iam_institution(id),
                 category_name VARCHAR REFERENCES iam_institution_category,

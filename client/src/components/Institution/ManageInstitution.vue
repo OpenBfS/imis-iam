@@ -146,15 +146,19 @@
               <v-col>
                 <ChipTextField
                   :label="$t('institution.central_alarm_phone')"
-                  @update:modelValue="institution.centralAlarmPhone = $event"
-                  :attribute="'centralAlarmPhone'"
+                  @update:modelValue="
+                    institution.centralAlarmPhoneNumbers = $event
+                  "
+                  :attribute="'centralAlarmPhoneNumbers'"
                 ></ChipTextField>
               </v-col>
               <v-col>
                 <ChipTextField
                   :label="$t('institution.central_alarm_email')"
-                  @update:modelValue="institution.centralAlarmMail = $event"
-                  :attribute="'centralAlarmMail'"
+                  @update:modelValue="
+                    institution.centralAlarmEmailAddresses = $event
+                  "
+                  :attribute="'centralAlarmEmailAddresses'"
                 ></ChipTextField>
               </v-col>
             </v-row>
