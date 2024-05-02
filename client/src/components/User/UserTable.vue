@@ -93,8 +93,8 @@ const tableHeaders = [
   },
   {
     title: t("user.lastname"),
-    key: "firstName",
-    value: (item) => getUserAttribute(item, "firstName"),
+    key: "lastName",
+    value: (item) => getUserAttribute(item, "lastName"),
     sortable: false,
   },
   {
