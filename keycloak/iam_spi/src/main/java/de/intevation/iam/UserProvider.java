@@ -20,7 +20,9 @@ import java.util.stream.Stream;
 
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -147,25 +149,28 @@ public class UserProvider implements RealmResourceProvider {
      * Get user by id.
      * @param id User id
      * @param headers Request headers
-     * @return User as json
+     * @return User
+     * @throws NotFoundException if a user with given ID does not exist
+     * @throws ForbiddenException if requesting user is not authorized to
+     * view the requested data.
      */
     @GET
     @Path("/{id}")
-    public Response getUserById(
+    public User getUserById(
         @PathParam("id") String id,
         @Context HttpHeaders headers
     ) {
         RealmModel realm = session.getContext().getRealm();
         UserModel userModel = session.users().getUserById(realm, id);
         if (userModel == null) {
-            return Response.status(Status.NOT_FOUND).build();
+            throw new NotFoundException();
         }
 
         User user = new User(userModel, session);
         if (!auth.isAuthorizedById(user, RequestMethod.GET, headers)) {
-            return Response.status(Status.UNAUTHORIZED).build();
+            throw new ForbiddenException();
         }
-        return Response.ok(user).build();
+        return user;
     }
 
     /**
