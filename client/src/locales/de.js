@@ -104,6 +104,8 @@ export default {
     central_phone: "Zentrales Telefon",
     required_central_phone: "Zentrales Telefon ist erforderlich",
     central_email: "Zentrale E-Mail",
+    central_alarm_phone: "Zentrale Alarmierung (Telefon)",
+    central_alarm_email: "Zentrale Alarmierung (E-Mail)",
     required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
     street: "Straße",

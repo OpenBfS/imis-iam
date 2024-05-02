@@ -142,6 +142,22 @@
                 :attribute="'centralFax'"
               ></TextField>
             </div>
+            <v-row class="mb-2">
+              <v-col>
+                <ChipTextField
+                  :label="$t('institution.central_alarm_phone')"
+                  @update:modelValue="institution.centralAlarmPhone = $event"
+                  :attribute="'centralAlarmPhone'"
+                ></ChipTextField>
+              </v-col>
+              <v-col>
+                <ChipTextField
+                  :label="$t('institution.central_alarm_email')"
+                  @update:modelValue="institution.centralAlarmEmail = $event"
+                  :attribute="'centralAlarmEmail'"
+                ></ChipTextField>
+              </v-col>
+            </v-row>
             <div class="group_class">
               <TextField
                 :disabled="
@@ -267,6 +283,7 @@ import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { debounce } from "debounce";
 import Checkbox from "@/components/Form/Checkbox.vue";
+import ChipTextField from "@/components/Form/ChipTextField.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
