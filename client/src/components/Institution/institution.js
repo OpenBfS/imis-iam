@@ -17,10 +17,12 @@ const addressPlace = {
 };
 const imis = { imisId: null, imisUserGroupId: null };
 const central = { centralMail: "", centralPhone: "", centralFax: "" };
+const alarm = { centralAlarmMail: [], centralAlarmPhone: [] };
 const expInstitution = {
   name: "",
   shortName: "",
   ...central,
+  ...alarm,
   ...imis,
   ...serviceBuildingPlace,
   ...addressPlace,

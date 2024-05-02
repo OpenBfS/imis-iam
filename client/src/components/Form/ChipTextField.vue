@@ -8,8 +8,6 @@
 <template>
   <v-text-field
     @keydown.enter="addEntry"
-    append-icon="mdi-plus"
-    @click:append="addEntry"
     v-model="input"
     :clearable="props.clearable"
     :density="props.density ?? 'compact'"
@@ -26,10 +24,16 @@
         : props.rules
     "
     :variant="props.variant ?? 'underlined'"
-    @update:model-value="
-      (event) => onUpdateModelValue(event, emit, props.attribute)
-    "
-  ></v-text-field>
+  >
+    <template v-slot:append="{ isValid }">
+      <v-btn
+        @click="addEntry"
+        size="x-small"
+        icon="mdi-plus"
+        :disabled="!isValid || input.length === 0"
+      ></v-btn>
+    </template>
+  </v-text-field>
   <v-chip
     v-for="(entry, index) in entries"
     @click:close="() => removeEntry(index)"
@@ -42,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
 
@@ -57,7 +61,6 @@ const props = defineProps([
   "disabled",
   "hint",
   "label",
-  "modelValue",
   "name",
   "prependInnerIcon",
   "readonly",
@@ -72,6 +75,16 @@ const emit = defineEmits(["update:modelValue"]);
 
 const input = ref("");
 const entries = ref([]);
+
+onMounted(() => {
+  if (props.attribute && applicationStore.managedItem[props.attribute]) {
+    entries.value = applicationStore.managedItem[props.attribute];
+  }
+});
+
+watch(entries, (newEntries) => {
+  onUpdateModelValue(newEntries, emit, props.attribute);
+});
 
 const addEntry = () => {
   entries.value = [...entries.value, input.value];

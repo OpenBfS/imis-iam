@@ -153,8 +153,8 @@
               <v-col>
                 <ChipTextField
                   :label="$t('institution.central_alarm_email')"
-                  @update:modelValue="institution.centralAlarmEmail = $event"
-                  :attribute="'centralAlarmEmail'"
+                  @update:modelValue="institution.centralAlarmMail = $event"
+                  :attribute="'centralAlarmMail'"
                 ></ChipTextField>
               </v-col>
             </v-row>
