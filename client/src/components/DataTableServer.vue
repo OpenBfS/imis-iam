@@ -47,11 +47,9 @@ const props = defineProps([
   "type",
 ]);
 const itemsLength = ref(
-  // TODO: Get total length of items from server
-  /*props.type === "users"
-    ? userStore.itemsLength
-    : institutionStore.itemsLength*/
-  100
+  props.type === "users"
+    ? userStore.totalNumberOfUsers
+    : institutionStore.totalNumberOfInstitutions
 );
 
 const updateTable = (event) => {

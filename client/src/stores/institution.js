@@ -25,6 +25,7 @@ export const useInstitutionStore = defineStore("institution", {
     itemsPerPage: 25,
     // Object with keys "key" and "order"
     sortBy: null,
+    totalNumberOfInstitutions: 0,
   }),
   actions: {
     //Convert current institution attributes to string arrays
@@ -71,11 +72,12 @@ export const useInstitutionStore = defineStore("institution", {
           },
         })
           .then((response) => {
+            this.totalNumberOfInstitutions = response.data.size;
             if (searchString) {
-              this.setFoundInstitutions(response.data);
+              this.setFoundInstitutions(response.data.list);
             } else {
-              this.setInstitutionList(response.data);
-              this.setFoundInstitutions(response.data);
+              this.setInstitutionList(response.data.list);
+              this.setFoundInstitutions(response.data.list);
             }
             resolve(response);
           })
@@ -94,10 +96,12 @@ export const useInstitutionStore = defineStore("institution", {
     },
     addInstitution(data) {
       this.institutions.push(data);
+      this.totalNumberOfInstitutions++;
     },
     removeInstitution(data) {
       const index = this.institutions.findIndex((inst) => inst.id === data.id);
       this.institutions.splice(index, 1);
+      this.totalNumberOfInstitutions--;
     },
   },
 });
