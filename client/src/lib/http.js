@@ -21,8 +21,11 @@ function handleError(error) {
     return;
   }
   if (error.response) {
-    if (error.response.data) {
-      applicationStore.setHttpErrorMessage(JSON.stringify(error.response.data));
+    const errData = error.response.data;
+    if (errData) {
+        applicationStore.setHttpErrorMessage(
+        errData.errorMessage ?? JSON.stringify(errData)
+      );
     } else {
       applicationStore.setHttpErrorMessage(error.response.statusText);
     }
