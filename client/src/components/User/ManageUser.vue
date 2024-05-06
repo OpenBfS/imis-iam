@@ -464,7 +464,13 @@ const userRoles = computed(() => {
   roles.forEach(
     (item) => (item.title = item.description ? t(item.description) : item.name)
   );
-  return roles;
+  return roles.filter(
+    // Only allow 'chief_editor' to grant this role
+    (item) =>
+      item.name !== "chief_editor" ||
+      user.value.role === "chief_editor" ||
+      profileStore.userData.role === "chief_editor"
+  );
 });
 // Deep Copy for objects
 const cloneObject = (obj) => {
