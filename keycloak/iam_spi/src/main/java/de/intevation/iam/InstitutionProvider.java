@@ -170,6 +170,11 @@ public class InstitutionProvider implements RealmResourceProvider {
         TypedQuery<Institution> result = em.createQuery(query)
             .setFirstResult(firstResult)
             .setMaxResults(maxResults);
+        List<Institution> institutions = result.getResultList();
+        for (Institution inst : institutions) {
+            System.out.println(inst.getCentralAlarmEmailAddresses());
+            System.out.println(inst.getCentralAlarmPhoneNumbers());
+        }
         return auth.filter(result.getResultList(), headers);
     }
 

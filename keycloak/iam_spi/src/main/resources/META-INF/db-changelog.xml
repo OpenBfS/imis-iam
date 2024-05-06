@@ -66,16 +66,14 @@
             );
 
             CREATE TABLE iam_institution_central_alarm_mail_addresses (
-                institution_id INTEGER,
+                institution_id INTEGER REFERENCES iam_institution,
                 mail VARCHAR,
-                FOREIGN KEY (institution_id) REFERENCES iam_institution(id),
                 PRIMARY KEY(institution_id, mail)
             );
 
             CREATE TABLE iam_institution_central_alarm_phone_numbers (
-                institution_id INTEGER,
+                institution_id INTEGER REFERENCES iam_institution,
                 phone VARCHAR,
-                FOREIGN KEY (institution_id) REFERENCES iam_institution(id),
                 PRIMARY KEY(institution_id, phone)
             );
 

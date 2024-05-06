@@ -12,7 +12,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +23,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
@@ -89,21 +90,15 @@ public class Institution {
     @Column(name = "central_mail", nullable = false)
     private String centralMail;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "iam_institution_central_alarm_phone_numbers",
-        joinColumns = {@JoinColumn(name = "institution_id")},
-        inverseJoinColumns = {@JoinColumn(name = "phone")}
-    )
-    private List<InstitutionCentralAlarmPhone> centralAlarmPhoneNumbers;
+    @ElementCollection
+    @CollectionTable(name = "iam_institution_central_alarm_phone_numbers", joinColumns = @JoinColumn(name = "institution_id"))
+    @Column(name = "phone")
+    private List<String> centralAlarmPhoneNumbers;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "iam_institution_central_alarm_mail_addresses",
-        joinColumns = {@JoinColumn(name = "institution_id")},
-        inverseJoinColumns = {@JoinColumn(name = "mail")}
-    )
-    private List<InstitutionCentralAlarmMail> centralAlarmMailAddresses;
+    @ElementCollection
+    @CollectionTable(name = "iam_institution_central_alarm_mail_addresses", joinColumns = @JoinColumn(name = "institution_id"))
+    @Column(name = "mail")
+    private List<String> centralAlarmMailAddresses;
 
     @Column(name = "imis_id")
     private String imisId;
@@ -248,39 +243,19 @@ public class Institution {
     }
 
     public void setCentralAlarmPhoneNumbers(List<String> centralAlarmPhoneNumbers) {
-        ArrayList<InstitutionCentralAlarmPhone> phoneNumbers = new ArrayList<>();
-        for (String phoneNumber : centralAlarmPhoneNumbers) {
-            InstitutionCentralAlarmPhone phone = new InstitutionCentralAlarmPhone();
-            phone.setPhone(phoneNumber);
-            phoneNumbers.add(phone);
-        }
-        this.centralAlarmPhoneNumbers = phoneNumbers;
+        this.centralAlarmPhoneNumbers = centralAlarmPhoneNumbers;
     }
 
     public void setCentralAlarmEmailAddresses(List<String> centralAlarmMailAddresses) {
-        ArrayList<InstitutionCentralAlarmMail> mailAddresses = new ArrayList<>();
-        for (String address : centralAlarmMailAddresses) {
-            InstitutionCentralAlarmMail mail = new InstitutionCentralAlarmMail();
-            mail.setMail(address);
-            mailAddresses.add(mail);
-        }
-        this.centralAlarmMailAddresses = mailAddresses;
+        this.centralAlarmMailAddresses = centralAlarmMailAddresses;
     }
 
     public List<String> getCentralAlarmPhoneNumbers() {
-        ArrayList<String> phoneNumbers = new ArrayList<>();
-        for (InstitutionCentralAlarmPhone phone : centralAlarmPhoneNumbers) {
-            phoneNumbers.add(phone.getPhone());
-        }
-        return phoneNumbers;
+        return centralAlarmPhoneNumbers;
     }
 
     public List<String> getCentralAlarmEmailAddresses() {
-        ArrayList<String> mailAddresses = new ArrayList<>();
-        for (InstitutionCentralAlarmMail mail : centralAlarmMailAddresses) {
-            mailAddresses.add(mail.getMail());
-        }
-        return mailAddresses;
+        return centralAlarmMailAddresses;
     }
 
     public String getImisId() {
