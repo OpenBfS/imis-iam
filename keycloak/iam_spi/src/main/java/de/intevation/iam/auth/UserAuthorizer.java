@@ -49,8 +49,11 @@ public class UserAuthorizer extends Authorizer<User> {
             case PUT: return authorizeUpdate(
                 data, session, requestingUser, client);
             case POST:
-                return !data.isEnabled() && Role.EDITOR.isRoleOf(requestingUser, session)
-                    || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+                return (!data.isEnabled()
+                    && Role.EDITOR.isRoleOf(requestingUser, session)
+                    || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session))
+                    // Not allowed granting roles superior to own role
+                    && requestingUser.hasRole(client.getRole(data.getRole()));
             default: return false;
         }
     }
