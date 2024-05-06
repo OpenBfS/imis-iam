@@ -20,21 +20,21 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.jpa.entities.GroupEntity;
-import org.keycloak.models.jpa.entities.RoleEntity;
 import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
-import org.keycloak.models.jpa.entities.UserRoleMappingEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import de.intevation.iam.auth.Role;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.UserAttributes;
+import de.intevation.iam.util.Constants;
+
 
 /**
  * User representation.
@@ -50,10 +50,13 @@ public class User {
 
     @NotEmpty
     private List<String> groups;
+
     @NotEmpty
     private List<String> institutions;
-    @NotEmpty
-    private List<String> roles;
+
+    @NotBlank
+    private String role;
+
     private Boolean readonly;
     private boolean enabled;
 
@@ -84,6 +87,13 @@ public class User {
             JpaConnectionProvider.class).getEntityManager();
         UserAttributes jpaModel = em.find(
             UserAttributes.class, userModel.getId());
+
+        // Get user-role, which by convention can be only one
+        setRole(userModel.getClientRoleMappingsStream(
+                session.getContext().getRealm().getClientByClientId(
+                    Constants.IAM_CLIENT_ID))
+            .map(role -> role.getName()).findFirst().orElse(null));
+
         if (jpaModel != null) {
             //Set institutions
             Map<Boolean, Institution> instList = jpaModel.getInstitutions();
@@ -93,38 +103,6 @@ public class User {
                 instList.forEach((isPrimary, inst) -> institutions.add(
                         inst.getName()));
             }
-
-            // Get user-role mappings
-            TypedQuery<UserRoleMappingEntity> roleMappingQuery =
-                em.createNamedQuery("userRoleMappings",
-                    UserRoleMappingEntity.class);
-            roleMappingQuery.setParameter(USER_PARAM, jpaModel.getUserEntity());
-            List<UserRoleMappingEntity> roleMappings
-                = roleMappingQuery.getResultList();
-
-            //Query role entities as mapping models only contain role ids
-            CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<RoleEntity> roleQuery = cb.createQuery(
-                RoleEntity.class);
-            Root<RoleEntity> root = roleQuery.from(RoleEntity.class);
-            roleQuery.select(root);
-            In<String> idFilter = cb.in(root.get(ID_PARAM));
-            roleMappings.forEach(
-                roleMapping -> idFilter.value(roleMapping.getRoleId()));
-
-            // Query only roles known in this application
-            In<String> nameFilter = cb.in(root.get(NAME_PARAM));
-            for (Role role: Role.values()) {
-                nameFilter.value(role.toString());
-            }
-
-            roleQuery.where(idFilter, nameFilter);
-            List<RoleEntity> roleEntities
-                = em.createQuery(roleQuery).getResultList();
-            //Get role names if role is iam client role
-            List<String> roleNames = new ArrayList<String>();
-            roleEntities.forEach(entity -> roleNames.add(entity.getName()));
-            setRoles(roleNames);
 
             //Get user groups
             TypedQuery<UserGroupMembershipEntity> groupMappingQuery =
@@ -195,11 +173,11 @@ public class User {
         this.institutions = institutions;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
     }
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     /**

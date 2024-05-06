@@ -7,7 +7,6 @@
 
 package de.intevation.iam.auth;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.ws.rs.core.HttpHeaders;
@@ -86,22 +85,12 @@ public class UserAuthorizer extends Authorizer<User> {
             && !Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
             return false;
         }
-        //If roles shall be changed:
+        //If role shall be changed:
         //Check if user is chief editor
-        List<String> oldRoles = new ArrayList<String>();
-        oldUserModel.getClientRoleMappingsStream(client)
-                .forEach(role -> oldRoles.add(role.getName()));
-        List<String> newRoles = user.getRoles() != null
-            ? user.getRoles()
-            : new ArrayList<>();
-        if (oldRoles.size() != newRoles.size()) {
+        String oldRole = oldUserModel.getClientRoleMappingsStream(client)
+            .map(role -> role.getName()).findFirst().orElse(null);
+        if (oldRole == null || !oldRole.equals(user.getRole())) {
             return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
-        }
-        for (int i = 0; i < newRoles.size(); i++) {
-            if (!oldRoles.contains(newRoles.get(i))
-                || !newRoles.contains(oldRoles.get(i))) {
-                return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
-            }
         }
         // Else only allow users with other roles than user to edit
         // or allow users to edit their own profile

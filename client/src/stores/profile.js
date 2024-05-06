@@ -34,7 +34,7 @@ export const useProfileStore = defineStore("profile", {
         );
     },
     isChiefEditor: (state) => {
-      return state.userData.roles?.find((e) => e === "chief_editor");
+      return state.userData.roles === "chief_editor";
     },
   },
   actions: {
@@ -55,12 +55,7 @@ export const useProfileStore = defineStore("profile", {
         HTTP.get("/iamuser/profile")
           .then((response) => {
             this.setUserData(response.data);
-            const roles = response.data.roles;
-            if (roles.length === 1 && ["user"].indexOf(roles[0]) !== -1) {
-              this.setIsAllowedToManage(false);
-            } else {
-              this.setIsAllowedToManage(true);
-            }
+            this.setIsAllowedToManage(response.data.role !== "user");
             resolve(response);
           })
           .catch((error) => reject(error));
