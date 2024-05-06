@@ -128,11 +128,12 @@ export function useForm() {
     const allKeys = [...Object.keys(a), ...Object.keys(b)];
     for (let i = 0; i < allKeys.length; i++) {
       const key = allKeys[i];
-      if (
-        a[key] === null ||
-        (b[key] === null &&
-          ((a[key] === null && b[key] !== null) ||
-            (a[key] !== null && b[key] === null)))
+      if (a[key] === null && b[key] === null) {
+        continue;
+      } else if (
+        (a[key] === null || b[key] === null) &&
+        ((a[key] === null && b[key] !== null) ||
+          (a[key] !== null && b[key] === null))
       ) {
         return true;
       } else if (typeof a[key] === "object" && typeof b[key] === "object") {

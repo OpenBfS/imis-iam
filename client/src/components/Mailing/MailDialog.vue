@@ -21,7 +21,7 @@
                     :no-data-text="$t('label.no_data_text')"
                     :items="senderList"
                     :label="$t('mailinglist.sender')"
-                    v-model="selectedSender"
+                    v-model="mail.selectedSender"
                   ></Select>
                   <Select
                     class="v-col-6"
@@ -32,7 +32,7 @@
                     item-title="name"
                     item-value="id"
                     :no-data-text="$t('mailinglist.no_mailing_list')"
-                    v-model="selectedList"
+                    v-model="mail.selectedList"
                   ></Select>
                   <Select
                     class="v-col-6"
@@ -43,7 +43,7 @@
                     :items="types"
                     item-title="name"
                     item-value="id"
-                    v-model="selectedType"
+                    v-model="mail.selectedType"
                   ></Select>
                 </v-row>
               </v-col>
@@ -77,7 +77,7 @@
                         closeConditional: closeConditional,
                         include: includeExpiryDatePicker,
                       }"
-                      v-model="expiryDate"
+                      v-model="mail.expiryDate"
                       v-show="isExpiryDatePickerOpen"
                       className="expiryDatePicker"
                       color="accent"
@@ -95,7 +95,7 @@
                       ><template v-slot:header>
                         <div class="v-date-picker-header bg-accent">
                           <div class="v-date-picker-header__content">
-                            {{ $d(expiryDate, "short") }}
+                            {{ $d(mail.expiryDate, "short") }}
                           </div>
                         </div>
                       </template>
@@ -105,14 +105,14 @@
                     attribute="archived"
                     class="v-col-6"
                     :label="$t('mailinglist.publish')"
-                    v-model="archived"
+                    v-model="mail.archived"
                   ></Checkbox>
                 </v-row>
               </v-col>
               <v-col cols="10">
                 <TextField
                   :label="$t('mailinglist.subject')"
-                  v-model="subject"
+                  v-model="mail.subject"
                   :attribute="'subject'"
                 ></TextField>
               </v-col>
@@ -122,7 +122,7 @@
                 <Textarea
                   :label="$t('mailinglist.message')"
                   name="input-7-1"
-                  v-model="mailText"
+                  v-model="mail.text"
                   attribute="text"
                 ></Textarea>
               </v-col>
@@ -149,8 +149,10 @@
           color="accent"
           size="small"
           @click="
-            $emit('mail-dialog-object', {
-              closeDialog: true,
+            onCancel(() => {
+              $emit('mail-dialog-object', {
+                closeDialog: true,
+              });
             })
           "
         >
@@ -158,6 +160,17 @@
         </v-btn>
       </v-card-actions>
     </v-card>
+    <ConfirmCancelDialog
+      :isActive="showConfirmCancelDialog"
+      :onConfirm="
+        () => {
+          $emit('mail-dialog-object', {
+            closeDialog: true,
+          });
+        }
+      "
+      :onCancel="() => closeConfirmCancelDialog()"
+    ></ConfirmCancelDialog>
   </v-dialog>
 </template>
 
@@ -174,6 +187,7 @@ import Checkbox from "@/components/Form/Checkbox.vue";
 import Textarea from "@/components/Form/Textarea.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
+import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 
 const props = defineProps({
   mailingLists: Array,
@@ -197,15 +211,14 @@ const {
   validGermanDate,
   doesRegexMatchWholeString,
   germanDateRegex,
+  watchChange,
+  onCancel,
+  showConfirmCancelDialog,
+  closeConfirmCancelDialog,
   initClientRules,
   handleValidationErrorFromServer,
   isServerValidationError,
 } = useForm();
-const selectedList = ref(null);
-const mailText = ref("");
-const subject = ref("");
-const archived = ref(false);
-const expiryDate = ref(new Date());
 const expiryDateString = ref("");
 const isExpiryDatePickerOpen = ref(false);
 const userData = profileStore.userData;
@@ -217,7 +230,29 @@ const senderList = ref([
     "<" + userData.attributes.email + ">",
   ].join(" "),
 ]);
-const selectedSender = ref(senderList.value[0] || senderList.value[0] || "");
+// type
+const types = computed(() => {
+  return mailStore.mailTypes;
+});
+const getTypes = () => {
+  mailStore
+    .loadMailTypes()
+    .then()
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+};
+const mail = ref({
+  selectedList: null,
+  text: "",
+  subject: "",
+  archived: false,
+  expiryDate: new Date(),
+  selectedType: null,
+  selectedSender: senderList.value[0] || "",
+});
+const emptyMail = structuredClone(mail.value);
+watchChange(emptyMail, mail.value);
 const toggleExpiryDatePicker = () => {
   isExpiryDatePickerOpen.value = !isExpiryDatePickerOpen.value;
 };
@@ -226,7 +261,7 @@ const handleInputForExpiryDate = (event) => {
   if (doesRegexMatchWholeString(germanDateRegex, input)) {
     const newDate = dateStringToDate(input);
     if (newDate) {
-      expiryDate.value = newDate;
+      mail.value.expiryDate = newDate;
     }
   }
 };
@@ -249,14 +284,16 @@ const includeExpiryDatePicker = () => {
 const sendMail = () => {
   resetNotification();
   HTTP.post("mail", {
-    sender: selectedSender.value,
-    text: mailText.value,
-    subject: subject.value,
-    archived: archived.value,
-    type: selectedType.value.id,
-    recipient: selectedList.value.id,
+    sender: mail.value.selectedSender,
+    text: mail.value.text,
+    subject: mail.value.subject,
+    archived: mail.value.archived,
+    type: mail.value.selectedType.id,
+    recipient: mail.value.selectedList.id,
     expiryDate:
-      expiryDateString.value?.length > 0 ? expiryDate.value.toISOString() : "",
+      expiryDateString.value?.length > 0
+        ? mail.value.expiryDate.toISOString()
+        : "",
   })
     .then(() => {
       emit("mail-dialog-object", {
@@ -267,19 +304,6 @@ const sendMail = () => {
       isServerValidationError(error)
         ? handleValidationErrorFromServer(error.response.data)
         : (hasRequestError.value = true);
-    });
-};
-// type
-const selectedType = ref();
-const types = computed(() => {
-  return mailStore.mailTypes;
-});
-const getTypes = () => {
-  mailStore
-    .loadMailTypes()
-    .then()
-    .catch(() => {
-      hasLoadingError.value = true;
     });
 };
 onBeforeMount(() => {

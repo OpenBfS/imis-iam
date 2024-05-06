@@ -7,13 +7,21 @@
  -->
 <template>
   <v-dialog :model-value="props.isActive">
-    <v-card width="50vw" class="mx-auto" title="Wirklich abbrechen?">
-      <v-card-text> Alle Änderungen werden dabei verworfen. </v-card-text>
+    <v-card
+      width="50vw"
+      class="mx-auto"
+      :title="$t('label.confirm_cancel_header')"
+    >
+      <v-card-text> {{ $t("label.confirm_cancel_explanation") }} </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="accent" @click="props.onConfirm()"> Ja </v-btn>
-        <v-btn color="accent" @click="props.onCancel()"> Nein </v-btn>
+        <v-btn color="accent" @click="props.onConfirm()">
+          {{ $t("button.yes") }}
+        </v-btn>
+        <v-btn color="accent" @click="props.onCancel()">
+          {{ $t("button.no") }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

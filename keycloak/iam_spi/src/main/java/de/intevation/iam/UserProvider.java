@@ -19,8 +19,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.persistence.EntityManager;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -101,18 +104,20 @@ public class UserProvider implements RealmResourceProvider {
      * Get profile of the current users.
      * @param headers Request header
      * @return User profile as json, 403 if not authorized
+     * @throws ForbiddenException if requesting user is not authorized to
+     * view the requested data.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
-    public Response getProfile(@Context HttpHeaders headers) {
+    public User getProfile(@Context HttpHeaders headers) {
         String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (id == null) {
-            return Response.status(Status.FORBIDDEN).build();
+            throw new ForbiddenException();
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, id);
-        return Response.ok(new User(user, session)).build();
+        return new User(user, session);
     }
 
     /**
@@ -166,25 +171,28 @@ public class UserProvider implements RealmResourceProvider {
      * Get user by id.
      * @param id User id
      * @param headers Request headers
-     * @return User as json
+     * @return User
+     * @throws NotFoundException if a user with given ID does not exist
+     * @throws ForbiddenException if requesting user is not authorized to
+     * view the requested data.
      */
     @GET
     @Path("/{id}")
-    public Response getUserById(
+    public User getUserById(
         @PathParam("id") String id,
         @Context HttpHeaders headers
     ) {
         RealmModel realm = session.getContext().getRealm();
         UserModel userModel = session.users().getUserById(realm, id);
         if (userModel == null) {
-            return Response.status(Status.NOT_FOUND).build();
+            throw new NotFoundException();
         }
 
         User user = new User(userModel, session);
         if (!auth.isAuthorizedById(user, RequestMethod.GET, headers)) {
-            return Response.status(Status.UNAUTHORIZED).build();
+            throw new ForbiddenException();
         }
-        return Response.ok(user).build();
+        return user;
     }
 
     /**
@@ -192,20 +200,21 @@ public class UserProvider implements RealmResourceProvider {
      * @param headers Request headers
      * @param rep User representation
      * @return New user json if successfull,
-     *         400 if username is empty,
-     *         409 if either username or email are already used
-     * @throws BadRequestException in case validation fails
+     * @throws BadRequestException in case validation fails or username is empty
+     * @throws ForbiddenException if requesting user is not authorized to
+     * create the requested data.
+     * @throws ClientErrorException if either username or email are already used
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(@Context HttpHeaders headers, final User rep) {
+    public User createUser(@Context HttpHeaders headers, final User rep) {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0));
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
-            return Response.status(Status.BAD_REQUEST).build();
+            throw new BadRequestException();
         }
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
-            return Response.status(Status.UNAUTHORIZED).build();
+            throw new ForbiddenException();
         }
 
         String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
@@ -217,16 +226,16 @@ public class UserProvider implements RealmResourceProvider {
             JpaConnectionProvider.class).getEntityManager();
 
         if (isEmailAlreadyUsed(realm, rep)) {
-            return Response.status(Status.CONFLICT)
+            throw new ClientErrorException(Response.status(Status.CONFLICT)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
-                .build();
+                .build());
         }
         if (isUsernameAlreadyUsed(realm, rep)) {
-            return Response.status(Status.CONFLICT)
+            throw new ClientErrorException(Response.status(Status.CONFLICT)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(i18n.getString("error_username_already_used"))
-                .build();
+                .build());
         }
 
         //Add keycloak user
@@ -268,7 +277,7 @@ public class UserProvider implements RealmResourceProvider {
         //Force flush and update to ensure attributes are persisted
         em.flush();
         em.refresh(attributes);
-        return Response.ok(new User(newUserModel, session)).build();
+        return new User(newUserModel, session);
     }
 
     /**
@@ -279,17 +288,21 @@ public class UserProvider implements RealmResourceProvider {
      *         403 if not authorized,
      *         409 if the new email address is already used
      * @throws BadRequestException in case validation fails
+     * @throws ForbiddenException if requesting user is not authorized to
+     * edit the requested data.
+     * @throws ClientErrorException if trying to use an already used
+     * e-mail adress
      */
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(
+    public User updateUser(
         @Context HttpHeaders headers,
         final User rep
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0));
         if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
-            return Response.status(Status.UNAUTHORIZED).build();
+            throw new ForbiddenException();
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -304,10 +317,10 @@ public class UserProvider implements RealmResourceProvider {
             ResourceBundle i18n
                 = I18nUtils.getI18nBundle(session, realm, requestingUser);
 
-            return Response.status(Status.CONFLICT)
-                    .type(MediaType.APPLICATION_JSON)
-                    .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
-                    .build();
+            throw new ClientErrorException(Response.status(Status.CONFLICT)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
+                .build());
         }
 
         UserAttributes attributes = rep.createOrUpdateJpaModel(em);
@@ -323,7 +336,7 @@ public class UserProvider implements RealmResourceProvider {
         attributes.setInactivityNotificationSent(
                 dbAttributes.getInactivityNotificationSent());
         em.merge(attributes);
-        return Response.ok(new User(user, session)).build();
+        return new User(user, session);
     }
 
     /**

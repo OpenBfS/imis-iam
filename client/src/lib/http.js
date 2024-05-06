@@ -12,7 +12,6 @@ const HTTP = axios.create({
 });
 
 function handleError(error) {
-  const applicationStore = useApplicationStore();
   // If the error has status 400 and contains at least one message it is probably
   // a validation error from keycloak which is handled in ManageUser.vue. In that
   // case we don't want to set the httpErrorMessage because we show the error right
@@ -20,18 +19,22 @@ function handleError(error) {
   if (error.response?.status === 400 && error.response.data?.[0]?.message) {
     return;
   }
+
+  let msg;
   if (error.response) {
-    if (error.response.data) {
-      applicationStore.setHttpErrorMessage(JSON.stringify(error.response.data));
+    const errData = error.response.data;
+    if (errData) {
+      msg = errData.errorMessage ?? JSON.stringify(errData);
     } else {
-      applicationStore.setHttpErrorMessage(error.response.statusText);
+      msg = error.response.statusText;
     }
     // Handle other type of errors.
   } else if (error.request) {
-    applicationStore.setHttpErrorMessage(error.request);
+    msg = error.request;
   } else {
-    applicationStore.setHttpErrorMessage("Error" + error.message);
+    msg = "Error" + error.message;
   }
+  useApplicationStore().setHttpErrorMessage(msg);
 }
 
 HTTP.interceptors.response.use(

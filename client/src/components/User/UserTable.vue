@@ -93,8 +93,8 @@ const tableHeaders = [
   },
   {
     title: t("user.lastname"),
-    key: "firstName",
-    value: (item) => getUserAttribute(item, "firstName"),
+    key: "lastName",
+    value: (item) => getUserAttribute(item, "lastName"),
     sortable: false,
   },
   {
@@ -129,6 +129,7 @@ const user = ref(getExpUser());
 const onCopyClicked = (id) => {
   user.value = cloneObject(getUserById(id));
   savedUser.value = cloneObject(user.value);
+  user.value.attributes.title = "";
   user.value.attributes.username = "";
   user.value.attributes.firstName = "";
   user.value.attributes.lastName = "";

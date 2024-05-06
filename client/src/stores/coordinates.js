@@ -18,15 +18,15 @@ export const useCoordinatesStore = defineStore("coordinates", {
       return new Promise((resolve, reject) => {
         PhotonHTTP.get("/api?q=" + query)
           .then((response) => {
-            this.setCoordinateList(response.data);
+            this.setCoordinateList(response);
             resolve(response);
           })
           .catch((error) => reject(error));
       });
     },
-    setCoordinateList(data) {
+    setCoordinateList(response) {
       this.coordinates.length = 0;
-      data.features.forEach((feature) => {
+      response?.data?.features.forEach((feature) => {
         var properties = feature.properties;
         var xCoord = feature.geometry.coordinates[0];
         var yCoord = feature.geometry.coordinates[1];

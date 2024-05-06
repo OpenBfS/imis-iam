@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -96,7 +97,8 @@ public class ExportProvider implements RealmResourceProvider {
      * @param quoteType Char used for quotes
      * @param rowDelimiter Char used as row delimiter
      * @param encoding Encoding to use
-     * @param search Optional search parameter
+     * @param search Optional search parameter (ignored if IDs are given)
+     * @param ids Multiple user-IDs can be given to export specific users
      * @param headers Request headers
      * @return Resulting csv data
      */
@@ -108,6 +110,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("rowDelimiter") String rowDelimiter,
             @QueryParam("encoding") String encoding,
             @QueryParam("search") String search,
+            @QueryParam("id") List<String> ids,
             @Context HttpHeaders headers
     ) {
         CSVExporter<User> exporter = new CSVExporter<>();
@@ -122,10 +125,16 @@ public class ExportProvider implements RealmResourceProvider {
             headers.getHeaderString(Constants.SHIB_USER_HEADER));
 
         UserProvider userProvider = new UserProvider(session);
-        return doExport(exporter,
-                        userProvider.getUsers(
-                            headers, search, null, null).getList(),
-                        i18n);
+        List<User> users = new ArrayList<>();
+        if (ids != null && !ids.isEmpty()) {
+            for (String id: ids) {
+                users.add(userProvider.getUserById(id, headers));
+            }
+        } else {
+            users = userProvider.getUsers(headers, search, null, null)
+                .getList();
+        }
+        return doExport(exporter, users, i18n);
     }
 
     /**
