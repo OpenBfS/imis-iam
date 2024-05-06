@@ -65,18 +65,6 @@
                 active BOOLEAN DEFAULT true
             );
 
-            CREATE TABLE iam_institution_central_alarm_mail_addresses (
-                institution_id INTEGER REFERENCES iam_institution,
-                mail VARCHAR,
-                PRIMARY KEY(institution_id, mail)
-            );
-
-            CREATE TABLE iam_institution_central_alarm_phone_numbers (
-                institution_id INTEGER REFERENCES iam_institution,
-                phone VARCHAR,
-                PRIMARY KEY(institution_id, phone)
-            );
-
             CREATE TABLE iam_institution_categories (
                 institution_id INTEGER REFERENCES iam_institution(id),
                 category_name VARCHAR REFERENCES iam_institution_category,
@@ -108,6 +96,23 @@
                 ADD COLUMN is_primary_institution boolean
                     CHECK(is_primary_institution IS NOT FALSE),
                 ADD UNIQUE(user_id, is_primary_institution);
+        </sql>
+    </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.3">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            CREATE TABLE iam_institution_central_alarm_mail_addresses (
+                institution_id INTEGER REFERENCES iam_institution,
+                mail VARCHAR,
+                PRIMARY KEY(institution_id, mail)
+            );
+
+            CREATE TABLE iam_institution_central_alarm_phone_numbers (
+                institution_id INTEGER REFERENCES iam_institution,
+                phone VARCHAR,
+                PRIMARY KEY(institution_id, phone)
+            );
         </sql>
     </changeSet>
 </databaseChangeLog>
