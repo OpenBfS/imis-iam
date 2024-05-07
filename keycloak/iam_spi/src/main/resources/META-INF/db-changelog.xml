@@ -98,4 +98,21 @@
                 ADD UNIQUE(user_id, is_primary_institution);
         </sql>
     </changeSet>
+    <changeSet author="pschwabauer@intevation.de" id="v0.3">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution_user
+                DROP CONSTRAINT iam_institution_user_is_primary_institution_check,
+                DROP CONSTRAINT iam_institution_user_user_id_is_primary_institution_key;
+            UPDATE iam_institution_user SET is_primary_institution = false
+                WHERE is_primary_institution IS NULL;
+            ALTER TABLE iam_institution_user
+                ALTER COLUMN is_primary_institution SET DEFAULT FALSE,
+                ALTER COLUMN is_primary_institution SET NOT NULL;
+            CREATE UNIQUE INDEX one_primary_institution
+                ON iam_institution_user (user_id, institution_id)
+                WHERE is_primary_institution = true;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

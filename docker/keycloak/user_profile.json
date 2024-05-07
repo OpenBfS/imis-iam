@@ -1,5 +1,17 @@
 {
   "attributes" : [ {
+    "name": "username",
+    "displayName": "${username}",
+    "permissions": {
+      "view": ["admin", "user"],
+      "edit": ["admin", "user"]
+    },
+    "validations": {
+      "length": { "min": 3, "max": 255 },
+      "username-prohibited-characters": {},
+      "up-username-not-idn-homograph": {}
+    }
+  }, {
     "name" : "email",
     "displayName" : "${email}",
     "permissions" : {
