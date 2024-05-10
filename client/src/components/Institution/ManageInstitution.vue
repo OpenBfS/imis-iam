@@ -146,6 +146,7 @@
               <v-col>
                 <ChipTextField
                   :label="$t('institution.central_alarm_phone')"
+                  :rules="validPhone($t('error.valid_phone'))"
                   @update:modelValue="
                     institution.centralAlarmPhoneNumbers = $event
                   "
@@ -155,6 +156,7 @@
               <v-col>
                 <ChipTextField
                   :label="$t('institution.central_alarm_email')"
+                  :rules="validMail($t('error.valid_email'))"
                   @update:modelValue="
                     institution.centralAlarmEmailAddresses = $event
                   "
@@ -315,8 +317,10 @@ const {
   valid,
   hasNoChange,
   reqValidmail,
+  validMail,
   reqField,
   reqValidPhone,
+  validPhone,
   reqValidPostalcode,
   resetForm,
   watchChange,

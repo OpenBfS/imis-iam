@@ -20,7 +20,10 @@
     :readonly="props.readonly"
     :rules="
       applicationStore.clientAndServerRules[props.attribute]
-        ? applicationStore.clientAndServerRules[props.attribute]
+        ? [
+            ...applicationStore.clientAndServerRules[props.attribute],
+            ...props.rules,
+          ]
         : props.rules
     "
     :variant="props.variant ?? 'underlined'"
@@ -30,7 +33,7 @@
         @click="addEntry"
         size="x-small"
         icon="mdi-plus"
-        :disabled="!isValid || input.length === 0"
+        :disabled="!unref(isValid) || input.length === 0"
       ></v-btn>
     </template>
   </v-text-field>
@@ -46,7 +49,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, unref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
 
