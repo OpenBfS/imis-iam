@@ -10,6 +10,7 @@
     :headers="tableHeaders"
     :items="props.users"
     :no-data-text="$t('user.no_users_available')"
+    :total-number-of-items="userStore.totalNumberOfUsers"
     type="users"
   >
     <template v-slot:[`item.actions`]="{ item }">
@@ -55,6 +56,7 @@
 <script setup>
 import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
+import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
 import { getExpUser } from "@/components/User/user";
 import { useI18n } from "vue-i18n";
@@ -76,6 +78,7 @@ function getUserAttribute(user, attributeName) {
 
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
+const userStore = useUserStore();
 const savedUser = ref();
 
 const tableHeaders = [

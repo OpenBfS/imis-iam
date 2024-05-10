@@ -10,6 +10,7 @@
     :headers="tableHeaders"
     :items="props.institutions"
     :no-data-text="$t('institution.no_institutions_available')"
+    :total-number-of-items="institutionStore.totalNumberOfInstitutions"
     type="institutions"
   >
     <template v-slot:[`item.actions`]="{ item }">
@@ -64,6 +65,7 @@
 
 <script setup>
 import { useApplicationStore } from "@/stores/application";
+import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { useI18n } from "vue-i18n";
 import DataTableServer from "@/components/DataTableServer.vue";
@@ -71,6 +73,7 @@ import DataTableServer from "@/components/DataTableServer.vue";
 const { t } = useI18n();
 
 const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 
 const tableHeaders = [

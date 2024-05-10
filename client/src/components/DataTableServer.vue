@@ -9,13 +9,13 @@
   <v-data-table-server
     :model-value="
       props.type === 'users'
-        ? userStore.itemsLength
-        : institutionStore.itemsLength
+        ? userStore.foundUsers
+        : institutionStore.foundInstitutions
     "
     class="ma-2 pa-2"
     :headers="props.headers"
     :items="props.items"
-    :items-length="itemsLength"
+    :items-length="totalNumberOfItems"
     :items-per-page-text="$t('label.items_per_page')"
     :loading="applicationStore.isLoading"
     :no-data-text="props.noDataText"
@@ -28,7 +28,6 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
@@ -42,15 +41,11 @@ const props = defineProps([
   "headers",
   "items",
   "noDataText",
+  "totalNumberOfItems",
 
   // Custom props
   "type",
 ]);
-const itemsLength = ref(
-  props.type === "users"
-    ? userStore.totalNumberOfUsers
-    : institutionStore.totalNumberOfInstitutions
-);
 
 const updateTable = (event) => {
   const offset = (event.page - 1) * event.itemsPerPage;
