@@ -90,12 +90,12 @@ public class Institution {
     @Column(name = "central_mail", nullable = false)
     private String centralMail;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "iam_institution_central_alarm_phone_numbers", joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
     private List<String> centralAlarmPhoneNumbers;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "iam_institution_central_alarm_mail_addresses", joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "mail")
     private List<String> centralAlarmMailAddresses;
