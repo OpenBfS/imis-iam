@@ -46,9 +46,7 @@
                   attribute="enabled"
                   :label="$t('user.enabled')"
                   v-model="user.enabled"
-                  :disabled="
-                    !profileStore.userData.roles.includes('chief_editor')
-                  "
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
                 ></Checkbox>
               </v-col>
             </v-row>
@@ -192,8 +190,7 @@
                 :label="$t('user.label_roles')"
                 :items="userRoles"
                 item-value="name"
-                v-model="user.roles"
-                multiple
+                v-model="user.role"
                 persistent-hint
               ></Select>
             </div>
@@ -435,7 +432,7 @@ onBeforeMount(() => {
   applicationStore.initClientRules({
     groups: [(v) => !!(v && v.length) || t("user.required_membership")],
     institutions: reqMultipleSelect(t("user.required_institution")),
-    roles: reqMultipleSelect(t("user.required_roles")),
+    role: reqField(t("user.required_roles")),
     username: reqField(
       t("error.user_attribute_required", [t("user.username")])
     ),
@@ -467,7 +464,13 @@ const userRoles = computed(() => {
   roles.forEach(
     (item) => (item.title = item.description ? t(item.description) : item.name)
   );
-  return roles;
+  return roles.filter(
+    // Only allow 'chief_editor' to grant this role
+    (item) =>
+      item.name !== "chief_editor" ||
+      user.value.role === "chief_editor" ||
+      profileStore.userData.role === "chief_editor"
+  );
 });
 // Deep Copy for objects
 const cloneObject = (obj) => {
@@ -482,11 +485,11 @@ const createUser = (shouldClose) => {
         applicationStore.setShowManageUserDialog(false);
       } else {
         // Use the same roles of the last created user.
-        const usedRoles = user.value.roles;
+        const usedRole = user.value.role;
         user.value = getExpUser();
         nextTick(() => {
           form.value.resetValidation();
-          user.value.roles = usedRoles;
+          user.value.role = usedRole;
         });
       }
       applicationStore.searchRequest(["users"]);

@@ -249,14 +249,8 @@ public class UserProvider implements RealmResourceProvider {
         handleUserProfile(rep.getAttributes(), newUserModel);
         UserAttributes attributes = rep.createOrUpdateJpaModel(em);
 
-        //Update roles
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        Stream<RoleModel> roleStream = client.getRolesStream().filter(item -> {
-            return rep.getRoles().contains(item.getName());
-        });
-        Map<String, RoleModel> roleMap = roleStream.collect(
-            Collectors.toMap(RoleModel::getId, Function.identity()));
-        updateRoles(roleMap, newUserModel, client);
+        newUserModel.grantRole(realm.getClientByClientId(
+                Constants.IAM_CLIENT_ID).getRole(rep.getRole()));
 
         //Update groups
         Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
@@ -397,25 +391,6 @@ public class UserProvider implements RealmResourceProvider {
         });
     }
 
-    private void updateRoles(
-        Map<String, RoleModel> newRoles,
-        UserModel user,
-        ClientModel client
-    ) {
-        //Grant new roles
-        newRoles.forEach((id, role) -> {
-            if (!user.hasRole(role)) {
-                user.grantRole(role);
-            }
-        });
-        //Remove roles if necessary
-        user.getClientRoleMappingsStream(client).forEach(role -> {
-            if (!newRoles.containsKey(role.getId())) {
-                user.deleteRoleMapping(role);
-            }
-        });
-    }
-
     /**
      * Update the given Keycloak usermodel with the data from the new one.
      * @param realm Realm
@@ -446,14 +421,15 @@ public class UserProvider implements RealmResourceProvider {
             Collectors.toMap(GroupModel::getName, Function.identity()));
         updateGroups(groupMap, oldUser);
 
-        //Update roles
+        //Update role
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        Stream<RoleModel> roleStream = client.getRolesStream().filter(item -> {
-            return newUser.getRoles().contains(item.getName());
-        });
-        Map<String, RoleModel> roleMap = roleStream.collect(
-            Collectors.toMap(RoleModel::getId, Function.identity()));
-        updateRoles(roleMap, oldUser, client);
+        RoleModel oldRole = oldUser.getClientRoleMappingsStream(client)
+            .findFirst().orElse(null);
+        String newRole = newUser.getRole();
+        if (oldRole == null || !oldRole.getName().equals(newRole)) {
+            oldUser.deleteRoleMapping(oldRole);
+            oldUser.grantRole(client.getRole(newRole));
+        }
 
         return oldUser;
     }
