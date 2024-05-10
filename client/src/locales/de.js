@@ -227,6 +227,7 @@ export default {
     site: "Ort",
     description: "Beschreibung",
     items_per_page: "Einträge pro Seite",
+    of: "von",
   },
   // MailingList
   mailinglist: {

@@ -9,7 +9,9 @@
   <DataTableServer
     :headers="tableHeaders"
     :items="props.institutions"
+    :items-per-page="institutionStore.itemsPerPage"
     :no-data-text="$t('institution.no_institutions_available')"
+    :offset="institutionStore.offset"
     :total-number-of-items="institutionStore.totalNumberOfInstitutions"
     type="institutions"
   >

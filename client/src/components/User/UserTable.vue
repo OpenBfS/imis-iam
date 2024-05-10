@@ -9,7 +9,9 @@
   <DataTableServer
     :headers="tableHeaders"
     :items="props.users"
+    :items-per-page="userStore.itemsPerPage"
     :no-data-text="$t('user.no_users_available')"
+    :offset="userStore.offset"
     :total-number-of-items="userStore.totalNumberOfUsers"
     type="users"
   >

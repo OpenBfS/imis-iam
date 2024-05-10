@@ -16,9 +16,13 @@
     :headers="props.headers"
     :items="props.items"
     :items-length="totalNumberOfItems"
+    :items-per-page="props.itemsPerPage"
     :items-per-page-text="$t('label.items_per_page')"
     :loading="applicationStore.isLoading"
     :no-data-text="props.noDataText"
+    :page-text="`${offset + 1}-${offset + props.itemsPerPage} ${$t(
+      'label.of'
+    )} ${props.totalNumberOfItems}`"
     @update:options="updateTable"
   >
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
@@ -40,7 +44,9 @@ const props = defineProps([
   // Vuetify props
   "headers",
   "items",
+  "itemsPerPage",
   "noDataText",
+  "offset",
   "totalNumberOfItems",
 
   // Custom props
