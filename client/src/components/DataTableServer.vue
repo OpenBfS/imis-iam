@@ -20,9 +20,11 @@
     :items-per-page-text="$t('label.items_per_page')"
     :loading="applicationStore.isLoading"
     :no-data-text="props.noDataText"
-    :page-text="`${offset + 1}-${offset + props.itemsPerPage} ${$t(
-      'label.of'
-    )} ${props.totalNumberOfItems}`"
+    :page-text="`${offset + 1}-${
+      offset + props.itemsPerPage > props.items.length
+        ? offset + props.items.length
+        : offset + props.itemsPerPage
+    } ${$t('label.of')} ${props.totalNumberOfItems}`"
     @update:options="updateTable"
   >
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
