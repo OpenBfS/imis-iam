@@ -7,20 +7,17 @@
 package de.intevation.iam.model.jpa;
 
 import java.sql.Timestamp;
-import java.util.Comparator;
-import java.util.SortedMap;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
-import org.hibernate.annotations.SortComparator;
 import org.keycloak.models.jpa.entities.UserEntity;
 
 /**
@@ -48,26 +45,12 @@ public class UserAttributes {
     @JoinColumn(name = "id", referencedColumnName = "id")
     private UserEntity userEntity;
 
-    @ManyToMany
-    @JoinTable(
-        name = "iam_institution_user",
-        joinColumns = {@JoinColumn(name = "user_id")},
-        inverseJoinColumns = {@JoinColumn(name = "institution_id")}
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
     )
-    @MapKeyColumn(name = "is_primary_institution")
-    @SortComparator(CompareBooleanWithNulls.class)
-    private SortedMap<Boolean, Institution> institutions;
-
-    /**
-     * Comparator to be used in a SortedMap that should allow any number
-     * of null-valued keys.
-     */
-    public static class CompareBooleanWithNulls implements Comparator<Boolean> {
-        @Override
-        public int compare(Boolean b1, Boolean b2) {
-            return b1 == null || b2 == null ? -1 : b1.compareTo(b2);
-        }
-    }
+    private Set<InstitutionUser> institutions;
 
     public String getId() {
         return id;
@@ -110,11 +93,14 @@ public class UserAttributes {
         this.userEntity = userEntity;
     }
 
-    public SortedMap<Boolean, Institution> getInstitutions() {
+    public Set<InstitutionUser> getInstitutions() {
         return institutions;
     }
 
-    public void setInstitutions(SortedMap<Boolean, Institution> institutions) {
-        this.institutions = institutions;
+    public void setInstitutions(Set<InstitutionUser> institutions) {
+        this.institutions.clear();
+        if (institutions != null) {
+            this.institutions.addAll(institutions);
+        }
     }
 }

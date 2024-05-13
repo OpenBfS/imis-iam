@@ -42,7 +42,7 @@
       "saml.allow.ecp.flow": "false",
       "id.token.as.detached.signature": "false",
       "saml.assertion.signature": "false",
-      "saml_single_logout_service_url_post": "/Shibboleth.sso/SLO/POST",
+      "saml_single_logout_service_url_post": "%SP_URL/Shibboleth.sso/SLO/POST",
       "saml.encrypt": "false",
       "saml.server.signature": "true",
       "exclude.session.state.from.auth.response": "false",
@@ -56,6 +56,7 @@
       "saml.onetimeuse.condition": "false",
       "saml_signature_canonicalization_method": "http://www.w3.org/2001/10/xml-exc-c14n#"
     },
+
     "authenticationFlowBindingOverrides": {},
     "fullScopeAllowed": true,
     "nodeReRegistrationTimeout": -1,

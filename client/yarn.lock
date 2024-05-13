@@ -7182,7 +7182,7 @@ vuetify-loader@^2.0.0-alpha.0:
     querystring "^0.2.1"
     upath "^2.0.1"
 
-vuetify@^3.4.11:
+vuetify@^3.6.4:
   version "3.6.4"
   resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.6.4.tgz#32bf401a569463fcc6e627b909b487aa35dfa2f7"
   integrity sha512-H0s+VQAuFDIaqJaxaYv3DuJoSlThMfIJX5l06sGkxk9YDMxiEjE4ABT58fTAZGdPMF/TzMXtTHbRNCHes0UaHQ==

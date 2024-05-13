@@ -7,10 +7,10 @@
 package de.intevation.iam.model.representation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
@@ -32,6 +32,7 @@ import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.InstitutionUser;
 import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.util.Constants;
 
@@ -96,12 +97,12 @@ public class User {
 
         if (jpaModel != null) {
             //Set institutions
-            Map<Boolean, Institution> instList = jpaModel.getInstitutions();
+            Set<InstitutionUser> instList = jpaModel.getInstitutions();
             if (instList != null) {
                 // TODO: send boolean keys to client
                 this.institutions = new ArrayList<String>();
-                instList.forEach((isPrimary, inst) -> institutions.add(
-                        inst.getName()));
+                instList.forEach((inst) -> institutions.add(
+                        inst.getInstitution().getName()));
             }
 
             //Get user groups
@@ -201,11 +202,10 @@ public class User {
             this.institutions.forEach(instName -> nameFilter.value(instName));
             query.where(nameFilter);
             List<Institution> insts = em.createQuery(query).getResultList();
-            SortedMap<Boolean, Institution> newInstitutions = new TreeMap<>(
-                new UserAttributes.CompareBooleanWithNulls());
-            for (Institution inst: insts) {
-                // TODO: Get boolean key from client
-                newInstitutions.put(null, inst);
+            Set<InstitutionUser> newInstitutions = new HashSet<>();
+            for (Institution inst : insts) {
+                newInstitutions.add(
+                    new InstitutionUser(inst, jpaUser));
             }
             jpaUser.setInstitutions(newInstitutions);
         }

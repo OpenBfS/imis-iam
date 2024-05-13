@@ -35,7 +35,9 @@ public class Validator {
 
         ValidationError(String message, Object... messageParameters) {
             this.message = message;
-            this.messageParameters = messageParameters == null ? EMPTY_PARAMETERS : messageParameters.clone();
+            this.messageParameters = messageParameters == null
+                ? EMPTY_PARAMETERS
+                : messageParameters.clone();
         }
 
         public String getMessage() {
@@ -47,14 +49,16 @@ public class Validator {
         }
     }
 
-    private HashMap<Locale, jakarta.validation.Validator> beanValidators = new HashMap<>();
-
-    public Validator() { }
+    private HashMap<Locale, jakarta.validation.Validator> beanValidators =
+        new HashMap<>();
 
     /**
      * @param locale Set locale for message localization.
+     * @return Validator with locale set.
      */
-    private synchronized jakarta.validation.Validator getBeanValidator(Locale locale) {
+    private synchronized jakarta.validation.Validator getBeanValidator(
+        Locale locale
+    ) {
         if (locale == null) {
             locale = Locale.getDefault();
         }
@@ -78,12 +82,12 @@ public class Validator {
      * @throws BadRequestException in case validation fails
      */
     public void validate(Object object, Locale locale) {
-        // Bean Validation
         jakarta.validation.Validator beanValidator = getBeanValidator(locale);
         Set<ConstraintViolation<Object>> beanViolations =
             beanValidator.validate(object);
         if (!beanViolations.isEmpty()) {
-            Set<ValidationError> validationErrors = new HashSet<ValidationError>();
+            Set<ValidationError> validationErrors =
+                new HashSet<ValidationError>();
 
             for (ConstraintViolation<Object> violation: beanViolations) {
                 validationErrors.add(new ValidationError(
