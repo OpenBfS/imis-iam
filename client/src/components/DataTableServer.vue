@@ -61,6 +61,6 @@ const updateTable = (event) => {
   store.offset = offset;
   store.itemsPerPage = event.itemsPerPage;
   store.sortBy = event.sortBy.length ? event.sortBy[0] : null;
-  applicationStore.searchRequest([props.type], true);
+  applicationStore.searchRequest([props.type]);
 };
 </script>
