@@ -16,6 +16,7 @@
     :label="props.label"
     :name="props.name"
     :persistent-hint="true"
+    :persistent-placeholder="entries.length > 0"
     :prepend-inner-icon="props.prependInnerIcon"
     :readonly="props.readonly"
     :rules="
@@ -33,19 +34,22 @@
         @click="addEntry"
         size="x-small"
         icon="mdi-plus"
+        class="ml-n3"
+        min-width="36"
+        min-height="36"
         :disabled="!unref(isValid) || input.length === 0"
       ></v-btn>
     </template>
+    <v-chip
+      v-for="(entry, index) in entries"
+      @click:close="() => removeEntry(index)"
+      closable
+      size="small"
+      :key="entry"
+    >
+      {{ entry }}
+    </v-chip>
   </v-text-field>
-  <v-chip
-    v-for="(entry, index) in entries"
-    @click:close="() => removeEntry(index)"
-    closable
-    size="small"
-    :key="entry"
-  >
-    {{ entry }}
-  </v-chip>
 </template>
 
 <script setup>

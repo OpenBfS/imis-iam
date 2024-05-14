@@ -142,7 +142,7 @@
                 :attribute="'centralFax'"
               ></TextField>
             </div>
-            <v-row class="mb-2">
+            <v-row>
               <v-col>
                 <ChipTextField
                   :label="$t('institution.central_alarm_phone')"
