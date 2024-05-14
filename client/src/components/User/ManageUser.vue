@@ -377,6 +377,9 @@ const getUserAttributeRules = (userAttribute) => {
       // is a required attribute so it won't appear in the
       // UserProfileMetadata. That's why we can't handle it the "generic"
       // way.
+      // TODO: Add rules for pattern and length as optional even when
+      // attribute is not required (when optional rules are supported
+      // by Vuetify)
       userAttribute.name === "email" ||
       userAttribute.required?.roles?.includes("user")
     ) {
