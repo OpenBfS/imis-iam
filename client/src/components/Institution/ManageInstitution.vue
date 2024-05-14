@@ -166,17 +166,13 @@
             </v-row>
             <div class="group_class">
               <TextField
-                :disabled="
-                  !profileStore.userData.roles.some((e) => e === 'chief_editor')
-                "
+                :disabled="profileStore.userData.role !== 'chief_editor'"
                 :label="$t('institution.imis_id')"
                 :attribute="'imisId'"
                 @update:modelValue="institution.imisId = $event"
               ></TextField>
               <TextField
-                :disabled="
-                  !profileStore.userData.roles.some((e) => e === 'chief_editor')
-                "
+                :disabled="profileStore.userData.role !== 'chief_editor'"
                 :label="$t('institution.imis_usergroup_id')"
                 :attribute="'imisUserGroupId'"
                 @update:modelValue="institution.imisUserGroupId = $event"

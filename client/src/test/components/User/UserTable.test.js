@@ -6,6 +6,7 @@
  */
 import { vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
+import { useApplicationStore } from "@/stores/application";
 import { useUserStore } from "@/stores/user";
 import { mount } from "@vue/test-utils";
 import UserTable from "@/components/User/UserTable.vue";
@@ -15,9 +16,11 @@ import { test, expect } from "vitest";
 setActivePinia(createPinia());
 
 const userStore = useUserStore();
+const applicationStore = useApplicationStore();
 
 // Mock HTTP request/response
 vi.spyOn(userStore, "loadMemberships").mockResolvedValue({});
+vi.spyOn(applicationStore, "searchRequest").mockResolvedValue({});
 
 // Test data
 const users = [
@@ -47,11 +50,11 @@ const wrapper = mount(UserTable, {
 });
 
 test("Username is displayed in first column", () => {
-  wrapper.findAll("tr").forEach((row, i) => {
+  wrapper.findAll("tbody tr").forEach((row, i) => {
     expect(row.get("td").text()).toBe(users[i].attributes.username[0]);
   });
 });
 
 test("Missing attribute is rendered as empty string", () => {
-  expect(wrapper.findAll("tr")[1].findAll("td")[1].text()).toBe("");
+  expect(wrapper.findAll("tbody tr")[1].findAll("td")[1].text()).toBe("");
 });

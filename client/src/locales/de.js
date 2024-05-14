@@ -166,7 +166,7 @@ export default {
     required_membership: "Mitgliedschaft ist erforderlich",
     required_position: "Position ist erforderlich",
     required_institution: "Institution ist erforderlich",
-    label_roles: "Rollen im IdM",
+    label_roles: "Rolle im IdM",
     required_roles: "Rolle ist erforderlich",
     no_users_available: "Es sind keine @:user_term vorhanden",
   },

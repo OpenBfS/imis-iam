@@ -16,6 +16,7 @@ export default defineConfig({
         inline: ["vuetify"],
       },
     },
+    setupFiles: ["src/test/setup.js"],
     alias: [{ find: "@", replacement: resolve(__dirname, "./src") }],
   },
   plugins: [vue()],

@@ -8,7 +8,7 @@ const expUser = {
   attributes: {},
   groups: [],
   institutions: [],
-  roles: [],
+  role: null,
   enabled: false,
 };
 

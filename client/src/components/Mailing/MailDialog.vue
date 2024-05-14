@@ -17,6 +17,7 @@
               <v-col cols="10">
                 <v-row>
                   <Select
+                    attribute="sender"
                     class="v-col-6"
                     :no-data-text="$t('label.no_data_text')"
                     :items="senderList"
@@ -24,6 +25,7 @@
                     v-model="mail.selectedSender"
                   ></Select>
                   <Select
+                    attribute="recipient"
                     class="v-col-6"
                     return-object
                     clearable
@@ -35,6 +37,7 @@
                     v-model="mail.selectedList"
                   ></Select>
                   <Select
+                    attribute="type"
                     class="v-col-6"
                     :no-data-text="$t('label.no_data_text')"
                     return-object
