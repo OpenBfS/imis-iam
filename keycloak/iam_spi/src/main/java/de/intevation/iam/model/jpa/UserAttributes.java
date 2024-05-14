@@ -7,6 +7,7 @@
 package de.intevation.iam.model.jpa;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -50,7 +51,7 @@ public class UserAttributes {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    private Set<InstitutionUser> institutions;
+    private Set<InstitutionUser> institutions = new HashSet<>();
 
     public String getId() {
         return id;
