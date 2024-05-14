@@ -8,6 +8,7 @@
 <template>
   <v-text-field
     @keydown.enter="addEntry"
+    @keydown.delete="onDelete"
     v-model="input"
     :clearable="props.clearable"
     :density="props.density ?? 'compact'"
@@ -100,5 +101,11 @@ const addEntry = () => {
 
 const removeEntry = (index) => {
   entries.value = entries.value.toSpliced(index, 1);
+};
+
+const onDelete = () => {
+  if (input.value === "") {
+    removeEntry(entries.value.length - 1);
+  }
 };
 </script>
