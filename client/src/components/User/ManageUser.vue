@@ -84,6 +84,7 @@
                     <Select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
                       :label="handleDisplayName(attribute.displayName)"
+                      :attribute="attribute.name"
                       item-title="name"
                       item-value="id"
                       :name="attribute.name"
@@ -138,6 +139,7 @@
                     :label="handleDisplayName(attribute.displayName)"
                     item-title="name"
                     item-value="id"
+                    :attribute="attribute.name"
                     :items="attribute.validations.options.options"
                     :name="attribute.name"
                     :model-value="user.attributes[attribute.name]"
@@ -161,6 +163,7 @@
 
             <div class="two_group_class">
               <Select
+                attribute="institutions"
                 :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
                 :label="$t('user.label_institutions')"
@@ -172,6 +175,7 @@
                 multiple
               ></Select>
               <Select
+                attribute="groups"
                 :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
                 :label="$t('user.label_memberships')"
@@ -185,6 +189,7 @@
             </div>
             <div class="one_group_class">
               <Select
+                attribute="role"
                 :clearable="profileStore.isAllowedToManage"
                 :disabled="!profileStore.isAllowedToManage"
                 :label="$t('user.label_roles')"
