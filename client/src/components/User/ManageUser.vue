@@ -112,7 +112,7 @@
                 v-for="attribute in profileStore.attributesWithoutGroup"
                 :key="attribute.name"
               >
-                <v-col cols="6">
+                <v-col v-if="attribute.name !== 'username'" cols="6">
                   <TextField
                     v-if="isTextField(attribute.annotations?.inputType)"
                     density="compact"
