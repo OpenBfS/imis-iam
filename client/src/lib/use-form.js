@@ -42,7 +42,9 @@ export function useForm() {
     ];
   };
   const validPhone = (validMsg) => {
-    (v) => doesRegexMatchWholeString(regExprPhone, v) || validMsg;
+    return [
+      (v) => doesRegexMatchWholeString(regExprPhone, v) || v == "" || validMsg,
+    ];
   };
   const validPostalcode = (validMsg) => {
     return [(v) => /^\d{5}$/.test(v) || v == "" || validMsg];
@@ -58,7 +60,7 @@ export function useForm() {
   };
   const doesRegexMatchWholeString = (regex, text) => {
     const matches = regex.exec(text);
-    return matches && matches.length === 1 && matches[0] === text;
+    return matches && matches[0] === text;
   };
   const validGermanDate = () => {
     return [
