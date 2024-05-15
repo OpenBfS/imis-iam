@@ -84,6 +84,7 @@
                     <Select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
                       :label="handleDisplayName(attribute.displayName)"
+                      :attribute="attribute.name"
                       item-title="name"
                       item-value="id"
                       :name="attribute.name"
@@ -112,7 +113,7 @@
                 v-for="attribute in profileStore.attributesWithoutGroup"
                 :key="attribute.name"
               >
-                <v-col cols="6">
+                <v-col v-if="attribute.name !== 'username'" cols="6">
                   <TextField
                     v-if="isTextField(attribute.annotations?.inputType)"
                     density="compact"
@@ -138,6 +139,7 @@
                     :label="handleDisplayName(attribute.displayName)"
                     item-title="name"
                     item-value="id"
+                    :attribute="attribute.name"
                     :items="attribute.validations.options.options"
                     :name="attribute.name"
                     :model-value="user.attributes[attribute.name]"
@@ -161,6 +163,7 @@
 
             <div class="two_group_class">
               <Select
+                attribute="institutions"
                 :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
                 :label="$t('user.label_institutions')"
@@ -172,6 +175,7 @@
                 multiple
               ></Select>
               <Select
+                attribute="groups"
                 :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
                 :label="$t('user.label_memberships')"
@@ -185,6 +189,7 @@
             </div>
             <div class="one_group_class">
               <Select
+                attribute="role"
                 :clearable="profileStore.isAllowedToManage"
                 :disabled="!profileStore.isAllowedToManage"
                 :label="$t('user.label_roles')"
@@ -377,6 +382,9 @@ const getUserAttributeRules = (userAttribute) => {
       // is a required attribute so it won't appear in the
       // UserProfileMetadata. That's why we can't handle it the "generic"
       // way.
+      // TODO: Add rules for pattern and length as optional even when
+      // attribute is not required (when optional rules are supported
+      // by Vuetify)
       userAttribute.name === "email" ||
       userAttribute.required?.roles?.includes("user")
     ) {
