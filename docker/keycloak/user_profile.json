@@ -6,6 +6,9 @@
       "view": ["admin", "user"],
       "edit": ["admin", "user"]
     },
+    "required" : {
+      "roles" : [ "admin", "user" ]
+    },
     "validations": {
       "length": { "min": 3, "max": 255 },
       "username-prohibited-characters": {},

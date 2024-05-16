@@ -40,6 +40,7 @@ import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionCategory;
+import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
@@ -119,7 +120,7 @@ public class InstitutionProvider implements RealmResourceProvider {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Institution> getInstitutions(@Context HttpHeaders headers,
+    public ObjectList<Institution> getInstitutions(@Context HttpHeaders headers,
             @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults,
@@ -133,6 +134,26 @@ public class InstitutionProvider implements RealmResourceProvider {
         CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
         Root<Institution> root = query.from(Institution.class);
         query.select(root);
+
+        long size = 0;
+        if (firstResult != null || maxResults != null) {
+            CriteriaBuilder cbSize = em.getCriteriaBuilder();
+            CriteriaQuery<Long> cqSize = cbSize.createQuery(Long.class);
+            Root<Institution> rootSize = cqSize.from(Institution.class);
+            cqSize.select(cbSize.count(rootSize));
+            if (!filter.isEmpty()) {
+                cqSize.where(cbSize.or(
+                    cbSize.like(
+                        cbSize.lower(rootSize.get("name")),
+                        filter),
+                    cbSize.like(
+                        cbSize.lower(rootSize.get("imisId")),
+                        filter)
+                    )
+                );
+            }
+            size = em.createQuery(cqSize).getSingleResult();
+        }
 
         if (firstResult == null || firstResult < 0) {
             firstResult = 0;
@@ -170,7 +191,12 @@ public class InstitutionProvider implements RealmResourceProvider {
         TypedQuery<Institution> result = em.createQuery(query)
             .setFirstResult(firstResult)
             .setMaxResults(maxResults);
-        return auth.filter(result.getResultList(), headers);
+        if (size == 0) {
+            size = result.getResultList().size();
+        }
+        return auth.filterObjectList(
+            new ObjectList<Institution>(size, result.getResultList()),
+            headers);
     }
 
     /**

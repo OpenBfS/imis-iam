@@ -81,22 +81,19 @@ export const useApplicationStore = defineStore("application", {
     /**
      *
      * @param {*} listOfTypes Array of strings with types to load, e.g. ["users", "institutions"]
-     * @param {*} force Force search request even if the searchString is empty
      * @returns Promise
      */
-    searchRequest(listOfTypes, force = false) {
+    searchRequest(listOfTypes) {
       this.isLoading = true;
       const userStore = useUserStore();
       const institutionStore = useInstitutionStore();
       return new Promise((resolve, reject) => {
         const promises = [];
-        if (force || this.searchString?.length > 0) {
-          if (listOfTypes.includes("users")) {
-            promises.push(userStore.loadUsers(this.searchString));
-          }
-          if (listOfTypes.includes("institutions")) {
-            promises.push(institutionStore.loadInstitutions(this.searchString));
-          }
+        if (listOfTypes.includes("users")) {
+          promises.push(userStore.loadUsers(this.searchString));
+        }
+        if (listOfTypes.includes("institutions")) {
+          promises.push(institutionStore.loadInstitutions(this.searchString));
         }
         Promise.all(promises)
           .then(() => resolve())

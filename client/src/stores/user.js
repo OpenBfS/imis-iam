@@ -16,6 +16,9 @@ export const useUserStore = defineStore("user", {
     foundUsers: [],
     offset: 0,
     itemsPerPage: 25,
+    // Object with keys "key" and "order"
+    sortBy: null,
+    totalNumberOfUsers: 0,
   }),
   actions: {
     setFoundUsers(data) {
@@ -54,14 +57,17 @@ export const useUserStore = defineStore("user", {
             search: searchString,
             firstResult: this.offset,
             maxResults: this.itemsPerPage,
+            sortBy: this.sortBy?.key,
+            order: this.sortBy?.order,
           },
         })
           .then((response) => {
+            this.totalNumberOfUsers = response.data.size;
             if (searchString) {
-              this.setFoundUsers(response.data);
+              this.setFoundUsers(response.data.list);
             } else {
-              this.setUsers(response.data);
-              this.setFoundUsers(response.data);
+              this.setUsers(response.data.list);
+              this.setFoundUsers(response.data.list);
             }
             resolve(response);
           })
@@ -91,10 +97,12 @@ export const useUserStore = defineStore("user", {
     },
     addUser(data) {
       this.users.push(data);
+      this.totalNumberOfUsers++;
     },
     removeUser(data) {
       const index = this.users.findIndex((user) => user.id === data.id);
       this.users.splice(index, 1);
+      this.totalNumberOfUsers--;
     },
   },
 });

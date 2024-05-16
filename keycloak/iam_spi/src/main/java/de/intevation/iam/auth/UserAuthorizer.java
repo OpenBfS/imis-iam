@@ -16,6 +16,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
+import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
@@ -68,6 +69,23 @@ public class UserAuthorizer extends Authorizer<User> {
         UserModel requestingUser = session.users().getUserById(realm, userId);
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         data.forEach(user -> {
+            user.setReadonly(
+                !authorizeUpdate(
+                    user, session, requestingUser, client));
+        });
+        return data;
+    }
+
+    @Override
+    public ObjectList<User> filterObjectList(
+            ObjectList<User> data,
+            HttpHeaders headers
+    ) {
+        RealmModel realm = session.getContext().getRealm();
+        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        UserModel requestingUser = session.users().getUserById(realm, userId);
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        data.getList().forEach(user -> {
             user.setReadonly(
                 !authorizeUpdate(
                     user, session, requestingUser, client));

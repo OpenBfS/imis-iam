@@ -9,6 +9,7 @@ export default {
   user_term: "IMIS-Nutzer",
   usergroup_id_term: "IMIS-Kennung/Nutzer",
   imis_id_term: "Messstellen-ID",
+  tag_term: "Tag",
   // Role names
   role_iam_user: "Nutzer",
   role_iam_editor: "Redakteur",
@@ -67,7 +68,7 @@ export default {
     person_name_invalid_character: "'{0}' enthält ungültige Zeichen.",
 
     // Custom errors
-    required_category: "Kategorie ist erforderlich",
+    required_category: "@:tag_term ist erforderlich",
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
     valid_phone: "Telefon muss gültig sein",
@@ -110,7 +111,7 @@ export default {
     place: "Ort",
     street: "Straße",
     postal_code: "PLZ",
-    categories: "Kategorien",
+    categories: "@:tag_term{'s'}",
     central_fax: "Zentrales Fax",
     differing_postal_address: "Abweichende Postanschrift",
     address_street: "Postanschrift: Straße/Hausnummer",
@@ -125,7 +126,6 @@ export default {
     imis_usergroup_id_length_validation_message:
       "Das Kürzel muss eine Länge von 3 Zeichen haben.",
     active: "Aktiv",
-    category_name: "Kategorienname",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
     y_coordinate: "Y-Koordinate",
@@ -229,6 +229,7 @@ export default {
     site: "Ort",
     description: "Beschreibung",
     items_per_page: "Einträge pro Seite",
+    of: "von",
   },
   // MailingList
   mailinglist: {

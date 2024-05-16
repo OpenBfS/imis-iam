@@ -11,7 +11,7 @@
       {{ $t("archive.title") }}
     </UIHeader>
     <v-row class="mt-6" align="center">
-      <v-select
+      <v-autocomplete
         :no-data-text="$t('label.no_data_text')"
         class="mx-1"
         style="max-width: 20%"
@@ -24,8 +24,8 @@
         density="compact"
         :hint="$t('mailinglist.filter_by_type')"
         persistent-hint
-      ></v-select>
-      <v-select
+      ></v-autocomplete>
+      <v-autocomplete
         :no-data-text="$t('label.no_data_text')"
         class="mx-1 text-truncate"
         style="max-width: 20%"
@@ -38,7 +38,7 @@
         density="compact"
         :hint="$t('mailinglist.filter_by_maillist')"
         persistent-hint
-      ></v-select>
+      ></v-autocomplete>
       <div class="d-flex mx-3 flex-column" style="width: 20%">
         <div style="position: relative">
           <div id="startDateTextfield">

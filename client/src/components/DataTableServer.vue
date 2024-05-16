@@ -9,16 +9,22 @@
   <v-data-table-server
     :model-value="
       props.type === 'users'
-        ? userStore.itemsLength
-        : institutionStore.itemsLength
+        ? userStore.foundUsers
+        : institutionStore.foundInstitutions
     "
     class="ma-2 pa-2"
     :headers="props.headers"
     :items="props.items"
-    :items-length="itemsLength"
+    :items-length="totalNumberOfItems"
+    :items-per-page="props.itemsPerPage"
     :items-per-page-text="$t('label.items_per_page')"
     :loading="applicationStore.isLoading"
     :no-data-text="props.noDataText"
+    :page-text="`${offset + 1}-${
+      offset + props.itemsPerPage > props.items.length
+        ? offset + props.items.length
+        : offset + props.itemsPerPage
+    } ${$t('label.of')} ${props.totalNumberOfItems}`"
     @update:options="updateTable"
   >
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
@@ -28,7 +34,6 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
@@ -41,29 +46,21 @@ const props = defineProps([
   // Vuetify props
   "headers",
   "items",
+  "itemsPerPage",
   "noDataText",
+  "offset",
+  "totalNumberOfItems",
 
   // Custom props
   "type",
 ]);
-const itemsLength = ref(
-  // TODO: Get total length of items from server
-  /*props.type === "users"
-    ? userStore.itemsLength
-    : institutionStore.itemsLength*/
-  100
-);
 
 const updateTable = (event) => {
   const offset = (event.page - 1) * event.itemsPerPage;
-  if (props.type === "users") {
-    userStore.offset = offset;
-    userStore.itemsPerPage = event.itemsPerPage;
-    applicationStore.searchRequest(["users"], true);
-  } else {
-    institutionStore.offset = offset;
-    institutionStore.itemsPerPage = event.itemsPerPage;
-    applicationStore.searchRequest(["institutions"], true);
-  }
+  const store = props.type === "users" ? userStore : institutionStore;
+  store.offset = offset;
+  store.itemsPerPage = event.itemsPerPage;
+  store.sortBy = event.sortBy.length ? event.sortBy[0] : null;
+  applicationStore.searchRequest([props.type]);
 };
 </script>
