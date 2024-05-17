@@ -10,12 +10,12 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -46,12 +46,13 @@ public class UserAttributes {
     @JoinColumn(name = "id", referencedColumnName = "id")
     private UserEntity userEntity;
 
-    @OneToMany(
-        mappedBy = "user",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
+    @ManyToMany
+    @JoinTable(
+        name = "iam_institution_user",
+        joinColumns = {@JoinColumn(name = "user_id")},
+        inverseJoinColumns = {@JoinColumn(name = "institution_id")}
     )
-    private Set<InstitutionUser> institutions = new HashSet<>();
+    private Set<Institution> institutions = new HashSet<>();
 
     public String getId() {
         return id;
@@ -94,11 +95,11 @@ public class UserAttributes {
         this.userEntity = userEntity;
     }
 
-    public Set<InstitutionUser> getInstitutions() {
+    public Set<Institution> getInstitutions() {
         return institutions;
     }
 
-    public void setInstitutions(Set<InstitutionUser> institutions) {
+    public void setInstitutions(Set<Institution> institutions) {
         this.institutions.clear();
         if (institutions != null) {
             this.institutions.addAll(institutions);
