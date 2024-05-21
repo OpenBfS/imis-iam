@@ -97,7 +97,6 @@ public class User {
             //Set institutions
             Set<Institution> instList = jpaModel.getInstitutions();
             if (instList != null) {
-                // TODO: send boolean keys to client
                 this.institutions = new ArrayList<String>();
                 instList.forEach((inst) -> institutions.add(
                         inst.getName()));
