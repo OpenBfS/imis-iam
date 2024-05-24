@@ -94,6 +94,13 @@ watch(entries, (newEntries) => {
   onUpdateModelValue(newEntries, emit, props.attribute);
 });
 
+applicationStore.$subscribe((mutation) => {
+  if (mutation.events.key === props.attribute) {
+    entries.value = mutation.events.newValue;
+    input.value = "";
+  }
+});
+
 const addEntry = () => {
   let isValid = true;
   props.rules.forEach((rule) => {
