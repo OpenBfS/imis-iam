@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 
 import org.keycloak.models.KeycloakSession;
 
+import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.RequestMethod;
 
 public abstract class Authorizer<T> {
@@ -42,6 +43,21 @@ public abstract class Authorizer<T> {
      */
     public List<T> filter(
         List<T> data,
+        HttpHeaders headers
+    ) {
+        return data;
+    }
+
+    /**
+     * Filter or modify the given list of objects.
+     * The default implementation returns data unchanged.
+     *
+     * @param data List of objects
+     * @param headers Request headers
+     * @return Filtered list
+     */
+    public ObjectList<T> filterObjectList(
+        ObjectList<T> data,
         HttpHeaders headers
     ) {
         return data;

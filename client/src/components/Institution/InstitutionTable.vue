@@ -9,7 +9,10 @@
   <DataTableServer
     :headers="tableHeaders"
     :items="props.institutions"
+    :items-per-page="institutionStore.itemsPerPage"
     :no-data-text="$t('institution.no_institutions_available')"
+    :offset="institutionStore.offset"
+    :total-number-of-items="institutionStore.totalNumberOfInstitutions"
     type="institutions"
   >
     <template v-slot:[`item.actions`]="{ item }">
@@ -64,6 +67,7 @@
 
 <script setup>
 import { useApplicationStore } from "@/stores/application";
+import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { useI18n } from "vue-i18n";
 import DataTableServer from "@/components/DataTableServer.vue";
@@ -71,12 +75,13 @@ import DataTableServer from "@/components/DataTableServer.vue";
 const { t } = useI18n();
 
 const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 
 const tableHeaders = [
-  { title: t("label.name"), key: "name", sortable: false },
-  { title: t("institution.shortname"), key: "shortName", sortable: false },
-  { title: t("institution.imis_id"), key: "imisId", sortable: false },
+  { title: t("label.name"), key: "name", sortable: true },
+  { title: t("institution.shortname"), key: "shortName", sortable: true },
+  { title: t("institution.imis_id"), key: "imisId", sortable: true },
   { title: t("label.actions"), key: "actions", sortable: false },
 ];
 

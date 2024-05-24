@@ -6,7 +6,7 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-select
+  <v-autocomplete
     :active="props.active"
     :chips="props.chips"
     :clearable="props.clearable"
@@ -41,7 +41,7 @@
     @update:model-value="
       (event) => onUpdateModelValue(event, emit, props.attribute)
     "
-  ></v-select>
+  ></v-autocomplete>
 </template>
 
 <script setup>
