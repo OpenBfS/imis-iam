@@ -95,6 +95,12 @@ watch(entries, (newEntries) => {
 });
 
 const addEntry = () => {
+  let isValid = true;
+  props.rules.forEach((rule) => {
+    const result = rule(input.value);
+    if (typeof result !== "boolean" || !result) isValid = false;
+  });
+  if (!isValid) return;
   entries.value = [...entries.value, input.value];
   input.value = "";
 };
