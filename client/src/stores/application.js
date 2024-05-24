@@ -25,6 +25,7 @@ export const useApplicationStore = defineStore("application", {
     // mechanism to show error messages. We use it to show validation errors
     // coming from keycloak.
     serverValidationRules: {},
+    attributesOfFieldsThatChanged: [],
     form: undefined,
     savedItem: {},
     showManageEventDialog: false,
@@ -76,6 +77,21 @@ export const useApplicationStore = defineStore("application", {
     },
     setlistToExport(message) {
       this.listToExport = message;
+    },
+    submitChangeInField(attribute) {
+      this.attributesOfFieldsThatChanged = [
+        ...this.attributesOfFieldsThatChanged,
+        attribute,
+      ];
+    },
+    removeChangeInField(attribute) {
+      const index = this.attributesOfFieldsThatChanged.findIndex(
+        (a) => a === attribute
+      );
+      if (index !== -1) {
+        this.attributesOfFieldsThatChanged =
+          this.attributesOfFieldsThatChanged.toSpliced(index, 1);
+      }
     },
 
     /**
