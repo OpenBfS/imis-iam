@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, unref, watch } from "vue";
+import { onMounted, onUnmounted, ref, unref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
 
@@ -90,11 +90,45 @@ onMounted(() => {
   }
 });
 
+onUnmounted(() => {
+  applicationStore.removeChangeInField(props.attribute);
+});
+
 watch(entries, (newEntries) => {
   onUpdateModelValue(newEntries, emit, props.attribute);
 });
+watch(input, (newInput) => {
+  const isContained = applicationStore.attributesOfFieldsThatChanged.includes(
+    props.attribute
+  );
+  if (newInput.length > 0 && !isContained) {
+    applicationStore.submitChangeInField(props.attribute);
+  } else if (newInput.length === 0 && isContained) {
+    applicationStore.removeChangeInField(props.attribute);
+  }
+});
+
+applicationStore.$subscribe((mutation) => {
+  const key = mutation.events.key;
+  if (key === props.attribute) {
+    entries.value = mutation.events.newValue;
+    input.value = "";
+  } else if (key === "attributesOfFieldsThatChanged") {
+    if (
+      !applicationStore.attributesOfFieldsThatChanged.includes(props.attribute)
+    ) {
+      input.value = "";
+    }
+  }
+});
 
 const addEntry = () => {
+  let isValid = true;
+  props.rules.forEach((rule) => {
+    const result = rule(input.value);
+    if (typeof result !== "boolean" || !result) isValid = false;
+  });
+  if (!isValid) return;
   entries.value = [...entries.value, input.value];
   input.value = "";
 };

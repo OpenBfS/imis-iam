@@ -115,7 +115,16 @@
                 WHERE is_primary_institution = true;
         </sql>
     </changeSet>
-    <changeSet author="christoph.klassen@intevation.de" id="v0.4">
+    <changeSet author="pschwabauer@intevation.de" id="v0.4">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            DROP INDEX one_primary_institution;
+            ALTER TABLE iam_institution_user
+                DROP COLUMN is_primary_institution;
+        </sql>
+    </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.5">
         <sql dbms="all"
              splitStatements="true"
              stripComments="true">

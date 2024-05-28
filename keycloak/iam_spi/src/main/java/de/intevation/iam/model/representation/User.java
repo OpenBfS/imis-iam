@@ -32,7 +32,6 @@ import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.intevation.iam.model.jpa.Institution;
-import de.intevation.iam.model.jpa.InstitutionUser;
 import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.util.Constants;
 
@@ -61,7 +60,6 @@ public class User {
     private Boolean readonly;
     private boolean enabled;
 
-    private static final String ID_PARAM = "id";
     private static final String USER_PARAM = "user";
     private static final String NAME_PARAM = "name";
 
@@ -97,12 +95,11 @@ public class User {
 
         if (jpaModel != null) {
             //Set institutions
-            Set<InstitutionUser> instList = jpaModel.getInstitutions();
+            Set<Institution> instList = jpaModel.getInstitutions();
             if (instList != null) {
-                // TODO: send boolean keys to client
                 this.institutions = new ArrayList<String>();
                 instList.forEach((inst) -> institutions.add(
-                        inst.getInstitution().getName()));
+                        inst.getName()));
             }
 
             //Get user groups
@@ -202,11 +199,8 @@ public class User {
             this.institutions.forEach(instName -> nameFilter.value(instName));
             query.where(nameFilter);
             List<Institution> insts = em.createQuery(query).getResultList();
-            Set<InstitutionUser> newInstitutions = new HashSet<>();
-            for (Institution inst : insts) {
-                newInstitutions.add(
-                    new InstitutionUser(inst, jpaUser));
-            }
+            Set<Institution> newInstitutions = new HashSet<>();
+            newInstitutions.addAll(insts);
             jpaUser.setInstitutions(newInstitutions);
         }
         return jpaUser;

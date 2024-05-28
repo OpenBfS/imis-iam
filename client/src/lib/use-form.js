@@ -111,11 +111,12 @@ export function useForm() {
       },
     ];
   };
-  const resetForm = (
+  const resetForm = async (
     originalObject,
     changedObject,
     resetNotificationCallback
   ) => {
+    const applicationStore = useApplicationStore();
     if (resetNotificationCallback) resetNotificationCallback();
     const changedKeys = Object.keys(changedObject);
     changedKeys.forEach((key) => {
@@ -124,6 +125,8 @@ export function useForm() {
       }
     });
     Object.assign(changedObject, originalObject);
+    await nextTick();
+    applicationStore.attributesOfFieldsThatChanged = [];
   };
 
   const areObjectsDifferent = (a, b) => {
@@ -160,9 +163,22 @@ export function useForm() {
   };
 
   const watchChange = (originalObject, changedObject) => {
-    watch(changedObject, () => {
-      hasNoChange.value = !areObjectsDifferent(originalObject, changedObject);
+    const applicationStore = useApplicationStore();
+    applicationStore.$subscribe((mutation) => {
+      if (mutation.events.key === "attributesOfFieldsThatChanged") {
+        updateHasNoChange(originalObject, changedObject);
+      }
     });
+    watch(changedObject, () => {
+      updateHasNoChange(originalObject, changedObject);
+    });
+  };
+
+  const updateHasNoChange = (originalObject, changedObject) => {
+    const applicationStore = useApplicationStore();
+    hasNoChange.value =
+      !areObjectsDifferent(originalObject, changedObject) &&
+      applicationStore.attributesOfFieldsThatChanged.length === 0;
   };
 
   const onCancel = (cancelCallback) => {
