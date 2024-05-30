@@ -41,18 +41,16 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
 
         switch (requestMethod) {
             case GET: return Role.USER.isRoleOf(requestingUser, session);
-            // Only Role.CHIEF_EDITOR is allowed to set/edit imisId and imisUserGroupId:
+            // Only Role.CHIEF_EDITOR is allowed to set/edit imisId
             case PUT:
                 EntityManager em = session.getProvider(
                     JpaConnectionProvider.class).getEntityManager();
                 return data.getImisId() == em.find(
                         Institution.class, data.getId()).getImisId()
-                    && data.getImisUserGroupId() == em.find(
-                        Institution.class, data.getId()).getImisUserGroupId()
                     && Role.EDITOR.isRoleOf(requestingUser, session)
                     || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             case POST:
-                if (data.getImisId() != null || data.getImisUserGroupId() != null) {
+                if (data.getImisId() != null) {
                     return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
                 }
             case DELETE: return Role.EDITOR.isRoleOf(requestingUser, session);

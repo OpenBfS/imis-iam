@@ -265,7 +265,6 @@ public class InstitutionProvider implements RealmResourceProvider {
      *   centralFax: [String] Central fax
      *   centralMail: [String] Central mail, mandatory
      *   imisId: [String] Institution imis id,
-     *   imisUsergroupId: [String] Institution usergroup id,
      *   xCoordinate: [Float] X coordinate,
      *   yCoordinate: [Float] Y coordinate,
      *   active: [Boolean] True if institution is active
@@ -283,9 +282,6 @@ public class InstitutionProvider implements RealmResourceProvider {
             @Context HttpHeaders headers) {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0));
-        if (rep == null || rep.getImisUserGroupId() == null) {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -337,7 +333,6 @@ public class InstitutionProvider implements RealmResourceProvider {
      *   centralFax: [String] Central fax
      *   centralMail: [String] Central mail, mandatory
      *   imisId: [String] Institution imis id,
-     *   imisUsergroupId: [String] Institution usergroup id,
      *   xCoordinate: [Float] X coordinate,
      *   yCoordinate: [Float] Y coordinate,
      *   active: [Boolean] True if institution is active
@@ -358,8 +353,7 @@ public class InstitutionProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         if (rep == null || rep.getId() == null
-               || em.find(Institution.class, rep.getId()) == null
-               || rep.getImisUserGroupId() == null) {
+               || em.find(Institution.class, rep.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
         if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {

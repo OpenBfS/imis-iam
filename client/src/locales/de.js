@@ -7,7 +7,6 @@
 export default {
   // For re-use
   user_term: "IMIS-Nutzer",
-  usergroup_id_term: "IMIS-Kennung/Nutzer",
   imis_id_term: "Messstellen-ID",
   tag_term: "Tag",
   // Role names
@@ -120,11 +119,6 @@ export default {
     imis_id: "@:imis_id_term",
     imis_id_length_validation_message:
       "Die @:imis_id_term muss exakt 5 Zeichen beinhalten",
-    imis_usergroup_id: "Kürzel für @:usergroup_id_term",
-    required_imis_usergroup_id:
-      "Kürzel für @:usergroup_id_term ist erforderlich",
-    imis_usergroup_id_length_validation_message:
-      "Das Kürzel muss eine Länge von 3 Zeichen haben.",
     active: "Aktiv",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",

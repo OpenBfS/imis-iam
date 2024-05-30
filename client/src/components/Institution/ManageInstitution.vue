@@ -164,33 +164,29 @@
                 ></ChipTextField>
               </v-col>
             </v-row>
-            <div class="group_class">
-              <TextField
-                :disabled="profileStore.userData.role !== 'chief_editor'"
-                :label="$t('institution.imis_id')"
-                :attribute="'imisId'"
-                @update:modelValue="institution.imisId = $event"
-              ></TextField>
-              <TextField
-                :disabled="profileStore.userData.role !== 'chief_editor'"
-                :label="$t('institution.imis_usergroup_id')"
-                :attribute="'imisUserGroupId'"
-                @update:modelValue="institution.imisUserGroupId = $event"
-              ></TextField>
-            </div>
-            <div class="group_class align-center">
-              <Select
-                attribute="categoryNames"
-                :no-data-text="$t('label.no_data_text')"
-                :label="$t('institution.categories')"
-                :items="categories"
-                v-model="institution.categoryNames"
-                item-title="name"
-                item-value="id"
-                persistent-hint
-                multiple
-              ></Select>
-            </div>
+            <v-row>
+              <v-col>
+                <TextField
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
+                  :label="$t('institution.imis_id')"
+                  :attribute="'imisId'"
+                  @update:modelValue="institution.imisId = $event"
+                ></TextField>
+              </v-col>
+              <v-col>
+                <Select
+                  attribute="categoryNames"
+                  :no-data-text="$t('label.no_data_text')"
+                  :label="$t('institution.categories')"
+                  :items="categories"
+                  v-model="institution.categoryNames"
+                  item-title="name"
+                  item-value="id"
+                  persistent-hint
+                  multiple
+                ></Select>
+              </v-col>
+            </v-row>
           </v-form>
         </v-col>
       </v-row>
@@ -364,12 +360,6 @@ onBeforeMount(() => {
         !v ||
         (v && v.length === 5) ||
         t("institution.imis_id_length_validation_message"),
-    ],
-    imisUserGroupId: [
-      (v) => !!v || t("institution.required_imis_usergroup_id"),
-      (v) =>
-        (v && v.length === 3) ||
-        t("institution.imis_usergroup_id_length_validation_message"),
     ],
     categoryNames: reqField(t("error.required_category")),
   });
