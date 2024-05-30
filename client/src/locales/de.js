@@ -26,7 +26,6 @@ export default {
   },
   // Archive component
   archive: {
-    title: "Archiv",
     search: "Durchsuchen",
   },
   // Calendar component
@@ -129,6 +128,7 @@ export default {
     title: "Integriertes Mess- und Informationssystem IMIS",
     institutions: "Institutionen",
     users: "@:user_term",
+    userAddressManagement: "Benutzer- und Adressverwaltung",
   },
   // Users component
   user: {
@@ -185,7 +185,6 @@ export default {
     create_and_prepare: "Erstellen und weiteren Nutzer anlegen",
     search: "Suche",
     no_data_text: "Keine Daten vorhanden",
-    faq: "FAQ",
     report_problem: "Problem melden",
     accessibility: "Barrierefreiheit",
     help: "Hilfe",
