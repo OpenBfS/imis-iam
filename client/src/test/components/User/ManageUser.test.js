@@ -8,7 +8,6 @@ import { vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
-import { useUserStore } from "@/stores/user";
 import { HTTP } from "@/lib/http";
 import { mount } from "@vue/test-utils";
 import ManageUser from "@/components/User/ManageUser.vue";
@@ -19,10 +18,8 @@ setActivePinia(createPinia());
 
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
-const userStore = useUserStore();
 
 // Mock HTTP requests/responses
-vi.spyOn(userStore, "loadMemberships").mockResolvedValue({});
 vi.spyOn(HTTP, "get").mockResolvedValue({});
 
 // Test data

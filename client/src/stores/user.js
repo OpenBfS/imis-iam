@@ -11,7 +11,6 @@ export const useUserStore = defineStore("user", {
   namespaced: true,
   state: () => ({
     users: [],
-    memberships: [],
     roles: [],
     foundUsers: [],
     offset: 0,
@@ -27,9 +26,6 @@ export const useUserStore = defineStore("user", {
     setUsers(data) {
       this.users = data;
     },
-    setMemberships(data) {
-      this.memberships = data;
-    },
     setRoles(data) {
       this.roles = data;
     },
@@ -38,16 +34,6 @@ export const useUserStore = defineStore("user", {
         if (element.id === data.id) {
           this.users[index] = data;
         }
-      });
-    },
-    loadMemberships() {
-      return new Promise((resolve, reject) => {
-        HTTP.get("iamuser/membership")
-          .then((response) => {
-            this.setMemberships(response.data);
-            resolve(response);
-          })
-          .catch((error) => reject(error));
       });
     },
     loadUsers(searchString) {

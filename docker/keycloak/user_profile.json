@@ -160,6 +160,25 @@
         "options" : [ "Leiter", "Vertreter", "Radiologischer Ansprechpartner", "Mitarbeiter", "IT-Ansprechperson", "Störplatz" ]
       }
     }
+  }, {
+    "name" : "tags",
+    "displayName" : "${tags}",
+    "required" : {
+      "roles" : [ "admin", "user" ]
+    },
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : {
+      "inputType" : "multiselect"
+    },
+    "validations" : {
+      "options" : {
+        "options" : [ "AK UN", "BMU Stab A", "BMU Stab S", "BfS Stab L", "BfS Stab M", "IBG", "IBG n", "IMIS informell", "IMIS-Betriebsartenwechsel", "In-Situ", "Kleine Lagen", "Lagezentrum BfS", "Landesadmin", "Messanleitung", "Messstellen Leitung", "NGA", "Plaus", "REI-Nutzer", "REI/REA informell", "SSK", "Schulungsangebote"]
+      }
+    },
+    "multivalued": true
   } ],
   "groups": [
     {

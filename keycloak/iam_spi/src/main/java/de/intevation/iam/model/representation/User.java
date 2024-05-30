@@ -11,11 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -26,8 +23,6 @@ import jakarta.validation.constraints.NotEmpty;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.jpa.entities.GroupEntity;
-import org.keycloak.models.jpa.entities.UserGroupMembershipEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -47,9 +42,6 @@ public class User {
     private String id;
 
     private Map<String, List<String>> attributes;
-
-    @NotEmpty
-    private List<String> groups;
 
     @NotEmpty
     private List<String> institutions;
@@ -101,26 +93,6 @@ public class User {
                 instList.forEach((inst) -> institutions.add(
                         inst.getName()));
             }
-
-            //Get user groups
-            TypedQuery<UserGroupMembershipEntity> groupMappingQuery =
-                em.createNamedQuery("userGroupMembership",
-                    UserGroupMembershipEntity.class);
-            groupMappingQuery.setParameter(
-                USER_PARAM, jpaModel.getUserEntity());
-            List<UserGroupMembershipEntity> groupMappings
-                = groupMappingQuery.getResultList();
-            List<String> idList = groupMappings
-                .stream()
-                .map(map -> map.getGroupId())
-                .collect(Collectors.toList());
-            Query query = em.createNativeQuery(
-                "SELECT * FROM keycloak.KEYCLOAK_GROUP WHERE ID in (:ids)",
-                GroupEntity.class);
-            query.setParameter("ids", idList);
-            List<GroupEntity> groupEntities = query.getResultList();
-            this.groups = new ArrayList<String>();
-            groupEntities.forEach(groupEnt -> groups.add(groupEnt.getName()));
         }
     }
 
@@ -155,13 +127,6 @@ public class User {
     }
     public void setAttributes(Map<String, List<String>> attributes) {
         this.attributes = attributes;
-    }
-
-    public List<String> getGroups() {
-        return groups;
-    }
-    public void setGroups(List<String> groups) {
-        this.groups = groups;
     }
 
     public List<String> getInstitutions() {

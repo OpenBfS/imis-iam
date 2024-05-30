@@ -10,7 +10,8 @@
         "mobile": ["0654-321"],
         "fax": ["0123-654"],
         "oe": ["oe"],
-        "bfslocation": ["location"]
+        "bfslocation": ["location"],
+        "tags": ["AK UN"]
     },
     "credentials": [
         {

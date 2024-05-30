@@ -7,7 +7,6 @@
 import { vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useApplicationStore } from "@/stores/application";
-import { useUserStore } from "@/stores/user";
 import { mount } from "@vue/test-utils";
 import UserTable from "@/components/User/UserTable.vue";
 import global from "@/test/components/global";
@@ -15,11 +14,9 @@ import { test, expect } from "vitest";
 
 setActivePinia(createPinia());
 
-const userStore = useUserStore();
 const applicationStore = useApplicationStore();
 
 // Mock HTTP request/response
-vi.spyOn(userStore, "loadMemberships").mockResolvedValue({});
 vi.spyOn(applicationStore, "searchRequest").mockResolvedValue({});
 
 // Test data

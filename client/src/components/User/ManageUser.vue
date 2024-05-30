@@ -174,18 +174,6 @@
                 persistent-hint
                 multiple
               ></Select>
-              <Select
-                attribute="groups"
-                :clearable="profileStore.isAllowedToManage"
-                :no-data-text="$t('label.no_data_text')"
-                :label="$t('user.label_memberships')"
-                :items="userStore.memberships"
-                v-model="user.groups"
-                item-title="name"
-                item-value="name"
-                persistent-hint
-                multiple
-              ></Select>
             </div>
             <div class="one_group_class">
               <Select
@@ -438,7 +426,6 @@ const getUserAttributeRules = (userAttribute) => {
 
 onBeforeMount(() => {
   applicationStore.initClientRules({
-    groups: [(v) => !!(v && v.length) || t("user.required_membership")],
     institutions: reqMultipleSelect(t("user.required_institution")),
     role: reqField(t("user.required_roles")),
     username: reqField(

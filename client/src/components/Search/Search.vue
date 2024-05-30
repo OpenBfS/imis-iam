@@ -121,7 +121,6 @@ watch(
 );
 onMounted(() => {
   userStore.loadRoles();
-  userStore.loadMemberships();
   Promise.all([
     userStore.loadUsers(),
     institutionStore.loadInstitutions(),

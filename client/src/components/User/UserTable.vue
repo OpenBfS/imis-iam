@@ -115,8 +115,8 @@ const tableHeaders = [
     sortable: false,
   },
   {
-    title: t("user.label_memberships"),
-    key: "label_memberships",
+    title: t("user.tags"),
+    key: "tags",
     value: (item) => item.groups?.join(", "),
     sortable: false,
   },

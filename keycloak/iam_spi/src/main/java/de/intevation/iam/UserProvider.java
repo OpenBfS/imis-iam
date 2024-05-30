@@ -14,7 +14,6 @@ import java.util.Locale;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,7 +37,6 @@ import jakarta.ws.rs.core.Response.Status;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.ClientModel;
-import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
@@ -54,7 +52,6 @@ import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.model.representation.Role;
 import de.intevation.iam.model.representation.User;
-import de.intevation.iam.model.representation.UserMembership;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;
@@ -252,14 +249,6 @@ public class UserProvider implements RealmResourceProvider {
         newUserModel.grantRole(realm.getClientByClientId(
                 Constants.IAM_CLIENT_ID).getRole(rep.getRole()));
 
-        //Update groups
-        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
-            item -> {
-                return rep.getGroups().contains(item.getName());
-            });
-        Map<String, GroupModel> groupMap = groupsStream.collect(
-            Collectors.toMap(GroupModel::getName, Function.identity()));
-        updateGroups(groupMap, newUserModel);
         if (attributes.getId() == null) {
             attributes.setId(newUserModel.getId());
         }
@@ -334,23 +323,6 @@ public class UserProvider implements RealmResourceProvider {
     }
 
     /**
-     * Get all memberships.
-     * @return Memberships as Json Array
-     */
-    @GET
-    @Path("/membership")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getMemberships() {
-        RealmModel realm = session.getContext().getRealm();
-        Stream<GroupModel> groups = realm.getGroupsStream();
-        ArrayList<UserMembership> memberships = new ArrayList<UserMembership>();
-        groups.forEach(group -> {
-            memberships.add(new UserMembership(group));
-        });
-        return Response.ok(memberships.toArray()).build();
-    }
-
-    /**
      * Get all available iam roles.
      * @return Roles as JSON array
      */
@@ -366,29 +338,6 @@ public class UserProvider implements RealmResourceProvider {
             roleNames.add(new Role(role));
         });
         return Response.ok(roleNames).build();
-    }
-
-    /**
-     * Update groups of the given user.
-     * @param newGroups Map of new groups: Map<{name},{Group}>
-     * @param user User to modifiy
-     */
-    private void updateGroups(
-        Map<String, GroupModel> newGroups,
-        UserModel user
-    ) {
-        //Join new groups
-        newGroups.forEach((name, group) -> {
-            if (!user.isMemberOf(group)) {
-                user.joinGroup(group);
-            }
-        });
-        //Leave groups if necessary
-        user.getGroupsStream().forEach(group -> {
-            if (!newGroups.containsKey(group.getName())) {
-                user.leaveGroup(group);
-            }
-        });
     }
 
     /**
@@ -411,15 +360,6 @@ public class UserProvider implements RealmResourceProvider {
         //Update user
         handleUserProfile(newUser.getAttributes(), oldUser);
         oldUser.setEnabled(newUser.isEnabled());
-
-        //Get new groups list and update
-        Stream<GroupModel> groupsStream = realm.getGroupsStream().filter(
-            item -> {
-                return newUser.getGroups().contains(item.getName());
-            });
-        Map<String, GroupModel> groupMap = groupsStream.collect(
-            Collectors.toMap(GroupModel::getName, Function.identity()));
-        updateGroups(groupMap, oldUser);
 
         //Update role
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
