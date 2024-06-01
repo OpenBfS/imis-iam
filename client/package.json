@@ -4,10 +4,11 @@
   "private": true,
   "license": "GPL-3.0",
   "scripts": {
-    "serve": "vue-cli-service serve",
     "test": "vitest",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
     "@fontsource/roboto": "^5.0.13",
@@ -16,20 +17,14 @@
     "core-js": "^3.8.3",
     "debounce": "^1.2.1",
     "pinia": "^2.1.7",
-    "vue": "^3.3.1",
-    "vue-i18n": "^9.1.10",
-    "vue-router": "^4.1.6",
+    "unplugin-vue-components": "^0.27.0",
+    "vue": "^3.4.27",
+    "vue-i18n": "^9.13.1",
+    "vue-router": "^4.3.2",
     "vuetify": "^3.6.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
-    "@vitejs/plugin-vue": "^4.5.0",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-plugin-router": "~5.0.0",
-    "@vue/cli-plugin-vuex": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
+    "@vitejs/plugin-vue": "^5.0.4",
     "@vue/test-utils": "^2.4.3",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
@@ -38,10 +33,9 @@
     "eslint-plugin-vue": "^8.0.3",
     "jsdom": "^22.1.0",
     "prettier": "^2.4.1",
-    "sass": "^1.38.0",
-    "sass-loader": "^10.0.0",
-    "vitest": "^1.0.4",
-    "vue-cli-plugin-vuetify": "~2.4.8",
-    "vuetify-loader": "^2.0.0-alpha.0"
+    "sass": "^1.77.3",
+    "vite": "^5.2.12",
+    "vite-plugin-vuetify": "2.0.3",
+    "vitest": "^1.0.4"
   }
 }
