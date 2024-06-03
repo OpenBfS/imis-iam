@@ -69,21 +69,12 @@
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
-import { useI18n } from "vue-i18n";
 import DataTableServer from "@/components/DataTableServer.vue";
-
-const { t } = useI18n();
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
-
-const tableHeaders = [
-  { title: t("label.name"), key: "name", sortable: true },
-  { title: t("institution.shortname"), key: "shortName", sortable: true },
-  { title: t("institution.imis_id"), key: "imisId", sortable: true },
-  { title: t("label.actions"), key: "actions", sortable: false },
-];
+const tableHeaders = ["name", "shortName"]
 
 const props = defineProps({
   institutions: Array,

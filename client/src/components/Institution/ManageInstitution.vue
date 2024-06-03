@@ -31,7 +31,7 @@
                 @update:modelValue="institution.name = $event"
               ></TextField>
               <TextField
-                :label="$t('institution.shortname')"
+                :label="$t('institution.short_name')"
                 :attribute="'shortName'"
                 @update:modelValue="institution.shortName = $event"
               ></TextField>
@@ -336,7 +336,7 @@ onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
     name: reqField(t("institution.required_name")),
-    shortName: reqField(t("institution.required_shortname")),
+    shortName: reqField(t("institution.required_short_name")),
     serviceBuildingLocation: reqField(
       t("institution.required_service_building_location")
     ),

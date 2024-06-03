@@ -178,7 +178,7 @@
                 attribute="groups"
                 :clearable="profileStore.isAllowedToManage"
                 :no-data-text="$t('label.no_data_text')"
-                :label="$t('user.label_memberships')"
+                :label="$t('user.groups')"
                 :items="userStore.memberships"
                 v-model="user.groups"
                 item-title="name"

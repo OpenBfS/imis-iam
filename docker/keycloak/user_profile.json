@@ -47,7 +47,7 @@
     "group": "name"
   }, {
     "name" : "firstName",
-    "displayName" : "${firstname}",
+    "displayName" : "${first_name}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -65,7 +65,7 @@
     "group": "name"
   }, {
     "name" : "lastName",
-    "displayName" : "${lastname}",
+    "displayName" : "${last_name}",
     "required" : {
       "roles" : [ "user" ]
     },
