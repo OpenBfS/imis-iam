@@ -74,7 +74,7 @@ import DataTableServer from "@/components/DataTableServer.vue";
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
-const tableHeaders = ["name", "shortName"]
+const tableHeaders = ["name", "shortName"];
 
 const props = defineProps({
   institutions: Array,
