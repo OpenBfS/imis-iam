@@ -112,10 +112,6 @@ roles=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/clients/$IMIS_CLI
 users=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN")
-groups=$(curl -sX GET "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/groups" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN")
-defaultGroupId=$(echo $groups | jq 'map(select(.name=="Landesadmin")) | .[0]' | jq .id | tr -d '"')
 
 echo "Assigning groups and client roles"
 
@@ -127,9 +123,6 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$userId/role-mappi
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN" \
         -d "$userRole"
-curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$userId/groups/$defaultGroupId" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN"
 
 #Assign editor role
 editorRole=$(echo $roles | jq 'map(select(.name=="editor"))')
@@ -139,9 +132,6 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$editorUserId/role
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN" \
         -d "$editorRole"
-curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$editorUserId/groups/$defaultGroupId" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN"
 
 #Assign chief_editor role
 chiefEditorRole=$(echo $roles | jq 'map(select(.name=="chief_editor"))')
@@ -151,9 +141,6 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TKN" \
         -d "$chiefEditorRole"
-curl -sX PUT "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId/groups/$defaultGroupId" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN"
 
 # Add example data
 psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_example_data.sql -w
