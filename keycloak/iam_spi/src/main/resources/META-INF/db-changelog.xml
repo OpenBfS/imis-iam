@@ -141,4 +141,12 @@
             );
         </sql>
     </changeSet>
+    <changeSet author="pschwabauer@intevation.de" id="v0.6">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution
+                DROP COLUMN imis_usergroup_id;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

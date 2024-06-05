@@ -103,9 +103,6 @@ public class Institution {
     @Column(name = "imis_id")
     private String imisId;
 
-    @Column(name = "imis_usergroup_id")
-    private String imisUserGroupId;
-
     @Column(name = "x_coordinate")
     @JsonProperty("xCoordinate")
     private Float xCoordinate;
@@ -264,14 +261,6 @@ public class Institution {
 
     public void setImisId(String imisId) {
         this.imisId = imisId;
-    }
-
-    public String getImisUserGroupId() {
-        return imisUserGroupId;
-    }
-
-    public void setImisUserGroupId(String imisUserGroupId) {
-        this.imisUserGroupId = imisUserGroupId;
     }
 
     public Float getXCoordinate() {

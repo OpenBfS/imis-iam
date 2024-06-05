@@ -14,6 +14,15 @@
       {{ $t("appbar.title") }}
     </v-toolbar-title>
     <v-spacer></v-spacer>
+    <v-list>
+      <v-list-item
+        base-color="accent"
+        class="me-4"
+        link
+        :href="`mailto:${applicationStore.reportMail}`"
+        :title="$t('label.report_problem')"
+      ></v-list-item>
+    </v-list>
     <div>
       {{ $t("appbar.text_login") }}
       {{

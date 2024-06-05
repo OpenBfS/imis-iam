@@ -61,22 +61,11 @@ import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
 import { getExpUser } from "@/components/User/user";
-import { useI18n } from "vue-i18n";
 import DataTableServer from "@/components/DataTableServer.vue";
-
-const { t } = useI18n();
 
 const props = defineProps({
   users: Array,
 });
-
-function getUserAttribute(user, attributeName) {
-  // Keycloak User Profile attributes are either missing (if no value is given)
-  // or an array expected to contain a single value
-  return user.attributes[attributeName]
-    ? user.attributes[attributeName][0]
-    : "";
-}
 
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
@@ -84,43 +73,12 @@ const userStore = useUserStore();
 const savedUser = ref();
 
 const tableHeaders = [
-  {
-    title: t("user.username"),
-    key: "username",
-    value: (item) => getUserAttribute(item, "username"),
-    sortable: false,
-  },
-  {
-    title: t("user.firstname"),
-    key: "firstName",
-    value: (item) => getUserAttribute(item, "firstName"),
-    sortable: false,
-  },
-  {
-    title: t("user.lastname"),
-    key: "lastName",
-    value: (item) => getUserAttribute(item, "lastName"),
-    sortable: false,
-  },
-  {
-    title: t("user.email"),
-    key: "email",
-    value: (item) => getUserAttribute(item, "email"),
-    sortable: false,
-  },
-  {
-    title: t("user.phone"),
-    key: "phone",
-    value: (item) => getUserAttribute(item, "phone"),
-    sortable: false,
-  },
-  {
-    title: t("user.tags"),
-    key: "tags",
-    value: (item) => item.attributes.tags?.join(", "),
-    sortable: false,
-  },
-  { title: t("label.actions"), key: "actions", sortable: false },
+  "username",
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "tags",
 ];
 
 // Deep Copy for objects

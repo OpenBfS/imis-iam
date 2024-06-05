@@ -8,7 +8,6 @@
 <template>
   <v-app>
     <Appbar />
-    <Sidebar />
     <v-main>
       <router-view />
       <UIAlert
@@ -55,9 +54,6 @@ const ManageInstitution = defineAsyncComponent(() =>
 );
 const ManageEvent = defineAsyncComponent(() =>
   import("@/components/Calendar/ManageEvent.vue")
-);
-const Sidebar = defineAsyncComponent(() =>
-  import("@/components/UI/Sidebar.vue")
 );
 const Appbar = defineAsyncComponent(() => import("@/components/UI/Appbar.vue"));
 const Appfooter = defineAsyncComponent(() =>

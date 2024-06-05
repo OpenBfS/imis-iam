@@ -7,7 +7,6 @@
 export default {
   // For re-use
   user_term: "IMIS-Nutzer",
-  usergroup_id_term: "IMIS-Kennung/Nutzer",
   imis_id_term: "Messstellen-ID",
   tag_term: "Tag",
   // Role names
@@ -27,7 +26,6 @@ export default {
   },
   // Archive component
   archive: {
-    title: "Archiv",
     search: "Durchsuchen",
   },
   // Calendar component
@@ -90,9 +88,9 @@ export default {
     no_institutions_available: "Es sind keine Institutionen vorhanden",
     fax: "Fax",
     phone: "Telephon",
-    shortname: "Messstellen-Bezeichnung",
+    short_name: "Messstellen-Bezeichnung",
     required_name: "Institutionsname ist erfoderlich",
-    required_shortname: "Messstellen-Bezeichnung ist erforderlich",
+    required_short_name: "Messstellen-Bezeichnung ist erforderlich",
     service_building_location: "Ort des Dienstgebäudes",
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
@@ -120,11 +118,6 @@ export default {
     imis_id: "@:imis_id_term",
     imis_id_length_validation_message:
       "Die @:imis_id_term muss exakt 5 Zeichen beinhalten",
-    imis_usergroup_id: "Kürzel für @:usergroup_id_term",
-    required_imis_usergroup_id:
-      "Kürzel für @:usergroup_id_term ist erforderlich",
-    imis_usergroup_id_length_validation_message:
-      "Das Kürzel muss eine Länge von 3 Zeichen haben.",
     active: "Aktiv",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
@@ -135,6 +128,7 @@ export default {
     title: "Integriertes Mess- und Informationssystem IMIS",
     institutions: "Institutionen",
     users: "@:user_term",
+    userAddressManagement: "Benutzer- und Adressverwaltung",
   },
   // Users component
   user: {
@@ -153,9 +147,9 @@ export default {
     oe: "Organisationseinheit",
     bfslocation: "Standort",
     title: "Titel",
-    firstname: "Vorname",
+    first_name: "Vorname",
     id: "ID",
-    lastname: "Nachname",
+    last_name: "Nachname",
     name: "Name",
     username: "IMIS-Kennung",
     enabled: "Aktiviert",
@@ -190,7 +184,6 @@ export default {
     create_and_prepare: "Erstellen und weiteren Nutzer anlegen",
     search: "Suche",
     no_data_text: "Keine Daten vorhanden",
-    faq: "FAQ",
     report_problem: "Problem melden",
     accessibility: "Barrierefreiheit",
     help: "Hilfe",
