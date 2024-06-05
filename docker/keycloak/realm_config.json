@@ -1469,7 +1469,6 @@
     "parRequestUriLifespan": "60",
     "cibaInterval": "5"
   },
-  "keycloakVersion": "15.0.2",
   "userManagedAccessAllowed": false,
   "clientProfiles": {
     "profiles": []
@@ -1477,6 +1476,5 @@
   "clientPolicies": {
     "policies": []
   },
-  "groups": [
-  ]
+  "groups": []
 }
