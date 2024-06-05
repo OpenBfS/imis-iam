@@ -6,7 +6,6 @@
  */
 const expUser = {
   attributes: {},
-  groups: [],
   institutions: [],
   role: null,
   enabled: false,
