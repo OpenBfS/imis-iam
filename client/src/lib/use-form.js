@@ -211,6 +211,7 @@ export function useForm() {
     const applicationStore = useApplicationStore();
     for (let i = 0; i < error.length; i++) {
       const errorObject = error[i];
+      const attribute = errorObject.messageParameters[0];
       const message = errorObject.message;
       let translatedString;
       // Keycloak error is not translated
@@ -218,16 +219,13 @@ export function useForm() {
         const stringToTranslate = message.startsWith("error-")
           ? message.replace("error-", "error.").replaceAll("-", "_")
           : message;
-        errorObject.messageParameters[0] = t(
-          `user.${errorObject.messageParameters[0].toLowerCase()}`
-        );
-        translatedString = t(stringToTranslate, errorObject.messageParameters);
+        const messageParameters = [t(`user.${attribute.toLowerCase()}`)];
+        translatedString = t(stringToTranslate, messageParameters);
       }
       // Keycloak error is already translated
       else {
         translatedString = message;
       }
-      const attribute = errorObject.messageParameters[0];
       // Create rules that can be used by the validation mechanism of Vuetify.
       applicationStore.serverValidationRules[attribute] = () => {
         return translatedString;
