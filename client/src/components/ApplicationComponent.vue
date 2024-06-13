@@ -38,7 +38,7 @@ const applications = [
     name: t("main.userAddressManagement"),
     icon: "mdi-application",
     url: "/search",
-    openInTab: false,
+    openInTab: true,
   },
   {
     name: "Example Application 1",
