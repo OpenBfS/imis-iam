@@ -14,7 +14,11 @@
           <v-btn
             :rounded="0"
             color="accent"
-            @click="app.openInTab ? openInTab(app.url) : $router.push(app.url)"
+            @click="
+              app.openInTab
+                ? openInTab(app.url, app.external)
+                : $router.push(app.url)
+            "
             class="ma-2 pa-2"
           >
             <v-icon>{{ app.icon }}</v-icon>
@@ -27,29 +31,39 @@
 </template>
 <script setup>
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const { t } = useI18n();
 
-const openInTab = (url) => {
-  window.open(url, "_blank").focus();
+const openInTab = (url, external) => {
+  if (external) {
+    window.open(url, "_blank").focus();
+  } else {
+    const routeData = router.resolve({ name: url });
+    window.open(routeData.href, "_blank").focus();
+  }
 };
 const applications = [
   {
     name: t("main.userAddressManagement"),
     icon: "mdi-application",
-    url: "/search",
+    url: "Search",
+    external: false,
     openInTab: true,
   },
   {
     name: "Example Application 1",
     icon: "mdi-application",
     url: "https://exampleapp1.test",
+    external: true,
     openInTab: true,
   },
   {
     name: "Example Application 2",
     icon: "mdi-application",
     url: "https://exampleapp2.test",
+    external: true,
     openInTab: true,
   },
 ];
