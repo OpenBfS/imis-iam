@@ -425,6 +425,7 @@ const getUserAttributeRules = (userAttribute) => {
 };
 
 onBeforeMount(() => {
+  applicationStore.setForm(form);
   applicationStore.initClientRules({
     institutions: reqMultipleSelect(t("user.required_institution")),
     role: reqField(t("user.required_roles")),
