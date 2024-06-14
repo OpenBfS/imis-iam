@@ -9,8 +9,8 @@ import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application";
 
-export function useForm() {
-  const { t } = useI18n();
+export function useForm(i18n) {
+  const { t } = i18n ?? useI18n();
   const form = ref(null);
   const valid = ref(false);
   const hasNoChange = ref(true);
@@ -233,7 +233,7 @@ export function useForm() {
       aggregateRules();
       // Need to wait for the DOM. Otherwise the error messages are not automatically shown.
       await nextTick();
-      form.value.validate();
+      form.value?.validate();
     }
   };
 
