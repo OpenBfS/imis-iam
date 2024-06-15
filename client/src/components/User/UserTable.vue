@@ -59,7 +59,7 @@
 import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
-import { ref } from "vue";
+import { ref, toRaw } from "vue";
 import { getExpUser } from "@/components/User/user";
 import DataTableServer from "@/components/DataTableServer.vue";
 
@@ -71,14 +71,11 @@ const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
 const savedUser = ref();
-
 const tableHeaders = [
-  "username",
-  "firstName",
-  "lastName",
-  "email",
-  "phone",
-  "tags",
+  ...profileStore.attributes.map((attr) => toRaw(attr).name),
+  "institutions",
+  "roles",
+  "enabled",
 ];
 
 // Deep Copy for objects

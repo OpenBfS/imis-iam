@@ -50,7 +50,7 @@
                 "
               ></TextField>
               <TextField
-                :label="$t('institution.service_building_postalcode')"
+                :label="$t('institution.service_building_postal_code')"
                 :attribute="'serviceBuildingPostalCode'"
                 @update:modelValue="
                   institution.serviceBuildingPostalCode = $event
@@ -145,7 +145,7 @@
             <v-row>
               <v-col>
                 <ChipTextField
-                  :label="$t('institution.central_alarm_phone')"
+                  :label="$t('institution.central_alarm_phone_numbers')"
                   :rules="validPhone($t('error.valid_phone'))"
                   @update:modelValue="
                     institution.centralAlarmPhoneNumbers = $event
@@ -155,7 +155,7 @@
               </v-col>
               <v-col>
                 <ChipTextField
-                  :label="$t('institution.central_alarm_email')"
+                  :label="$t('institution.central_alarm_email_addresses')"
                   :rules="validMail($t('error.valid_email'))"
                   @update:modelValue="
                     institution.centralAlarmEmailAddresses = $event
@@ -177,7 +177,7 @@
                 <Select
                   attribute="categoryNames"
                   :no-data-text="$t('label.no_data_text')"
-                  :label="$t('institution.categories')"
+                  :label="$t('institution.category_names')"
                   :items="categories"
                   v-model="institution.categoryNames"
                   item-title="name"

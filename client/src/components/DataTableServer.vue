@@ -65,7 +65,7 @@
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -108,9 +108,14 @@ const updateTable = (event) => {
   applicationStore.searchRequest([props.type]);
 };
 
-function getUserAttribute(user, attributeName) {
-  const attribute = user.attributes[attributeName] ?? user[attributeName];
-  return attribute?.join(", ");
+function getDisplayName(value) {
+  if (!value) return;
+  if (typeof value === "boolean") {
+    return t(`${value}`);
+  } else if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+  return value;
 }
 
 const camelCaseToUnderscore = (text) => {
@@ -131,9 +136,13 @@ onMounted(() => {
       sortable: props.type !== "users",
       visible: true,
     };
-    if (props.type === "users") {
-      newHeader.value = (item) => getUserAttribute(item, header);
-    }
+    newHeader.value = (item) => {
+      const value =
+        props.type === "users"
+          ? toRaw(item.attributes[header] ?? item[header])
+          : item[header];
+      return value ? getDisplayName(toRaw(value)) : undefined;
+    };
     headers.value.push(newHeader);
   });
   selectedHeaders.value = headers.value;

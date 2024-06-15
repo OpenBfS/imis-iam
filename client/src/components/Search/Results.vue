@@ -17,7 +17,7 @@
         >{{ $t("main.users") }} ({{ userStore.foundUsers.length }})</v-tab
       >
       <v-tab value="institutions"
-        >{{ $t("main.institutions") }} ({{
+        >{{ $t("institutions") }} ({{
           institutionStore.foundInstitutions.length
         }})</v-tab
       >

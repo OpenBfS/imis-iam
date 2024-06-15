@@ -70,11 +70,12 @@ import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import DataTableServer from "@/components/DataTableServer.vue";
+import { getExpInstitution } from "@/components/Institution/institution";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
-const tableHeaders = ["name", "shortName"];
+const tableHeaders = Object.keys(getExpInstitution());
 
 const props = defineProps({
   institutions: Array,
