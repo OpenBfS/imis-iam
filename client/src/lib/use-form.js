@@ -10,7 +10,7 @@ import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application";
 
 export function useForm(i18n) {
-  const { t } = i18n ?? useI18n();
+  const { t } = i18n?.global ?? useI18n();
   const form = ref(null);
   const valid = ref(false);
   const hasNoChange = ref(true);
@@ -221,6 +221,8 @@ export function useForm(i18n) {
           : message;
         const messageParameters = [t(`user.${attribute.toLowerCase()}`)];
         translatedString = t(stringToTranslate, messageParameters);
+      } else if (message.startsWith("error.")) {
+        translatedString = t(message, attribute);
       }
       // Keycloak error is already translated
       else {
