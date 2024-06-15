@@ -129,7 +129,7 @@
                 :attribute="'centralPhone'"
               ></TextField>
               <TextField
-                :label="$t('institution.central_email')"
+                :label="$t('institution.central_mail')"
                 :attribute="'centralMail'"
                 @update:modelValue="institution.centralMail = $event"
               ></TextField>

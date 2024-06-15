@@ -137,6 +137,13 @@ onMounted(() => {
       visible: true,
     };
     newHeader.value = (item) => {
+      if (
+        props.type === "users" &&
+        header === "role" &&
+        toRaw(item)?.[header]
+      ) {
+        return t(`role_iam_${toRaw(item)[header]}`);
+      }
       const value =
         props.type === "users"
           ? toRaw(item.attributes[header] ?? item[header])

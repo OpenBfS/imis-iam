@@ -180,7 +180,7 @@
                 attribute="role"
                 :clearable="profileStore.isAllowedToManage"
                 :disabled="!profileStore.isAllowedToManage"
-                :label="$t('user.roles')"
+                :label="$t('user.role')"
                 :items="userRoles"
                 item-value="name"
                 v-model="user.role"

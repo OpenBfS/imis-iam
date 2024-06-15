@@ -74,7 +74,7 @@ const savedUser = ref();
 const tableHeaders = [
   ...profileStore.attributes.map((attr) => toRaw(attr).name),
   "institutions",
-  "roles",
+  "role",
   "enabled",
 ];
 
