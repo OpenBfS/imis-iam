@@ -12,6 +12,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import de.intevation.iam.validation.constraints.MeasFacilOrNone;
+import de.intevation.iam.validation.constraints.Unique;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -34,6 +36,9 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
+@Unique(fields = {"imisId"},
+    clazz = Institution.class)
+@MeasFacilOrNone
 public class Institution {
 
     @Id

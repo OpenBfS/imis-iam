@@ -71,6 +71,8 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     private Validator validator;
 
+    private EntityManager entityManager;
+
     /**
      * Constructor.
      * @param session Keycloak session
@@ -79,6 +81,7 @@ public class InstitutionProvider implements RealmResourceProvider {
         this.session = session;
         this.auth = new InstitutionAuthorizer(session);
         this.validator = new Validator();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class).getEntityManager();
     }
 
     /**
@@ -284,7 +287,7 @@ public class InstitutionProvider implements RealmResourceProvider {
             @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -353,7 +356,7 @@ public class InstitutionProvider implements RealmResourceProvider {
             final Institution rep, @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         if (rep == null || rep.getId() == null
