@@ -9,6 +9,7 @@
   <v-text-field
     @keydown.enter="addEntry"
     @keydown.delete="onDelete"
+    @keydown.tab="onTab"
     @update:focused="onFocus"
     v-model="input"
     :clearable="props.clearable"
@@ -33,6 +34,7 @@
   >
     <template v-slot:append="{ isValid }">
       <v-btn
+        ref="plusButton"
         @click="addEntry"
         size="x-small"
         icon="mdi-plus"
@@ -83,7 +85,9 @@ const props = defineProps([
 const emit = defineEmits(["update:modelValue"]);
 
 const input = ref("");
+const plusButton = ref(null);
 const entries = ref([]);
+let isAdding = false;
 
 onMounted(() => {
   if (props.attribute && applicationStore.managedItem[props.attribute]) {
@@ -123,7 +127,9 @@ applicationStore.$subscribe((mutation) => {
   }
 });
 
-const addEntry = () => {
+const addEntry = (moveToNextElement = false) => {
+  if (isAdding) return;
+  isAdding = true;
   if (input.value === "") return;
   let isValid = true;
   props.rules.forEach((rule) => {
@@ -132,7 +138,14 @@ const addEntry = () => {
   });
   if (!isValid) return;
   entries.value = [...entries.value, input.value];
+  if (moveToNextElement) {
+    const index = Array.from(plusButton.value.$el.form).indexOf(
+      plusButton.value.$el
+    );
+    plusButton.value.$el.form[index + 1]?.focus();
+  }
   input.value = "";
+  isAdding = false;
 };
 
 const removeEntry = (index) => {
@@ -147,5 +160,9 @@ const onDelete = () => {
 
 const onFocus = (event) => {
   if (!event) addEntry();
+};
+
+const onTab = () => {
+  addEntry(true);
 };
 </script>
