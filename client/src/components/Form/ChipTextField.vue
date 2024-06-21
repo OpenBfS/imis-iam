@@ -9,6 +9,7 @@
   <v-text-field
     @keydown.enter="addEntry"
     @keydown.delete="onDelete"
+    @update:focused="onFocus"
     v-model="input"
     :clearable="props.clearable"
     :density="props.density ?? 'compact'"
@@ -123,6 +124,7 @@ applicationStore.$subscribe((mutation) => {
 });
 
 const addEntry = () => {
+  if (input.value === "") return;
   let isValid = true;
   props.rules.forEach((rule) => {
     const result = rule(input.value);
@@ -141,5 +143,9 @@ const onDelete = () => {
   if (input.value === "") {
     removeEntry(entries.value.length - 1);
   }
+};
+
+const onFocus = (event) => {
+  if (!event) addEntry();
 };
 </script>
