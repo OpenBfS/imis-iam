@@ -72,7 +72,13 @@ const profileStore = useProfileStore();
 const userStore = useUserStore();
 const savedUser = ref();
 const tableHeaders = [
-  ...profileStore.attributes.map((attr) => toRaw(attr).name),
+  ...profileStore.attributes
+    .filter(
+      (attr) =>
+        attr.annotations?.defaultField &&
+        Boolean(attr.annotations?.defaultField) === true
+    )
+    .map((attr) => toRaw(attr).name),
   "institutions",
   "role",
   "enabled",
