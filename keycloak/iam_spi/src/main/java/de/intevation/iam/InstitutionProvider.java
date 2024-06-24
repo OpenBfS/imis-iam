@@ -6,15 +6,15 @@
  */
 package de.intevation.iam;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
+import de.intevation.iam.model.representation.SearchParam;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -79,6 +79,14 @@ public class InstitutionProvider implements RealmResourceProvider {
         this.validator = new Validator();
     }
 
+    private Predicate getFilterQuery(Root<Institution> root, CriteriaBuilder cb, Map<String, String> search) {
+        List<Predicate> predicates = new ArrayList<>();
+        for (Map.Entry<String, String> entry : search.entrySet()) {
+            predicates.add(cb.equal(root.get(entry.getKey()), entry.getValue()));
+        }
+        return cb.or(predicates.toArray(new Predicate[0]));
+    }
+
     /**
      * Get all institutions.
      * Response:
@@ -121,13 +129,20 @@ public class InstitutionProvider implements RealmResourceProvider {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public ObjectList<Institution> getInstitutions(@Context HttpHeaders headers,
-            @QueryParam("search") String search,
+            @QueryParam("search") SearchParam search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults,
             @QueryParam("sortBy") String sortBy,
             @QueryParam("order") SortOrder order) {
-        String filter = search != null && !search.isEmpty()
-            ? "%" + search.toLowerCase() + "%" : "";
+        Map<String, String> attributes = new HashMap<>();
+        if (search != null) {
+            attributes = search.getAttributes();
+        }
+        String generalSearch = attributes.get("search");
+        String filter = generalSearch != null && !generalSearch.isEmpty()
+            ? "%" + generalSearch.toLowerCase() + "%" : "";
+        attributes.remove("search");
+
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -148,7 +163,8 @@ public class InstitutionProvider implements RealmResourceProvider {
                         filter),
                     cbSize.like(
                         cbSize.lower(rootSize.get("imisId")),
-                        filter)
+                        filter),
+                    getFilterQuery(root, cbSize, attributes)
                     )
                 );
             }
@@ -178,7 +194,8 @@ public class InstitutionProvider implements RealmResourceProvider {
                     filter),
                 cb.like(
                     cb.lower(root.get("imisId")),
-                    filter)
+                    filter),
+                getFilterQuery(root, cb, attributes)
                 )
             );
         }

@@ -17,6 +17,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.intevation.iam.model.representation.SearchParam;
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.BadRequestException;
@@ -128,14 +129,19 @@ public class UserProvider implements RealmResourceProvider {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public ObjectList<User> getUsers(@Context HttpHeaders headers,
-            @QueryParam("search") String search,
+            @QueryParam("search") SearchParam search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults) {
         RealmModel realm = session.getContext().getRealm();
 
         Map<String, String> attributes = new HashMap<>();
-        if (search != null && !search.isEmpty()) {
-            attributes.put(UserModel.SEARCH, search);
+        if (search != null) {
+            attributes = search.getAttributes();
+        }
+        String generalSearch = attributes.get("search");
+        if (generalSearch != null) {
+            attributes.put(UserModel.SEARCH, generalSearch);
+            attributes.remove("search");
         }
         long size = 0;
         Stream<UserModel> userModels;

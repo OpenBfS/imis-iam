@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import de.intevation.iam.model.representation.SearchParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
@@ -109,7 +110,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
             @QueryParam("encoding") String encoding,
-            @QueryParam("search") String search,
+            @QueryParam("search") SearchParam search,
             @QueryParam("id") List<String> ids,
             @Context HttpHeaders headers
     ) {
@@ -155,7 +156,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("quoteType") String quoteType,
             @QueryParam("rowDelimiter") String rowDelimiter,
             @QueryParam("encoding") String encoding,
-            @QueryParam("search") String search,
+            @QueryParam("search") SearchParam search,
             @Context HttpHeaders headers
     ) {
         CSVExporter<Institution> exporter = new CSVExporter<>();
