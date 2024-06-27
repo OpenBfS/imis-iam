@@ -76,12 +76,16 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application";
+import { useUserStore } from "@/stores/user";
+import { useInstitutionStore } from "@/stores/institution";
 import { useNotification } from "@/lib/use-notification";
 
 const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
+const userStore = useUserStore();
 const { t } = useI18n();
 const { hasRequestError } = useNotification();
 // Use array of objects to enable translation of the itemes in <v-select> element
@@ -130,6 +134,17 @@ const csvOptions = ref({
   encoding: encoding[0],
   quoteType: quoteTypes[0].value,
   search: applicationStore.searchString,
+});
+
+onMounted(() => {
+  if (
+    applicationStore.listToExport === "users" &&
+    userStore.selectedUsers.length > 0
+  ) {
+    csvOptions.value["ids"] = userStore.selectedUsers;
+  } else if (institutionStore.selectedInstitutions.length > 0) {
+    csvOptions.value["ids"] = institutionStore.selectedInstitutions;
+  }
 });
 
 const exportRequest = (itemsName) => {
