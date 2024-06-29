@@ -82,6 +82,8 @@ import { useApplicationStore } from "@/stores/application";
 import { useUserStore } from "@/stores/user";
 import { useInstitutionStore } from "@/stores/institution";
 import { useNotification } from "@/lib/use-notification";
+import { HTTP } from "@/lib/http";
+import qs from "qs";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -141,25 +143,22 @@ onMounted(() => {
     applicationStore.listToExport === "users" &&
     userStore.selectedUsers.length > 0
   ) {
-    csvOptions.value["ids"] = userStore.selectedUsers;
+    csvOptions.value["id"] = userStore.selectedUsers;
   } else if (institutionStore.selectedInstitutions.length > 0) {
-    csvOptions.value["ids"] = institutionStore.selectedInstitutions;
+    csvOptions.value["id"] = institutionStore.selectedInstitutions;
   }
 });
 
 const exportRequest = (itemsName) => {
-  fetch(
-    "/backend/realms/imis3/export/" +
-      itemsName +
-      "?" +
-      new URLSearchParams(csvOptions.value).toString()
-  )
+  HTTP.get(`/export/${itemsName}`, {
+    params: csvOptions.value,
+    paramsSerializer: (params) => {
+      return qs.stringify(params, { indices: false });
+    },
+  })
     .then((res) => {
-      if (!res.ok) throw new Error(res.statusText);
-      return res.blob();
-    })
-    .then((data) => {
-      const blob = new Blob([data]);
+      if (!res.statusText === "OK") throw new Error(res.statusText);
+      const blob = new Blob([res.data]);
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = "export.csv";
