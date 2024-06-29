@@ -203,7 +203,15 @@
         color="accent"
         :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
         @click="
-          processType == 'add' ? createInstitution() : updateInstitution()
+          processType == 'add'
+            ? createInstitution()
+            : updateInstitution(
+                institution,
+                showPostalAddress,
+                isServerValidationError,
+                handleValidationErrorFromServer,
+                hasRequestError
+              )
         "
       >
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
@@ -280,6 +288,7 @@ import { useCoordinatesStore } from "@/stores/coordinates";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { debounce } from "debounce";
+import { updateInstitution } from "./institution";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import ChipTextField from "@/components/Form/ChipTextField.vue";
 import TextField from "@/components/Form/TextField.vue";
@@ -395,25 +404,7 @@ const createInstitution = () => {
         : (hasRequestError.value = true);
     });
 };
-const updateInstitution = () => {
-  let payload = { ...institution.value };
-  if (!showPostalAddress.value) {
-    delete payload.addressLocation;
-    delete payload.addressPostalCode;
-    delete payload.addressStreet;
-  }
-  institutionStore
-    .updateInstitution(payload)
-    .then(() => {
-      applicationStore.searchRequest(["institutions"]);
-      applicationStore.setShowManageInstitutionDialog(false);
-    })
-    .catch((error) => {
-      isServerValidationError(error)
-        ? handleValidationErrorFromServer(error.response.data)
-        : (hasRequestError.value = true);
-    });
-};
+
 const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)
     .then(() => {

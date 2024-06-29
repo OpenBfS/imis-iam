@@ -5,6 +5,9 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
+import { useApplicationStore } from "@/stores/application";
+import { useInstitutionStore } from "@/stores/institution";
+
 const serviceBuildingPlace = {
   serviceBuildingLocation: "",
   serviceBuildingPostalCode: "",
@@ -36,4 +39,33 @@ function getExpInstitution() {
   return structuredClone(expInstitution);
 }
 
-export { getExpInstitution };
+function updateInstitution(
+  institution,
+  showPostalAddress,
+  isServerValidationError,
+  handleValidationErrorFromServer,
+  hasRequestError
+) {
+  const applicationStore = useApplicationStore();
+  const institutionStore = useInstitutionStore();
+  if (!showPostalAddress) {
+    delete institution.addressLocation;
+    delete institution.addressPostalCode;
+    delete institution.addressStreet;
+  }
+  institutionStore
+    .updateInstitution(institution)
+    .then(() => {
+      applicationStore.searchRequest(["institutions"]);
+      applicationStore.setShowManageInstitutionDialog(false);
+      return true;
+    })
+    .catch((error) => {
+      isServerValidationError(error)
+        ? handleValidationErrorFromServer(error.response.data)
+        : (hasRequestError.value = true);
+      return false;
+    });
+}
+
+export { getExpInstitution, updateInstitution };

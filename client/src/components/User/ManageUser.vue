@@ -213,7 +213,13 @@
         @click="
           ['add', 'copy'].indexOf(processType) !== -1
             ? createUser(true)
-            : updateUser()
+            : updateUser(
+                user,
+                resetNotification,
+                isServerValidationError,
+                handleValidationErrorFromServer,
+                hasRequestError
+              )
         "
       >
         {{
@@ -286,7 +292,11 @@ import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
-import { getExpUser } from "@/components/User/user";
+import {
+  getExpUser,
+  handleDisplayName,
+  updateUser,
+} from "@/components/User/user";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
@@ -352,12 +362,6 @@ const getTextFieldType = (nameOfAttribute) => {
   } else {
     return "text";
   }
-};
-const handleDisplayName = (displayName) => {
-  if (displayName.startsWith("${") && displayName.endsWith("}")) {
-    return t(`user.${displayName.replace("${", "").slice(0, -1)}`);
-  }
-  return displayName;
 };
 
 // Creating rules for the validation of form components.
@@ -494,27 +498,6 @@ const createUser = (shouldClose) => {
       isServerValidationError(error)
         ? handleValidationErrorFromServer(error.response.data)
         : (hasRequestError.value = true);
-    });
-};
-
-const updateUser = () => {
-  resetNotification();
-  userStore
-    .updateUser(user.value)
-    .then(() => {
-      // Update current user Profile and thus the data in App bar.
-      if (profileStore.userData.id === user.value.id) {
-        profileStore.loadProfile();
-      }
-      applicationStore.setOwnAccount(false);
-      applicationStore.setShowManageUserDialog(false);
-      applicationStore.searchRequest(["users"]);
-    })
-    .catch((error) => {
-      isServerValidationError(error)
-        ? handleValidationErrorFromServer(error.response.data)
-        : (hasRequestError.value = true);
-      console.error(error);
     });
 };
 

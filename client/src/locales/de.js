@@ -168,6 +168,7 @@ export default {
   // Shared button texts
   button: {
     add: "Hinzufügen",
+    remove: "Entfernen",
     create: "Erstellen",
     cancel: "Abbrechen",
     close: "Schließen",
@@ -267,5 +268,8 @@ export default {
   search: {
     found_users: "Gefundene Nutzer",
     found_institution: "Gefunden Institutionen:",
+    edit_tags: "Tags bearbeiten",
+    edit_tags_institutions: "Tags der ausgewählten Institutionen bearbeiten",
+    edit_tags_users: "Tags der ausgewählten Nutzer bearbeiten",
   },
 };
