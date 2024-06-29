@@ -18,6 +18,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -232,14 +233,14 @@ public class InstitutionProvider implements RealmResourceProvider {
      */
     @GET
     @Path("/{id}")
-    public Response getInstitutionById(@PathParam("id") Integer id) {
+    public Institution getInstitutionById(@PathParam("id") Integer id) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         Institution in = em.find(Institution.class, id);
         if (in == null) {
-            return Response.status(Status.NOT_FOUND).build();
+            throw new NotFoundException();
         }
-        return Response.ok(in).build();
+        return in;
     }
 
     /**
