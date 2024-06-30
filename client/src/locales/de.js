@@ -78,6 +78,7 @@ export default {
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
     valid_date: "Datum muss gültig sein",
+    all_or_nothing: "{0} und {1} oder keines angeben",
   },
   hints: {
     date_format: "Format: dd.mm.jjjj",

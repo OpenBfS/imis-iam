@@ -24,25 +24,47 @@
             ref="form"
             :readonly="!profileStore.isAllowedToManage"
           >
-            <div class="group_class">
-              <TextField
-                :label="$t('label.name')"
-                :attribute="'name'"
-                required
-                @update:modelValue="institution.name = $event"
-              ></TextField>
-              <TextField
-                :label="$t('institution.meas_facil_name')"
-                :attribute="'measFacilName'"
-                required
-                @update:modelValue="institution.measFacilName = $event"
-              ></TextField>
-              <Checkbox
-                attribute="active"
-                v-model="institution.active"
-                :label="$t('institution.active')"
-              ></Checkbox>
-            </div>
+            <v-row>
+              <v-col>
+                <TextField
+                  :label="$t('label.name')"
+                  :attribute="'name'"
+                  @update:modelValue="institution.name = $event"
+                ></TextField>
+              </v-col>
+              <v-col>
+                <Checkbox
+                  attribute="active"
+                  v-model="institution.active"
+                  :label="$t('institution.active')"
+                ></Checkbox>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="3">
+                <TextField
+                  ref="imisIdField"
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
+                  :label="$t('institution.meas_facil_id')"
+                  :attribute="'imisId'"
+                  @update:modelValue="
+                    institution.measFacilId = $event;
+                    shortNameField.validate();
+                  "
+                ></TextField>
+              </v-col>
+              <v-col cols="3">
+                <TextField
+                  ref="shortNameField"
+                  :label="$t('institution.meas_facil_name')"
+                  :attribute="'measFacilName'"
+                  @update:modelValue="
+                    institution.measFacileName = $event;
+                    imisIdField.validate();
+                  "
+                ></TextField>
+              </v-col>
+            </v-row>
             <div class="group_class">
               <TextField
                 :label="$t('institution.service_building_location')"
@@ -341,11 +363,22 @@ const getCategories = () => {
       hasLoadingError.value = true;
     });
 };
+const imisIdAndShortNameOrNothing = () => {
+  return [
+    () =>
+      (institution.value.imisId === "" && institution.value.shortName === "") ||
+      (institution.value.imisId !== "" && institution.value.shortName !== "") ||
+      t("error.all_or_nothing", [
+        t("institution.imis_id"),
+        t("institution.short_name"),
+      ]),
+  ];
+};
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
     name: reqField(t("institution.required_name")),
-    measFacilName: reqField(t("institution.required_meas_facil_name")),
+    measFacilName: [...imisIdAndShortNameOrNothing()],
     serviceBuildingLocation: reqField(
       t("institution.required_service_building_location")
     ),
@@ -368,7 +401,7 @@ onBeforeMount(() => {
       (v) =>
         !v ||
         (v && v.length === 5) ||
-        t("institution.meas_facil_id_length_validation_message"),
+        t("institution.imis_id_length_validation_message"),
     ],
     tags: reqField(t("error.required_tag")),
   });
