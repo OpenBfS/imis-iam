@@ -265,7 +265,7 @@ export default {
     required_mailinglist_name: "E-Mail-Verteiler Name ist erforderlich",
   },
   search: {
-    found_users: "Gefundene Nutzer",
-    found_institution: "Gefunden Institutionen:",
+    found_users: "Gefundene Nutzer:",
+    found_institution: "Gefundene Institutionen:",
   },
 };
