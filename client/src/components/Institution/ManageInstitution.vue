@@ -341,7 +341,7 @@ onBeforeMount(() => {
       t("institution.required_service_building_location")
     ),
     serviceBuildingPostalCode: reqValidPostalcode(
-      t("institution.required_service_building_postalcode"),
+      t("institution.required_service_building_postal_code"),
       t("error.valid_postalcode")
     ),
     serviceBuildingStreet: reqField(
