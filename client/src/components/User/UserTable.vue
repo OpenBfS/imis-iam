@@ -80,8 +80,6 @@ const tableHeaders = [
     )
     .map((attr) => toRaw(attr).name),
   "institutions",
-  "role",
-  "enabled",
 ];
 
 // Deep Copy for objects
