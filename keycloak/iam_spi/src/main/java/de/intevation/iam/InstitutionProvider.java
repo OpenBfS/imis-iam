@@ -147,7 +147,7 @@ public class InstitutionProvider implements RealmResourceProvider {
                         cbSize.lower(rootSize.get("name")),
                         filter),
                     cbSize.like(
-                        cbSize.lower(rootSize.get("imis_id")),
+                        cbSize.lower(rootSize.get("imisId")),
                         filter)
                     )
                 );
