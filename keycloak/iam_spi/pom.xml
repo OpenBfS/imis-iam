@@ -70,6 +70,17 @@
             <artifactId>keycloak-model-jpa</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- Static model generation -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>6.1.7.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
         <!-- Bean validation -->
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -159,6 +170,10 @@
                         <configuration>
                             <failOnWarning>true</failOnWarning>
                             <ignoreUnusedRuntime>true</ignoreUnusedRuntime>
+                            <ignoredDependencies>
+                                <ignoredDependency>org.hibernate.orm:hibernate-jpamodelgen</ignoredDependency>
+                                <ignoredDependency>jakarta.xml.bind:jakarta.xml.bind-api</ignoredDependency>
+                            </ignoredDependencies>
                         </configuration>
                     </execution>
                 </executions>
