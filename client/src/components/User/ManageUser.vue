@@ -183,6 +183,7 @@
                 :label="$t('user.role')"
                 :items="userRoles"
                 item-value="name"
+                name="role"
                 v-model="user.role"
                 persistent-hint
               ></Select>
@@ -524,5 +525,11 @@ const isReadOnly = computed(() => {
     return false;
   }
   return !profileStore.isAllowedToManage;
+});
+
+// Necessary so tests are able to access exactly these instances used in this component.
+defineExpose({
+  form,
+  resetForm,
 });
 </script>
