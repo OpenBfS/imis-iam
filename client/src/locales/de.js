@@ -30,6 +30,7 @@ export default {
   // Archive component
   archive: {
     search: "Durchsuchen",
+    title: "Archiv",
   },
   // Calendar component
   calendar: {
