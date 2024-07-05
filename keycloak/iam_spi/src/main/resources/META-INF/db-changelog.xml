@@ -149,4 +149,12 @@
                 DROP COLUMN imis_usergroup_id;
         </sql>
     </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.7">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution
+                ADD COLUMN service_building_state VARCHAR NOT NULL;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

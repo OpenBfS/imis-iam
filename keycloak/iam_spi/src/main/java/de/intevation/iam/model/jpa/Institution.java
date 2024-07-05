@@ -70,6 +70,10 @@ public class Institution {
     @Column(name = "service_building_location", nullable = false)
     private String serviceBuildingLocation;
 
+    @NotBlank
+    @Column(name = "service_building_state", nullable = false)
+    private String serviceBuildingState;
+
     @Column(name = "address_street")
     private String addressStreet;
 
@@ -189,6 +193,14 @@ public class Institution {
 
     public void setServiceBuildingLocation(String serviceBuildingLocation) {
         this.serviceBuildingLocation = serviceBuildingLocation;
+    }
+
+    public String getServiceBuildingState() {
+        return serviceBuildingState;
+    }
+
+    public void setServiceBuildingState(String serviceBuildingState) {
+        this.serviceBuildingState = serviceBuildingState;
     }
 
     public String getAddressStreet() {

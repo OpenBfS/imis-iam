@@ -9,6 +9,7 @@ const serviceBuildingPlace = {
   serviceBuildingLocation: "",
   serviceBuildingPostalCode: "",
   serviceBuildingStreet: "",
+  serviceBuildingState: "",
 };
 const addressPlace = {
   addressStreet: "",

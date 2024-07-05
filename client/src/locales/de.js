@@ -98,6 +98,8 @@ export default {
     service_building_location: "Ort des Dienstgebäudes",
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
+    required_service_building_state:
+      "Bundesland des Dienstgebäudes ist erforderlich",
     service_building_street: "Straße/Hausnummer des Dienstgebäudes",
     required_service_building_street:
       "Straße/Hausnummer des Dienstgebäudes ist erforderlich",
@@ -126,6 +128,22 @@ export default {
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
     y_coordinate: "Y-Koordinate",
+    state_baden_wuerttemberg: "Baden Würtemberg",
+    state_bavaria: "Bayern",
+    state_berlin: "Berlin",
+    state_brandenburg: "Brandenburg",
+    state_bremen: "Bremen",
+    state_hamburg: "Hamburg",
+    state_hesse: "Hessen",
+    state_lower_saxony: "Niedersachsen",
+    state_mecklenburg_vorpommern: "Mecklenburg-Vorpommern",
+    state_north_rhine_westphalia: "Nordrhein-Westfalen",
+    state_rhineland_palatinate: "Rheinland-Pfalz",
+    state_saarland: "Saarland",
+    state_saxony: "Sachsen",
+    state_saxony_anhalt: "Sachsen-Anhalt",
+    state_schleswig_holstein: "Schleswig-Holstein",
+    state_thuringia: "Thüringen",
   },
   // Main component
   main: {

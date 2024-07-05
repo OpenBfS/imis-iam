@@ -62,6 +62,15 @@
                 @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
+            <v-row>
+              <v-col>
+                <Select
+                  attribute="serviceBuildingState"
+                  :items="states"
+                  @update:modelValue="institution.serviceBuildingState = $event"
+                ></Select>
+              </v-col>
+            </v-row>
             <v-form
               ><v-row>
                 <v-select
@@ -332,6 +341,24 @@ const getCategories = () => {
       hasLoadingError.value = true;
     });
 };
+const states = [
+  t("institution.state_baden_wuerttemberg"),
+  t("institution.state_bavaria"),
+  t("institution.state_berlin"),
+  t("institution.state_brandenburg"),
+  t("institution.state_bremen"),
+  t("institution.state_hamburg"),
+  t("institution.state_hesse"),
+  t("institution.state_lower_saxony"),
+  t("institution.state_mecklenburg_vorpommern"),
+  t("institution.state_north_rhine_westphalia"),
+  t("institution.state_rhineland_palatinate"),
+  t("institution.state_saarland"),
+  t("institution.state_saxony"),
+  t("institution.state_saxony_anhalt"),
+  t("institution.state_schleswig_holstein"),
+  t("institution.state_thuringia"),
+];
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
@@ -346,6 +373,9 @@ onBeforeMount(() => {
     ),
     serviceBuildingStreet: reqField(
       t("institution.required_service_building_street")
+    ),
+    serviceBuildingState: reqField(
+      t("institution.required_service_building_state")
     ),
     centralPhone: reqValidPhone(
       t("institution.required_central_phone"),
