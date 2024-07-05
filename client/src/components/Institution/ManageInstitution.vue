@@ -112,7 +112,7 @@
                 @update:modelValue="institution.addressLocation = $event"
               ></TextField>
               <TextField
-                :label="$t('institution.address_postalcode')"
+                :label="$t('institution.address_postal_code')"
                 :attribute="'addressPostalCode'"
                 @update:modelValue="institution.addressPostalCode = $event"
               ></TextField>
