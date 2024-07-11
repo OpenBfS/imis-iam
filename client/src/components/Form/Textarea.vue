@@ -15,7 +15,7 @@
     :density="props.density"
     :disabled="props.disabled"
     :hint="props.hint"
-    :label="props.label"
+    :label="`${props.label}${props.required ? ' *' : ''}`"
     :model-value="
       props.attribute && !props.modelValue
         ? applicationStore.managedItem[props.attribute]
@@ -45,27 +45,28 @@ const { onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
-const props = defineProps([
-  // Vuetify props
-  "active",
-  "autoGrow",
-  "clearable",
-  "counter",
-  "counterValue",
-  "density",
-  "disabled",
-  "hint",
-  "label",
-  "modelValue",
-  "name",
-  "persistentHint",
-  "prependInnerIcon",
-  "readonly",
-  "rules",
-  "variant",
+const props = defineProps({
+  active: Boolean,
+  autoGrow: Boolean,
+  clearable: Boolean,
+  counter: Number,
+  counterValue: Function,
+  density: String,
+  disabled: Boolean,
+  hint: String,
+  label: String,
+  modelValue: [Object, String],
+  name: String,
+  prependInnerIcon: [Object, String],
+  readonly: Boolean,
+  rules: Array,
+  variant: String,
 
   // Custom props
-  "attribute",
-]);
+  attribute: String,
+  required: Boolean,
+  updateCallBack: Function,
+});
+
 const emit = defineEmits(["update:modelValue"]);
 </script>

@@ -28,11 +28,13 @@
               <TextField
                 :label="$t('label.name')"
                 :attribute="'name'"
+                required
                 @update:modelValue="institution.name = $event"
               ></TextField>
               <TextField
                 :label="$t('institution.short_name')"
                 :attribute="'shortName'"
+                required
                 @update:modelValue="institution.shortName = $event"
               ></TextField>
               <Checkbox
@@ -45,6 +47,7 @@
               <TextField
                 :label="$t('institution.service_building_location')"
                 :attribute="'serviceBuildingLocation'"
+                required
                 @update:modelValue="
                   institution.serviceBuildingLocation = $event
                 "
@@ -52,6 +55,7 @@
               <TextField
                 :label="$t('institution.service_building_postal_code')"
                 :attribute="'serviceBuildingPostalCode'"
+                required
                 @update:modelValue="
                   institution.serviceBuildingPostalCode = $event
                 "
@@ -59,6 +63,7 @@
               <TextField
                 :label="$t('institution.service_building_street')"
                 :attribute="'serviceBuildingStreet'"
+                required
                 @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
@@ -127,11 +132,13 @@
                 :label="$t('institution.central_phone')"
                 @update:modelValue="institution.centralPhone = $event"
                 :attribute="'centralPhone'"
+                :required="true"
               ></TextField>
               <TextField
                 :label="$t('institution.central_mail')"
                 :attribute="'centralMail'"
                 @update:modelValue="institution.centralMail = $event"
+                required
               ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
@@ -183,6 +190,7 @@
                   item-title="name"
                   item-value="id"
                   persistent-hint
+                  required
                   multiple
                 ></Select>
               </v-col>
@@ -190,6 +198,7 @@
           </v-form>
         </v-col>
       </v-row>
+      <v-label>* {{ $t("hints.required_fields") }}</v-label>
       <UIAlert
         v-if="hasLoadingError || hasRequestError"
         v-bind:message="applicationStore.httpErrorMessage"

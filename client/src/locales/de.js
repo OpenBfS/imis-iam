@@ -81,6 +81,7 @@ export default {
   },
   hints: {
     date_format: "Format: dd.mm.jjjj",
+    required_fields: "Erforderliche Felder",
   },
   // Institutions component
   institution: {

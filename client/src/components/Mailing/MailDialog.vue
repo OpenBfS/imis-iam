@@ -34,6 +34,7 @@
                     item-title="name"
                     item-value="id"
                     :no-data-text="$t('mailinglist.no_mailing_list')"
+                    required
                     v-model="mail.selectedList"
                   ></Select>
                   <Select
@@ -46,6 +47,7 @@
                     :items="types"
                     item-title="name"
                     item-value="id"
+                    required
                     v-model="mail.selectedType"
                   ></Select>
                 </v-row>
@@ -117,6 +119,7 @@
                   :label="$t('mailinglist.subject')"
                   v-model="mail.subject"
                   :attribute="'subject'"
+                  required
                 ></TextField>
               </v-col>
             </v-row>
@@ -127,11 +130,13 @@
                   name="input-7-1"
                   v-model="mail.text"
                   attribute="text"
+                  required
                 ></Textarea>
               </v-col>
             </v-row>
           </v-form>
         </v-row>
+        <v-label>* {{ $t("hints.required_fields") }}</v-label>
         <UIAlert
           v-if="hasRequestError || hasLoadingError"
           v-bind:message="applicationStore.httpErrorMessage"
