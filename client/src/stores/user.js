@@ -6,6 +6,7 @@
  */
 import { defineStore } from "pinia";
 import { HTTP } from "../lib/http";
+import qs from "qs";
 
 export const useUserStore = defineStore("user", {
   namespaced: true,
@@ -15,6 +16,7 @@ export const useUserStore = defineStore("user", {
     foundUsers: [],
     offset: 0,
     itemsPerPage: 25,
+    filterBy: {},
     // Object with keys "key" and "order"
     sortBy: null,
     totalNumberOfUsers: 0,
@@ -38,14 +40,19 @@ export const useUserStore = defineStore("user", {
     },
     loadUsers(searchString) {
       return new Promise((resolve, reject) => {
-        HTTP.get("/iamuser", {
-          params: {
+        const filter = this.filterBy;
+        const params = {
+          search: {
             search: searchString,
-            firstResult: this.offset,
-            maxResults: this.itemsPerPage,
-            sortBy: this.sortBy?.key,
-            order: this.sortBy?.order,
+            ...filter,
           },
+          firstResult: this.offset,
+          maxResults: this.itemsPerPage,
+          sortBy: this.sortBy?.key,
+          order: this.sortBy?.order,
+        };
+        HTTP.get("/iamuser", {
+          params: qs.stringify(params, { encode: false }),
         })
           .then((response) => {
             this.totalNumberOfUsers = response.data.size;
@@ -89,6 +96,13 @@ export const useUserStore = defineStore("user", {
       const index = this.users.findIndex((user) => user.id === data.id);
       this.users.splice(index, 1);
       this.totalNumberOfUsers--;
+    },
+    updateFilter(key, term) {
+      if (this.filterBy[key] && term.length === 0) {
+        delete this.filterBy[key];
+      } else if (term.length > 0) {
+        this.filterBy[key] = term;
+      }
     },
   },
 });

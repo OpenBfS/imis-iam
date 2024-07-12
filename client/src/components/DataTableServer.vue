@@ -58,6 +58,20 @@
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
       ><slot :name="slot" v-bind="scope"
     /></template>
+
+    <template v-slot:thead>
+      <tr>
+        <td class="px-2" v-for="header in allHeaders" :key="header">
+          <v-text-field
+            density="compact"
+            :placeholder="$t('search.filterBy', { attribute: header.title })"
+            hide-details
+            variant="underlined"
+            @update:modelValue="(event) => handleFilterInput(header.key, event)"
+          ></v-text-field>
+        </td>
+      </tr>
+    </template>
   </v-data-table-server>
 </template>
 
@@ -67,6 +81,7 @@ import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
 import { computed, onMounted, ref, toRaw } from "vue";
 import { useI18n } from "vue-i18n";
+import debounce from "debounce";
 
 const { t } = useI18n();
 
@@ -154,4 +169,17 @@ onMounted(() => {
   });
   selectedHeaders.value = headers.value;
 });
+
+const triggerSearch = debounce(() => {
+  applicationStore.searchRequest([props.type]);
+}, 500);
+
+const handleFilterInput = (key, value) => {
+  if (props.type === "users") {
+    userStore.updateFilter(key, value);
+  } else if (props.type === "institution") {
+    institutionStore.updateFilter(key, value);
+  }
+  triggerSearch();
+};
 </script>

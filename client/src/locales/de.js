@@ -268,5 +268,6 @@ export default {
   search: {
     found_users: "Gefundene Nutzer:",
     found_institution: "Gefundene Institutionen:",
+    filterBy: "Nach {attribute} filtern",
   },
 };
