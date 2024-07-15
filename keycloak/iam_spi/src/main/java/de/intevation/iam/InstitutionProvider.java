@@ -8,7 +8,6 @@ package de.intevation.iam;
 
 import java.util.*;
 
-import de.intevation.iam.model.representation.SearchParam;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
@@ -45,6 +44,7 @@ import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
+import org.keycloak.utils.SearchQueryUtils;
 
 /**
  * Class providing rest interfaces to create, get and delete Institutions.
@@ -129,15 +129,14 @@ public class InstitutionProvider implements RealmResourceProvider {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public ObjectList<Institution> getInstitutions(@Context HttpHeaders headers,
-            @QueryParam("search") SearchParam search,
+            @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults,
             @QueryParam("sortBy") String sortBy,
             @QueryParam("order") SortOrder order) {
-        Map<String, String> attributes = new HashMap<>();
-        if (search != null) {
-            attributes = search.getAttributes();
-        }
+        Map<String, String> attributes = search == null
+                ? Collections.emptyMap()
+                : SearchQueryUtils.getFields(search);
         String generalSearch = attributes.get("search");
         String filter = generalSearch != null && !generalSearch.isEmpty()
             ? "%" + generalSearch.toLowerCase() + "%" : "";

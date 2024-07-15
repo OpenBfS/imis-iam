@@ -9,15 +9,14 @@ package de.intevation.iam;
 import static org.keycloak.userprofile.UserProfileContext.USER_API;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.intevation.iam.model.representation.SearchParam;
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.BadRequestException;
@@ -58,6 +57,8 @@ import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
+import org.keycloak.utils.SearchQueryUtils;
+
 public class UserProvider implements RealmResourceProvider {
 
     private static final String MAIL_ALREADY_USED_KEY
@@ -129,15 +130,14 @@ public class UserProvider implements RealmResourceProvider {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public ObjectList<User> getUsers(@Context HttpHeaders headers,
-            @QueryParam("search") SearchParam search,
+            @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults) {
         RealmModel realm = session.getContext().getRealm();
 
-        Map<String, String> attributes = new HashMap<>();
-        if (search != null) {
-            attributes = search.getAttributes();
-        }
+        Map<String, String> attributes = search == null
+                ? Collections.emptyMap()
+                : SearchQueryUtils.getFields(search);
         String generalSearch = attributes.get("search");
         if (generalSearch != null) {
             attributes.put(UserModel.SEARCH, generalSearch);
