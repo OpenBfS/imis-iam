@@ -24,6 +24,8 @@ services:
     image: "iam_db"
     networks:
       - imis3
+    ports:
+      - 2345:5432
   keycloak:
     container_name: "iam-keycloak"
     build:
