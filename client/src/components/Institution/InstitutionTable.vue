@@ -79,7 +79,7 @@ const tableHeaders = [
   "shortName",
   "imisId",
   "serviceBuildingLocation",
-  "categoryNames",
+  "tags",
   "active",
 ];
 

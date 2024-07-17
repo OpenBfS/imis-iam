@@ -149,4 +149,16 @@
                 DROP COLUMN imis_usergroup_id;
         </sql>
     </changeSet>
+    <changeSet author="tom@intevation.de" id="v0.7">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution_category
+                RENAME TO iam_institution_tag;
+            ALTER TABLE iam_institution_categories
+                RENAME TO iam_institution_tags;
+            ALTER TABLE iam_institution_tags
+                RENAME category_name TO tag_name;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

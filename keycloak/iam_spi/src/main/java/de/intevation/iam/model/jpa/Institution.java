@@ -50,12 +50,12 @@ public class Institution {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "iam_institution_categories",
+        name = "iam_institution_tags",
         joinColumns = {@JoinColumn(name = "institution_id")},
-        inverseJoinColumns = {@JoinColumn(name = "category_name")}
+        inverseJoinColumns = {@JoinColumn(name = "tag_name")}
     )
     @NotEmpty
-    private List<InstitutionCategory> categoryNames;
+    private List<InstitutionTag> tags;
 
     @NotBlank
     @Column(name = "service_building_street", nullable = false)
@@ -149,22 +149,22 @@ public class Institution {
         this.shortName = shortName;
     }
 
-    public List<String> getCategoryNames() {
-        ArrayList<String> categories = new ArrayList<>();
-        for (InstitutionCategory category : categoryNames) {
-            categories.add(category.getName());
+    public List<String> getTags() {
+        ArrayList<String> names = new ArrayList<>();
+        for (InstitutionTag tag : tags) {
+            names.add(tag.getName());
         }
-        return categories;
+        return names;
     }
 
-    public void setCategoryNames(List<String> categoryNames) {
-        ArrayList<InstitutionCategory> categories = new ArrayList<>();
-        for (String category : categoryNames) {
-            InstitutionCategory institutionCategory = new InstitutionCategory();
-            institutionCategory.setName(category);
-            categories.add(institutionCategory);
+    public void setTags(List<String> names) {
+        ArrayList<InstitutionTag> tagList = new ArrayList<>();
+        for (String tag : names) {
+            InstitutionTag institutionTag = new InstitutionTag();
+            institutionTag.setName(tag);
+            tagList.add(institutionTag);
         }
-        this.categoryNames = categories;
+        this.tags = tagList;
     }
 
     public String getServiceBuildingStreet() {

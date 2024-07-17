@@ -6,16 +6,14 @@
  */
 package de.intevation.iam.model.jpa;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "iam_institution_category", schema = "keycloak")
-public class InstitutionCategory {
+@Table(name = "iam_institution_tag", schema = "keycloak")
+public class InstitutionTag {
     @Id
-    @Column(name = "name", nullable = false)
     private String name;
 
     public String getName() {

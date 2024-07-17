@@ -70,7 +70,7 @@ export default {
     person_name_invalid_character: "'{0}' enthält ungültige Zeichen.",
 
     // Custom errors
-    required_category: "@:tag_term ist erforderlich",
+    required_tag: "@:tag_term ist erforderlich",
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
     valid_phone: "Telefon muss gültig sein",
@@ -114,7 +114,7 @@ export default {
     place: "Ort",
     street: "Straße",
     postal_code: "PLZ",
-    category_names: "@:tag_term{'s'}",
+    tags: "@:tag_term{'s'}",
     central_fax: "Zentrales Fax",
     differing_postal_address: "Abweichende Postanschrift",
     address_street: "Postanschrift: Straße/Hausnummer",

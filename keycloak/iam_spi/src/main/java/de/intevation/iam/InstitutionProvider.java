@@ -39,7 +39,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
 import de.intevation.iam.model.jpa.Institution;
-import de.intevation.iam.model.jpa.InstitutionCategory;
+import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
@@ -407,34 +407,20 @@ public class InstitutionProvider implements RealmResourceProvider {
     }
 
     /**
-     * Get all institution categories.
-     * Response:
-     * <pre>
-     * <code>
-     * [{
-     *   id: [String] InstitutionCategory ID,
-     *   name: [String] InstitutionCategory Name
-     * },
-     * {
-     *   ...
-     * }]
-     * </code>
-     * </pre>
-     * @return Array of institution categories
+     * Get all institution tags.
+     * @return List of institution tags
      */
     @GET
-    @Path("/category")
-    public Response getInstitutionCategories() {
+    @Path("/tag")
+    public List<InstitutionTag> getInstitutionTags() {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<InstitutionCategory> query
-            = cb.createQuery(InstitutionCategory.class);
-        Root<InstitutionCategory> root = query.from(InstitutionCategory.class);
+        CriteriaQuery<InstitutionTag> query
+            = cb.createQuery(InstitutionTag.class);
+        Root<InstitutionTag> root = query.from(InstitutionTag.class);
         query.select(root);
-        List<InstitutionCategory> institutionCategories
-            = em.createQuery(query).getResultList();
-        return Response.ok(institutionCategories).build();
+        return em.createQuery(query).getResultList();
     }
 
     private boolean isShortNameAlreadyUsed(Institution inst, EntityManager em) {

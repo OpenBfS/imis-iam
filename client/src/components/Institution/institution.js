@@ -26,7 +26,7 @@ const expInstitution = {
   ...imis,
   ...serviceBuildingPlace,
   ...addressPlace,
-  categoryNames: [],
+  tags: [],
   active: false,
   xCoordinate: "",
   yCoordinate: "",

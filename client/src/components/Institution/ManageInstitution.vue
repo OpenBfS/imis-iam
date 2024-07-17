@@ -182,11 +182,11 @@
               </v-col>
               <v-col>
                 <Select
-                  attribute="categoryNames"
+                  attribute="tags"
                   :no-data-text="$t('label.no_data_text')"
-                  :label="$t('institution.category_names')"
+                  :label="$t('institution.tags')"
                   :items="categories"
-                  v-model="institution.categoryNames"
+                  v-model="institution.tags"
                   item-title="name"
                   item-value="id"
                   persistent-hint
@@ -333,7 +333,7 @@ const {
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
-  HTTP.get("institution/category")
+  HTTP.get("institution/tag")
     .then((response) => {
       categories.value = response.data;
     })
@@ -370,7 +370,7 @@ onBeforeMount(() => {
         (v && v.length === 5) ||
         t("institution.imis_id_length_validation_message"),
     ],
-    categoryNames: reqField(t("error.required_category")),
+    tags: reqField(t("error.required_tag")),
   });
 });
 onMounted(() => {
