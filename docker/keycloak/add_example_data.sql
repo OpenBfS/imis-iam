@@ -8,7 +8,7 @@ INSERT INTO iam_mail_type (id, name) VALUES
     (7, 'Soll/Ist-Vergleich'),
     (8, 'Hinweis');
 
-INSERT INTO iam_institution_category (name) VALUES
+INSERT INTO iam_institution_tag (name) VALUES
     ('Bundesministerium'),
     ('Leitstelle'),
     ('Bundesbehörde'),
@@ -35,7 +35,7 @@ INSERT INTO keycloak.iam_institution_user(user_id, institution_id) VALUES
 ((SELECT id FROM keycloak.user_entity WHERE username = 'redakteur'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')),
 ((SELECT id FROM keycloak.user_entity WHERE username = 'chefredakteur'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1'));
 
-INSERT INTO keycloak.iam_institution_categories(institution_id, category_name) VALUES
+INSERT INTO keycloak.iam_institution_tags(institution_id, tag_name) VALUES
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), 'Bundesministerium'),
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), 'Bundesbehörde');
 
