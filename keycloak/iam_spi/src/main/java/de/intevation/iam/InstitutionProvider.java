@@ -6,12 +6,13 @@
  */
 package de.intevation.iam;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -64,8 +65,8 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     private static final String NAME_ALREADY_USED_KEY
         = "error_name_already_used";
-    private static final String SHORT_NAME_ALREADY_USED_KEY
-        = "error_short_name_already_used";
+    private static final String MEAS_FACIL_NAME_ALREADY_USED
+        = "error_meas_facil_name_already_used";
 
     private Validator validator;
 
@@ -279,7 +280,8 @@ public class InstitutionProvider implements RealmResourceProvider {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response createInstitution(final Institution rep,
-            @Context HttpHeaders headers) {
+            @Context HttpHeaders headers
+    ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0));
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
@@ -293,16 +295,16 @@ public class InstitutionProvider implements RealmResourceProvider {
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
-        if (isNameAlreadyUsed(rep, em)) {
+        if (isAlreadyUsed("name", rep, em)) {
             return Response.status(Status.CONFLICT)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(i18n.getString(NAME_ALREADY_USED_KEY))
                 .build();
         }
-        if (isShortNameAlreadyUsed(rep, em)) {
+        if (isAlreadyUsed("measFacilName", rep, em)) {
             return Response.status(Status.CONFLICT)
                 .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(SHORT_NAME_ALREADY_USED_KEY))
+                .entity(i18n.getString(MEAS_FACIL_NAME_ALREADY_USED))
                 .build();
         }
         em.persist(rep);
@@ -347,7 +349,8 @@ public class InstitutionProvider implements RealmResourceProvider {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateInstitution(
-            final Institution rep, @Context HttpHeaders headers) {
+            final Institution rep, @Context HttpHeaders headers
+    ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0));
         EntityManager em = session.getProvider(
@@ -364,16 +367,16 @@ public class InstitutionProvider implements RealmResourceProvider {
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
-        if (isNameAlreadyUsed(rep, em)) {
+        if (isAlreadyUsed("name", rep, em)) {
             return Response.status(Status.CONFLICT)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(i18n.getString(NAME_ALREADY_USED_KEY))
                 .build();
         }
-        if (isShortNameAlreadyUsed(rep, em)) {
+        if (isAlreadyUsed("measFacilName", rep, em)) {
             return Response.status(Status.CONFLICT)
                 .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(SHORT_NAME_ALREADY_USED_KEY))
+                .entity(i18n.getString(MEAS_FACIL_NAME_ALREADY_USED))
                 .build();
         }
 
@@ -423,36 +426,23 @@ public class InstitutionProvider implements RealmResourceProvider {
         return em.createQuery(query).getResultList();
     }
 
-    private boolean isShortNameAlreadyUsed(Institution inst, EntityManager em) {
-        try {
-            TypedQuery<Institution> query = em.createQuery(
-                "SELECT i FROM Institution i WHERE i.shortName=:shortName",
-                Institution.class)
-                .setParameter("shortName", inst.getShortName());
-            Institution found = query.getSingleResult();
-            if (inst.getId() == null) {
-                return true;
-            }
-            return !inst.getId().equals(found.getId());
-        } catch (NoResultException nre) {
-            return false;
+    private boolean isAlreadyUsed(
+        String attributeName, Institution inst, EntityManager em
+    ) throws IntrospectionException, ReflectiveOperationException {
+        TypedQuery<Boolean> query = em.createQuery(
+            String.format(
+                "SELECT EXISTS(SELECT 1 FROM Institution i "
+                + "WHERE i.%s=:value "
+                + (inst.getId() != null ? "AND i.id<>:id)" : ")"),
+                attributeName),
+            Boolean.class)
+            .setParameter("value", new PropertyDescriptor(
+                    attributeName, Institution.class
+                ).getReadMethod().invoke(inst));
+        if (inst.getId() != null) {
+            query.setParameter("id", inst.getId());
         }
-    }
-
-    private boolean isNameAlreadyUsed(Institution inst, EntityManager em) {
-        try {
-        TypedQuery<Institution> query = em.createQuery(
-            "SELECT i FROM Institution i WHERE i.name=:name",
-            Institution.class)
-            .setParameter("name", inst.getName());
-            Institution found = query.getSingleResult();
-            if (inst.getId() == null) {
-                return true;
-            }
-            return !inst.getId().equals(found.getId());
-        } catch (NoResultException nre) {
-            return false;
-        }
+        return query.getSingleResult();
     }
 
     @Override

@@ -76,8 +76,8 @@ const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const tableHeaders = [
   "name",
-  "shortName",
-  "imisId",
+  "measFacilName",
+  "measFacilId",
   "serviceBuildingLocation",
   "tags",
   "active",

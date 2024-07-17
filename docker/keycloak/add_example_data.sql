@@ -21,7 +21,16 @@ INSERT INTO iam_institution_tag (name) VALUES
     ('Sonstige'),
     ('Alle');
 
-INSERT INTO keycloak.iam_institution(name, short_name, service_building_street, service_building_postal_code, service_building_location, central_phone, central_mail, imis_id) VALUES
+INSERT INTO keycloak.iam_institution(
+    name,
+    meas_facil_name,
+    service_building_street,
+    service_building_postal_code,
+    service_building_location,
+    central_phone,
+    central_mail,
+    meas_facil_id
+) VALUES
     ('Institution 1', 'inst_1', 'Examplestreet 1', '12345', 'ExampleLocation-1', '0123/456789', 'inst1@example.test', 'inst1'),
     ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', '0123/456789', 'inst2@example.test', 'inst2');
 

@@ -45,8 +45,8 @@ public class Institution {
     private String name;
 
     @NotBlank
-    @Column(name = "short_name", nullable = false)
-    private String shortName;
+    @Column(name = "meas_facil_name", nullable = false)
+    private String measFacilName;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -100,8 +100,8 @@ public class Institution {
     @Column(name = "mail")
     private List<String> centralAlarmMailAddresses;
 
-    @Column(name = "imis_id")
-    private String imisId;
+    @Column(name = "meas_facil_id")
+    private String measFacilId;
 
     @Column(name = "x_coordinate")
     @JsonProperty("xCoordinate")
@@ -141,12 +141,12 @@ public class Institution {
         this.name = name;
     }
 
-    public String getShortName() {
-        return shortName;
+    public String getMeasFacilName() {
+        return measFacilName;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    public void setMeasFacilName(String measFacilName) {
+        this.measFacilName = measFacilName;
     }
 
     public List<String> getTags() {
@@ -255,12 +255,12 @@ public class Institution {
         return centralAlarmMailAddresses;
     }
 
-    public String getImisId() {
-        return imisId;
+    public String getMeasFacilId() {
+        return measFacilId;
     }
 
-    public void setImisId(String imisId) {
-        this.imisId = imisId;
+    public void setMeasFacilId(String measFacilId) {
+        this.measFacilId = measFacilId;
     }
 
     public Float getXCoordinate() {

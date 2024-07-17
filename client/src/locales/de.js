@@ -7,7 +7,7 @@
 export default {
   // For re-use
   user_term: "IMIS-Nutzer",
-  imis_id_term: "Messstellen-ID",
+  meas_facil_id_term: "Messstellen-ID",
   tag_term: "Tag",
   institutions: "Institutionen",
   true: "Ja",
@@ -93,9 +93,9 @@ export default {
     no_institutions_available: "Es sind keine Institutionen vorhanden",
     fax: "Fax",
     phone: "Telephon",
-    short_name: "Messstellen-Bezeichnung",
+    meas_facil_name: "Messstellen-Bezeichnung",
     required_name: "Institutionsname ist erfoderlich",
-    required_short_name: "Messstellen-Bezeichnung ist erforderlich",
+    required_meas_facil_name: "Messstellen-Bezeichnung ist erforderlich",
     service_building_location: "Ort des Dienstgebäudes",
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
@@ -120,9 +120,9 @@ export default {
     address_street: "Postanschrift: Straße/Hausnummer",
     address_postal_code: "Postanschrift: PLZ",
     address_location: "Postanschrift: Ort",
-    imis_id: "@:imis_id_term",
-    imis_id_length_validation_message:
-      "Die @:imis_id_term muss exakt 5 Zeichen beinhalten",
+    meas_facil_id: "@:meas_facil_id_term",
+    meas_facil_id_length_validation_message:
+      "Die @:meas_facil_id_term muss exakt 5 Zeichen beinhalten",
     active: "Aktiv",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
