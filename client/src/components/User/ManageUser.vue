@@ -35,6 +35,7 @@
                   :label="$t('user.username')"
                   :model-value="user.attributes.username"
                   :rules="applicationStore.clientAndServerRules['username']"
+                  required
                   @update:model-value="
                     clearValidationError('username');
                     setUserAttribute('username', $event);
@@ -68,6 +69,7 @@
                     <TextField
                       v-if="isTextField(attribute.annotations?.inputType)"
                       density="compact"
+                      :required="isUserAttributeRequired(attribute)"
                       variant="underlined"
                       :label="handleDisplayName(attribute.displayName)"
                       :name="attribute.name"
@@ -96,6 +98,7 @@
                       :multiple="
                         attribute.annotations.inputType === 'multiselect'
                       "
+                      :required="isUserAttributeRequired(attribute)"
                       @update:model-value="
                         setUserAttribute(attribute.name, $event)
                       "
@@ -117,6 +120,7 @@
                   <TextField
                     v-if="isTextField(attribute.annotations?.inputType)"
                     density="compact"
+                    :required="isUserAttributeRequired(attribute)"
                     variant="underlined"
                     :label="handleDisplayName(attribute.displayName)"
                     :name="attribute.name"
@@ -149,6 +153,7 @@
                     :multiple="
                       attribute.annotations.inputType === 'multiselect'
                     "
+                    :required="isUserAttributeRequired(attribute)"
                     @update:model-value="
                       setUserAttribute(attribute.name, $event)
                     "
@@ -173,6 +178,7 @@
                 item-value="name"
                 persistent-hint
                 multiple
+                required
               ></Select>
             </div>
             <div class="one_group_class">
@@ -183,11 +189,14 @@
                 :label="$t('user.role')"
                 :items="userRoles"
                 item-value="name"
+                name="role"
+                required
                 v-model="user.role"
                 persistent-hint
               ></Select>
             </div>
           </v-form>
+          <v-label>* {{ $t("hints.required_fields") }}</v-label>
           <UIAlert
             v-if="hasLoadingError || hasRequestError"
             v-bind:message="applicationStore.httpErrorMessage"
@@ -199,20 +208,12 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn
-        v-if="processType == 'add'"
-        @click="createAndPrepare"
-        color="accent"
-        :disabled="!valid"
-      >
-        {{ $t("label.create_and_prepare") }}
-      </v-btn>
-      <v-btn
         v-if="!isReadOnly"
         color="accent"
         :disabled="!valid || hasNoChange"
         @click="
           ['add', 'copy'].indexOf(processType) !== -1
-            ? createUser(true)
+            ? createUser()
             : updateUser()
         "
       >
@@ -277,7 +278,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, nextTick } from "vue";
+import { computed, onBeforeMount, onMounted } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
@@ -286,7 +287,6 @@ import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { useForm } from "@/lib/use-form";
-import { getExpUser } from "@/components/User/user";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
@@ -360,6 +360,10 @@ const handleDisplayName = (displayName) => {
   return displayName;
 };
 
+const isUserAttributeRequired = (userAttribute) => {
+  return userAttribute.required?.roles?.includes("user");
+};
+
 // Creating rules for the validation of form components.
 const getUserAttributeRules = (userAttribute) => {
   const tmpRules = [];
@@ -374,7 +378,7 @@ const getUserAttributeRules = (userAttribute) => {
       // attribute is not required (when optional rules are supported
       // by Vuetify)
       userAttribute.name === "email" ||
-      userAttribute.required?.roles?.includes("user")
+      isUserAttributeRequired(userAttribute)
     ) {
       tmpRules.push(
         ...reqField(
@@ -472,22 +476,12 @@ const userRoles = computed(() => {
 const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
-const createUser = (shouldClose) => {
+const createUser = () => {
   HTTP.post("/iamuser", user.value)
     .then((response) => {
       userStore.addUser(response.data);
-      if (shouldClose) {
-        applicationStore.setOwnAccount(true);
-        applicationStore.setShowManageUserDialog(false);
-      } else {
-        // Use the same roles of the last created user.
-        const usedRole = user.value.role;
-        user.value = getExpUser();
-        nextTick(() => {
-          form.value.resetValidation();
-          user.value.role = usedRole;
-        });
-      }
+      applicationStore.setOwnAccount(true);
+      applicationStore.setShowManageUserDialog(false);
       applicationStore.searchRequest(["users"]);
     })
     .catch((error) => {
@@ -518,10 +512,6 @@ const updateUser = () => {
     });
 };
 
-const createAndPrepare = () => {
-  resetNotification();
-  createUser(false);
-};
 // Form
 const {
   form,
@@ -547,5 +537,11 @@ const isReadOnly = computed(() => {
     return false;
   }
   return !profileStore.isAllowedToManage;
+});
+
+// Necessary so tests are able to access exactly these instances used in this component.
+defineExpose({
+  form,
+  resetForm,
 });
 </script>

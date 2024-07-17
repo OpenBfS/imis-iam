@@ -19,7 +19,7 @@
     :items="props.items"
     :item-title="props.itemTitle"
     :item-value="props.itemValue"
-    :label="props.label"
+    :label="`${props.label}${props.required ? ' *' : ''}`"
     :model-value="
       props.attribute && !props.modelValue
         ? applicationStore.managedItem[props.attribute]
@@ -52,34 +52,36 @@ const { onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
-const props = defineProps([
-  // Vuetify props
-  "active",
-  "chips",
-  "clearable",
-  "closableChips",
-  "counter",
-  "counterValue",
-  "density",
-  "disabled",
-  "hint",
-  "items",
-  "itemTitle",
-  "itemValue",
-  "label",
-  "modelValue",
-  "multiple",
-  "name",
-  "noDataText",
-  "persistentHint",
-  "prependInnerIcon",
-  "readonly",
-  "returnObject",
-  "rules",
-  "variant",
+const props = defineProps({
+  active: Boolean,
+  chips: Boolean,
+  clearable: Boolean,
+  closableChips: Boolean,
+  counter: Number,
+  counterValue: Function,
+  density: String,
+  disabled: Boolean,
+  hint: String,
+  items: Array,
+  itemTitle: String,
+  itemValue: [Object, String],
+  label: String,
+  modelValue: [Object, String],
+  multiple: Boolean,
+  name: String,
+  noDataText: String,
+  persistentHint: String,
+  prependInnerIcon: [Object, String],
+  readonly: Boolean,
+  returnObject: Boolean,
+  rules: Array,
+  variant: String,
 
   // Custom props
-  "attribute",
-]);
+  attribute: String,
+  required: Boolean,
+  updateCallBack: Function,
+});
+
 const emit = defineEmits(["update:modelValue"]);
 </script>

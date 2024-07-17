@@ -45,12 +45,12 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
             case PUT:
                 EntityManager em = session.getProvider(
                     JpaConnectionProvider.class).getEntityManager();
-                return data.getImisId() == em.find(
-                        Institution.class, data.getId()).getImisId()
+                return data.getMeasFacilId() == em.find(
+                        Institution.class, data.getId()).getMeasFacilId()
                     && Role.EDITOR.isRoleOf(requestingUser, session)
                     || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             case POST:
-                if (data.getImisId() != null) {
+                if (data.getMeasFacilId() != null) {
                     return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
                 }
             case DELETE: return Role.EDITOR.isRoleOf(requestingUser, session);

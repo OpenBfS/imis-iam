@@ -127,6 +127,9 @@ export function useForm(i18n) {
     Object.assign(changedObject, originalObject);
     await nextTick();
     applicationStore.attributesOfFieldsThatChanged = [];
+    applicationStore.serverValidationRules = {};
+    aggregateRules();
+    form.value?.validate();
   };
 
   const areObjectsDifferent = (a, b) => {

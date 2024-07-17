@@ -16,7 +16,7 @@
     :density="props.density ?? 'compact'"
     :disabled="props.disabled"
     :hint="props.hint"
-    :label="props.label"
+    :label="`${props.label}${props.required ? ' *' : ''}`"
     :name="props.name"
     :persistent-hint="true"
     :persistent-placeholder="entries.length > 0"
@@ -65,23 +65,26 @@ const { onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
-const props = defineProps([
-  "class",
-  "clearable",
-  "density",
-  "disabled",
-  "hint",
-  "label",
-  "name",
-  "prependInnerIcon",
-  "readonly",
-  "rules",
-  "updateCallback",
-  "variant",
+const props = defineProps({
+  class: String,
+  clearable: Boolean,
+  density: String,
+  disabled: Boolean,
+  hint: String,
+  label: String,
+  modelValue: [Object, String],
+  name: String,
+  prependInnerIcon: Object,
+  readonly: Boolean,
+  rules: Array,
+  variant: String,
 
   // Custom props
-  "attribute",
-]);
+  attribute: String,
+  required: Boolean,
+  updateCallBack: Function,
+});
+
 const emit = defineEmits(["update:modelValue"]);
 
 const input = ref("");

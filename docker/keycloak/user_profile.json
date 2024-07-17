@@ -6,9 +6,6 @@
       "view": ["admin", "user"],
       "edit": ["admin", "user"]
     },
-    "annotations": {
-      "defaultField": "true"
-    },
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -25,8 +22,10 @@
       "edit" : [ "admin", "user" ]
     },
     "annotations": {
-      "defaultField": "true",
       "inputType": "html5-email"
+    },
+    "required" : {
+      "roles" : [ "user" ]
     },
     "validations" : {
       "email" : { },
@@ -101,7 +100,6 @@
       "view" : [ "user", "admin" ]
     },
     "annotations": {
-      "defaultField": "true",
       "inputType": "html5-tel"
     },
     "validations" : {
@@ -182,7 +180,6 @@
       "view" : [ "user", "admin" ]
     },
     "annotations" : {
-      "defaultField": "true",
       "inputType" : "multiselect"
     },
     "validations" : {
