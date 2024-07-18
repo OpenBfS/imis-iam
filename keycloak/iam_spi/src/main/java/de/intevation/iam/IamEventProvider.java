@@ -60,7 +60,8 @@ public class IamEventProvider implements RealmResourceProvider {
         this.session = session;
         this.auth = new EventAuthorizer(session);
         this.validator = new Validator();
-        this.entityManager = session.getProvider(JpaConnectionProvider.class).getEntityManager();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     /**

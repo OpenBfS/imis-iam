@@ -74,7 +74,8 @@ public class Validator {
             if (this == obj) {
                 return true;
             }
-            return locale.equals(bk.locale) && entityManager.equals(bk.entityManager);
+            return locale.equals(bk.locale)
+                && entityManager.equals(bk.entityManager);
         }
     }
 
@@ -92,14 +93,17 @@ public class Validator {
         if (locale == null) {
             locale = Locale.getDefault();
         }
-        jakarta.validation.Validator validator = beanValidators.get(new BeanKey(locale, em));
+        jakarta.validation.Validator validator =
+            beanValidators.get(new BeanKey(locale, em));
         if (validator == null) {
-            ValidatorFactory validatorFactory = Validation.byProvider(HibernateValidator.class)
+            ValidatorFactory validatorFactory = Validation
+                .byProvider(HibernateValidator.class)
                 .configure()
                 .defaultLocale(locale)
                 .buildValidatorFactory();
             ValidatorContext validatorContext = validatorFactory.usingContext();
-            validatorContext.constraintValidatorFactory(new ConstraintValidatorFactoryImpl(em));
+            validatorContext.constraintValidatorFactory(
+                new ConstraintValidatorFactoryImpl(em));
             validator = validatorContext.getValidator();
             beanValidators.put(new BeanKey(locale, em), validator);
         }
@@ -114,7 +118,8 @@ public class Validator {
      * @throws BadRequestException in case validation fails
      */
     public void validate(Object object, Locale locale, EntityManager em) {
-        jakarta.validation.Validator beanValidator = getBeanValidator(locale, em);
+        jakarta.validation.Validator beanValidator =
+            getBeanValidator(locale, em);
         Set<ConstraintViolation<Object>> beanViolations =
             beanValidator.validate(object);
         if (!beanViolations.isEmpty()) {

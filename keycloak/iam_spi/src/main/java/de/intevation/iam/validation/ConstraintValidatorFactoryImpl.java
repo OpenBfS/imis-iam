@@ -12,9 +12,11 @@ import jakarta.validation.ConstraintValidatorFactory;
 
 import java.util.logging.Logger;
 
-public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
+public class ConstraintValidatorFactoryImpl
+    implements ConstraintValidatorFactory {
 
-    private static final Logger LOG = Logger.getLogger("ConstraintValidatorFactoryImpl");
+    private static final Logger LOG = Logger.getLogger(
+        "ConstraintValidatorFactoryImpl");
     private final EntityManager entityManager;
 
     public ConstraintValidatorFactoryImpl(EntityManager entityManager) {
@@ -33,7 +35,8 @@ public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactor
         }
 
         if (EntityManagerAwareValidator.class.isAssignableFrom(key)) {
-            EntityManagerAwareValidator validator = (EntityManagerAwareValidator) instance;
+            EntityManagerAwareValidator validator =
+                (EntityManagerAwareValidator) instance;
             validator.setEntityManager(entityManager);
         }
 
@@ -41,5 +44,6 @@ public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactor
     }
 
     @Override
-    public void releaseInstance(ConstraintValidator<?, ?> constraintValidator) { }
+    public void releaseInstance(
+        ConstraintValidator<?, ?> constraintValidator) { }
 }

@@ -86,7 +86,8 @@ public class UserProvider implements RealmResourceProvider {
         this.userProfileProvider =
             session.getProvider(UserProfileProvider.class);
         this.validator = new Validator();
-        this.entityManager = session.getProvider(JpaConnectionProvider.class).getEntityManager();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     /**

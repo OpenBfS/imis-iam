@@ -81,7 +81,8 @@ public class InstitutionProvider implements RealmResourceProvider {
         this.session = session;
         this.auth = new InstitutionAuthorizer(session);
         this.validator = new Validator();
-        this.entityManager = session.getProvider(JpaConnectionProvider.class).getEntityManager();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     /**

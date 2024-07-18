@@ -96,7 +96,8 @@ public class MailProvider implements RealmResourceProvider {
         this.auth = new MailAuthorizer(session);
         this.authList = new MailListAuthorizer(session);
         this.validator = new Validator();
-        this.entityManager = session.getProvider(JpaConnectionProvider.class).getEntityManager();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     @Override
