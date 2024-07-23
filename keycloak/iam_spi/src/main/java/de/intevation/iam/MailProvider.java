@@ -55,7 +55,9 @@ import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.MailAuthorizer;
 import de.intevation.iam.auth.MailListAuthorizer;
 import de.intevation.iam.model.jpa.Mail;
+import de.intevation.iam.model.jpa.Mail_;
 import de.intevation.iam.model.jpa.MailList;
+import de.intevation.iam.model.jpa.MailList_;
 import de.intevation.iam.model.jpa.MailType;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
@@ -463,12 +465,12 @@ public class MailProvider implements RealmResourceProvider {
         CriteriaQuery<Mail> critQuery = cb.createQuery(Mail.class);
         Root<Mail> root = critQuery.from(Mail.class);
         critQuery.select(root);
-        critQuery.orderBy(cb.desc(root.get("sendDate")));
+        critQuery.orderBy(cb.desc(root.get(Mail_.sendDate)));
         Predicate filter;
 
         //Filter by mailing lists the user is subscribed to
         List<MailList> mailLists = getMailLists(userId, true);
-        In<Integer> listFilter = cb.in(root.get("recipient"));
+        In<Integer> listFilter = cb.in(root.get(Mail_.recipient));
         if (lists != null && !lists.isEmpty()) {
             for (MailList list: mailLists) {
                 if (lists.contains(list.getId())) {
@@ -483,13 +485,13 @@ public class MailProvider implements RealmResourceProvider {
         }
 
         //Filter by mails according to "archived" value
-        Predicate archiveFilter = cb.equal(root.get("archived"), archived);
+        Predicate archiveFilter = cb.equal(root.get(Mail_.archived), archived);
 
         //Filter by expiry date
         Timestamp now = new Timestamp(new Date().getTime());
         Predicate expiredFilter = cb.greaterThan(
-                root.<Timestamp>get("expiryDate"), now);
-        Predicate noDateFilter = cb.isNull(root.get("expiryDate"));
+                root.<Timestamp>get(Mail_.expiryDate), now);
+        Predicate noDateFilter = cb.isNull(root.get(Mail_.expiryDate));
         Predicate dateExpiredOrNoDateFilter = cb.or(
             expiredFilter, noDateFilter);
 
@@ -500,25 +502,25 @@ public class MailProvider implements RealmResourceProvider {
         if (start != null) {
             Timestamp startTimestamp = Timestamp.from(start.toInstant());
             Predicate dateFilter = cb.greaterThanOrEqualTo(
-                root.<Timestamp>get("sendDate"), startTimestamp);
+                root.<Timestamp>get(Mail_.sendDate), startTimestamp);
             filter = cb.and(filter, dateFilter);
         }
         if (end != null) {
             Timestamp endTimestamp = Timestamp.from(end.toInstant());
             Predicate dateFilter = cb.lessThanOrEqualTo(
-                root.<Timestamp>get("sendDate"), endTimestamp);
+                root.<Timestamp>get(Mail_.sendDate), endTimestamp);
             filter = cb.and(filter, dateFilter);
         }
 
         if (sender != null && !sender.equals("")) {
-            Predicate senderFilter = cb.equal(root.get("sender"), sender);
+            Predicate senderFilter = cb.equal(root.get(Mail_.sender), sender);
             filter = cb.and(filter, senderFilter);
         }
 
         //Filter by mail type
         In<Integer> typeFilter;
         if (types != null && !types.isEmpty()) {
-            typeFilter = cb.in(root.get("type"));
+            typeFilter = cb.in(root.get(Mail_.type));
             for (Integer type: types) {
                 typeFilter.value(type);
             }
@@ -629,7 +631,7 @@ public class MailProvider implements RealmResourceProvider {
             Predicate filter = cb.equal(join.get("id"), userId);
             critQuery.where(filter);
         }
-        critQuery.orderBy(cb.asc(root.get("name")));
+        critQuery.orderBy(cb.asc(root.get(MailList_.name)));
         TypedQuery<MailList> query = em.createQuery(critQuery);
         List<MailList> lists = query.getResultList();
         return lists;

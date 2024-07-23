@@ -27,6 +27,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.UserAttributes;
+import de.intevation.iam.model.jpa.UserAttributes_;
 
 
 /**
@@ -64,8 +65,8 @@ public class MailTask implements KeycloakSessionTask {
         query.select(root);
         Predicate filter;
         Predicate sentFilter = cb.equal(
-                root.get("expiredNotificationSent"), false);
-        Predicate inactivityFilter = cb.lessThan(root.get("expiryDate"),
+                root.get(UserAttributes_.expiredNotificationSent), false);
+        Predicate inactivityFilter = cb.lessThan(root.get(UserAttributes_.expiryDate),
         new Timestamp(System.currentTimeMillis()));
         filter = cb.and(sentFilter, inactivityFilter);
         query.where(filter);
@@ -98,8 +99,8 @@ public class MailTask implements KeycloakSessionTask {
         query.select(root);
         Predicate filter;
         Predicate sentFilter = cb.equal(
-                root.get("inactivityNotificationSent"), false);
-        Predicate inactivityFilter = cb.lessThan(root.get("expiryDate"),
+                root.get(UserAttributes_.inactivityNotificationSent), false);
+        Predicate inactivityFilter = cb.lessThan(root.get(UserAttributes_.expiryDate),
             Timestamp.from(Instant.now().plus(inactivityWarningTerm)));
         filter = cb.and(sentFilter, inactivityFilter);
         query.where(filter);
