@@ -70,17 +70,6 @@
             <artifactId>keycloak-model-jpa</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- Static model generation -->
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>6.1.7.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.1</version>
-        </dependency>
         <!-- Bean validation -->
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -116,8 +105,15 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.11.0</version>
                 <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.hibernate.orm</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>6.1.7.Final</version>
+                        </path>
+                    </annotationProcessorPaths>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
@@ -170,10 +166,6 @@
                         <configuration>
                             <failOnWarning>true</failOnWarning>
                             <ignoreUnusedRuntime>true</ignoreUnusedRuntime>
-                            <ignoredDependencies>
-                                <ignoredDependency>org.hibernate.orm:hibernate-jpamodelgen</ignoredDependency>
-                                <ignoredDependency>jakarta.xml.bind:jakarta.xml.bind-api</ignoredDependency>
-                            </ignoredDependencies>
                         </configuration>
                     </execution>
                 </executions>
