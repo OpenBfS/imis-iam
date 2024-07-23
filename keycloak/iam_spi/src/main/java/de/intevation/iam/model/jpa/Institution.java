@@ -36,7 +36,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
-@Unique(fields = {"imisId"},
+@Unique(fields = {"measFacilId"},
     clazz = Institution.class)
 @MeasFacilOrNone
 public class Institution {
@@ -49,8 +49,7 @@ public class Institution {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank
-    @Column(name = "meas_facil_name", nullable = false)
+    @Column(name = "meas_facil_name")
     private String measFacilName;
 
     @ManyToMany(fetch = FetchType.EAGER)

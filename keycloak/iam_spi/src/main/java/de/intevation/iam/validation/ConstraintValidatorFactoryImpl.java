@@ -10,13 +10,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorFactory;
 
-import java.util.logging.Logger;
-
 public class ConstraintValidatorFactoryImpl
     implements ConstraintValidatorFactory {
 
-    private static final Logger LOG = Logger.getLogger(
-        "ConstraintValidatorFactoryImpl");
     private final EntityManager entityManager;
 
     public ConstraintValidatorFactoryImpl(EntityManager entityManager) {
@@ -28,10 +24,9 @@ public class ConstraintValidatorFactoryImpl
         T instance;
         try {
             instance = key.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException e) {
             // could not instantiate class
-            LOG.severe(e.getMessage());
-            return null;
+            throw new RuntimeException(e);
         }
 
         if (EntityManagerAwareValidator.class.isAssignableFrom(key)) {

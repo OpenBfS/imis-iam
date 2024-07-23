@@ -176,7 +176,7 @@
              splitStatements="true"
              stripComments="true">
             ALTER TABLE iam_institution
-                ADD CONSTRAINT imis_id_unique UNIQUE (imis_id),
+                ADD CONSTRAINT meas_facil_id_unique UNIQUE (meas_facil_id),
             ALTER COLUMN meas_facil_name DROP NOT NULL,
                 ADD CONSTRAINT measure_facil_or_not CHECK (
                 (meas_facil_id IS NULL AND meas_facil_name IS NULL) OR

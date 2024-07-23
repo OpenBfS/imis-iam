@@ -47,10 +47,7 @@
                   :disabled="profileStore.userData.role !== 'chief_editor'"
                   :label="$t('institution.meas_facil_id')"
                   :attribute="'imisId'"
-                  @update:modelValue="
-                    institution.measFacilId = $event;
-                    shortNameField.validate();
-                  "
+                  @update:modelValue="institution.measFacilId = $event;"
                 ></TextField>
               </v-col>
               <v-col cols="3">
@@ -58,10 +55,7 @@
                   ref="shortNameField"
                   :label="$t('institution.meas_facil_name')"
                   :attribute="'measFacilName'"
-                  @update:modelValue="
-                    institution.measFacileName = $event;
-                    imisIdField.validate();
-                  "
+                  @update:modelValue="institution.measFacileName = $event;"
                 ></TextField>
               </v-col>
             </v-row>

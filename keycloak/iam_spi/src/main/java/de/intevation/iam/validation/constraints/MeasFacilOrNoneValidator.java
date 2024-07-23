@@ -12,8 +12,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 
 /**
- * Checks if the validated entity references either Network or MeasFacil
- * or none.
+ * Checks if the validated entity references either MeasFacil or none.
  */
 public class MeasFacilOrNoneValidator
     implements ConstraintValidator<MeasFacilOrNone, Institution> {
@@ -28,14 +27,14 @@ public class MeasFacilOrNoneValidator
     @Override
     public boolean isValid(Institution institution, ConstraintValidatorContext ctx) {
         if (institution == null
-            || institution.getShortName() == null
-            || institution.getImisId() == null
+            || institution.getMeasFacilName() == null
+            || institution.getMeasFacilId() == null
         ) {
             return true;
         }
 
-        if (!institution.getShortName().isBlank()
-            && !institution.getImisId().isBlank()) {
+        if (!institution.getMeasFacilName().isBlank()
+            && !institution.getMeasFacilId().isBlank()) {
                 return true;
             }
 

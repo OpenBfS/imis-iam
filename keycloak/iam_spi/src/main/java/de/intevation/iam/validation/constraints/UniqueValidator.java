@@ -7,7 +7,6 @@
 package de.intevation.iam.validation.constraints;
 
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -20,14 +19,13 @@ import java.util.Map;
 import de.intevation.iam.validation.EntityManagerAwareValidator;
 import jakarta.persistence.EntityManager;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Query;
 import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
-import de.intevation.iam.model.NamingStrategy;
 
 /**
  * Check if combination of values for given fields is unique for all
@@ -96,9 +94,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object>, Ent
 
             // Qualified database table name corresponding to annotated class
             this.tableName = clazz.getAnnotation(Table.class).schema()
-                + ".iam_" + NamingStrategy.camelToSnake(
-                    Introspector.getBeanInfo(clazz).getBeanDescriptor()
-                    .getName());
+                + "." + clazz.getAnnotation(Table.class).name();
 
             // WHERE clause for EXISTS_QUERY_TEMPLATE restricting query result
             // to entries distinct from current entity but with the same
@@ -106,15 +102,15 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object>, Ent
             // respectively partial UNIQUE constraint, if predicate is given.
             List<String> whereClauseParams = new ArrayList<>();
             for (String field : fields) {
-                whereClauseParams.add(NamingStrategy.camelToSnake(field)
+                whereClauseParams.add(clazz.getDeclaredField(field).getAnnotation(Column.class).name()
                         + "=:" + field);
             }
             whereClauseParams.add(
-                NamingStrategy.camelToSnake(idField)
+                "id"
                 + " IS DISTINCT FROM :" + idField);
             for (int i = 0; i < this.predicateFields.length; i++) {
                 final String predicateFieldName =
-                    NamingStrategy.camelToSnake(this.predicateFields[i]);
+                    this.predicateFields[i];
                 if (this.predicateIsNull.length > i
                     && this.predicateIsNull[i]
                 ) {
@@ -126,7 +122,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object>, Ent
                 }
             }
             this.whereClause = String.join(" AND ", whereClauseParams);
-        } catch (IntrospectionException e) {
+        } catch (IntrospectionException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
 
