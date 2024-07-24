@@ -243,7 +243,7 @@ public class Institution {
         this.centralAlarmPhoneNumbers = centralAlarmPhoneNumbers;
     }
 
-    public void setCentralAlarmEmailAddresses(List<String> centralAlarmMailAddresses) {
+    public void setCentralAlarmMailAddresses(List<String> centralAlarmMailAddresses) {
         this.centralAlarmMailAddresses = centralAlarmMailAddresses;
     }
 
@@ -251,7 +251,7 @@ public class Institution {
         return centralAlarmPhoneNumbers;
     }
 
-    public List<String> getCentralAlarmEmailAddresses() {
+    public List<String> getCentralAlarmMailAddresses() {
         return centralAlarmMailAddresses;
     }
 
