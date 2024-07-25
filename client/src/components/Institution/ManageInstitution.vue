@@ -43,19 +43,17 @@
             <v-row>
               <v-col cols="3">
                 <TextField
-                  ref="imisIdField"
                   :disabled="profileStore.userData.role !== 'chief_editor'"
                   :label="$t('institution.meas_facil_id')"
-                  :attribute="'imisId'"
-                  @update:modelValue="institution.measFacilId = $event;"
+                  :attribute="'measFacilId'"
+                  @update:modelValue="institution.measFacilId = $event"
                 ></TextField>
               </v-col>
               <v-col cols="3">
                 <TextField
-                  ref="shortNameField"
                   :label="$t('institution.meas_facil_name')"
                   :attribute="'measFacilName'"
-                  @update:modelValue="institution.measFacileName = $event;"
+                  @update:modelValue="institution.measFacilName = $event"
                 ></TextField>
               </v-col>
             </v-row>
@@ -188,14 +186,6 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col>
-                <TextField
-                  :disabled="profileStore.userData.role !== 'chief_editor'"
-                  :label="$t('institution.meas_facil_id')"
-                  :attribute="'measFacilId'"
-                  @update:modelValue="institution.measFacilId = $event"
-                ></TextField>
-              </v-col>
               <v-col>
                 <Select
                   attribute="tags"
@@ -357,14 +347,16 @@ const getCategories = () => {
       hasLoadingError.value = true;
     });
 };
-const imisIdAndShortNameOrNothing = () => {
+const measIdAndNameOrNothing = () => {
   return [
     () =>
-      (institution.value.imisId === "" && institution.value.shortName === "") ||
-      (institution.value.imisId !== "" && institution.value.shortName !== "") ||
+      (institution.value.measFacilId === "" &&
+        institution.value.measFacilName === "") ||
+      (institution.value.measFacilId !== "" &&
+        institution.value.measFacilName !== "") ||
       t("error.all_or_nothing", [
-        t("institution.imis_id"),
-        t("institution.short_name"),
+        t("institution.meas_facil_id"),
+        t("institution.meas_facil_name"),
       ]),
   ];
 };
@@ -372,7 +364,7 @@ onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
     name: reqField(t("institution.required_name")),
-    measFacilName: [...imisIdAndShortNameOrNothing()],
+    measFacilName: [...measIdAndNameOrNothing()],
     serviceBuildingLocation: reqField(
       t("institution.required_service_building_location")
     ),
@@ -396,6 +388,7 @@ onBeforeMount(() => {
         !v ||
         (v && v.length === 5) ||
         t("institution.imis_id_length_validation_message"),
+      ...measIdAndNameOrNothing(),
     ],
     tags: reqField(t("error.required_tag")),
   });
