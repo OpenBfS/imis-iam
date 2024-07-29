@@ -61,7 +61,7 @@
 
     <template v-slot:thead>
       <tr>
-        <td class="px-2" v-for="header in allHeaders" :key="header">
+        <td class="px-2" v-for="header in headers" :key="header">
           <v-text-field
             density="compact"
             :placeholder="$t('search.filterBy', { attribute: header.title })"
