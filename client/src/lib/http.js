@@ -50,4 +50,26 @@ const PhotonHTTP = axios.create({
   baseURL: "/photon",
 });
 
-export { handleError, HTTP, PhotonHTTP };
+/**
+ * Creates a query parameter like this:
+ * "search=search:searchTerm firstName:Jane lastName:Doe"
+ * @param {string} searchTerm
+ * @param {object} filters
+ */
+function createSearchQueryString(searchTerm, filters) {
+  let searchQueryString = "";
+  if (searchTerm?.length > 0) {
+    searchQueryString = searchQueryString.concat(`search:${searchTerm}`);
+  }
+  const keys = Object.keys(filters);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    searchQueryString = searchQueryString.concat(`${key}:${filters[key]}`);
+    if (i < keys.length - 1) {
+      searchQueryString = searchQueryString.concat(" ");
+    }
+  }
+  return searchQueryString;
+}
+
+export { createSearchQueryString, handleError, HTTP, PhotonHTTP };

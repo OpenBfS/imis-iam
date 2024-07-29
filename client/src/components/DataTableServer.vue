@@ -177,7 +177,7 @@ const triggerSearch = debounce(() => {
 const handleFilterInput = (key, value) => {
   if (props.type === "users") {
     userStore.updateFilter(key, value);
-  } else if (props.type === "institution") {
+  } else if (props.type === "institutions") {
     institutionStore.updateFilter(key, value);
   }
   triggerSearch();

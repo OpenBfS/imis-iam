@@ -5,8 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { defineStore } from "pinia";
-import { HTTP } from "../lib/http";
-import qs from "qs";
+import { createSearchQueryString, HTTP } from "../lib/http";
 
 export const useUserStore = defineStore("user", {
   namespaced: true,
@@ -40,19 +39,15 @@ export const useUserStore = defineStore("user", {
     },
     loadUsers(searchString) {
       return new Promise((resolve, reject) => {
-        const filter = this.filterBy;
         const params = {
-          search: {
-            search: searchString,
-            ...filter,
-          },
+          search: createSearchQueryString(searchString, this.filterBy),
           firstResult: this.offset,
           maxResults: this.itemsPerPage,
           sortBy: this.sortBy?.key,
           order: this.sortBy?.order,
         };
         HTTP.get("/iamuser", {
-          params: qs.stringify(params, { encode: false }),
+          params,
         })
           .then((response) => {
             this.totalNumberOfUsers = response.data.size;

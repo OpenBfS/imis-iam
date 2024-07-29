@@ -6,8 +6,7 @@
  */
 import { defineStore } from "pinia";
 import { Promise } from "core-js";
-import { HTTP } from "../lib/http";
-import qs from "qs";
+import { createSearchQueryString, HTTP } from "../lib/http";
 
 export const useInstitutionStore = defineStore("institution", {
   namespaced: true,
@@ -64,19 +63,15 @@ export const useInstitutionStore = defineStore("institution", {
     },
     loadInstitutions(searchString) {
       return new Promise((resolve, reject) => {
-        const filter = this.filterBy;
         const params = {
-          search: {
-            search: searchString,
-            ...filter,
-          },
+          search: createSearchQueryString(searchString, this.filterBy),
           firstResult: this.offset,
           maxResults: this.itemsPerPage,
           sortBy: this.sortBy?.key,
           order: this.sortBy?.order,
         };
         HTTP.get("/institution", {
-          params: qs.stringify(params, { encode: false }),
+          params,
         })
           .then((response) => {
             this.totalNumberOfInstitutions = response.data.size;
