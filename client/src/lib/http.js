@@ -62,6 +62,8 @@ function createSearchQueryString(searchTerm, filters) {
     searchQueryString = searchQueryString.concat(`search:${searchTerm}`);
   }
   const keys = Object.keys(filters);
+  if (keys.length > 0 && searchQueryString.length > 0)
+    searchQueryString = searchQueryString.concat(" ");
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     searchQueryString = searchQueryString.concat(`${key}:${filters[key]}`);
