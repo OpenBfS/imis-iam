@@ -63,19 +63,6 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
         List<Institution> data,
         HttpHeaders headers
     ) {
-        boolean readonly;
-        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
-        if (userId == null) {
-            readonly = true;
-        } else {
-            RealmModel realm = session.getContext().getRealm();
-            UserModel requestingUser = session.users().getUserById(
-                realm, userId);
-            readonly = !Role.EDITOR.isRoleOf(requestingUser, session);
-        }
-        data.forEach(institution -> {
-                institution.setReadonly(readonly);
-            });
         return data;
     }
 }

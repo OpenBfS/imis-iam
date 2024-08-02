@@ -24,7 +24,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -113,17 +112,6 @@ public class Institution {
 
     @Column(name = "active")
     private Boolean active;
-
-    @Transient
-    private Boolean readonly;
-
-    public Boolean getReadonly() {
-        return readonly;
-    }
-
-    public void setReadonly(Boolean readonly) {
-        this.readonly = readonly;
-    }
 
     public Integer getId() {
         return id;
