@@ -420,8 +420,17 @@ onMounted(() => {
     triggerLoadCoordinates([loc, poc, str].join(" "));
   }
 });
+const sanitizePayload = (payload) => {
+  if (payload.measFacilId && payload.measFacilId === "") {
+    delete payload.measFacilId;
+  }
+  if (payload.measFacilName && payload.measFacilName === "") {
+    delete payload.measFacilName;
+  }
+};
 const createInstitution = () => {
   let payload = { ...institution.value };
+  sanitizePayload(payload);
   HTTP.post("/institution", payload)
     .then((response) => {
       institutionStore.addInstitution(response.data);
@@ -436,6 +445,7 @@ const createInstitution = () => {
 };
 const updateInstitution = () => {
   let payload = { ...institution.value };
+  sanitizePayload(payload);
   if (!showPostalAddress.value) {
     delete payload.addressLocation;
     delete payload.addressPostalCode;
