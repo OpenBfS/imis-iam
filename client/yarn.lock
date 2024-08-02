@@ -7521,10 +7521,10 @@ vuetify-loader@^2.0.0-alpha.0:
     querystring "^0.2.1"
     upath "^2.0.1"
 
-vuetify@^3.6.4:
-  version "3.6.4"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.6.4.tgz#32bf401a569463fcc6e627b909b487aa35dfa2f7"
-  integrity sha512-H0s+VQAuFDIaqJaxaYv3DuJoSlThMfIJX5l06sGkxk9YDMxiEjE4ABT58fTAZGdPMF/TzMXtTHbRNCHes0UaHQ==
+vuetify@^3.6.14:
+  version "3.6.14"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.6.14.tgz#85bd1fe610f2fbf6ddafffb666c3e106abb4b587"
+  integrity sha512-iSa3CgdTEt/7B0aGDmkBARe8rxDDycEYHu1zNtOf1Xpvs/Tv7Ql5yHGqM2XCY0h7SL8Dme39pJIovzg3q4JLbQ==
 
 w3c-xmlserializer@^4.0.0:
   version "4.0.0"
