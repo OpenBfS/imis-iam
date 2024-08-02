@@ -72,6 +72,9 @@
                 <Select
                   attribute="serviceBuildingState"
                   :items="states"
+                  item-title="label"
+                  item-value="value"
+                  :label="$t('institution.state')"
                   @update:modelValue="institution.serviceBuildingState = $event"
                 ></Select>
               </v-col>
@@ -351,23 +354,24 @@ const getCategories = () => {
     });
 };
 const states = [
-  t("institution.state_baden_wuerttemberg"),
-  t("institution.state_bavaria"),
-  t("institution.state_berlin"),
-  t("institution.state_brandenburg"),
-  t("institution.state_bremen"),
-  t("institution.state_hamburg"),
-  t("institution.state_hesse"),
-  t("institution.state_lower_saxony"),
-  t("institution.state_mecklenburg_vorpommern"),
-  t("institution.state_north_rhine_westphalia"),
-  t("institution.state_rhineland_palatinate"),
-  t("institution.state_saarland"),
-  t("institution.state_saxony"),
-  t("institution.state_saxony_anhalt"),
-  t("institution.state_schleswig_holstein"),
-  t("institution.state_thuringia"),
+  { value: "baden_wuerttemberg" },
+  { value: "bavaria" },
+  { value: "berlin" },
+  { value: "brandenburg" },
+  { value: "bremen" },
+  { value: "hamburg" },
+  { value: "hesse" },
+  { value: "lower_saxony" },
+  { value: "mecklenburg_vorpommern" },
+  { value: "north_rhine_westphalia" },
+  { value: "rhineland_palatinate" },
+  { value: "saarland" },
+  { value: "saxony" },
+  { value: "saxony_anhalt" },
+  { value: "schleswig_holstein" },
+  { value: "thuringia" },
 ];
+
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
@@ -401,6 +405,9 @@ onBeforeMount(() => {
         t("institution.meas_facil_id_length_validation_message"),
     ],
     tags: reqField(t("error.required_tag")),
+  });
+  states.forEach((state) => {
+    state["label"] = t(`institution.state_${state.value}`);
   });
 });
 onMounted(() => {

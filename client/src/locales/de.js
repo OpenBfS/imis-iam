@@ -130,6 +130,7 @@ export default {
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
     y_coordinate: "Y-Koordinate",
+    state: "Bundesland",
     state_baden_wuerttemberg: "Baden Würtemberg",
     state_bavaria: "Bayern",
     state_berlin: "Berlin",
