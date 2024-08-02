@@ -165,9 +165,9 @@
                   :label="$t('institution.central_alarm_email_addresses')"
                   :rules="validMail($t('error.valid_email'))"
                   @update:modelValue="
-                    institution.centralAlarmEmailAddresses = $event
+                    institution.centralAlarmMailAddresses = $event
                   "
-                  :attribute="'centralAlarmEmailAddresses'"
+                  :attribute="'centralAlarmMailAddresses'"
                 ></ChipTextField>
               </v-col>
             </v-row>
