@@ -56,6 +56,12 @@
   </v-text-field>
 </template>
 
+<style>
+.v-input input {
+  min-width: 80pt;
+}
+</style>
+
 <script setup>
 import { onMounted, onUnmounted, ref, unref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
