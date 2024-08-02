@@ -37,19 +37,16 @@ public class MeasFacilOrNoneValidator
             && !institution.getMeasFacilId().isBlank()) {
                 return true;
             }
-        if (institution.getMeasFacilName().isBlank()
-            && institution.getMeasFacilId().isBlank()) {
-            return true;
-        }
 
-        final String measFacilName = "measFacilName",
-            measFacilId = "measFacilId";
+
+        final String shortNameKey = "shortName",
+            imisIdKey = "imisId";
         ctx.disableDefaultConstraintViolation();
         ctx.buildConstraintViolationWithTemplate(this.message)
-            .addPropertyNode(measFacilName)
+            .addPropertyNode(shortNameKey)
             .addConstraintViolation();
         ctx.buildConstraintViolationWithTemplate(this.message)
-            .addPropertyNode(measFacilId)
+            .addPropertyNode(imisIdKey)
             .addConstraintViolation();
         return false;
     }
