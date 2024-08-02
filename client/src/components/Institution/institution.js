@@ -18,18 +18,18 @@ const addressPlace = {
   addressPostalCode: "",
   addressLocation: "",
 };
-const imis = { imisId: null };
+const imis = { measFacilId: null };
 const central = { centralMail: "", centralPhone: "", centralFax: "" };
-const alarm = { centralAlarmEmailAddresses: [], centralAlarmPhoneNumbers: [] };
+const alarm = { centralAlarmMailAddresses: [], centralAlarmPhoneNumbers: [] };
 const expInstitution = {
   name: "",
-  shortName: "",
+  measFacilName: "",
   ...central,
   ...alarm,
   ...imis,
   ...serviceBuildingPlace,
   ...addressPlace,
-  categoryNames: [],
+  tags: [],
   active: false,
   xCoordinate: "",
   yCoordinate: "",

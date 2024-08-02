@@ -59,7 +59,7 @@
 import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
-import { ref, toRaw } from "vue";
+import { computed, ref, toRaw } from "vue";
 import { getExpUser } from "@/components/User/user";
 import DataTableServer from "@/components/DataTableServer.vue";
 
@@ -71,18 +71,20 @@ const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
 const savedUser = ref();
-const tableHeaders = [
-  ...profileStore.attributes
-    .filter(
-      (attr) =>
-        attr.annotations?.defaultField &&
-        Boolean(attr.annotations?.defaultField) === true
-    )
-    .map((attr) => toRaw(attr).name),
-  "institutions",
-  "role",
-  "enabled",
-];
+const tableHeaders = computed(() => {
+  return profileStore.attributes
+    ? [
+        ...profileStore.attributes
+          .filter(
+            (attr) =>
+              attr.annotations?.defaultField &&
+              Boolean(attr.annotations?.defaultField) === true
+          )
+          .map((attr) => toRaw(attr).name),
+        "institutions",
+      ]
+    : [];
+});
 
 // Deep Copy for objects
 const cloneObject = (obj) => {

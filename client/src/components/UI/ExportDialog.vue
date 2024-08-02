@@ -93,12 +93,12 @@ const { hasRequestError } = useNotification();
 // Use array of objects to enable translation of the itemes in <v-select> element
 const fieldSeparators = [
   {
-    name: t("label.comma"),
-    value: "comma",
-  },
-  {
     name: t("label.semicolon"),
     value: "semicolon",
+  },
+  {
+    name: t("label.comma"),
+    value: "comma",
   },
   {
     name: t("label.space"),
@@ -121,15 +121,15 @@ const quoteTypes = [
 ];
 const rowDelimiters = [
   {
-    name: t("label.linux"),
-    value: "linux",
-  },
-  {
     name: t("label.windows"),
     value: "windows",
   },
+  {
+    name: t("label.linux"),
+    value: "linux",
+  },
 ];
-const encoding = ["utf-8", "utf-16", "ascii"];
+const encoding = ["utf-16", "utf-8", "ascii"];
 const csvOptions = ref({
   fieldSeparator: fieldSeparators[0].value,
   rowDelimiter: rowDelimiters[0].value,
