@@ -53,7 +53,7 @@ import org.keycloak.utils.SearchQueryUtils;
 @Produces(MediaType.APPLICATION_JSON)
 public class InstitutionProvider implements RealmResourceProvider {
 
-    enum SortOrder {
+    public enum SortOrder {
         asc,
         desc
     }
@@ -79,12 +79,35 @@ public class InstitutionProvider implements RealmResourceProvider {
         this.validator = new Validator();
     }
 
-    private List<Predicate> getFilterQuery(Root<Institution> root, CriteriaBuilder cb, Map<String, String> search) {
+    private Predicate getFilterQuery(Root<Institution> root, CriteriaBuilder cb, Map<String, String> attributes) {
         List<Predicate> predicates = new ArrayList<>();
-        for (Map.Entry<String, String> entry : search.entrySet()) {
-            predicates.add(cb.like(cb.lower(root.get(entry.getKey())), entry.getValue()));
+
+        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+            entry.setValue("%" + entry.getValue() + "%");
         }
-        return predicates;
+
+        String generalSearch = attributes.get("search");
+        attributes.remove("search");
+
+        if (generalSearch != null) {
+            predicates.add(cb.or(
+                    cb.like(
+                            cb.lower(root.get("name")),
+                            generalSearch),
+                    cb.like(
+                            cb.lower(root.get("imisId")),
+                            generalSearch)
+            ));
+        }
+
+        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+            String value = "%" + entry.getValue() + "%";
+            predicates.add(cb.like(
+                    cb.lower(root.get(entry.getKey())),
+                    value
+            ));
+        }
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 
     /**
@@ -137,17 +160,11 @@ public class InstitutionProvider implements RealmResourceProvider {
         Map<String, String> attributes = search == null
                 ? Collections.emptyMap()
                 : SearchQueryUtils.getFields(search);
-        String generalSearch = attributes.get("search");
-        String filter = generalSearch != null && !generalSearch.isEmpty()
-            ? "%" + generalSearch.toLowerCase() + "%" : "";
-        attributes.remove("search");
+
 
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
-        Root<Institution> root = query.from(Institution.class);
-        query.select(root);
+
 
         long size = 0;
         if (firstResult != null || maxResults != null) {
@@ -155,22 +172,8 @@ public class InstitutionProvider implements RealmResourceProvider {
             CriteriaQuery<Long> cqSize = cbSize.createQuery(Long.class);
             Root<Institution> rootSize = cqSize.from(Institution.class);
             cqSize.select(cbSize.count(rootSize));
-            if (!attributes.isEmpty() || !filter.isEmpty()) {
-                List<Predicate> predicates = new ArrayList<>();
-                if (!attributes.isEmpty()) {
-                    predicates.addAll(getFilterQuery(rootSize, cbSize, attributes));
-                }
-                if (!filter.isEmpty()) {
-                    predicates.add(cbSize.or(
-                        cbSize.like(
-                                cbSize.lower(rootSize.get("name")),
-                                filter),
-                        cbSize.like(
-                                cbSize.lower(rootSize.get("imisId")),
-                                filter)
-                    ));
-                }
-                cqSize.where(cbSize.and(predicates.toArray(new Predicate[0])));
+            if (!attributes.isEmpty()) {
+                cqSize.where(getFilterQuery(rootSize, cbSize, attributes));
             }
             size = em.createQuery(cqSize).getSingleResult();
         }
@@ -191,22 +194,13 @@ public class InstitutionProvider implements RealmResourceProvider {
             order = SortOrder.asc;
         }
 
-        if (!attributes.isEmpty() || !filter.isEmpty()) {
-            List<Predicate> predicates = new ArrayList<>();
-            if (!attributes.isEmpty()) {
-                predicates.addAll(getFilterQuery(root, cb, attributes));
-            }
-            if (!filter.isEmpty()) {
-                predicates.add(cb.or(
-                        cb.like(
-                                cb.lower(root.get("name")),
-                                filter),
-                        cb.like(
-                                cb.lower(root.get("imisId")),
-                                filter)
-                ));
-            }
-            query.where(cb.and(predicates.toArray(new Predicate[0])));
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
+        Root<Institution> root = query.from(Institution.class);
+        query.select(root);
+
+        if (!attributes.isEmpty()) {
+            query.where(cb.and(getFilterQuery(root, cb, attributes)));
         }
 
         if (order == SortOrder.asc) {
@@ -222,7 +216,7 @@ public class InstitutionProvider implements RealmResourceProvider {
             size = result.getResultList().size();
         }
         return auth.filterObjectList(
-            new ObjectList<Institution>(size, result.getResultList()),
+                new ObjectList<>(size, result.getResultList()),
             headers);
     }
 
