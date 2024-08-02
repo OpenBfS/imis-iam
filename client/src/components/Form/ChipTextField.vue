@@ -27,8 +27,9 @@
         ? [
             ...applicationStore.clientAndServerRules[props.attribute],
             ...props.rules,
+            ...rules,
           ]
-        : props.rules
+        : [...props.rules, ...rules]
     "
     :variant="props.variant ?? 'underlined'"
   >
@@ -48,6 +49,7 @@
       v-for="(entry, index) in entries"
       @click:close="() => removeEntry(index)"
       closable
+      :color="index === indexOfDuplicate ? 'error' : 'default'"
       size="small"
       :key="entry"
     >
@@ -66,7 +68,9 @@
 import { onMounted, onUnmounted, ref, unref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const { onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
@@ -96,6 +100,18 @@ const emit = defineEmits(["update:modelValue"]);
 const input = ref("");
 const plusButton = ref(null);
 const entries = ref([]);
+const indexOfDuplicate = ref(-1);
+const rules = ref([
+  (v) => {
+    const index = entries.value.indexOf(v);
+    indexOfDuplicate.value = index;
+    if (index === -1) {
+      return true;
+    } else {
+      return t("error.only_unique_values");
+    }
+  },
+]);
 let isAdding = false;
 
 onMounted(() => {
@@ -146,7 +162,7 @@ applicationStore.$subscribe((mutation) => {
 const addEntry = (moveToNextElement = false) => {
   if (isAdding) return;
   isAdding = true;
-  if (input.value === "") return;
+  if (input.value === "" || entries.value.indexOf(input.value) !== -1) return;
   let isValid = true;
   props.rules.forEach((rule) => {
     const result = rule(input.value);

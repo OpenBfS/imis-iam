@@ -78,6 +78,7 @@ export default {
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
     valid_date: "Datum muss gültig sein",
+    only_unique_values: "Bitte geben Sie keine doppelten Werte ein.",
   },
   hints: {
     date_format: "Format: dd.mm.jjjj",
