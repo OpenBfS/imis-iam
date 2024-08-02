@@ -397,7 +397,7 @@ onBeforeMount(() => {
       (v) =>
         !v ||
         (v && v.length === 5) ||
-        t("institution.imis_id_length_validation_message"),
+        t("institution.meas_facil_id_length_validation_message"),
       ...measIdAndNameOrNothing(),
     ],
     tags: reqField(t("error.required_tag")),
