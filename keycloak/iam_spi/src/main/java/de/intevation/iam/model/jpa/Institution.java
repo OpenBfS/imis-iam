@@ -70,8 +70,7 @@ public class Institution {
     @Column(name = "service_building_location", nullable = false)
     private String serviceBuildingLocation;
 
-    @NotBlank
-    @Column(name = "service_building_state", nullable = false)
+    @Column(name = "service_building_state")
     private String serviceBuildingState;
 
     @Column(name = "address_street")

@@ -71,6 +71,7 @@
               <v-col>
                 <Select
                   attribute="serviceBuildingState"
+                  clearable
                   :items="states"
                   item-title="label"
                   item-value="value"
@@ -386,9 +387,6 @@ onBeforeMount(() => {
     ),
     serviceBuildingStreet: reqField(
       t("institution.required_service_building_street")
-    ),
-    serviceBuildingState: reqField(
-      t("institution.required_service_building_state")
     ),
     centralPhone: reqValidPhone(
       t("institution.required_central_phone"),

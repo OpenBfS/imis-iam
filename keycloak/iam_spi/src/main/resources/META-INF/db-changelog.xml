@@ -176,7 +176,7 @@
              splitStatements="true"
              stripComments="true">
             ALTER TABLE iam_institution
-                ADD COLUMN service_building_state VARCHAR NOT NULL;
+                ADD COLUMN service_building_state VARCHAR;
         </sql>
     </changeSet>
 </databaseChangeLog>
