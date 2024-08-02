@@ -43,17 +43,25 @@
             <v-row>
               <v-col cols="3">
                 <TextField
+                  ref="measFacilIdField"
                   :disabled="profileStore.userData.role !== 'chief_editor'"
                   :label="$t('institution.meas_facil_id')"
                   :attribute="'measFacilId'"
-                  @update:modelValue="institution.measFacilId = $event"
+                  @update:modelValue="
+                    institution.measFacilId = $event;
+                    measFacilNameField.validate();
+                  "
                 ></TextField>
               </v-col>
               <v-col cols="3">
                 <TextField
+                  ref="measFacilNameField"
                   :label="$t('institution.meas_facil_name')"
                   :attribute="'measFacilName'"
-                  @update:modelValue="institution.measFacilName = $event"
+                  @update:modelValue="
+                    institution.measFacilName = $event;
+                    measFacilIdField.validate();
+                  "
                 ></TextField>
               </v-col>
             </v-row>
@@ -312,6 +320,8 @@ const coordinatesStore = useCoordinatesStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 
+const measFacilIdField = ref(null);
+const measFacilNameField = ref(null);
 const institution = ref(applicationStore.managedItem);
 const originalInstitution = { ...institution.value };
 const processType = ref(applicationStore.processType);
