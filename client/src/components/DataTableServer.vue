@@ -61,12 +61,14 @@
 
     <template v-slot:thead>
       <tr>
-        <td class="px-2" v-for="header in headers" :key="header">
+        <td class="pe-2" v-for="header in headers" :key="header">
           <v-text-field
+            v-if="header.key !== 'active'"
+            class="my-1"
             density="compact"
-            :placeholder="$t('search.filterBy', { attribute: header.title })"
+            :placeholder="header.title"
             hide-details
-            variant="underlined"
+            variant="outlined"
             @update:modelValue="(event) => handleFilterInput(header.key, event)"
           ></v-text-field>
         </td>
