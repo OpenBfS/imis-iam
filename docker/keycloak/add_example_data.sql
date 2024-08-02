@@ -8,7 +8,7 @@ INSERT INTO iam_mail_type (id, name) VALUES
     (7, 'Soll/Ist-Vergleich'),
     (8, 'Hinweis');
 
-INSERT INTO iam_institution_category (name) VALUES
+INSERT INTO iam_institution_tag (name) VALUES
     ('Bundesministerium'),
     ('Leitstelle'),
     ('Bundesbehörde'),
@@ -21,9 +21,19 @@ INSERT INTO iam_institution_category (name) VALUES
     ('Sonstige'),
     ('Alle');
 
-INSERT INTO keycloak.iam_institution(name, short_name, service_building_street, service_building_postal_code, service_building_location, service_building_state, central_phone, central_mail, imis_id) VALUES
-    ('Institution 1', 'inst_1', 'Examplestreet 1', '12345', 'ExampleLocation-1', 'Berlin', '0123/456789', 'inst1@example.test', 'inst1'),
-    ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', 'Berlin', '0123/456789', 'inst2@example.test', 'inst2');
+INSERT INTO keycloak.iam_institution(
+    name,
+    meas_facil_name,
+    service_building_street,
+    service_building_postal_code,
+    service_building_location,
+    service_building_state,
+    central_phone,
+    central_mail,
+    meas_facil_id
+) VALUES
+    ('Institution 1', 'inst_1', 'Examplestreet 1', '12345', 'ExampleLocation-1', 'berlin', '0123/456789', 'inst1@example.test', 'inst1'),
+    ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', 'berlin', '0123/456789', 'inst2@example.test', 'inst2');
 
 INSERT INTO keycloak.iam_user_attributes (id, expiry_date)
     SELECT id, current_date + interval '12 month'
@@ -35,7 +45,7 @@ INSERT INTO keycloak.iam_institution_user(user_id, institution_id) VALUES
 ((SELECT id FROM keycloak.user_entity WHERE username = 'redakteur'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')),
 ((SELECT id FROM keycloak.user_entity WHERE username = 'chefredakteur'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1'));
 
-INSERT INTO keycloak.iam_institution_categories(institution_id, category_name) VALUES
+INSERT INTO keycloak.iam_institution_tags(institution_id, tag_name) VALUES
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), 'Bundesministerium'),
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), 'Bundesbehörde');
 

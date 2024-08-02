@@ -45,17 +45,17 @@ public class Institution {
     private String name;
 
     @NotBlank
-    @Column(name = "short_name", nullable = false)
-    private String shortName;
+    @Column(name = "meas_facil_name", nullable = false)
+    private String measFacilName;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "iam_institution_categories",
+        name = "iam_institution_tags",
         joinColumns = {@JoinColumn(name = "institution_id")},
-        inverseJoinColumns = {@JoinColumn(name = "category_name")}
+        inverseJoinColumns = {@JoinColumn(name = "tag_name")}
     )
     @NotEmpty
-    private List<InstitutionCategory> categoryNames;
+    private List<InstitutionTag> tags;
 
     @NotBlank
     @Column(name = "service_building_street", nullable = false)
@@ -104,8 +104,8 @@ public class Institution {
     @Column(name = "mail")
     private List<String> centralAlarmMailAddresses;
 
-    @Column(name = "imis_id")
-    private String imisId;
+    @Column(name = "meas_facil_id")
+    private String measFacilId;
 
     @Column(name = "x_coordinate")
     @JsonProperty("xCoordinate")
@@ -145,30 +145,30 @@ public class Institution {
         this.name = name;
     }
 
-    public String getShortName() {
-        return shortName;
+    public String getMeasFacilName() {
+        return measFacilName;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    public void setMeasFacilName(String measFacilName) {
+        this.measFacilName = measFacilName;
     }
 
-    public List<String> getCategoryNames() {
-        ArrayList<String> categories = new ArrayList<>();
-        for (InstitutionCategory category : categoryNames) {
-            categories.add(category.getName());
+    public List<String> getTags() {
+        ArrayList<String> names = new ArrayList<>();
+        for (InstitutionTag tag : tags) {
+            names.add(tag.getName());
         }
-        return categories;
+        return names;
     }
 
-    public void setCategoryNames(List<String> categoryNames) {
-        ArrayList<InstitutionCategory> categories = new ArrayList<>();
-        for (String category : categoryNames) {
-            InstitutionCategory institutionCategory = new InstitutionCategory();
-            institutionCategory.setName(category);
-            categories.add(institutionCategory);
+    public void setTags(List<String> names) {
+        ArrayList<InstitutionTag> tagList = new ArrayList<>();
+        for (String tag : names) {
+            InstitutionTag institutionTag = new InstitutionTag();
+            institutionTag.setName(tag);
+            tagList.add(institutionTag);
         }
-        this.categoryNames = categories;
+        this.tags = tagList;
     }
 
     public String getServiceBuildingStreet() {
@@ -255,7 +255,7 @@ public class Institution {
         this.centralAlarmPhoneNumbers = centralAlarmPhoneNumbers;
     }
 
-    public void setCentralAlarmEmailAddresses(List<String> centralAlarmMailAddresses) {
+    public void setCentralAlarmMailAddresses(List<String> centralAlarmMailAddresses) {
         this.centralAlarmMailAddresses = centralAlarmMailAddresses;
     }
 
@@ -263,16 +263,16 @@ public class Institution {
         return centralAlarmPhoneNumbers;
     }
 
-    public List<String> getCentralAlarmEmailAddresses() {
+    public List<String> getCentralAlarmMailAddresses() {
         return centralAlarmMailAddresses;
     }
 
-    public String getImisId() {
-        return imisId;
+    public String getMeasFacilId() {
+        return measFacilId;
     }
 
-    public void setImisId(String imisId) {
-        this.imisId = imisId;
+    public void setMeasFacilId(String measFacilId) {
+        this.measFacilId = measFacilId;
     }
 
     public Float getXCoordinate() {

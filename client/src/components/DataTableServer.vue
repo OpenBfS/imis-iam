@@ -53,6 +53,8 @@
         ? offset + props.items.length
         : offset + props.itemsPerPage
     } ${$t('label.of')} ${props.totalNumberOfItems}`"
+    show-select
+    v-model="selected"
     @update:options="updateTable"
   >
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
@@ -65,7 +67,7 @@
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
-import { computed, onMounted, ref, toRaw } from "vue";
+import { computed, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -85,6 +87,7 @@ const actionHeader = {
 const allHeaders = computed(() => {
   return [...headers.value.filter((h) => h.visible), actionHeader];
 });
+const selected = ref([]);
 
 const props = defineProps([
   // Vuetify props
@@ -98,6 +101,14 @@ const props = defineProps([
   // Custom props
   "type",
 ]);
+
+watch(selected, (value) => {
+  if (props.type === "users") {
+    userStore.selectedUsers = value;
+  } else {
+    institutionStore.selectedInstitutions = value;
+  }
+});
 
 const updateTable = (event) => {
   const offset = (event.page - 1) * event.itemsPerPage;

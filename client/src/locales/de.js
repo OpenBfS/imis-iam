@@ -7,7 +7,7 @@
 export default {
   // For re-use
   user_term: "IMIS-Nutzer",
-  imis_id_term: "Messstellen-ID",
+  meas_facil_id_term: "Messstellen-ID",
   tag_term: "Tag",
   institutions: "Institutionen",
   true: "Ja",
@@ -70,7 +70,7 @@ export default {
     person_name_invalid_character: "'{0}' enthält ungültige Zeichen.",
 
     // Custom errors
-    required_category: "@:tag_term ist erforderlich",
+    required_tag: "@:tag_term ist erforderlich",
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
     valid_phone: "Telefon muss gültig sein",
@@ -78,9 +78,11 @@ export default {
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
     valid_date: "Datum muss gültig sein",
+    only_unique_values: "Bitte geben Sie keine doppelten Werte ein.",
   },
   hints: {
     date_format: "Format: dd.mm.jjjj",
+    required_fields: "Erforderliche Felder",
   },
   // Institutions component
   institution: {
@@ -92,9 +94,9 @@ export default {
     no_institutions_available: "Es sind keine Institutionen vorhanden",
     fax: "Fax",
     phone: "Telephon",
-    short_name: "Messstellen-Bezeichnung",
+    meas_facil_name: "Messstellen-Bezeichnung",
     required_name: "Institutionsname ist erfoderlich",
-    required_short_name: "Messstellen-Bezeichnung ist erforderlich",
+    required_meas_facil_name: "Messstellen-Bezeichnung ist erforderlich",
     service_building_location: "Ort des Dienstgebäudes",
     required_service_building_location:
       "Ort des Dienstgebäudes ist erforderlich",
@@ -115,15 +117,15 @@ export default {
     place: "Ort",
     street: "Straße",
     postal_code: "PLZ",
-    category_names: "@:tag_term{'s'}",
+    tags: "@:tag_term{'s'}",
     central_fax: "Zentrales Fax",
     differing_postal_address: "Abweichende Postanschrift",
     address_street: "Postanschrift: Straße/Hausnummer",
     address_postal_code: "Postanschrift: PLZ",
     address_location: "Postanschrift: Ort",
-    imis_id: "@:imis_id_term",
-    imis_id_length_validation_message:
-      "Die @:imis_id_term muss exakt 5 Zeichen beinhalten",
+    meas_facil_id: "@:meas_facil_id_term",
+    meas_facil_id_length_validation_message:
+      "Die @:meas_facil_id_term muss exakt 5 Zeichen beinhalten",
     active: "Aktiv",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",

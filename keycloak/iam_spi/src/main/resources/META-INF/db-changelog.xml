@@ -149,7 +149,29 @@
                 DROP COLUMN imis_usergroup_id;
         </sql>
     </changeSet>
-    <changeSet author="christoph.klassen@intevation.de" id="v0.7">
+    <changeSet author="tom@intevation.de" id="v0.7">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution_category
+                RENAME TO iam_institution_tag;
+            ALTER TABLE iam_institution_categories
+                RENAME TO iam_institution_tags;
+            ALTER TABLE iam_institution_tags
+                RENAME category_name TO tag_name;
+        </sql>
+    </changeSet>
+    <changeSet author="tom@intevation.de" id="v0.8">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution
+                RENAME short_name TO meas_facil_name;
+            ALTER TABLE iam_institution
+                RENAME imis_id TO meas_facil_id;
+        </sql>
+    </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.9">
         <sql dbms="all"
              splitStatements="true"
              stripComments="true">
