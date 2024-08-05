@@ -421,10 +421,10 @@ onMounted(() => {
   }
 });
 const sanitizePayload = (payload) => {
-  if (payload.measFacilId && payload.measFacilId === "") {
+  if (payload.measFacilId !== undefined && payload.measFacilId === "") {
     delete payload.measFacilId;
   }
-  if (payload.measFacilName && payload.measFacilName === "") {
+  if (payload.measFacilName !== undefined && payload.measFacilName === "") {
     delete payload.measFacilName;
   }
 };
