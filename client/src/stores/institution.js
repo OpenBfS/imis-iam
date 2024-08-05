@@ -21,6 +21,7 @@ export const useInstitutionStore = defineStore("institution", {
       name: "",
     },
     foundInstitutions: [],
+    selectedInstitutions: [],
     offset: 0,
     itemsPerPage: 25,
     filterBy: {},

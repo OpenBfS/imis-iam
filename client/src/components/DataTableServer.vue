@@ -53,6 +53,8 @@
         ? offset + props.items.length
         : offset + props.itemsPerPage
     } ${$t('label.of')} ${props.totalNumberOfItems}`"
+    show-select
+    v-model="selected"
     @update:options="updateTable"
   >
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
@@ -81,7 +83,7 @@
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
-import { computed, onMounted, ref, toRaw } from "vue";
+import { computed, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import debounce from "debounce";
 
@@ -102,6 +104,7 @@ const actionHeader = {
 const allHeaders = computed(() => {
   return [...headers.value.filter((h) => h.visible), actionHeader];
 });
+const selected = ref([]);
 
 const props = defineProps([
   // Vuetify props
@@ -116,30 +119,22 @@ const props = defineProps([
   "type",
 ]);
 
-const updateTable = (event) => {
-  const offset = (event.page - 1) * event.itemsPerPage;
-  const store = props.type === "users" ? userStore : institutionStore;
-  store.offset = offset;
-  store.itemsPerPage = event.itemsPerPage;
-  store.sortBy = event.sortBy.length ? event.sortBy[0] : null;
-  applicationStore.searchRequest([props.type]);
-};
-
-function getDisplayName(value) {
-  if (!value) return;
-  if (typeof value === "boolean") {
-    return t(`${value}`);
-  } else if (Array.isArray(value)) {
-    return value.join(", ");
+watch(selected, (value) => {
+  if (props.type === "users") {
+    userStore.selectedUsers = value;
+  } else {
+    institutionStore.selectedInstitutions = value;
   }
-  return value;
-}
+});
 
-const camelCaseToUnderscore = (text) => {
-  return text.replace(/([A-Z])/g, "_$1").toLowerCase();
-};
+watch(
+  () => props.headers,
+  () => {
+    adjustHeaders();
+  }
+);
 
-onMounted(() => {
+const adjustHeaders = () => {
   props.headers.forEach((header) => {
     const translationPrefix = props.type === "users" ? "user" : "institution";
     const translationKey =
@@ -170,6 +165,33 @@ onMounted(() => {
     headers.value.push(newHeader);
   });
   selectedHeaders.value = headers.value;
+};
+
+const updateTable = (event) => {
+  const offset = (event.page - 1) * event.itemsPerPage;
+  const store = props.type === "users" ? userStore : institutionStore;
+  store.offset = offset;
+  store.itemsPerPage = event.itemsPerPage;
+  store.sortBy = event.sortBy.length ? event.sortBy[0] : null;
+  applicationStore.searchRequest([props.type]);
+};
+
+function getDisplayName(value) {
+  if (!value) return;
+  if (typeof value === "boolean") {
+    return t(`${value}`);
+  } else if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+  return value;
+}
+
+const camelCaseToUnderscore = (text) => {
+  return text.replace(/([A-Z])/g, "_$1").toLowerCase();
+};
+
+onMounted(() => {
+  adjustHeaders();
 });
 
 const triggerSearch = debounce(() => {

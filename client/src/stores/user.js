@@ -13,6 +13,7 @@ export const useUserStore = defineStore("user", {
     users: [],
     roles: [],
     foundUsers: [],
+    selectedUsers: [],
     offset: 0,
     itemsPerPage: 25,
     filterBy: {},

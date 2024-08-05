@@ -32,10 +32,10 @@
                 @update:modelValue="institution.name = $event"
               ></TextField>
               <TextField
-                :label="$t('institution.short_name')"
-                :attribute="'shortName'"
+                :label="$t('institution.meas_facil_name')"
+                :attribute="'measFacilName'"
                 required
-                @update:modelValue="institution.shortName = $event"
+                @update:modelValue="institution.measFacilName = $event"
               ></TextField>
               <Checkbox
                 attribute="active"
@@ -165,9 +165,9 @@
                   :label="$t('institution.central_alarm_email_addresses')"
                   :rules="validMail($t('error.valid_email'))"
                   @update:modelValue="
-                    institution.centralAlarmEmailAddresses = $event
+                    institution.centralAlarmMailAddresses = $event
                   "
-                  :attribute="'centralAlarmEmailAddresses'"
+                  :attribute="'centralAlarmMailAddresses'"
                 ></ChipTextField>
               </v-col>
             </v-row>
@@ -175,18 +175,18 @@
               <v-col>
                 <TextField
                   :disabled="profileStore.userData.role !== 'chief_editor'"
-                  :label="$t('institution.imis_id')"
-                  :attribute="'imisId'"
-                  @update:modelValue="institution.imisId = $event"
+                  :label="$t('institution.meas_facil_id')"
+                  :attribute="'measFacilId'"
+                  @update:modelValue="institution.measFacilId = $event"
                 ></TextField>
               </v-col>
               <v-col>
                 <Select
-                  attribute="categoryNames"
+                  attribute="tags"
                   :no-data-text="$t('label.no_data_text')"
-                  :label="$t('institution.category_names')"
+                  :label="$t('institution.tags')"
                   :items="categories"
-                  v-model="institution.categoryNames"
+                  v-model="institution.tags"
                   item-title="name"
                   item-value="id"
                   persistent-hint
@@ -333,7 +333,7 @@ const {
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
-  HTTP.get("institution/category")
+  HTTP.get("institution/tag")
     .then((response) => {
       categories.value = response.data;
     })
@@ -345,7 +345,7 @@ onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
     name: reqField(t("institution.required_name")),
-    shortName: reqField(t("institution.required_short_name")),
+    measFacilName: reqField(t("institution.required_meas_facil_name")),
     serviceBuildingLocation: reqField(
       t("institution.required_service_building_location")
     ),
@@ -364,13 +364,13 @@ onBeforeMount(() => {
       t("institution.required_central_email"),
       t("error.valid_email")
     ),
-    imisId: [
+    measFacilId: [
       (v) =>
         !v ||
         (v && v.length === 5) ||
-        t("institution.imis_id_length_validation_message"),
+        t("institution.meas_facil_id_length_validation_message"),
     ],
-    categoryNames: reqField(t("error.required_category")),
+    tags: reqField(t("error.required_tag")),
   });
 });
 onMounted(() => {
