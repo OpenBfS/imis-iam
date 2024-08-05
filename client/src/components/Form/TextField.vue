@@ -11,7 +11,7 @@
     :density="props.density ?? 'compact'"
     :disabled="props.disabled"
     :hint="props.hint"
-    :label="props.label"
+    :label="`${props.label}${props.required ? ' *' : ''}`"
     :model-value="
       props.attribute && !props.modelValue
         ? applicationStore.managedItem[props.attribute]
@@ -25,6 +25,7 @@
         ? applicationStore.clientAndServerRules[props.attribute]
         : props.rules
     "
+    :type="props.type ?? 'text'"
     :variant="props.variant ?? 'underlined'"
     @update:model-value="
       (event) => onUpdateModelValue(event, emit, props.attribute)
@@ -40,23 +41,26 @@ const { onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
-const props = defineProps([
-  "class",
-  "clearable",
-  "density",
-  "disabled",
-  "hint",
-  "label",
-  "modelValue",
-  "name",
-  "prependInnerIcon",
-  "readonly",
-  "rules",
-  "updateCallback",
-  "variant",
+const props = defineProps({
+  class: String,
+  clearable: Boolean,
+  density: String,
+  disabled: Boolean,
+  hint: String,
+  label: String,
+  modelValue: [Object, String],
+  name: String,
+  prependInnerIcon: [Object, String],
+  readonly: Boolean,
+  rules: Array,
+  type: String,
+  variant: String,
 
   // Custom props
-  "attribute",
-]);
+  attribute: String,
+  required: Boolean,
+  updateCallBack: Function,
+});
+
 const emit = defineEmits(["update:modelValue"]);
 </script>

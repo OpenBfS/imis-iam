@@ -76,23 +76,29 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application";
+import { useUserStore } from "@/stores/user";
+import { useInstitutionStore } from "@/stores/institution";
 import { useNotification } from "@/lib/use-notification";
+import { HTTP } from "@/lib/http";
+import qs from "qs";
 
 const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
+const userStore = useUserStore();
 const { t } = useI18n();
 const { hasRequestError } = useNotification();
 // Use array of objects to enable translation of the itemes in <v-select> element
 const fieldSeparators = [
   {
-    name: t("label.comma"),
-    value: "comma",
-  },
-  {
     name: t("label.semicolon"),
     value: "semicolon",
+  },
+  {
+    name: t("label.comma"),
+    value: "comma",
   },
   {
     name: t("label.space"),
@@ -115,15 +121,15 @@ const quoteTypes = [
 ];
 const rowDelimiters = [
   {
-    name: t("label.linux"),
-    value: "linux",
-  },
-  {
     name: t("label.windows"),
     value: "windows",
   },
+  {
+    name: t("label.linux"),
+    value: "linux",
+  },
 ];
-const encoding = ["utf-8", "utf-16", "ascii"];
+const encoding = ["utf-16", "utf-8", "ascii"];
 const csvOptions = ref({
   fieldSeparator: fieldSeparators[0].value,
   rowDelimiter: rowDelimiters[0].value,
@@ -132,19 +138,27 @@ const csvOptions = ref({
   search: applicationStore.searchString,
 });
 
+onMounted(() => {
+  if (
+    applicationStore.listToExport === "users" &&
+    userStore.selectedUsers.length > 0
+  ) {
+    csvOptions.value["id"] = userStore.selectedUsers;
+  } else if (institutionStore.selectedInstitutions.length > 0) {
+    csvOptions.value["id"] = institutionStore.selectedInstitutions;
+  }
+});
+
 const exportRequest = (itemsName) => {
-  fetch(
-    "/backend/realms/imis3/export/" +
-      itemsName +
-      "?" +
-      new URLSearchParams(csvOptions.value).toString()
-  )
+  HTTP.get(`/export/${itemsName}`, {
+    params: csvOptions.value,
+    paramsSerializer: (params) => {
+      return qs.stringify(params, { indices: false });
+    },
+  })
     .then((res) => {
-      if (!res.ok) throw new Error(res.statusText);
-      return res.blob();
-    })
-    .then((data) => {
-      const blob = new Blob([data]);
+      if (!res.statusText === "OK") throw new Error(res.statusText);
+      const blob = new Blob([res.data]);
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = "export.csv";

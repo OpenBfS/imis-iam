@@ -53,6 +53,8 @@
         ? offset + props.items.length
         : offset + props.itemsPerPage
     } ${$t('label.of')} ${props.totalNumberOfItems}`"
+    show-select
+    v-model="selected"
     @update:options="updateTable"
   >
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
@@ -65,7 +67,7 @@
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
-import { computed, onMounted, ref, toRaw } from "vue";
+import { computed, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -76,7 +78,6 @@ const userStore = useUserStore();
 
 const areTableSettingsOpen = ref(false);
 const headers = ref([]);
-const selectedHeaders = ref([]);
 const actionHeader = {
   title: t("label.actions"),
   key: "actions",
@@ -85,6 +86,7 @@ const actionHeader = {
 const allHeaders = computed(() => {
   return [...headers.value.filter((h) => h.visible), actionHeader];
 });
+const selected = ref([]);
 
 const props = defineProps([
   // Vuetify props
@@ -98,6 +100,56 @@ const props = defineProps([
   // Custom props
   "type",
 ]);
+
+watch(selected, (value) => {
+  if (props.type === "users") {
+    userStore.selectedUsers = value;
+  } else {
+    institutionStore.selectedInstitutions = value;
+  }
+});
+
+watch(
+  () => props.headers,
+  () => {
+    adjustHeaders();
+  }
+);
+
+const adjustHeaders = () => {
+  const newHeaders = [];
+  props.headers.forEach((header) => {
+    const headerName = header.name;
+    const translationPrefix = props.type === "users" ? "user" : "institution";
+    const translationKey =
+      headerName === "name"
+        ? "label.name"
+        : `${translationPrefix}.${camelCaseToUnderscore(headerName)}`;
+
+    const newHeader = {
+      title: t(translationKey),
+      key: headerName,
+      sortable: props.type !== "users",
+      visible: header.default,
+    };
+    newHeader.value = (item) => {
+      if (
+        props.type === "users" &&
+        headerName === "role" &&
+        toRaw(item)?.[headerName]
+      ) {
+        return t(`role_iam_${toRaw(item)[headerName]}`);
+      }
+      const value =
+        props.type === "users"
+          ? toRaw(item.attributes[headerName] ?? item[headerName])
+          : item[headerName];
+      return value ? getDisplayName(toRaw(value)) : undefined;
+    };
+    newHeaders.push(newHeader);
+  });
+  headers.value = newHeaders;
+};
 
 const updateTable = (event) => {
   const offset = (event.page - 1) * event.itemsPerPage;
@@ -123,35 +175,6 @@ const camelCaseToUnderscore = (text) => {
 };
 
 onMounted(() => {
-  props.headers.forEach((header) => {
-    const translationPrefix = props.type === "users" ? "user" : "institution";
-    const translationKey =
-      header === "name"
-        ? "label.name"
-        : `${translationPrefix}.${camelCaseToUnderscore(header)}`;
-
-    const newHeader = {
-      title: t(translationKey),
-      key: header,
-      sortable: props.type !== "users",
-      visible: true,
-    };
-    newHeader.value = (item) => {
-      if (
-        props.type === "users" &&
-        header === "role" &&
-        toRaw(item)?.[header]
-      ) {
-        return t(`role_iam_${toRaw(item)[header]}`);
-      }
-      const value =
-        props.type === "users"
-          ? toRaw(item.attributes[header] ?? item[header])
-          : item[header];
-      return value ? getDisplayName(toRaw(value)) : undefined;
-    };
-    headers.value.push(newHeader);
-  });
-  selectedHeaders.value = headers.value;
+  adjustHeaders();
 });
 </script>

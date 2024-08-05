@@ -25,6 +25,7 @@
               :label="$t('mailinglist.name')"
               :modelValue="listName"
               :attribute="'name'"
+              required
               @update:modelValue="listName = $event"
             ></TextField>
             <Select
@@ -38,7 +39,9 @@
               item-value="id"
               persistent-hint
               multiple
+              required
             ></Select>
+            <v-label>* {{ $t("hints.required_fields") }}</v-label>
             <UIAlert
               v-if="hasRequestError"
               v-bind:isSuccessful="!hasRequestError"

@@ -24,6 +24,9 @@
     "annotations": {
       "inputType": "html5-email"
     },
+    "required" : {
+      "roles" : [ "user" ]
+    },
     "validations" : {
       "email" : { },
       "length" : {

@@ -35,6 +35,7 @@
                   :label="$t('user.username')"
                   :model-value="user.attributes.username"
                   :rules="applicationStore.clientAndServerRules['username']"
+                  required
                   @update:model-value="
                     clearValidationError('username');
                     setUserAttribute('username', $event);
@@ -68,6 +69,7 @@
                     <TextField
                       v-if="isTextField(attribute.annotations?.inputType)"
                       density="compact"
+                      :required="isUserAttributeRequired(attribute)"
                       variant="underlined"
                       :label="handleDisplayName(attribute.displayName)"
                       :name="attribute.name"
@@ -96,6 +98,7 @@
                       :multiple="
                         attribute.annotations.inputType === 'multiselect'
                       "
+                      :required="isUserAttributeRequired(attribute)"
                       @update:model-value="
                         setUserAttribute(attribute.name, $event)
                       "
@@ -117,6 +120,7 @@
                   <TextField
                     v-if="isTextField(attribute.annotations?.inputType)"
                     density="compact"
+                    :required="isUserAttributeRequired(attribute)"
                     variant="underlined"
                     :label="handleDisplayName(attribute.displayName)"
                     :name="attribute.name"
@@ -149,6 +153,7 @@
                     :multiple="
                       attribute.annotations.inputType === 'multiselect'
                     "
+                    :required="isUserAttributeRequired(attribute)"
                     @update:model-value="
                       setUserAttribute(attribute.name, $event)
                     "
@@ -173,6 +178,7 @@
                 item-value="name"
                 persistent-hint
                 multiple
+                required
               ></Select>
             </div>
             <div class="one_group_class">
@@ -184,11 +190,13 @@
                 :items="userRoles"
                 item-value="name"
                 name="role"
+                required
                 v-model="user.role"
                 persistent-hint
               ></Select>
             </div>
           </v-form>
+          <v-label>* {{ $t("hints.required_fields") }}</v-label>
           <UIAlert
             v-if="hasLoadingError || hasRequestError"
             v-bind:message="applicationStore.httpErrorMessage"
@@ -352,6 +360,10 @@ const handleDisplayName = (displayName) => {
   return displayName;
 };
 
+const isUserAttributeRequired = (userAttribute) => {
+  return userAttribute.required?.roles?.includes("user");
+};
+
 // Creating rules for the validation of form components.
 const getUserAttributeRules = (userAttribute) => {
   const tmpRules = [];
@@ -366,7 +378,7 @@ const getUserAttributeRules = (userAttribute) => {
       // attribute is not required (when optional rules are supported
       // by Vuetify)
       userAttribute.name === "email" ||
-      userAttribute.required?.roles?.includes("user")
+      isUserAttributeRequired(userAttribute)
     ) {
       tmpRules.push(
         ...reqField(

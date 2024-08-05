@@ -16,7 +16,7 @@
     :density="props.density ?? 'compact'"
     :disabled="props.disabled"
     :hint="props.hint"
-    :label="props.label"
+    :label="`${props.label}${props.required ? ' *' : ''}`"
     :name="props.name"
     :persistent-hint="true"
     :persistent-placeholder="entries.length > 0"
@@ -27,8 +27,9 @@
         ? [
             ...applicationStore.clientAndServerRules[props.attribute],
             ...props.rules,
+            ...rules,
           ]
-        : props.rules
+        : [...props.rules, ...rules]
     "
     :variant="props.variant ?? 'underlined'"
   >
@@ -48,6 +49,7 @@
       v-for="(entry, index) in entries"
       @click:close="() => removeEntry(index)"
       closable
+      :color="index === indexOfDuplicate ? 'error' : 'default'"
       size="small"
       :key="entry"
     >
@@ -56,37 +58,60 @@
   </v-text-field>
 </template>
 
+<style>
+.v-input input {
+  min-width: 80pt;
+}
+</style>
+
 <script setup>
 import { onMounted, onUnmounted, ref, unref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const { onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
-const props = defineProps([
-  "class",
-  "clearable",
-  "density",
-  "disabled",
-  "hint",
-  "label",
-  "name",
-  "prependInnerIcon",
-  "readonly",
-  "rules",
-  "updateCallback",
-  "variant",
+const props = defineProps({
+  class: String,
+  clearable: Boolean,
+  density: String,
+  disabled: Boolean,
+  hint: String,
+  label: String,
+  modelValue: [Object, String],
+  name: String,
+  prependInnerIcon: Object,
+  readonly: Boolean,
+  rules: Array,
+  variant: String,
 
   // Custom props
-  "attribute",
-]);
+  attribute: String,
+  required: Boolean,
+  updateCallBack: Function,
+});
+
 const emit = defineEmits(["update:modelValue"]);
 
 const input = ref("");
 const plusButton = ref(null);
 const entries = ref([]);
+const indexOfDuplicate = ref(-1);
+const rules = ref([
+  (v) => {
+    const index = entries.value.indexOf(v);
+    indexOfDuplicate.value = index;
+    if (index === -1) {
+      return true;
+    } else {
+      return t("error.only_unique_values");
+    }
+  },
+]);
 let isAdding = false;
 
 onMounted(() => {
@@ -116,6 +141,13 @@ watch(input, (newInput) => {
 applicationStore.$subscribe((mutation) => {
   const key = mutation.events.key;
   if (key === props.attribute) {
+    // Mutations with the same key can also occur when the rules in the application store are
+    // updated so we need to ensure that we don't get an array with rules (functions).
+    if (
+      mutation.events.newValue[0] &&
+      typeof mutation.events.newValue[0] === "function"
+    )
+      return;
     entries.value = mutation.events.newValue;
     input.value = "";
   } else if (key === "attributesOfFieldsThatChanged") {
@@ -130,7 +162,7 @@ applicationStore.$subscribe((mutation) => {
 const addEntry = (moveToNextElement = false) => {
   if (isAdding) return;
   isAdding = true;
-  if (input.value === "") return;
+  if (input.value === "" || entries.value.indexOf(input.value) !== -1) return;
   let isValid = true;
   props.rules.forEach((rule) => {
     const result = rule(input.value);

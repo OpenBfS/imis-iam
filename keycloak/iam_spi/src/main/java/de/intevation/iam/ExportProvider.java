@@ -144,7 +144,8 @@ public class ExportProvider implements RealmResourceProvider {
      * @param quoteType Char used for quotes
      * @param rowDelimiter Char used as row delimiter
      * @param encoding Encoding to use
-     * @param search Optional search parameter
+     * @param search Optional search parameter (ignored if IDs are given)
+     * @param ids Multiple institution-IDs can be given to export specific institutions
      * @param headers Request headers
      * @return Institutions as CSV
      */
@@ -156,6 +157,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("rowDelimiter") String rowDelimiter,
             @QueryParam("encoding") String encoding,
             @QueryParam("search") String search,
+            @QueryParam("id") List<Integer> ids,
             @Context HttpHeaders headers
     ) {
         CSVExporter<Institution> exporter = new CSVExporter<>();
@@ -170,9 +172,16 @@ public class ExportProvider implements RealmResourceProvider {
                 headers.getHeaderString(Constants.SHIB_USER_HEADER));
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
-        return doExport(
-            exporter, instProvider.getInstitutions(
-                headers, search, null, null, null, null).getList(), i18n);
+        List<Institution> institutions = new ArrayList<>();
+        if (ids != null && !ids.isEmpty()) {
+            for (Integer id: ids) {
+                institutions.add(instProvider.getInstitutionById(id));
+            }
+        } else {
+            institutions = instProvider.getInstitutions(headers, search, null, null, null, null)
+                .getList();
+        }
+        return doExport(exporter, institutions, i18n);
     }
 
     private <T> void setCsvOptions(
