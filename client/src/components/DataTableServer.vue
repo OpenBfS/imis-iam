@@ -110,30 +110,14 @@ watch(selected, (value) => {
   }
 });
 
-const updateTable = (event) => {
-  const offset = (event.page - 1) * event.itemsPerPage;
-  const store = props.type === "users" ? userStore : institutionStore;
-  store.offset = offset;
-  store.itemsPerPage = event.itemsPerPage;
-  store.sortBy = event.sortBy.length ? event.sortBy[0] : null;
-  applicationStore.searchRequest([props.type]);
-};
-
-function getDisplayName(value) {
-  if (!value) return;
-  if (typeof value === "boolean") {
-    return t(`${value}`);
-  } else if (Array.isArray(value)) {
-    return value.join(", ");
+watch(
+  () => props.headers,
+  () => {
+    adjustHeaders();
   }
-  return value;
-}
+);
 
-const camelCaseToUnderscore = (text) => {
-  return text.replace(/([A-Z])/g, "_$1").toLowerCase();
-};
-
-onMounted(() => {
+const adjustHeaders = () => {
   props.headers.forEach((header) => {
     const translationPrefix = props.type === "users" ? "user" : "institution";
     const translationKey =
@@ -164,5 +148,32 @@ onMounted(() => {
     headers.value.push(newHeader);
   });
   selectedHeaders.value = headers.value;
+};
+
+const updateTable = (event) => {
+  const offset = (event.page - 1) * event.itemsPerPage;
+  const store = props.type === "users" ? userStore : institutionStore;
+  store.offset = offset;
+  store.itemsPerPage = event.itemsPerPage;
+  store.sortBy = event.sortBy.length ? event.sortBy[0] : null;
+  applicationStore.searchRequest([props.type]);
+};
+
+function getDisplayName(value) {
+  if (!value) return;
+  if (typeof value === "boolean") {
+    return t(`${value}`);
+  } else if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+  return value;
+}
+
+const camelCaseToUnderscore = (text) => {
+  return text.replace(/([A-Z])/g, "_$1").toLowerCase();
+};
+
+onMounted(() => {
+  adjustHeaders();
 });
 </script>
