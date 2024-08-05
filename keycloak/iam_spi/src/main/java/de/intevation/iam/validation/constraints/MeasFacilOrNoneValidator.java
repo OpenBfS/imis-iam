@@ -27,17 +27,20 @@ public class MeasFacilOrNoneValidator
     @Override
     public boolean isValid(Institution institution, ConstraintValidatorContext ctx) {
         if (institution == null
-            || institution.getMeasFacilName() == null
-            || institution.getMeasFacilId() == null
+            || (institution.getMeasFacilName() == null
+            && institution.getMeasFacilId() == null)
         ) {
             return true;
         }
 
-        if (!institution.getMeasFacilName().isBlank()
-            && !institution.getMeasFacilId().isBlank()) {
+        // Only check if both values are set
+        if (institution.getMeasFacilId() != null
+            && institution.getMeasFacilName() != null) {
+            if (!institution.getMeasFacilName().isBlank()
+                    && !institution.getMeasFacilId().isBlank()) {
                 return true;
             }
-
+        }
 
         final String measFacilName = "measFacilName",
             measFacilId = "measFacilId";
