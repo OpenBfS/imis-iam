@@ -162,7 +162,7 @@
               </v-col>
               <v-col>
                 <ChipTextField
-                  :label="$t('institution.central_alarm_email_addresses')"
+                  :label="$t('institution.central_alarm_mail_addresses')"
                   :rules="validMail($t('error.valid_email'))"
                   @update:modelValue="
                     institution.centralAlarmMailAddresses = $event

@@ -110,7 +110,7 @@ export default {
     required_central_phone: "Zentrales Telefon ist erforderlich",
     central_mail: "Zentrale E-Mail",
     central_alarm_phone_numbers: "Zentrale Alarmierung (Telefon)",
-    central_alarm_email_addresses: "Zentrale Alarmierung (E-Mail)",
+    central_alarm_mail_addresses: "Zentrale Alarmierung (E-Mail)",
     required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
     street: "Straße",
