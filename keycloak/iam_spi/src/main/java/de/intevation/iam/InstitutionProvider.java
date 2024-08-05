@@ -14,6 +14,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.ws.rs.DELETE;
@@ -101,14 +102,22 @@ public class InstitutionProvider implements RealmResourceProvider {
         }
 
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
-            if (Objects.equals(entry.getKey(), "search")) {
+            if (entry.getKey().equals("search")) {
                 continue;
             }
-            String value = "%" + entry.getValue() + "%";
-            predicates.add(cb.like(
-                    cb.lower(root.get(entry.getKey())),
-                    value
-            ));
+
+            String value = "%" + entry.getValue().toLowerCase() + "%";
+            if (entry.getKey().equals("tags")) {
+                Join<Institution, InstitutionTag> tags = root.join("tags");
+                predicates.add(cb.like(
+                                cb.lower(tags.get("name")),
+                                value));
+            } else {
+                predicates.add(cb.like(
+                        cb.lower(root.get(entry.getKey())),
+                        value
+                ));
+            }
         }
         return cb.and(predicates.toArray(new Predicate[0]));
     }
