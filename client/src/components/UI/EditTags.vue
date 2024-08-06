@@ -20,11 +20,11 @@
         <v-form v-model="valid" ref="form" class="v-col v-col-10">
           <Select
             v-if="props.type === 'institutions'"
-            attribute="categoryNames"
+            attribute="tags"
             :no-data-text="$t('label.no_data_text')"
-            :label="$t('institution.category_names')"
-            :items="categories"
-            v-model="selectedCategories"
+            :label="$t('institution.tags')"
+            :items="institutionTags"
+            v-model="selectedInstitutionTags"
             item-title="name"
             item-value="id"
             persistent-hint
@@ -44,6 +44,10 @@
           ></Select>
         </v-form>
       </v-card-text>
+      <UIAlert
+        v-if="hasLoadingError || hasRequestError"
+        v-bind:message="applicationStore.httpErrorMessage"
+      />
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -57,10 +61,6 @@
           {{ $t("button.cancel") }}
         </v-btn>
       </v-card-actions>
-      <UIAlert
-        v-if="hasLoadingError || hasRequestError"
-        v-bind:message="applicationStore.httpErrorMessage"
-      />
     </v-card>
   </v-dialog>
 </template>
@@ -93,16 +93,16 @@ const {
   handleValidationErrorFromServer,
   isServerValidationError,
 } = useForm();
-const categories = ref([]);
-const selectedCategories = ref([]);
+const institutionTags = ref([]);
+const selectedInstitutionTags = ref([]);
 const userTagsAttribute = ref("");
 const userTags = ref([]);
 const selectedUserTags = ref([]);
 
-const getCategories = () => {
-  HTTP.get("institution/category")
+const getInstitutionTags = () => {
+  HTTP.get("institution/tag")
     .then((response) => {
-      categories.value = response.data;
+      institutionTags.value = response.data;
     })
     .catch(() => {
       hasLoadingError.value = true;
@@ -115,7 +115,7 @@ onBeforeMount(() => {
 
 onUpdated(async () => {
   if (props.type === "institutions") {
-    getCategories();
+    getInstitutionTags();
   } else if (props.type === "users") {
     if (!profileStore.attributes) {
       await profileStore.loadUserProfileMetadata();
@@ -134,11 +134,11 @@ const editInstitutionTags = (remove) => {
       institutionStore.foundInstitutions.find((inst) => inst.id === id)
     );
     if (remove) {
-      institutionToEdit.categoryNames = institutionToEdit.categoryNames.filter(
-        (category) => !selectedCategories.value.includes(category)
+      institutionToEdit.tags = institutionToEdit.tags.filter(
+        (tag) => !selectedInstitutionTags.value.includes(tag)
       );
     } else {
-      institutionToEdit.categoryNames = selectedCategories.value;
+      institutionToEdit.tags = selectedInstitutionTags.value;
     }
     const result = updateInstitution(
       institutionToEdit,
