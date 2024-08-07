@@ -271,5 +271,7 @@ export default {
     edit_tags: "Tags bearbeiten",
     edit_tags_institutions: "Tags der ausgewählten Institutionen bearbeiten",
     edit_tags_users: "Tags der ausgewählten Nutzer bearbeiten",
+    didnt_remove:
+      "Der Tag '{tag}' wurde nicht entfernt, da {type} mindestens einen Tag besitzen müssen.",
   },
 };

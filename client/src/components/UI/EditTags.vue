@@ -19,35 +19,25 @@
       <v-card-text>
         <v-form v-model="valid" ref="form" class="v-col v-col-10">
           <Select
-            v-if="props.type === 'institutions'"
-            attribute="tags"
             :no-data-text="$t('label.no_data_text')"
             :label="$t('institution.tags')"
-            :items="institutionTags"
-            v-model="selectedInstitutionTags"
-            item-title="name"
-            item-value="id"
-            persistent-hint
-            multiple
-          ></Select>
-          <Select
-            v-if="props.type === 'users'"
-            attribute="tags"
-            :no-data-text="$t('label.no_data_text')"
-            :label="handleDisplayName(userTagsAttribute.displayName ?? '')"
-            :items="userTags"
-            v-model="selectedUserTags"
+            :items="props.type === 'institutions' ? institutionTags : userTags"
+            v-model="selectedTags"
             item-title="name"
             item-value="id"
             persistent-hint
             multiple
           ></Select>
         </v-form>
+        <v-alert
+          v-for="message in errorMessages"
+          v-bind:key="message.key"
+          type="error"
+          variant="text"
+        >
+          {{ message.key }}: {{ message.value }}
+        </v-alert>
       </v-card-text>
-      <UIAlert
-        v-if="hasLoadingError || hasRequestError"
-        v-bind:message="applicationStore.httpErrorMessage"
-      />
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -66,17 +56,18 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onUpdated, ref } from "vue";
+import { onBeforeMount, onUpdated, ref, watch } from "vue";
 import { HTTP } from "@/lib/http";
 import { useForm } from "@/lib/use-form";
 import { useNotification } from "@/lib/use-notification";
 import { updateInstitution } from "@/components/Institution/institution";
-import { handleDisplayName, updateUser } from "@/components/User/user";
+import { updateUser } from "@/components/User/user";
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import Select from "@/components/Form/Select";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps(["close", "isActive", "type"]);
 
@@ -85,21 +76,39 @@ const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
 
+const { t } = useI18n();
 const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
 const {
   form,
+  translateError,
   valid,
   handleValidationErrorFromServer,
   isServerValidationError,
 } = useForm();
 const institutionTags = ref([]);
-const selectedInstitutionTags = ref([]);
-const userTagsAttribute = ref("");
+const selectedTags = ref([]);
+const userTagsAttribute = ref(null);
 const userTags = ref([]);
-const selectedUserTags = ref([]);
+const errorMessages = ref([]);
 
-const getInstitutionTags = () => {
+const isInstitutionType = () => {
+  return props.type === "institutions";
+};
+
+const isUserType = () => {
+  return props.type === "users";
+};
+
+watch(
+  () => props.isActive,
+  () => {
+    resetMessages();
+    resetSelection();
+  }
+);
+
+const loadInstitutionTags = () => {
   HTTP.get("institution/tag")
     .then((response) => {
       institutionTags.value = response.data;
@@ -109,81 +118,133 @@ const getInstitutionTags = () => {
     });
 };
 
+const loadUserTags = async () => {
+  if (!profileStore.attributes) {
+    await profileStore.loadUserProfileMetadata();
+  }
+  userTagsAttribute.value = profileStore.attributes.find(
+    (attribute) => attribute.name === "tags"
+  );
+  userTags.value = userTagsAttribute.value.validations.options.options;
+};
+
 onBeforeMount(() => {
   applicationStore.setForm(form);
 });
 
-onUpdated(async () => {
-  if (props.type === "institutions") {
-    getInstitutionTags();
-  } else if (props.type === "users") {
-    if (!profileStore.attributes) {
-      await profileStore.loadUserProfileMetadata();
-    }
-    userTagsAttribute.value = profileStore.attributes.find(
-      (attribute) => attribute.name === "tags"
-    );
-    userTags.value = userTagsAttribute.value.validations.options.options;
+onUpdated(() => {
+  resetMessages();
+  if (isInstitutionType()) {
+    loadInstitutionTags();
+  } else if (isUserType()) {
+    loadUserTags();
   }
 });
 
-const editInstitutionTags = (remove) => {
-  let successful = true;
-  institutionStore.selectedInstitutions.forEach((id) => {
-    const institutionToEdit = structuredClone(
-      institutionStore.foundInstitutions.find((inst) => inst.id === id)
-    );
-    if (remove) {
-      institutionToEdit.tags = institutionToEdit.tags.filter(
-        (tag) => !selectedInstitutionTags.value.includes(tag)
-      );
-    } else {
-      institutionToEdit.tags = selectedInstitutionTags.value;
-    }
-    const result = updateInstitution(
-      institutionToEdit,
-      true,
-      isServerValidationError,
-      handleValidationErrorFromServer,
-      hasRequestError
-    );
-    if (!result) successful = false;
-  });
-  return successful;
+const resetMessages = () => {
+  errorMessages.value = [];
 };
 
-const editUserTags = (remove) => {
-  let successful = true;
-  userStore.selectedUsers.forEach((id) => {
-    const userToEdit = structuredClone(
-      userStore.foundUsers.find((user) => user.id === id)
-    );
-    if (remove) {
-      userToEdit.attributes.tags = userToEdit.attributes.tags.filter(
-        (tag) => !selectedUserTags.value.includes(tag)
-      );
-    } else {
-      userToEdit.attributes.tags = selectedUserTags.value;
-    }
-    const result = updateUser(
-      userToEdit,
-      resetNotification,
-      isServerValidationError,
-      handleValidationErrorFromServer,
-      hasRequestError
-    );
-    if (!result) successful = false;
-  });
-  return successful;
+const resetSelection = () => {
+  selectedTags.value = [];
 };
 
-const editTags = (remove) => {
-  let successful;
-  if (props.type === "institutions") {
-    successful = editInstitutionTags(remove);
-  } else if (props.type === "users") {
-    successful = editUserTags(remove);
+const editTags = async (remove) => {
+  resetMessages();
+  const newErrorMessages = [];
+  let selectedItems,
+    foundItems,
+    areTagsRequired = true;
+  if (isInstitutionType()) {
+    selectedItems = institutionStore.selectedInstitutions;
+    foundItems = institutionStore.foundInstitutions;
+  } else if (isUserType()) {
+    selectedItems = userStore.selectedUsers;
+    foundItems = userStore.foundUsers;
+    areTagsRequired = userTagsAttribute.value.required?.roles?.includes("user");
   }
-  if (successful) props.close();
+  for (let i = 0; i < selectedItems.length; i++) {
+    const id = selectedItems[i];
+    const itemToEdit = structuredClone(
+      foundItems.find((item) => item.id === id)
+    );
+    let newTags = [];
+    const oldTags = isInstitutionType()
+      ? itemToEdit.tags
+      : itemToEdit.attributes.tags;
+    if (remove) {
+      newTags = oldTags.filter((tag) => !selectedTags.value.includes(tag));
+      if (newTags.length === 0 && areTagsRequired) {
+        newTags.push(oldTags[0]);
+        let key, translatedType;
+        if (isInstitutionType()) {
+          key = itemToEdit.name;
+          translatedType = t("institutions");
+        } else if (isUserType()) {
+          key = itemToEdit.attributes.username[0];
+          translatedType = t("user_term");
+        }
+        newErrorMessages.push({
+          key: key,
+          value: t("search.didnt_remove", {
+            tag: oldTags[0],
+            type: translatedType,
+          }),
+        });
+      }
+    } else {
+      for (let i = 0; i < oldTags.length; i++) {
+        newTags.push(oldTags[i]);
+      }
+      for (let i = 0; i < selectedTags.value.length; i++) {
+        const tag = selectedTags.value[i];
+        if (!oldTags.includes(tag)) {
+          newTags.push(tag);
+        }
+      }
+    }
+    if (isInstitutionType()) {
+      itemToEdit.tags = newTags;
+    } else if (isUserType()) {
+      itemToEdit.attributes.tags = newTags;
+    }
+
+    let result;
+    if (isInstitutionType()) {
+      result = await updateInstitution(
+        itemToEdit,
+        true,
+        isServerValidationError,
+        handleValidationErrorFromServer,
+        hasRequestError
+      );
+    } else if (isUserType()) {
+      result = updateUser(
+        itemToEdit,
+        resetNotification,
+        isServerValidationError,
+        handleValidationErrorFromServer,
+        hasRequestError
+      );
+    }
+    if (result.response !== 200) {
+      if (isServerValidationError(result)) {
+        const errors = result.response.data;
+        const errorObject = errors[0];
+        const attribute = errorObject.messageParameters[0];
+        const translatedMessage = translateError(
+          errorObject.message,
+          attribute
+        );
+        newErrorMessages.push({
+          key: itemToEdit.name,
+          value: translatedMessage,
+        });
+      }
+    }
+  }
+
+  errorMessages.value = newErrorMessages;
+  if (newErrorMessages.length === 0) props.close();
 };
 </script>

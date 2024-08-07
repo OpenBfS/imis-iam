@@ -53,19 +53,22 @@ function updateInstitution(
     delete institution.addressPostalCode;
     delete institution.addressStreet;
   }
-  institutionStore
-    .updateInstitution(institution)
-    .then(() => {
-      applicationStore.searchRequest(["institutions"]);
-      applicationStore.setShowManageInstitutionDialog(false);
-      return true;
-    })
-    .catch((error) => {
-      isServerValidationError(error)
-        ? handleValidationErrorFromServer(error.response.data)
-        : (hasRequestError.value = true);
-      return false;
-    });
+  return new Promise((resolve) => {
+    institutionStore
+      .updateInstitution(institution)
+      .then(() => {
+        applicationStore.searchRequest(["institutions"]);
+        applicationStore.setShowManageInstitutionDialog(false);
+        resolve({ status: 200 });
+      })
+      .catch((error) => {
+        isServerValidationError(error)
+          ? handleValidationErrorFromServer(error.response.data)
+          : (hasRequestError.value = true);
+        console.error(error.response);
+        resolve(error);
+      });
+  });
 }
 
 export { getExpInstitution, updateInstitution };

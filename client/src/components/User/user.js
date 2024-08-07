@@ -39,25 +39,27 @@ function updateUser(
   const profileStore = useProfileStore();
   const userStore = useUserStore();
   if (resetNotification) resetNotification();
-  userStore
-    .updateUser(user)
-    .then(() => {
-      // Update current user Profile and thus the data in App bar.
-      if (profileStore.userData.id === user.id) {
-        profileStore.loadProfile();
-      }
-      applicationStore.setOwnAccount(false);
-      applicationStore.setShowManageUserDialog(false);
-      applicationStore.searchRequest(["users"]);
-      return true;
-    })
-    .catch((error) => {
-      isServerValidationError(error)
-        ? handleValidationErrorFromServer(error.response.data)
-        : (hasRequestError.value = true);
-      console.error(error);
-      return false;
-    });
+  return new Promise((resolve) => {
+    userStore
+      .updateUser(user)
+      .then(() => {
+        // Update current user Profile and thus the data in App bar.
+        if (profileStore.userData.id === user.id) {
+          profileStore.loadProfile();
+        }
+        applicationStore.setOwnAccount(false);
+        applicationStore.setShowManageUserDialog(false);
+        applicationStore.searchRequest(["users"]);
+        resolve({ status: 200 });
+      })
+      .catch((error) => {
+        isServerValidationError(error)
+          ? handleValidationErrorFromServer(error.response.data)
+          : (hasRequestError.value = true);
+        console.error(error.response);
+        resolve(error);
+      });
+  });
 }
 
 export { getExpUser, handleDisplayName, updateUser };
