@@ -14,7 +14,6 @@ import org.keycloak.connections.jpa.entityprovider.JpaEntityProvider;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.jpa.Mail;
-import de.intevation.iam.model.jpa.MailList;
 import de.intevation.iam.model.jpa.UserAttributes;
 
 
@@ -32,7 +31,6 @@ public class IamJpaEntityProvider implements JpaEntityProvider {
     public List<Class<?>> getEntities() {
         List<Class<?>> entities =  Collections.<Class<?>>emptyList();
         entities.add(Mail.class);
-        entities.add(MailList.class);
         entities.add(UserAttributes.class);
         entities.add(Institution.class);
         entities.add(InstitutionTag.class);

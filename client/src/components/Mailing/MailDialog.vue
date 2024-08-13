@@ -8,7 +8,7 @@
 <template>
   <v-dialog v-model="show">
     <v-card min-width="60vw" class="align-self-center">
-      <v-card-title>{{ $t("mailinglist.write_new_email") }}</v-card-title>
+      <v-card-title>{{ $t("emails.write_new_email") }}</v-card-title>
       <v-divider></v-divider>
       <v-container>
         <v-row class="px-2 py-2" no-gutters>
@@ -21,7 +21,7 @@
                     class="v-col-6"
                     :no-data-text="$t('label.no_data_text')"
                     :items="senderList"
-                    :label="$t('mailinglist.sender')"
+                    :label="$t('emails.sender')"
                     v-model="mail.selectedSender"
                   ></Select>
                   <Select
@@ -29,11 +29,11 @@
                     class="v-col-6"
                     return-object
                     clearable
-                    :label="$t('mailinglist.select_mailing_list')"
+                    :label="$t('emails.recipient')"
                     :items="props.mailingLists"
                     item-title="name"
                     item-value="id"
-                    :no-data-text="$t('mailinglist.no_mailing_list')"
+                    :no-data-text="$t('emails.no_recipients')"
                     required
                     v-model="mail.selectedList"
                   ></Select>
@@ -43,7 +43,7 @@
                     :no-data-text="$t('label.no_data_text')"
                     return-object
                     clearable
-                    :label="$t('mailinglist.type')"
+                    :label="$t('emails.type')"
                     :items="types"
                     item-title="name"
                     item-value="id"
@@ -67,7 +67,7 @@
                         variant="filled"
                         prepend-inner-icon="mdi-calendar-blank"
                         :hint="$t('hints.date_format')"
-                        :label="$t('mailinglist.expiry_date')"
+                        :label="$t('emails.expiry_date')"
                         :attribute="'expiryDate'"
                         @click="isExpiryDatePickerOpen = true"
                         @click:clear="isExpiryDatePickerOpen = false"
@@ -95,7 +95,7 @@
                         box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
                       "
                       :show-adjacent-months="true"
-                      :title="$t('mailinglist.expiry_date')"
+                      :title="$t('emails.expiry_date')"
                       @update:modelValue="handleExpiryDateUpdate"
                       ><template v-slot:header>
                         <div class="v-date-picker-header bg-accent">
@@ -109,14 +109,14 @@
                   <Checkbox
                     attribute="archived"
                     class="v-col-6"
-                    :label="$t('mailinglist.publish')"
+                    :label="$t('emails.publish')"
                     v-model="mail.archived"
                   ></Checkbox>
                 </v-row>
               </v-col>
               <v-col cols="10">
                 <TextField
-                  :label="$t('mailinglist.subject')"
+                  :label="$t('emails.subject')"
                   v-model="mail.subject"
                   :attribute="'subject'"
                   required
@@ -126,7 +126,7 @@
             <v-row>
               <v-col cols="12" class="mt-4">
                 <Textarea
-                  :label="$t('mailinglist.message')"
+                  :label="$t('emails.message')"
                   name="input-7-1"
                   v-model="mail.text"
                   attribute="text"
@@ -318,10 +318,10 @@ onBeforeMount(() => {
   applicationStore.setForm(form);
   initClientRules({
     expiryDate: validGermanDate(),
-    recipient: reqField(t("mailinglist.required_mailing_list")),
-    subject: reqField(t("mailinglist.required_subject")),
-    text: reqField(t("mailinglist.required_content")),
-    type: reqField(t("mailinglist.required_type")),
+    recipient: reqField(t("emails.required_recipient")),
+    subject: reqField(t("emails.required_subject")),
+    text: reqField(t("emails.required_content")),
+    type: reqField(t("emails.required_type")),
   });
 });
 onMounted(() => {

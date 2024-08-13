@@ -171,4 +171,19 @@
                 RENAME imis_id TO meas_facil_id;
         </sql>
     </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.9">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_mail
+                DROP COLUMN recipient;
+            DROP TABLE iam_mail_list_user;
+            DROP TABLE iam_mail_list;
+            CREATE TABLE iam_mail_user (
+                mail_id INTEGER REFERENCES iam_mail(id) ON DELETE CASCADE,
+                recipient VARCHAR(36) REFERENCES user_entity(id),
+                PRIMARY KEY (mail_id, recipient)
+            );
+        </sql>
+    </changeSet>
 </databaseChangeLog>

@@ -22,21 +22,7 @@
         return-object
         multiple
         density="compact"
-        :hint="$t('mailinglist.filter_by_type')"
-        persistent-hint
-      ></v-autocomplete>
-      <v-autocomplete
-        :no-data-text="$t('label.no_data_text')"
-        class="mx-1 text-truncate"
-        style="max-width: 20%"
-        v-model="selectedMailinglist"
-        :items="mailinglists"
-        item-title="name"
-        item-value="id"
-        return-object
-        multiple
-        density="compact"
-        :hint="$t('mailinglist.filter_by_maillist')"
+        :hint="$t('emails.filter_by_type')"
         persistent-hint
       ></v-autocomplete>
       <div class="d-flex mx-3 flex-column" style="width: 20%">
@@ -138,7 +124,7 @@
         class="mx-1"
         variant="underlined"
         style="max-width: 20%"
-        :label="$t('mailinglist.filter_by_sender')"
+        :label="$t('emails.filter_by_sender')"
         v-model="sender"
       ></v-text-field>
     </v-row>
@@ -146,9 +132,9 @@
       <v-col cols="12" class="mt-6">
         <v-table class="pa-2 ma-2" density="compact">
           <thead>
-            <th class="text-left">{{ $t("mailinglist.subject") }}</th>
-            <th class="text-left">{{ $t("mailinglist.sender") }}</th>
-            <th class="text-left">{{ $t("mailinglist.date") }}</th>
+            <th class="text-left">{{ $t("emails.subject") }}</th>
+            <th class="text-left">{{ $t("emails.sender") }}</th>
+            <th class="text-left">{{ $t("emails.date") }}</th>
           </thead>
           <tbody>
             <tr
@@ -164,7 +150,7 @@
               <td>{{ new Date(mail.sendDate).toLocaleDateString() }}</td>
             </tr>
             <tr v-if="mails && !mails.length">
-              <td colspan="3">{{ $t("mailinglist.no_mails_available") }}</td>
+              <td colspan="3">{{ $t("emails.no_mails_available") }}</td>
             </tr>
           </tbody>
         </v-table>
@@ -308,11 +294,6 @@ const getMails = () => {
   if (sender.value) {
     payload += "&sender=" + sender.value;
   }
-  if (selectedMailinglist.value && selectedMailinglist.value.length) {
-    selectedMailinglist.value.forEach((l) => {
-      payload += "&list=" + l.id;
-    });
-  }
   if (selectedFilter.value && selectedFilter.value.length) {
     selectedFilter.value.forEach((t) => {
       payload += "&type=" + t.id;
@@ -331,12 +312,6 @@ onMounted(() => {
   getMails();
   mailStore
     .loadMailTypes()
-    .then()
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-  mailStore
-    .loadMailinglists()
     .then()
     .catch(() => {
       hasLoadingError.value = true;
@@ -406,19 +381,6 @@ watch(
   (oldValue, newValue) => {
     if (oldValue !== newValue) {
       triggerFilter();
-    }
-  }
-);
-const selectedMailinglist = ref([]);
-const mailinglists = computed(() => {
-  return mailStore.mailingLists;
-});
-
-watch(
-  () => selectedMailinglist.value,
-  (oldValue, newValue) => {
-    if (oldValue !== newValue) {
-      getMails();
     }
   }
 );
