@@ -67,6 +67,8 @@
                 @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
+            <!-- TODO: Geocoding feature delayed to a subsequent date -->
+            <!--
             <v-form
               ><v-row>
                 <v-select
@@ -102,6 +104,7 @@
                 @update:modelValue="institution.yCoordinate = $event"
               ></TextField>
             </div>
+            -->
 
             <v-checkbox
               v-model="showPostalAddress"
@@ -280,15 +283,16 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeMount, onMounted, ref } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useApplicationStore } from "@/stores/application";
-import { useCoordinatesStore } from "@/stores/coordinates";
+// TODO: Geocoding feature delayed to a subsequent date
+// import { useCoordinatesStore } from "@/stores/coordinates";
+// import { debounce } from "debounce";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
-import { debounce } from "debounce";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import ChipTextField from "@/components/Form/ChipTextField.vue";
 import TextField from "@/components/Form/TextField.vue";
@@ -302,15 +306,18 @@ const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
 
 const applicationStore = useApplicationStore();
-const coordinatesStore = useCoordinatesStore();
+// TODO: Geocoding feature delayed to a subsequent date
+// const coordinatesStore = useCoordinatesStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 
 const institution = ref(applicationStore.managedItem);
 const originalInstitution = { ...institution.value };
 const processType = ref(applicationStore.processType);
-const coordinates = ref(coordinatesStore.coordinates);
-const selectedCoordinates = ref(null);
+
+// TODO: Geocoding feature delayed to a subsequent date
+// const coordinates = ref(coordinatesStore.coordinates);
+// const selectedCoordinates = ref(null);
 const showPostalAddress = ref(false);
 const initialShowPostalAddress = ref(false);
 const {
@@ -374,7 +381,8 @@ onBeforeMount(() => {
   });
 });
 onMounted(() => {
-  coordinatesStore.coordinates.length = 0;
+  // TODO: Geocoding feature delayed to a subsequent date
+  // coordinatesStore.coordinates.length = 0;
   getCategories();
 
   if (hasPostalAddress()) {
@@ -382,13 +390,14 @@ onMounted(() => {
     initialShowPostalAddress.value = true;
   }
 
+  // TODO: Geocoding feature delayed to a subsequent date
   // Initialize dropdown for coordinates
-  const loc = institution.value.serviceBuildingLocation;
+  /*const loc = institution.value.serviceBuildingLocation;
   const poc = institution.value.serviceBuildingPostalCode;
   const str = institution.value.serviceBuildingStreet;
   if (loc || poc || str) {
     triggerLoadCoordinates([loc, poc, str].join(" "));
-  }
+  }*/
 });
 const createInstitution = () => {
   let payload = { ...institution.value };
@@ -448,6 +457,8 @@ const isPostalAddressToBeDeleted = computed(() => {
   return hasPostalAddress() && !showPostalAddress.value;
 });
 
+// TODO: Geocoding feature delayed to a subsequent date
+/*
 const coordinatesLoading = ref(false);
 const coordinatesError = ref(false);
 const coordinatesErrorMessages = ref("");
@@ -492,5 +503,5 @@ watch(
   ([newLoc, newPc, newStreet]) => {
     triggerLoadCoordinates([newLoc, newPc, newStreet].join(" "));
   }
-);
+);*/
 </script>
