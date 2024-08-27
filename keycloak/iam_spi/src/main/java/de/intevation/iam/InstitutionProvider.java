@@ -85,19 +85,16 @@ public class InstitutionProvider implements RealmResourceProvider {
     private Predicate getFilterQuery(Root<Institution> root, CriteriaBuilder cb, Map<String, String> attributes) {
         List<Predicate> predicates = new ArrayList<>();
 
-        for (Map.Entry<String, String> entry : attributes.entrySet()) {
-            entry.setValue("%" + entry.getValue() + "%");
-        }
-
         String generalSearch = attributes.get("search");
         if (generalSearch != null) {
+            String value = "%" + generalSearch.toLowerCase() + "%";
             predicates.add(cb.or(
                     cb.like(
                             cb.lower(root.get("name")),
-                            generalSearch),
+                            value),
                     cb.like(
                             cb.lower(root.get("measFacilId")),
-                            generalSearch)
+                            value)
             ));
         }
 
