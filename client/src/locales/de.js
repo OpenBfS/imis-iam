@@ -79,6 +79,7 @@ export default {
     valid_postalcode: "PLZ muss gültig sein",
     valid_date: "Datum muss gültig sein",
     all_or_nothing: "{0} und {1} oder keines angeben",
+    only_unique_values: "Bitte geben Sie keine doppelten Werte ein.",
   },
   hints: {
     date_format: "Format: dd.mm.jjjj",
@@ -110,7 +111,7 @@ export default {
     required_central_phone: "Zentrales Telefon ist erforderlich",
     central_mail: "Zentrale E-Mail",
     central_alarm_phone_numbers: "Zentrale Alarmierung (Telefon)",
-    central_alarm_email_addresses: "Zentrale Alarmierung (E-Mail)",
+    central_alarm_mail_addresses: "Zentrale Alarmierung (E-Mail)",
     required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
     street: "Straße",
@@ -265,9 +266,5 @@ export default {
     message: "Nachricht",
     required_type: "Art der E-Mail ist erforderlich",
     required_mailinglist_name: "E-Mail-Verteiler Name ist erforderlich",
-  },
-  search: {
-    found_users: "Gefundene Nutzer:",
-    found_institution: "Gefundene Institutionen:",
   },
 };
