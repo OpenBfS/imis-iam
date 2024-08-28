@@ -12,7 +12,8 @@ import jakarta.validation.ConstraintValidatorContext;
 
 
 /**
- * Checks if the validated entity references either MeasFacil or none.
+ * Checks if the validated entity has either both MeasFacil ID and name
+ * or none of them.
  */
 public class MeasFacilOrNoneValidator
     implements ConstraintValidator<MeasFacilOrNone, Institution> {

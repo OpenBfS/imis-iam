@@ -16,8 +16,10 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
+
 /**
- * Checks if the validated either MeasFacil or none.
+ * Checks if the validated entity has either both MeasFacil ID and name
+ * or none of them.
  */
 @Target({ TYPE })
 @Retention(RUNTIME)
