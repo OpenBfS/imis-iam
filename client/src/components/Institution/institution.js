@@ -28,8 +28,10 @@ const expInstitution = {
   ...addressPlace,
   tags: [],
   active: false,
+  /* TODO: Geocoding feature delayed to a subsequent date
   xCoordinate: "",
   yCoordinate: "",
+  */
 };
 
 function getExpInstitution() {
