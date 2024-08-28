@@ -5,6 +5,9 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
+import { useApplicationStore } from "@/stores/application";
+import { useInstitutionStore } from "@/stores/institution";
+
 const serviceBuildingPlace = {
   serviceBuildingLocation: "",
   serviceBuildingPostalCode: "",
@@ -29,12 +32,46 @@ const expInstitution = {
   ...addressPlace,
   tags: [],
   active: false,
+  /* TODO: Geocoding feature delayed to a subsequent date
   xCoordinate: "",
   yCoordinate: "",
+  */
 };
 
 function getExpInstitution() {
   return structuredClone(expInstitution);
 }
 
-export { getExpInstitution };
+function updateInstitution(
+  institution,
+  showPostalAddress,
+  isServerValidationError,
+  handleValidationErrorFromServer,
+  hasRequestError
+) {
+  const applicationStore = useApplicationStore();
+  const institutionStore = useInstitutionStore();
+  if (!showPostalAddress) {
+    delete institution.addressLocation;
+    delete institution.addressPostalCode;
+    delete institution.addressStreet;
+  }
+  return new Promise((resolve) => {
+    institutionStore
+      .updateInstitution(institution)
+      .then(() => {
+        applicationStore.searchRequest(["institutions"]);
+        applicationStore.setShowManageInstitutionDialog(false);
+        resolve({ status: 200 });
+      })
+      .catch((error) => {
+        isServerValidationError(error)
+          ? handleValidationErrorFromServer(error.response.data)
+          : (hasRequestError.value = true);
+        console.error(error.response);
+        resolve(error);
+      });
+  });
+}
+
+export { getExpInstitution, updateInstitution };

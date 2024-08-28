@@ -70,11 +70,14 @@ import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
 import DataTableServer from "@/components/DataTableServer.vue";
+import { getExpInstitution } from "@/components/Institution/institution";
+import { onMounted, ref } from "vue";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
-const tableHeaders = [
+const tableHeaders = ref([]);
+const defaultHeaders = [
   "name",
   "measFacilName",
   "measFacilId",
@@ -85,5 +88,14 @@ const tableHeaders = [
 
 const props = defineProps({
   institutions: Array,
+});
+
+onMounted(() => {
+  tableHeaders.value = Object.keys(getExpInstitution()).map((key) => {
+    return {
+      name: key,
+      default: defaultHeaders.includes(key),
+    };
+  });
 });
 </script>

@@ -74,14 +74,16 @@ const savedUser = ref();
 const tableHeaders = computed(() => {
   return profileStore.attributes
     ? [
-        ...profileStore.attributes
-          .filter(
-            (attr) =>
+        ...profileStore.attributes.map((attr) => {
+          const rawAttr = toRaw(attr);
+          return {
+            name: rawAttr.name,
+            default:
               attr.annotations?.defaultField &&
-              Boolean(attr.annotations?.defaultField) === true
-          )
-          .map((attr) => toRaw(attr).name),
-        "institutions",
+              Boolean(attr.annotations?.defaultField) === true,
+          };
+        }),
+        { name: "institutions", default: true },
       ]
     : [];
 });
