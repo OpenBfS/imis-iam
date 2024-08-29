@@ -67,6 +67,21 @@
                 @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
+            <v-row>
+              <v-col>
+                <Select
+                  attribute="serviceBuildingState"
+                  clearable
+                  :items="states"
+                  item-title="label"
+                  item-value="value"
+                  :label="$t('institution.state')"
+                  @update:modelValue="institution.serviceBuildingState = $event"
+                ></Select>
+              </v-col>
+            </v-row>
+            <!-- TODO: Geocoding feature delayed to a subsequent date -->
+            <!--
             <v-form
               ><v-row>
                 <v-select
@@ -102,6 +117,7 @@
                 @update:modelValue="institution.yCoordinate = $event"
               ></TextField>
             </div>
+            -->
 
             <v-checkbox
               v-model="showPostalAddress"
@@ -162,12 +178,12 @@
               </v-col>
               <v-col>
                 <ChipTextField
-                  :label="$t('institution.central_alarm_email_addresses')"
+                  :label="$t('institution.central_alarm_mail_addresses')"
                   :rules="validMail($t('error.valid_email'))"
                   @update:modelValue="
-                    institution.centralAlarmEmailAddresses = $event
+                    institution.centralAlarmMailAddresses = $event
                   "
-                  :attribute="'centralAlarmEmailAddresses'"
+                  :attribute="'centralAlarmMailAddresses'"
                 ></ChipTextField>
               </v-col>
             </v-row>
@@ -212,7 +228,15 @@
         color="accent"
         :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
         @click="
-          processType == 'add' ? createInstitution() : updateInstitution()
+          processType == 'add'
+            ? createInstitution()
+            : updateInstitution(
+                institution,
+                showPostalAddress,
+                isServerValidationError,
+                handleValidationErrorFromServer,
+                hasRequestError
+              )
         "
       >
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
@@ -280,15 +304,17 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeMount, onMounted, ref } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
 import { useApplicationStore } from "@/stores/application";
-import { useCoordinatesStore } from "@/stores/coordinates";
+// TODO: Geocoding feature delayed to a subsequent date
+// import { useCoordinatesStore } from "@/stores/coordinates";
+// import { debounce } from "debounce";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
-import { debounce } from "debounce";
+import { updateInstitution } from "./institution";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import ChipTextField from "@/components/Form/ChipTextField.vue";
 import TextField from "@/components/Form/TextField.vue";
@@ -302,15 +328,18 @@ const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
 
 const applicationStore = useApplicationStore();
-const coordinatesStore = useCoordinatesStore();
+// TODO: Geocoding feature delayed to a subsequent date
+// const coordinatesStore = useCoordinatesStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 
 const institution = ref(applicationStore.managedItem);
 const originalInstitution = { ...institution.value };
 const processType = ref(applicationStore.processType);
-const coordinates = ref(coordinatesStore.coordinates);
-const selectedCoordinates = ref(null);
+
+// TODO: Geocoding feature delayed to a subsequent date
+// const coordinates = ref(coordinatesStore.coordinates);
+// const selectedCoordinates = ref(null);
 const showPostalAddress = ref(false);
 const initialShowPostalAddress = ref(false);
 const {
@@ -341,6 +370,25 @@ const getCategories = () => {
       hasLoadingError.value = true;
     });
 };
+const states = [
+  { value: "baden_wuerttemberg" },
+  { value: "bavaria" },
+  { value: "berlin" },
+  { value: "brandenburg" },
+  { value: "bremen" },
+  { value: "hamburg" },
+  { value: "hesse" },
+  { value: "lower_saxony" },
+  { value: "mecklenburg_vorpommern" },
+  { value: "north_rhine_westphalia" },
+  { value: "rhineland_palatinate" },
+  { value: "saarland" },
+  { value: "saxony" },
+  { value: "saxony_anhalt" },
+  { value: "schleswig_holstein" },
+  { value: "thuringia" },
+];
+
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
@@ -372,9 +420,13 @@ onBeforeMount(() => {
     ],
     tags: reqField(t("error.required_tag")),
   });
+  states.forEach((state) => {
+    state["label"] = t(`institution.state_${state.value}`);
+  });
 });
 onMounted(() => {
-  coordinatesStore.coordinates.length = 0;
+  // TODO: Geocoding feature delayed to a subsequent date
+  // coordinatesStore.coordinates.length = 0;
   getCategories();
 
   if (hasPostalAddress()) {
@@ -382,13 +434,14 @@ onMounted(() => {
     initialShowPostalAddress.value = true;
   }
 
+  // TODO: Geocoding feature delayed to a subsequent date
   // Initialize dropdown for coordinates
-  const loc = institution.value.serviceBuildingLocation;
+  /*const loc = institution.value.serviceBuildingLocation;
   const poc = institution.value.serviceBuildingPostalCode;
   const str = institution.value.serviceBuildingStreet;
   if (loc || poc || str) {
     triggerLoadCoordinates([loc, poc, str].join(" "));
-  }
+  }*/
 });
 const createInstitution = () => {
   let payload = { ...institution.value };
@@ -404,25 +457,7 @@ const createInstitution = () => {
         : (hasRequestError.value = true);
     });
 };
-const updateInstitution = () => {
-  let payload = { ...institution.value };
-  if (!showPostalAddress.value) {
-    delete payload.addressLocation;
-    delete payload.addressPostalCode;
-    delete payload.addressStreet;
-  }
-  institutionStore
-    .updateInstitution(payload)
-    .then(() => {
-      applicationStore.searchRequest(["institutions"]);
-      applicationStore.setShowManageInstitutionDialog(false);
-    })
-    .catch((error) => {
-      isServerValidationError(error)
-        ? handleValidationErrorFromServer(error.response.data)
-        : (hasRequestError.value = true);
-    });
-};
+
 const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)
     .then(() => {
@@ -448,6 +483,8 @@ const isPostalAddressToBeDeleted = computed(() => {
   return hasPostalAddress() && !showPostalAddress.value;
 });
 
+// TODO: Geocoding feature delayed to a subsequent date
+/*
 const coordinatesLoading = ref(false);
 const coordinatesError = ref(false);
 const coordinatesErrorMessages = ref("");
@@ -492,5 +529,5 @@ watch(
   ([newLoc, newPc, newStreet]) => {
     triggerLoadCoordinates([newLoc, newPc, newStreet].join(" "));
   }
-);
+);*/
 </script>

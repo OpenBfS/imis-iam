@@ -201,6 +201,25 @@ export function useForm(i18n) {
     });
   };
 
+  const translateError = (message, attribute) => {
+    let translatedMessage;
+    // Keycloak error is not translated
+    if (message.startsWith("error-")) {
+      const stringToTranslate = message.startsWith("error-")
+        ? message.replace("error-", "error.").replaceAll("-", "_")
+        : message;
+      const messageParameters = [t(`user.${attribute.toLowerCase()}`)];
+      translatedMessage = t(stringToTranslate, messageParameters);
+    } else if (message.startsWith("error.")) {
+      translatedMessage = t(message, attribute);
+    }
+    // Keycloak error is already translated
+    else {
+      translatedMessage = message;
+    }
+    return translatedMessage;
+  };
+
   /**
    * @param {object} error:
    * {
@@ -216,24 +235,10 @@ export function useForm(i18n) {
       const errorObject = error[i];
       const attribute = errorObject.messageParameters[0];
       const message = errorObject.message;
-      let translatedString;
-      // Keycloak error is not translated
-      if (message.startsWith("error-")) {
-        const stringToTranslate = message.startsWith("error-")
-          ? message.replace("error-", "error.").replaceAll("-", "_")
-          : message;
-        const messageParameters = [t(`user.${attribute.toLowerCase()}`)];
-        translatedString = t(stringToTranslate, messageParameters);
-      } else if (message.startsWith("error.")) {
-        translatedString = t(message, attribute);
-      }
-      // Keycloak error is already translated
-      else {
-        translatedString = message;
-      }
+      const translatedMessage = translateError(message, attribute);
       // Create rules that can be used by the validation mechanism of Vuetify.
       applicationStore.serverValidationRules[attribute] = () => {
-        return translatedString;
+        return translatedMessage;
       };
       aggregateRules();
       // Need to wait for the DOM. Otherwise the error messages are not automatically shown.
@@ -332,5 +337,6 @@ export function useForm(i18n) {
     clearValidationError,
     isServerValidationError,
     onUpdateModelValue,
+    translateError,
   };
 }
