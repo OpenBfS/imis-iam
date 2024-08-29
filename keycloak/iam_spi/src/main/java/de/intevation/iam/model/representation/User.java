@@ -27,6 +27,7 @@ import org.keycloak.models.UserModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.Institution_;
 import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.util.Constants;
 
@@ -51,9 +52,6 @@ public class User {
 
     private Boolean readonly;
     private boolean enabled;
-
-    private static final String USER_PARAM = "user";
-    private static final String NAME_PARAM = "name";
 
     /**
      * Empty constructor used by JSON de-/serialization.
@@ -160,7 +158,7 @@ public class User {
                 = cb.createQuery(Institution.class);
             Root<Institution> root = query.from(Institution.class);
             query.select(root);
-            In<String> nameFilter = cb.in(root.get(NAME_PARAM));
+            In<String> nameFilter = cb.in(root.get(Institution_.name));
             this.institutions.forEach(instName -> nameFilter.value(instName));
             query.where(nameFilter);
             List<Institution> insts = em.createQuery(query).getResultList();
