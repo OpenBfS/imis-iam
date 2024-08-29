@@ -66,7 +66,8 @@ public class MailTask implements KeycloakSessionTask {
         Predicate filter;
         Predicate sentFilter = cb.equal(
                 root.get(UserAttributes_.expiredNotificationSent), false);
-        Predicate inactivityFilter = cb.lessThan(root.get(UserAttributes_.expiryDate),
+        Predicate inactivityFilter = cb.lessThan(
+            root.get(UserAttributes_.expiryDate),
         new Timestamp(System.currentTimeMillis()));
         filter = cb.and(sentFilter, inactivityFilter);
         query.where(filter);
@@ -100,7 +101,8 @@ public class MailTask implements KeycloakSessionTask {
         Predicate filter;
         Predicate sentFilter = cb.equal(
                 root.get(UserAttributes_.inactivityNotificationSent), false);
-        Predicate inactivityFilter = cb.lessThan(root.get(UserAttributes_.expiryDate),
+        Predicate inactivityFilter = cb.lessThan(
+            root.get(UserAttributes_.expiryDate),
             Timestamp.from(Instant.now().plus(inactivityWarningTerm)));
         filter = cb.and(sentFilter, inactivityFilter);
         query.where(filter);
