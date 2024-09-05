@@ -162,13 +162,19 @@ applicationStore.$subscribe((mutation) => {
 const addEntry = (moveToNextElement = false) => {
   if (isAdding) return;
   isAdding = true;
-  if (input.value === "" || entries.value.indexOf(input.value) !== -1) return;
+  if (input.value === "" || entries.value.indexOf(input.value) !== -1) {
+    isAdding = false;
+    return;
+  }
   let isValid = true;
   props.rules.forEach((rule) => {
     const result = rule(input.value);
     if (typeof result !== "boolean" || !result) isValid = false;
   });
-  if (!isValid) return;
+  if (!isValid) {
+    isAdding = false;
+    return;
+  }
   entries.value = [...entries.value, input.value];
   if (moveToNextElement) {
     const index = Array.from(plusButton.value.$el.form).indexOf(
