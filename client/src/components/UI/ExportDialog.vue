@@ -82,8 +82,7 @@ import { useApplicationStore } from "@/stores/application";
 import { useUserStore } from "@/stores/user";
 import { useInstitutionStore } from "@/stores/institution";
 import { useNotification } from "@/lib/use-notification";
-import { HTTP } from "@/lib/http";
-import qs from "qs";
+import { HTTP, paramsSerializer } from "@/lib/http";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -152,11 +151,7 @@ onMounted(() => {
 const exportRequest = (itemsName) => {
   HTTP.get(`/export/${itemsName}`, {
     params: structuredClone(csvOptions.value),
-    paramsSerializer: {
-      serialize: (params) => {
-        return qs.stringify(params, { indices: false });
-      },
-    },
+    paramsSerializer,
   })
     .then((res) => {
       if (!res.statusText === "OK") throw new Error(res.statusText);

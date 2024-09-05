@@ -6,6 +6,7 @@
  */
 import { useApplicationStore } from "@/stores/application";
 import axios from "axios";
+import qs from "qs";
 
 const HTTP = axios.create({
   baseURL: "/backend/realms/imis3",
@@ -50,4 +51,10 @@ const PhotonHTTP = axios.create({
   baseURL: "/photon",
 });
 
-export { handleError, HTTP, PhotonHTTP };
+const paramsSerializer = {
+  serialize: (params) => {
+    return qs.stringify(params, { indices: false });
+  },
+};
+
+export { handleError, HTTP, PhotonHTTP, paramsSerializer };
