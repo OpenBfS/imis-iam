@@ -151,9 +151,11 @@ onMounted(() => {
 
 const exportRequest = (itemsName) => {
   HTTP.get(`/export/${itemsName}`, {
-    params: csvOptions.value,
-    paramsSerializer: (params) => {
-      return qs.stringify(params, { indices: false });
+    params: structuredClone(csvOptions.value),
+    paramsSerializer: {
+      serialize: (params) => {
+        return qs.stringify(params, { indices: false });
+      },
     },
   })
     .then((res) => {
