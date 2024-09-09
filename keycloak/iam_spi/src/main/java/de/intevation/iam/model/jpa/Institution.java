@@ -30,6 +30,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.UniqueElements;
+
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
@@ -69,6 +71,9 @@ public class Institution {
     @Column(name = "service_building_location", nullable = false)
     private String serviceBuildingLocation;
 
+    @Column(name = "service_building_state")
+    private String serviceBuildingState;
+
     @Column(name = "address_street")
     private String addressStreet;
 
@@ -90,13 +95,19 @@ public class Institution {
     private String centralMail;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "iam_institution_central_alarm_phone_numbers", joinColumns = @JoinColumn(name = "institution_id"))
+    @CollectionTable(
+        name = "iam_institution_central_alarm_phone_numbers",
+        joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
+    @UniqueElements
     private List<String> centralAlarmPhoneNumbers;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "iam_institution_central_alarm_mail_addresses", joinColumns = @JoinColumn(name = "institution_id"))
+    @CollectionTable(
+        name = "iam_institution_central_alarm_mail_addresses",
+        joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "mail")
+    @UniqueElements
     private List<String> centralAlarmMailAddresses;
 
     @Column(name = "meas_facil_id")
@@ -177,6 +188,14 @@ public class Institution {
 
     public void setServiceBuildingLocation(String serviceBuildingLocation) {
         this.serviceBuildingLocation = serviceBuildingLocation;
+    }
+
+    public String getServiceBuildingState() {
+        return serviceBuildingState;
+    }
+
+    public void setServiceBuildingState(String serviceBuildingState) {
+        this.serviceBuildingState = serviceBuildingState;
     }
 
     public String getAddressStreet() {

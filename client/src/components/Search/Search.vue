@@ -21,6 +21,25 @@
         </v-text-field>
       </v-col>
       <v-spacer></v-spacer>
+      <v-tooltip location="top">
+        <template v-slot:activator="{ props }">
+          <v-btn
+            color="accent"
+            class="mr-4"
+            v-bind="props"
+            icon="mdi-tag-edit"
+            :disabled="
+              (selectedTab === 'users' &&
+                userStore.selectedUsers.length === 0) ||
+              (selectedTab === 'institutions' &&
+                institutionStore.selectedInstitutions.length === 0)
+            "
+            @click="toggleEditTags"
+          >
+          </v-btn>
+        </template>
+        <span>{{ $t("search.edit_tags") }}</span>
+      </v-tooltip>
       <v-tooltip v-if="selectedTab === 'users'" location="top">
         <template v-slot:activator="{ props }">
           <v-btn
@@ -82,6 +101,11 @@
       v-bind:message="applicationStore.httpErrorMessage"
     />
   </v-container>
+  <EditTags
+    :close="() => toggleEditTags()"
+    :isActive="showEditTags"
+    :type="selectedTab"
+  ></EditTags>
 </template>
 
 <script setup>
@@ -94,6 +118,7 @@ import { useUserStore } from "@/stores/user";
 import { useProfileStore } from "@/stores/profile";
 import { getExpInstitution } from "@/components/Institution/institution";
 import { getExpUser } from "@/components/User/user";
+import EditTags from "@/components/UI/EditTags.vue";
 
 const { hasLoadingError, hasRequestError } = useNotification();
 
@@ -108,6 +133,7 @@ const isAllowedToAdd = computed(() => {
   return profileStore.isAllowedToManage;
 });
 const selectedTab = ref("users");
+const showEditTags = ref(false);
 const triggerSearch = debounce(() => {
   applicationStore.searchRequest(["users", "institutions"], true);
 }, 500);
@@ -131,4 +157,8 @@ onMounted(() => {
 function onSelectedTab(tab) {
   selectedTab.value = tab;
 }
+
+const toggleEditTags = () => {
+  showEditTags.value = !showEditTags.value;
+};
 </script>

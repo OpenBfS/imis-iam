@@ -41,6 +41,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
 import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.Institution_;
 import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.Constants;
@@ -146,10 +147,10 @@ public class InstitutionProvider implements RealmResourceProvider {
             if (!filter.isEmpty()) {
                 cqSize.where(cbSize.or(
                     cbSize.like(
-                        cbSize.lower(rootSize.get("name")),
+                        cbSize.lower(rootSize.get(Institution_.name)),
                         filter),
                     cbSize.like(
-                        cbSize.lower(rootSize.get("imisId")),
+                        cbSize.lower(rootSize.get(Institution_.measFacilId)),
                         filter)
                     )
                 );
@@ -176,10 +177,10 @@ public class InstitutionProvider implements RealmResourceProvider {
         if (!filter.isEmpty()) {
             query.where(cb.or(
                 cb.like(
-                    cb.lower(root.get("name")),
+                    cb.lower(root.get(Institution_.name)),
                     filter),
                 cb.like(
-                    cb.lower(root.get("imisId")),
+                    cb.lower(root.get(Institution_.measFacilId)),
                     filter)
                 )
             );
