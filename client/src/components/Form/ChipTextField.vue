@@ -71,7 +71,7 @@ import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-const { onUpdateModelValue } = useForm();
+const { areArraysDifferent, onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
@@ -137,6 +137,21 @@ watch(input, (newInput) => {
     applicationStore.removeChangeInField(props.attribute);
   }
 });
+
+// We need this watcher as $subscribe doesn't detect all changes if
+// there are several at the same time.
+watch(
+  // Without structuredClone changes are not detected correctly.
+  () => structuredClone(applicationStore.managedItem),
+  (newValue, oldValue) => {
+    const oldEntries = oldValue[props.attribute];
+    const newEntries = newValue[props.attribute];
+    if (areArraysDifferent(oldEntries, newEntries)) {
+      entries.value = newEntries;
+      input.value = "";
+    }
+  }
+);
 
 applicationStore.$subscribe((mutation) => {
   const key = mutation.events.key;
