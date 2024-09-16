@@ -26,7 +26,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -75,6 +74,9 @@ public class Institution {
     @NotBlank
     @Column(name = "service_building_location", nullable = false)
     private String serviceBuildingLocation;
+
+    @Column(name = "service_building_state")
+    private String serviceBuildingState;
 
     @Column(name = "address_street")
     private String addressStreet;
@@ -125,17 +127,6 @@ public class Institution {
 
     @Column(name = "active")
     private Boolean active;
-
-    @Transient
-    private Boolean readonly;
-
-    public Boolean getReadonly() {
-        return readonly;
-    }
-
-    public void setReadonly(Boolean readonly) {
-        this.readonly = readonly;
-    }
 
     public Integer getId() {
         return id;
@@ -201,6 +192,14 @@ public class Institution {
 
     public void setServiceBuildingLocation(String serviceBuildingLocation) {
         this.serviceBuildingLocation = serviceBuildingLocation;
+    }
+
+    public String getServiceBuildingState() {
+        return serviceBuildingState;
+    }
+
+    public void setServiceBuildingState(String serviceBuildingState) {
+        this.serviceBuildingState = serviceBuildingState;
     }
 
     public String getAddressStreet() {

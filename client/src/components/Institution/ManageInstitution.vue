@@ -89,6 +89,19 @@
                 @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
+            <v-row>
+              <v-col>
+                <Select
+                  attribute="serviceBuildingState"
+                  clearable
+                  :items="states"
+                  item-title="label"
+                  item-value="value"
+                  :label="$t('institution.state')"
+                  @update:modelValue="institution.serviceBuildingState = $event"
+                ></Select>
+              </v-col>
+            </v-row>
             <!-- TODO: Geocoding feature delayed to a subsequent date -->
             <!--
             <v-form
@@ -229,7 +242,15 @@
         color="accent"
         :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
         @click="
-          processType == 'add' ? createInstitution() : updateInstitution()
+          processType == 'add'
+            ? createInstitution()
+            : updateInstitution(
+                sanitizePayload({ ...institution }),
+                showPostalAddress,
+                isServerValidationError,
+                handleValidationErrorFromServer,
+                hasRequestError
+              )
         "
       >
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
@@ -307,6 +328,7 @@ import { useApplicationStore } from "@/stores/application";
 // import { debounce } from "debounce";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
+import { updateInstitution } from "./institution";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import ChipTextField from "@/components/Form/ChipTextField.vue";
 import TextField from "@/components/Form/TextField.vue";
@@ -364,6 +386,25 @@ const getCategories = () => {
       hasLoadingError.value = true;
     });
 };
+const states = [
+  { value: "baden_wuerttemberg" },
+  { value: "bavaria" },
+  { value: "berlin" },
+  { value: "brandenburg" },
+  { value: "bremen" },
+  { value: "hamburg" },
+  { value: "hesse" },
+  { value: "lower_saxony" },
+  { value: "mecklenburg_vorpommern" },
+  { value: "north_rhine_westphalia" },
+  { value: "rhineland_palatinate" },
+  { value: "saarland" },
+  { value: "saxony" },
+  { value: "saxony_anhalt" },
+  { value: "schleswig_holstein" },
+  { value: "thuringia" },
+];
+
 const measIdAndNameOrNothing = () => {
   return [
     () =>
@@ -409,6 +450,9 @@ onBeforeMount(() => {
     ],
     tags: reqField(t("error.required_tag")),
   });
+  states.forEach((state) => {
+    state["label"] = t(`institution.state_${state.value}`);
+  });
 });
 onMounted(() => {
   // TODO: Geocoding feature delayed to a subsequent date
@@ -436,6 +480,7 @@ const sanitizePayload = (payload) => {
   if (payload.measFacilName !== undefined && payload.measFacilName === "") {
     delete payload.measFacilName;
   }
+  return payload;
 };
 const createInstitution = () => {
   let payload = { ...institution.value };
@@ -443,26 +488,6 @@ const createInstitution = () => {
   HTTP.post("/institution", payload)
     .then((response) => {
       institutionStore.addInstitution(response.data);
-      applicationStore.searchRequest(["institutions"]);
-      applicationStore.setShowManageInstitutionDialog(false);
-    })
-    .catch((error) => {
-      isServerValidationError(error)
-        ? handleValidationErrorFromServer(error.response.data)
-        : (hasRequestError.value = true);
-    });
-};
-const updateInstitution = () => {
-  let payload = { ...institution.value };
-  sanitizePayload(payload);
-  if (!showPostalAddress.value) {
-    delete payload.addressLocation;
-    delete payload.addressPostalCode;
-    delete payload.addressStreet;
-  }
-  institutionStore
-    .updateInstitution(payload)
-    .then(() => {
       applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })

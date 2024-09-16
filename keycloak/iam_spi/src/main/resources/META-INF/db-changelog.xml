@@ -171,7 +171,15 @@
                 RENAME imis_id TO meas_facil_id;
         </sql>
     </changeSet>
-    <changeSet author="pschwabauer@intevation.de" id="v0.9">
+    <changeSet author="christoph.klassen@intevation.de" id="v0.9">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution
+                ADD COLUMN service_building_state VARCHAR;
+        </sql>
+    </changeSet>
+    <changeSet author="pschwabauer@intevation.de" id="v0.10">
         <sql dbms="all"
              splitStatements="true"
              stripComments="true">
