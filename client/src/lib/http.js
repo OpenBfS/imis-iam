@@ -6,6 +6,7 @@
  */
 import { useApplicationStore } from "@/stores/application";
 import axios from "axios";
+import qs from "qs";
 
 const HTTP = axios.create({
   baseURL: "/backend/realms/imis3",
@@ -50,6 +51,12 @@ const PhotonHTTP = axios.create({
   baseURL: "/photon",
 });
 
+const paramsSerializer = {
+  serialize: (params) => {
+    return qs.stringify(params, { indices: false });
+  },
+};
+
 /**
  * Creates a query parameter like this:
  * "search=search:searchTerm firstName:Jane lastName:Doe"
@@ -74,4 +81,10 @@ function createSearchQueryString(searchTerm, filters) {
   return searchQueryString;
 }
 
-export { createSearchQueryString, handleError, HTTP, PhotonHTTP };
+export {
+  createSearchQueryString,
+  handleError,
+  HTTP,
+  PhotonHTTP,
+  paramsSerializer,
+};

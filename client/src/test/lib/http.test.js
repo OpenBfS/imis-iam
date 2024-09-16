@@ -8,9 +8,31 @@ import { setActivePinia, createPinia } from "pinia";
 import { useApplicationStore } from "@/stores/application";
 import { handleError } from "@/lib/http";
 import { test, expect } from "vitest";
+import axios from "axios";
+import { paramsSerializer } from "@/lib/http";
 
 setActivePinia(createPinia());
 const applicationStore = useApplicationStore();
+
+test("Test axios request options", () => {
+  const axiosClient = axios.create({
+    baseURL: "localhost",
+  });
+  axiosClient.interceptors.request.use(function () {
+    // Interrupt request as we don't have a backend and only want to test the options.
+    throw Error();
+  });
+
+  // If the options for the following request are invalid the catch is not reached
+  // and the test is failing. That is what we want to happen.
+  axiosClient
+    .get(`/`, {
+      paramsSerializer,
+    })
+    .catch((e) => {
+      console.log("Error", e);
+    });
+});
 
 test("Test error handling", () => {
   const request = "/get/something";

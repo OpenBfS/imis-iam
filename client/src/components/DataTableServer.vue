@@ -95,7 +95,6 @@ const userStore = useUserStore();
 
 const areTableSettingsOpen = ref(false);
 const headers = ref([]);
-const selectedHeaders = ref([]);
 const actionHeader = {
   title: t("label.actions"),
   key: "actions",
@@ -135,36 +134,38 @@ watch(
 );
 
 const adjustHeaders = () => {
+  const newHeaders = [];
   props.headers.forEach((header) => {
+    const headerName = header.name;
     const translationPrefix = props.type === "users" ? "user" : "institution";
     const translationKey =
-      header === "name"
+      headerName === "name"
         ? "label.name"
-        : `${translationPrefix}.${camelCaseToUnderscore(header)}`;
+        : `${translationPrefix}.${camelCaseToUnderscore(headerName)}`;
 
     const newHeader = {
       title: t(translationKey),
-      key: header,
+      key: headerName,
       sortable: props.type !== "users",
-      visible: true,
+      visible: header.default,
     };
     newHeader.value = (item) => {
       if (
         props.type === "users" &&
-        header === "role" &&
-        toRaw(item)?.[header]
+        headerName === "role" &&
+        toRaw(item)?.[headerName]
       ) {
-        return t(`role_iam_${toRaw(item)[header]}`);
+        return t(`role_iam_${toRaw(item)[headerName]}`);
       }
       const value =
         props.type === "users"
-          ? toRaw(item.attributes[header] ?? item[header])
-          : item[header];
+          ? toRaw(item.attributes[headerName] ?? item[headerName])
+          : item[headerName];
       return value ? getDisplayName(toRaw(value)) : undefined;
     };
-    headers.value.push(newHeader);
+    newHeaders.push(newHeader);
   });
-  selectedHeaders.value = headers.value;
+  headers.value = newHeaders;
 };
 
 const updateTable = (event) => {

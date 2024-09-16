@@ -146,12 +146,8 @@ export function useForm(i18n) {
         return true;
       } else if (typeof a[key] === "object" && typeof b[key] === "object") {
         // Compare arrays
-        if (a[key].length && b[key].length && a[key].length === b[key].length) {
-          for (let j = 0; j < a[key].length; j++) {
-            if (!b[key].includes(a[key][j])) {
-              return true;
-            }
-          }
+        if (a[key].length && b[key].length && areArraysDifferent(a, b)) {
+          return true;
         } else {
           // Compare nested objects
           if (areObjectsDifferent(a[key], b[key])) {
@@ -161,6 +157,14 @@ export function useForm(i18n) {
       } else if (a[key] !== b[key]) {
         return true;
       }
+    }
+    return false;
+  };
+
+  const areArraysDifferent = (a, b) => {
+    if (a.length !== b.length) return true;
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return true;
     }
     return false;
   };
@@ -201,6 +205,25 @@ export function useForm(i18n) {
     });
   };
 
+  const translateError = (message, attribute) => {
+    let translatedMessage;
+    // Keycloak error is not translated
+    if (message.startsWith("error-")) {
+      const stringToTranslate = message.startsWith("error-")
+        ? message.replace("error-", "error.").replaceAll("-", "_")
+        : message;
+      const messageParameters = [t(`user.${attribute.toLowerCase()}`)];
+      translatedMessage = t(stringToTranslate, messageParameters);
+    } else if (message.startsWith("error.")) {
+      translatedMessage = t(message, attribute);
+    }
+    // Keycloak error is already translated
+    else {
+      translatedMessage = message;
+    }
+    return translatedMessage;
+  };
+
   /**
    * @param {object} error:
    * {
@@ -216,24 +239,10 @@ export function useForm(i18n) {
       const errorObject = error[i];
       const attribute = errorObject.messageParameters[0];
       const message = errorObject.message;
-      let translatedString;
-      // Keycloak error is not translated
-      if (message.startsWith("error-")) {
-        const stringToTranslate = message.startsWith("error-")
-          ? message.replace("error-", "error.").replaceAll("-", "_")
-          : message;
-        const messageParameters = [t(`user.${attribute.toLowerCase()}`)];
-        translatedString = t(stringToTranslate, messageParameters);
-      } else if (message.startsWith("error.")) {
-        translatedString = t(message, attribute);
-      }
-      // Keycloak error is already translated
-      else {
-        translatedString = message;
-      }
+      const translatedMessage = translateError(message, attribute);
       // Create rules that can be used by the validation mechanism of Vuetify.
       applicationStore.serverValidationRules[attribute] = () => {
-        return translatedString;
+        return translatedMessage;
       };
       aggregateRules();
       // Need to wait for the DOM. Otherwise the error messages are not automatically shown.
@@ -332,5 +341,7 @@ export function useForm(i18n) {
     clearValidationError,
     isServerValidationError,
     onUpdateModelValue,
+    translateError,
+    areArraysDifferent,
   };
 }

@@ -78,6 +78,7 @@ export default {
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
     valid_date: "Datum muss gültig sein",
+    all_or_nothing: "{0} und {1} oder keines angeben",
     only_unique_values: "Bitte geben Sie keine doppelten Werte ein.",
   },
   hints: {
@@ -110,7 +111,7 @@ export default {
     required_central_phone: "Zentrales Telefon ist erforderlich",
     central_mail: "Zentrale E-Mail",
     central_alarm_phone_numbers: "Zentrale Alarmierung (Telefon)",
-    central_alarm_email_addresses: "Zentrale Alarmierung (E-Mail)",
+    central_alarm_mail_addresses: "Zentrale Alarmierung (E-Mail)",
     required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
     street: "Straße",
@@ -128,6 +129,23 @@ export default {
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
     y_coordinate: "Y-Koordinate",
+    state: "Bundesland",
+    state_baden_wuerttemberg: "Baden Würtemberg",
+    state_bavaria: "Bayern",
+    state_berlin: "Berlin",
+    state_brandenburg: "Brandenburg",
+    state_bremen: "Bremen",
+    state_hamburg: "Hamburg",
+    state_hesse: "Hessen",
+    state_lower_saxony: "Niedersachsen",
+    state_mecklenburg_vorpommern: "Mecklenburg-Vorpommern",
+    state_north_rhine_westphalia: "Nordrhein-Westfalen",
+    state_rhineland_palatinate: "Rheinland-Pfalz",
+    state_saarland: "Saarland",
+    state_saxony: "Sachsen",
+    state_saxony_anhalt: "Sachsen-Anhalt",
+    state_schleswig_holstein: "Schleswig-Holstein",
+    state_thuringia: "Thüringen",
   },
   // Main component
   main: {
@@ -171,6 +189,7 @@ export default {
   // Shared button texts
   button: {
     add: "Hinzufügen",
+    remove: "Entfernen",
     create: "Erstellen",
     cancel: "Abbrechen",
     close: "Schließen",
@@ -267,7 +286,10 @@ export default {
     required_mailinglist_name: "E-Mail-Verteiler Name ist erforderlich",
   },
   search: {
-    found_users: "Gefundene Nutzer:",
-    found_institution: "Gefundene Institutionen:",
+    edit_tags: "Tags bearbeiten",
+    edit_tags_institutions: "Tags der ausgewählten Institutionen bearbeiten",
+    edit_tags_users: "Tags der ausgewählten Nutzer bearbeiten",
+    didnt_remove:
+      "Der Tag '{tag}' wurde nicht entfernt, da {type} mindestens einen Tag besitzen müssen.",
   },
 };

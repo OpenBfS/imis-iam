@@ -42,6 +42,8 @@ public class IamEventProvider implements RealmResourceProvider {
 
     private Validator validator;
 
+    private EntityManager entityManager;
+
     @Override
     public void close() { }
 
@@ -58,6 +60,8 @@ public class IamEventProvider implements RealmResourceProvider {
         this.session = session;
         this.auth = new EventAuthorizer(session);
         this.validator = new Validator();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     /**
@@ -116,7 +120,7 @@ public class IamEventProvider implements RealmResourceProvider {
         @Context HttpHeaders headers
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         if (rep == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -143,7 +147,7 @@ public class IamEventProvider implements RealmResourceProvider {
         @Context HttpHeaders headers
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         if (rep == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }

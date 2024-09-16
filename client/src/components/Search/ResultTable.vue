@@ -8,15 +8,6 @@
 <template>
   <v-container>
     <v-list density="compact" nav lines="">
-      <v-list-item-subtitle>
-        {{
-          `${
-            props.type === "users"
-              ? $t("search.found_users")
-              : $t("search.found_institution")
-          }`
-        }}
-      </v-list-item-subtitle>
       <InstitutionTable
         v-if="props.type != 'users'"
         v-bind:institutions="institutionStore.foundInstitutions"

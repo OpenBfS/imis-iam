@@ -171,4 +171,25 @@
                 RENAME imis_id TO meas_facil_id;
         </sql>
     </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.9">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution
+                ADD COLUMN service_building_state VARCHAR;
+        </sql>
+    </changeSet>
+    <changeSet author="pschwabauer@intevation.de" id="v0.10">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution
+                ADD CONSTRAINT meas_facil_id_unique UNIQUE (meas_facil_id),
+            ALTER COLUMN meas_facil_name DROP NOT NULL,
+                ADD CONSTRAINT measure_facil_or_not CHECK (
+                (meas_facil_id IS NULL AND meas_facil_name IS NULL) OR
+                (meas_facil_id IS NOT NULL AND meas_facil_name IS NOT NULL)
+            );
+        </sql>
+    </changeSet>
 </databaseChangeLog>
