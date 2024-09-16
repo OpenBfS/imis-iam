@@ -146,12 +146,8 @@ export function useForm(i18n) {
         return true;
       } else if (typeof a[key] === "object" && typeof b[key] === "object") {
         // Compare arrays
-        if (a[key].length && b[key].length && a[key].length === b[key].length) {
-          for (let j = 0; j < a[key].length; j++) {
-            if (!b[key].includes(a[key][j])) {
-              return true;
-            }
-          }
+        if (a[key].length && b[key].length && areArraysDifferent(a, b)) {
+          return true;
         } else {
           // Compare nested objects
           if (areObjectsDifferent(a[key], b[key])) {
@@ -161,6 +157,14 @@ export function useForm(i18n) {
       } else if (a[key] !== b[key]) {
         return true;
       }
+    }
+    return false;
+  };
+
+  const areArraysDifferent = (a, b) => {
+    if (a.length !== b.length) return true;
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return true;
     }
     return false;
   };
@@ -338,5 +342,6 @@ export function useForm(i18n) {
     isServerValidationError,
     onUpdateModelValue,
     translateError,
+    areArraysDifferent,
   };
 }

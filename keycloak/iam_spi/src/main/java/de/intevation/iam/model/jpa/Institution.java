@@ -12,6 +12,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import de.intevation.iam.validation.constraints.MeasFacilOrNone;
+import de.intevation.iam.validation.constraints.Unique;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -24,7 +26,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +37,9 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
+@Unique(fields = {"measFacilId"},
+    clazz = Institution.class)
+@MeasFacilOrNone
 public class Institution {
 
     @Id
@@ -46,8 +50,7 @@ public class Institution {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank
-    @Column(name = "meas_facil_name", nullable = false)
+    @Column(name = "meas_facil_name")
     private String measFacilName;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -124,17 +127,6 @@ public class Institution {
 
     @Column(name = "active")
     private Boolean active;
-
-    @Transient
-    private Boolean readonly;
-
-    public Boolean getReadonly() {
-        return readonly;
-    }
-
-    public void setReadonly(Boolean readonly) {
-        this.readonly = readonly;
-    }
 
     public Integer getId() {
         return id;

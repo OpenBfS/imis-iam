@@ -71,7 +71,7 @@ import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-const { onUpdateModelValue } = useForm();
+const { areArraysDifferent, onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
@@ -138,6 +138,21 @@ watch(input, (newInput) => {
   }
 });
 
+// We need this watcher as $subscribe doesn't detect all changes if
+// there are several at the same time.
+watch(
+  // Without structuredClone changes are not detected correctly.
+  () => structuredClone(applicationStore.managedItem),
+  (newValue, oldValue) => {
+    const oldEntries = oldValue[props.attribute];
+    const newEntries = newValue[props.attribute];
+    if (areArraysDifferent(oldEntries, newEntries)) {
+      entries.value = newEntries;
+      input.value = "";
+    }
+  }
+);
+
 applicationStore.$subscribe((mutation) => {
   const key = mutation.events.key;
   if (key === props.attribute) {
@@ -162,13 +177,19 @@ applicationStore.$subscribe((mutation) => {
 const addEntry = (moveToNextElement = false) => {
   if (isAdding) return;
   isAdding = true;
-  if (input.value === "" || entries.value.indexOf(input.value) !== -1) return;
+  if (input.value === "" || entries.value.indexOf(input.value) !== -1) {
+    isAdding = false;
+    return;
+  }
   let isValid = true;
   props.rules.forEach((rule) => {
     const result = rule(input.value);
     if (typeof result !== "boolean" || !result) isValid = false;
   });
-  if (!isValid) return;
+  if (!isValid) {
+    isAdding = false;
+    return;
+  }
   entries.value = [...entries.value, input.value];
   if (moveToNextElement) {
     const index = Array.from(plusButton.value.$el.form).indexOf(
