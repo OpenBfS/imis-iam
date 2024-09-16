@@ -87,6 +87,8 @@ public class MailProvider implements RealmResourceProvider {
 
     private Validator validator;
 
+    private EntityManager entityManager;
+
     /**
      * Constructor.
      * @param session Keycloak session
@@ -96,6 +98,8 @@ public class MailProvider implements RealmResourceProvider {
         this.auth = new MailAuthorizer(session);
         this.authList = new MailListAuthorizer(session);
         this.validator = new Validator();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     @Override
@@ -240,7 +244,7 @@ public class MailProvider implements RealmResourceProvider {
     public Response createList(final MailList list,
             @Context HttpHeaders headers) {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(list, languages.get(0));
+        validator.validate(list, languages.get(0), entityManager);
         if (list == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
@@ -305,7 +309,7 @@ public class MailProvider implements RealmResourceProvider {
     public Response updateList(final MailList list,
             @Context HttpHeaders headers) {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(list, languages.get(0));
+        validator.validate(list, languages.get(0), entityManager);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         MailList originalList = em.find(MailList.class, list.getId());
@@ -551,7 +555,7 @@ public class MailProvider implements RealmResourceProvider {
         final Mail mail
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(mail, languages.get(0));
+        validator.validate(mail, languages.get(0), entityManager);
         String userId = headers.getHeaderString(USER_ID_HEADER);
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();

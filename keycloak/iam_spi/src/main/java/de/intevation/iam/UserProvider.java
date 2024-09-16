@@ -69,6 +69,8 @@ public class UserProvider implements RealmResourceProvider {
     private Validator validator;
     private UserProfileProvider userProfileProvider;
 
+    private EntityManager entityManager;
+
     enum SortOrder {
         asc,
         desc
@@ -84,6 +86,8 @@ public class UserProvider implements RealmResourceProvider {
         this.userProfileProvider =
             session.getProvider(UserProfileProvider.class);
         this.validator = new Validator();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     /**
@@ -206,7 +210,7 @@ public class UserProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     public User createUser(@Context HttpHeaders headers, final User rep) {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             throw new BadRequestException();
         }
@@ -283,7 +287,7 @@ public class UserProvider implements RealmResourceProvider {
         final User rep
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
             throw new ForbiddenException();
         }

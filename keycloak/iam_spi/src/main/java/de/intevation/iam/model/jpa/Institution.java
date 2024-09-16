@@ -12,6 +12,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import de.intevation.iam.validation.constraints.MeasFacilOrNone;
+import de.intevation.iam.validation.constraints.Unique;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -35,6 +37,9 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
+@Unique(fields = {"measFacilId"},
+    clazz = Institution.class)
+@MeasFacilOrNone
 public class Institution {
 
     @Id
@@ -45,8 +50,7 @@ public class Institution {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank
-    @Column(name = "meas_facil_name", nullable = false)
+    @Column(name = "meas_facil_name")
     private String measFacilName;
 
     @ManyToMany(fetch = FetchType.EAGER)
