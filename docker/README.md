@@ -12,7 +12,7 @@ In case remote access to the application on the Docker host should be enabled,
 change the respective environment variables, e.g. using:
 
 ```bash
-KC_HOSTNAME=docker-host docker compose up -d
+HOSTNAME=docker-host docker compose up -d
 ```
 
 To mount local repository checkouts into the containers for development use
