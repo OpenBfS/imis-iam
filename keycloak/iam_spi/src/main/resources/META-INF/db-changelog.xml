@@ -192,4 +192,16 @@
             );
         </sql>
     </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.11">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution
+                ALTER COLUMN meas_facil_id TYPE VARCHAR(7),
+                ADD CONSTRAINT meas_facil_id_length CHECK (
+                    (char_length(meas_facil_id) &gt;= 5) AND
+                    (char_length(meas_facil_id) &lt;= 7)
+                );
+        </sql>
+    </changeSet>
 </databaseChangeLog>

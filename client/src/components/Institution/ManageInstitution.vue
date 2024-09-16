@@ -444,8 +444,11 @@ onBeforeMount(() => {
     measFacilId: [
       (v) =>
         !v ||
-        (v && v.length === 5) ||
-        t("institution.meas_facil_id_length_validation_message"),
+        (v && v.length >= 5 && v.length <= 7) ||
+        t("institution.meas_facil_id_length_validation_message", {
+          minLength: 5,
+          maxLength: 7,
+        }),
       ...measIdAndNameOrNothing(),
     ],
     tags: reqField(t("error.required_tag")),
