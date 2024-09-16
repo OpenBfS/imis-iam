@@ -152,6 +152,10 @@ const exportRequest = (itemsName) => {
   HTTP.get(`/export/${itemsName}`, {
     params: structuredClone(csvOptions.value),
     paramsSerializer,
+    // responseEncoding and responseType are necessary so axios doesn't decode the response
+    // what would lead to a wrong encoding of the download.
+    responseEncoding: "binary",
+    responseType: "arraybuffer",
   })
     .then((res) => {
       if (!res.statusText === "OK") throw new Error(res.statusText);
