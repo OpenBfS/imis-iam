@@ -410,8 +410,8 @@ const measIdAndNameOrNothing = () => {
     () =>
       (institution.value.measFacilId === "" &&
         institution.value.measFacilName === "") ||
-      (institution.value.measFacilId !== "" &&
-        institution.value.measFacilName !== "") ||
+      ((institution.value.measFacilId || "") !== "" &&
+        (institution.value.measFacilName || "") !== "") ||
       t("error.all_or_nothing", [
         t("institution.meas_facil_id"),
         t("institution.meas_facil_name"),
