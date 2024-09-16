@@ -128,7 +128,7 @@ const rowDelimiters = [
     value: "linux",
   },
 ];
-const encoding = ["utf-16", "utf-8", "ascii"];
+const encoding = ["iso-8859-15", "utf-16", "utf-8", "ascii"];
 const csvOptions = ref({
   fieldSeparator: fieldSeparators[0].value,
   rowDelimiter: rowDelimiters[0].value,
