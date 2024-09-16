@@ -63,16 +63,20 @@
 
     <template v-slot:thead>
       <tr>
-        <td class="pe-2" v-for="header in headers" :key="header">
-          <v-text-field
-            v-if="header.key !== 'active'"
-            class="my-1"
-            density="compact"
-            :placeholder="header.title"
-            hide-details
-            variant="outlined"
-            @update:modelValue="(event) => handleFilterInput(header.key, event)"
-          ></v-text-field>
+        <td></td>
+        <td class="pe-2" v-for="header in allHeaders" :key="header">
+          <template v-if="header.key !== 'actions' && header.key !== 'active'">
+            <v-text-field
+              class="my-1"
+              density="compact"
+              :placeholder="header.title"
+              hide-details
+              variant="outlined"
+              @update:modelValue="
+                (event) => handleFilterInput(header.key, event)
+              "
+            ></v-text-field>
+          </template>
         </td>
       </tr>
     </template>
