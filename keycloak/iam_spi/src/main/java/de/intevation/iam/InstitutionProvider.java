@@ -8,6 +8,7 @@ package de.intevation.iam;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.util.*;
 
 import jakarta.persistence.EntityManager;
@@ -108,17 +109,27 @@ public class InstitutionProvider implements RealmResourceProvider {
             }
 
             String value = "%" + entry.getValue().toLowerCase() + "%";
-            if (entry.getKey().equals("tags")) {
-                Join<Institution, InstitutionTag> tags = root.join("tags");
-                predicates.add(cb.like(
-                                cb.lower(tags.get("name")),
+            try {
+                Field field = Institution.class.getDeclaredField(entry.getKey());
+                if (field.getType().isAssignableFrom(List.class)) {
+                    Join<Institution, ?> join = root.join(entry.getKey());
+                    if (Objects.equals(entry.getKey(), "tags")) {
+                        predicates.add(cb.like(
+                                cb.lower(join.get("name")),
                                 value));
-            } else {
-                predicates.add(cb.like(
-                        cb.lower(root.get(entry.getKey())),
-                        value
-                ));
-            }
+                    } else {
+                        predicates.add(cb.like(
+                                cb.lower(join.as(String.class)),
+                                value));
+                    }
+
+                } else {
+                    predicates.add(cb.like(
+                            cb.lower(root.get(entry.getKey())),
+                            value
+                    ));
+                }
+            } catch (NoSuchFieldException ignored) { }
         }
         return cb.and(predicates.toArray(new Predicate[0]));
     }
