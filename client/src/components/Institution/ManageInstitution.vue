@@ -241,17 +241,7 @@
         v-if="profileStore.isAllowedToManage"
         color="accent"
         :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
-        @click="
-          processType == 'add'
-            ? createInstitution()
-            : updateInstitution(
-                sanitizePayload({ ...institution }),
-                showPostalAddress,
-                isServerValidationError,
-                handleValidationErrorFromServer,
-                hasRequestError
-              )
-        "
+        @click="processType == 'add' ? createInstitution() : saveInstitution()"
       >
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
       </v-btn>
@@ -503,6 +493,17 @@ const createInstitution = () => {
         ? handleValidationErrorFromServer(error.response.data)
         : (hasRequestError.value = true);
     });
+};
+// Cannot call updateInstitution directly in the <template> because then hasRequestError is no ref anymore
+// but a ref is necessary so we can detect any change of it in this component.
+const saveInstitution = () => {
+  updateInstitution(
+    sanitizePayload({ ...institution.value }),
+    showPostalAddress,
+    isServerValidationError,
+    handleValidationErrorFromServer,
+    hasRequestError
+  );
 };
 const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)
