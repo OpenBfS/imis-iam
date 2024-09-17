@@ -82,8 +82,7 @@ import { useApplicationStore } from "@/stores/application";
 import { useUserStore } from "@/stores/user";
 import { useInstitutionStore } from "@/stores/institution";
 import { useNotification } from "@/lib/use-notification";
-import { HTTP } from "@/lib/http";
-import qs from "qs";
+import { HTTP, paramsSerializer } from "@/lib/http";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -129,7 +128,7 @@ const rowDelimiters = [
     value: "linux",
   },
 ];
-const encoding = ["utf-16", "utf-8", "ascii"];
+const encoding = ["iso-8859-15", "utf-16", "utf-8", "ascii"];
 const csvOptions = ref({
   fieldSeparator: fieldSeparators[0].value,
   rowDelimiter: rowDelimiters[0].value,
@@ -151,10 +150,12 @@ onMounted(() => {
 
 const exportRequest = (itemsName) => {
   HTTP.get(`/export/${itemsName}`, {
-    params: csvOptions.value,
-    paramsSerializer: (params) => {
-      return qs.stringify(params, { indices: false });
-    },
+    params: structuredClone(csvOptions.value),
+    paramsSerializer,
+    // responseEncoding and responseType are necessary so axios doesn't decode the response
+    // what would lead to a wrong encoding of the download.
+    responseEncoding: "binary",
+    responseType: "arraybuffer",
   })
     .then((res) => {
       if (!res.statusText === "OK") throw new Error(res.statusText);

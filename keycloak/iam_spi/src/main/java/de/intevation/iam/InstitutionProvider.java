@@ -41,6 +41,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
 import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.Institution_;
 import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.Constants;
@@ -71,6 +72,8 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     private Validator validator;
 
+    private EntityManager entityManager;
+
     /**
      * Constructor.
      * @param session Keycloak session
@@ -79,6 +82,8 @@ public class InstitutionProvider implements RealmResourceProvider {
         this.session = session;
         this.auth = new InstitutionAuthorizer(session);
         this.validator = new Validator();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     /**
@@ -146,10 +151,10 @@ public class InstitutionProvider implements RealmResourceProvider {
             if (!filter.isEmpty()) {
                 cqSize.where(cbSize.or(
                     cbSize.like(
-                        cbSize.lower(rootSize.get("name")),
+                        cbSize.lower(rootSize.get(Institution_.name)),
                         filter),
                     cbSize.like(
-                        cbSize.lower(rootSize.get("imisId")),
+                        cbSize.lower(rootSize.get(Institution_.measFacilId)),
                         filter)
                     )
                 );
@@ -176,10 +181,10 @@ public class InstitutionProvider implements RealmResourceProvider {
         if (!filter.isEmpty()) {
             query.where(cb.or(
                 cb.like(
-                    cb.lower(root.get("name")),
+                    cb.lower(root.get(Institution_.name)),
                     filter),
                 cb.like(
-                    cb.lower(root.get("imisId")),
+                    cb.lower(root.get(Institution_.measFacilId)),
                     filter)
                 )
             );
@@ -284,7 +289,7 @@ public class InstitutionProvider implements RealmResourceProvider {
             @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -353,7 +358,7 @@ public class InstitutionProvider implements RealmResourceProvider {
             final Institution rep, @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         if (rep == null || rep.getId() == null
