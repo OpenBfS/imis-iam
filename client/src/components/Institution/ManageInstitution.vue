@@ -407,15 +407,19 @@ const states = [
 
 const measIdAndNameOrNothing = () => {
   return [
-    () =>
-      (institution.value.measFacilId === "" &&
-        institution.value.measFacilName === "") ||
-      ((institution.value.measFacilId || "") !== "" &&
-        (institution.value.measFacilName || "") !== "") ||
-      t("error.all_or_nothing", [
-        t("institution.meas_facil_id"),
-        t("institution.meas_facil_name"),
-      ]),
+    () => {
+      const id = institution.value.measFacilId;
+      const name = institution.value.measFacilName;
+      return (
+        (id === "" && name === "") ||
+        (!id && !name) ||
+        ((id || "") !== "" && (name || "") !== "") ||
+        t("error.all_or_nothing", [
+          t("institution.meas_facil_id"),
+          t("institution.meas_facil_name"),
+        ])
+      );
+    },
   ];
 };
 onBeforeMount(() => {
