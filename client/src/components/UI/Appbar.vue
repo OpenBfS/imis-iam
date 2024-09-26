@@ -55,8 +55,8 @@
 </template>
 <style scoped></style>
 <script setup>
-import { useApplicationStore } from "@/stores/application";
-import { useProfileStore } from "@/stores/profile";
+import { useApplicationStore } from "@/stores/application.js";
+import { useProfileStore } from "@/stores/profile.js";
 import { computed } from "@vue/reactivity";
 
 const cloneObject = (obj) => {

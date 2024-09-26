@@ -39,9 +39,9 @@
 
 <script setup>
 import { defineAsyncComponent, onMounted } from "vue";
-import { useApplicationStore } from "@/stores/application";
-import { useProfileStore } from "@/stores/profile";
-import { useNotification } from "./lib/use-notification";
+import { useApplicationStore } from "@/stores/application.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { useNotification } from "./lib/use-notification.js";
 
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();

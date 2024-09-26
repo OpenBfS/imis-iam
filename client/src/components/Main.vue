@@ -31,7 +31,7 @@
 <script setup>
 import { defineAsyncComponent } from "vue";
 const Applications = defineAsyncComponent(() =>
-  import("@/components/ApplicationComponent")
+  import("@/components/ApplicationComponent.vue")
 );
 const NOTIFICATION = defineAsyncComponent(() =>
   import("../components/Notification.vue")

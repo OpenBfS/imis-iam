@@ -6,7 +6,7 @@
  */
 import { defineStore } from "pinia";
 import { Promise } from "core-js";
-import { HTTP } from "../lib/http";
+import { HTTP } from "../lib/http.js";
 
 export const useInstitutionStore = defineStore("institution", {
   namespaced: true,

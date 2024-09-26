@@ -155,11 +155,11 @@
 </template>
 
 <script setup>
-import { useNotification } from "@/lib/use-notification";
+import { useNotification } from "@/lib/use-notification.js";
 import { onMounted, ref, defineAsyncComponent, computed } from "vue";
-import { useApplicationStore } from "@/stores/application";
-import { useMailStore } from "@/stores/mail";
-import { useProfileStore } from "@/stores/profile";
+import { useApplicationStore } from "@/stores/application.js";
+import { useMailStore } from "@/stores/mail.js";
+import { useProfileStore } from "@/stores/profile.js";
 
 const ManageMailing = defineAsyncComponent(() =>
   import("@/components/Mailing/ManageMailing.vue")

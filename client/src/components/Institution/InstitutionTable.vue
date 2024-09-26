@@ -66,11 +66,11 @@
 </template>
 
 <script setup>
-import { useApplicationStore } from "@/stores/application";
-import { useInstitutionStore } from "@/stores/institution";
-import { useProfileStore } from "@/stores/profile";
+import { useApplicationStore } from "@/stores/application.js";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useProfileStore } from "@/stores/profile.js";
 import DataTableServer from "@/components/DataTableServer.vue";
-import { getExpInstitution } from "@/components/Institution/institution";
+import { getExpInstitution } from "@/components/Institution/institution.js";
 import { onMounted, ref } from "vue";
 
 const applicationStore = useApplicationStore();

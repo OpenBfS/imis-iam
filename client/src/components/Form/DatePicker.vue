@@ -58,7 +58,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
-import { useForm } from "@/lib/use-form";
+import { useForm } from "@/lib/use-form.js";
 import { useI18n } from "vue-i18n";
 
 const props = defineProps([

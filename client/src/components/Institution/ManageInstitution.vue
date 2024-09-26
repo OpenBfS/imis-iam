@@ -319,16 +319,16 @@ form > div {
 </style>
 <script setup>
 import { computed, onBeforeMount, onMounted, ref } from "vue";
-import { HTTP } from "@/lib/http";
-import { useNotification } from "@/lib/use-notification";
-import { useForm } from "@/lib/use-form";
-import { useApplicationStore } from "@/stores/application";
+import { HTTP } from "@/lib/http.js";
+import { useNotification } from "@/lib/use-notification.js";
+import { useForm } from "@/lib/use-form.js";
+import { useApplicationStore } from "@/stores/application.js";
 // TODO: Geocoding feature delayed to a subsequent date
-// import { useCoordinatesStore } from "@/stores/coordinates";
+// import { useCoordinatesStore } from "@/stores/coordinates.js";
 // import { debounce } from "debounce";
-import { useInstitutionStore } from "@/stores/institution";
-import { useProfileStore } from "@/stores/profile";
-import { updateInstitution } from "./institution";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { updateInstitution } from "./institution.js";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import ChipTextField from "@/components/Form/ChipTextField.vue";
 import TextField from "@/components/Form/TextField.vue";

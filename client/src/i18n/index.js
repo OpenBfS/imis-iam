@@ -6,7 +6,7 @@
  */
 import { createI18n } from "vue-i18n";
 
-import de from "@/locales/de";
+import de from "@/locales/de.js";
 
 const datetimeFormats = {
   de: {

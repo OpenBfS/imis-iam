@@ -5,8 +5,8 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { defineStore } from "pinia";
-import { useInstitutionStore } from "@/stores/institution";
-import { useUserStore } from "@/stores/user";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useUserStore } from "@/stores/user.js";
 import { nextTick } from "vue";
 
 export const useApplicationStore = defineStore("application", {

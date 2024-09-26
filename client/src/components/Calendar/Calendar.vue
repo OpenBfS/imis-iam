@@ -86,13 +86,13 @@
   </v-container>
 </template>
 <script setup>
-import { expEvent } from "./event";
+import { expEvent } from "./event.js";
 import { computed, onMounted, ref } from "vue";
-import { useNotification } from "@/lib/use-notification";
-import { useApplicationStore } from "@/stores/application";
-import { useEventsStore } from "@/stores/events";
-import { useProfileStore } from "@/stores/profile";
-import { HTTP } from "@/lib/http";
+import { useNotification } from "@/lib/use-notification.js";
+import { useApplicationStore } from "@/stores/application.js";
+import { useEventsStore } from "@/stores/events.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { HTTP } from "@/lib/http.js";
 
 const hover = true;
 const applicationStore = useApplicationStore();

@@ -5,8 +5,8 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { useApplicationStore } from "@/stores/application";
-import { useInstitutionStore } from "@/stores/institution";
+import { useApplicationStore } from "@/stores/application.js";
+import { useInstitutionStore } from "@/stores/institution.js";
 
 const serviceBuildingPlace = {
   serviceBuildingLocation: "",

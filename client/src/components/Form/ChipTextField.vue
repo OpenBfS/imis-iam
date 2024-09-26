@@ -66,8 +66,8 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref, unref, watch } from "vue";
-import { useApplicationStore } from "@/stores/application";
-import { useForm } from "@/lib/use-form";
+import { useApplicationStore } from "@/stores/application.js";
+import { useForm } from "@/lib/use-form.js";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

@@ -6,7 +6,7 @@
  */
 import { defineStore } from "pinia";
 import { Promise } from "core-js";
-import { PhotonHTTP } from "../lib/http";
+import { PhotonHTTP } from "../lib/http.js";
 export const useCoordinatesStore = defineStore("coordinates", {
   namespaced: true,
   state: () => ({

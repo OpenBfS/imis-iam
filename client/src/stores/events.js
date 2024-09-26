@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { defineStore } from "pinia";
-import { HTTP } from "../lib/http";
+import { HTTP } from "../lib/http.js";
 export const useEventsStore = defineStore("events", {
   namespaced: true,
   state: () => ({

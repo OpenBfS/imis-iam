@@ -134,12 +134,12 @@
 </style>
 <script setup>
 import { ref, onBeforeMount, onMounted, computed } from "vue";
-import { useNotification } from "@/lib/use-notification";
-import { HTTP } from "@/lib/http";
+import { useNotification } from "@/lib/use-notification.js";
+import { HTTP } from "@/lib/http.js";
 import { useI18n } from "vue-i18n";
-import { useApplicationStore } from "@/stores/application";
-import { useUserStore } from "@/stores/user";
-import { useForm } from "@/lib/use-form";
+import { useApplicationStore } from "@/stores/application.js";
+import { useUserStore } from "@/stores/user.js";
+import { useForm } from "@/lib/use-form.js";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 const props = defineProps({

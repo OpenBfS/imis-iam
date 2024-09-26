@@ -54,7 +54,7 @@
 
 <script>
 import { computed, onMounted } from "vue";
-import { useApplicationStore } from "@/stores/application";
+import { useApplicationStore } from "@/stores/application.js";
 export default {
   setup() {
     const applicationStore = useApplicationStore();

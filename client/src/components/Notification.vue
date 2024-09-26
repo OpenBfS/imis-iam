@@ -189,10 +189,10 @@ p {
 }
 </style>
 <script setup>
-import { HTTP } from "@/lib/http";
-import { useNotification } from "@/lib/use-notification";
-import { useApplicationStore } from "@/stores/application";
-import { useProfileStore } from "@/stores/profile";
+import { HTTP } from "@/lib/http.js";
+import { useNotification } from "@/lib/use-notification.js";
+import { useApplicationStore } from "@/stores/application.js";
+import { useProfileStore } from "@/stores/profile.js";
 import { ref, onMounted, defineAsyncComponent } from "vue";
 
 const applicationStore = useApplicationStore();
