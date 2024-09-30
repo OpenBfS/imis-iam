@@ -84,6 +84,8 @@ const tableHeaders = computed(() => {
           };
         }),
         { name: "institutions", default: true },
+        { name: "role", default: false },
+        { name: "enabled", default: false },
       ]
     : [];
 });
