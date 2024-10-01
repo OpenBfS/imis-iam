@@ -114,6 +114,7 @@ public class Institution {
     @UniqueElements
     private List<String> centralAlarmMailAddresses;
 
+    @Size(min = 5, max = 7)
     @Column(name = "meas_facil_id")
     private String measFacilId;
 

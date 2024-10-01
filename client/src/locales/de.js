@@ -124,7 +124,7 @@ export default {
     address_location: "Postanschrift: Ort",
     meas_facil_id: "@:meas_facil_id_term",
     meas_facil_id_length_validation_message:
-      "Die @:meas_facil_id_term muss exakt 5 Zeichen beinhalten",
+      "Die @:meas_facil_id_term muss eine Länge von mind. {minLength} und max. {maxLength} Zeichen beinhalten",
     active: "Aktiv",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",

@@ -241,17 +241,7 @@
         v-if="profileStore.isAllowedToManage"
         color="accent"
         :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
-        @click="
-          processType == 'add'
-            ? createInstitution()
-            : updateInstitution(
-                sanitizePayload({ ...institution }),
-                showPostalAddress,
-                isServerValidationError,
-                handleValidationErrorFromServer,
-                hasRequestError
-              )
-        "
+        @click="processType == 'add' ? createInstitution() : saveInstitution()"
       >
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
       </v-btn>
@@ -407,15 +397,19 @@ const states = [
 
 const measIdAndNameOrNothing = () => {
   return [
-    () =>
-      (institution.value.measFacilId === "" &&
-        institution.value.measFacilName === "") ||
-      ((institution.value.measFacilId || "") !== "" &&
-        (institution.value.measFacilName || "") !== "") ||
-      t("error.all_or_nothing", [
-        t("institution.meas_facil_id"),
-        t("institution.meas_facil_name"),
-      ]),
+    () => {
+      const id = institution.value.measFacilId;
+      const name = institution.value.measFacilName;
+      return (
+        (id === "" && name === "") ||
+        (!id && !name) ||
+        ((id || "") !== "" && (name || "") !== "") ||
+        t("error.all_or_nothing", [
+          t("institution.meas_facil_id"),
+          t("institution.meas_facil_name"),
+        ])
+      );
+    },
   ];
 };
 onBeforeMount(() => {
@@ -444,8 +438,11 @@ onBeforeMount(() => {
     measFacilId: [
       (v) =>
         !v ||
-        (v && v.length === 5) ||
-        t("institution.meas_facil_id_length_validation_message"),
+        (v && v.length >= 5 && v.length <= 7) ||
+        t("institution.meas_facil_id_length_validation_message", {
+          minLength: 5,
+          maxLength: 7,
+        }),
       ...measIdAndNameOrNothing(),
     ],
     tags: reqField(t("error.required_tag")),
@@ -496,6 +493,17 @@ const createInstitution = () => {
         ? handleValidationErrorFromServer(error.response.data)
         : (hasRequestError.value = true);
     });
+};
+// Cannot call updateInstitution directly in the <template> because then hasRequestError is no ref anymore
+// but a ref is necessary so we can detect any change of it in this component.
+const saveInstitution = () => {
+  updateInstitution(
+    sanitizePayload({ ...institution.value }),
+    showPostalAddress,
+    isServerValidationError,
+    handleValidationErrorFromServer,
+    hasRequestError
+  );
 };
 const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)

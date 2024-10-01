@@ -1,12 +1,12 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 LABEL maintainer awoestmann@intevation.de
 
 RUN apt-get update && apt-get install -y \
-            openjdk-17-jre-headless maven jq curl \
+            openjdk-21-jre-headless maven jq curl \
             postgresql-client wait-for-it
 
-ENV KEYCLOAK_VERSION 24.0.4
+ENV KEYCLOAK_VERSION 25.0.5
 ENV KEYCLOAK_HOME /opt/keycloak
 
 RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
