@@ -8,7 +8,7 @@
 <template>
   <v-checkbox
     :density="props.density"
-    :disabled="props.disabled"
+    :disabled="applicationStore.form?.readonly || props.disabled"
     :hint="props.hint"
     :label="props.label"
     :model-value="

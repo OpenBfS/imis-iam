@@ -14,7 +14,7 @@
     :counter="props.counter"
     :counterValue="props.counterValue"
     :density="props.density"
-    :disabled="props.disabled"
+    :disabled="applicationStore.form?.readonly || props.disabled"
     :hint="props.hint"
     :items="props.items"
     :item-title="props.itemTitle"

@@ -15,7 +15,7 @@
         prepend-inner-icon="mdi-calendar-blank"
         :hint="!props.readonly ? $t('hints.date_format') : ''"
         :label="label"
-        :readonly="props.readonly"
+        :readonly="applicationStore.form?.readonly || props.readonly"
         :rules="rules"
         @click="
           if (!props.readonly) {

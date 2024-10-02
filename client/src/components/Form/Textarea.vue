@@ -13,7 +13,7 @@
     :counter="props.counter"
     :counterValue="props.counterValue"
     :density="props.density"
-    :disabled="props.disabled"
+    :disabled="applicationStore.form?.readonly || props.disabled"
     :hint="props.hint"
     :label="`${props.label}${props.required ? ' *' : ''}`"
     :model-value="

@@ -9,7 +9,7 @@
   <v-text-field
     :clearable="props.clearable"
     :density="props.density ?? 'compact'"
-    :disabled="props.disabled"
+    :disabled="applicationStore.form?.readonly || props.disabled"
     :hint="props.hint"
     :label="`${props.label}${props.required ? ' *' : ''}`"
     :model-value="
