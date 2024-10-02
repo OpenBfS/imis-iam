@@ -214,13 +214,7 @@
         @click="
           ['add', 'copy'].indexOf(processType) !== -1
             ? createUser()
-            : updateUser(
-                user,
-                resetNotification,
-                isServerValidationError,
-                handleValidationErrorFromServer,
-                hasRequestError
-              )
+            : saveUser()
         "
       >
         {{
@@ -493,6 +487,18 @@ const createUser = () => {
         ? handleValidationErrorFromServer(error.response.data)
         : (hasRequestError.value = true);
     });
+};
+
+// Cannot call updateUser directly in the <template> because then hasRequestError is no ref anymore
+// but a ref is necessary so we can detect any change of it in this component.
+const saveUser = () => {
+  updateUser(
+    { ...user.value },
+    resetNotification,
+    isServerValidationError,
+    handleValidationErrorFromServer,
+    hasRequestError
+  );
 };
 
 // Form
