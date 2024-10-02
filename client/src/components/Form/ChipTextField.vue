@@ -174,7 +174,7 @@ applicationStore.$subscribe((mutation) => {
   }
 });
 
-const addEntry = (moveToNextElement = false) => {
+const addEntry = () => {
   if (isAdding) return;
   isAdding = true;
   if (input.value === "" || entries.value.indexOf(input.value) !== -1) {
@@ -191,12 +191,6 @@ const addEntry = (moveToNextElement = false) => {
     return;
   }
   entries.value = [...entries.value, input.value];
-  if (moveToNextElement) {
-    const index = Array.from(plusButton.value.$el.form).indexOf(
-      plusButton.value.$el
-    );
-    plusButton.value.$el.form[index + 1]?.focus();
-  }
   input.value = "";
   isAdding = false;
 };
@@ -216,6 +210,6 @@ const onFocus = (event) => {
 };
 
 const onTab = () => {
-  addEntry(true);
+  addEntry();
 };
 </script>
