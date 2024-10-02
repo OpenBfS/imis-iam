@@ -438,6 +438,9 @@ onBeforeMount(() => {
       t("error.user_attribute_required", [t("user.username")])
     ),
   });
+  if (!userStore.roles) {
+    userStore.loadRoles();
+  }
 });
 
 onMounted(() => {
@@ -460,7 +463,7 @@ const processType = computed(() => {
   return applicationStore.processType;
 });
 const userRoles = computed(() => {
-  var roles = userStore.roles;
+  var roles = userStore.roles ?? [];
   // If available, use description field for localization
   roles.forEach(
     (item) => (item.title = item.description ? t(item.description) : item.name)

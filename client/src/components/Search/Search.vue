@@ -146,7 +146,9 @@ watch(
   }
 );
 onMounted(() => {
-  userStore.loadRoles();
+  if (!userStore.roles) {
+    userStore.loadRoles();
+  }
   Promise.all([
     userStore.loadUsers(),
     institutionStore.loadInstitutions(),
