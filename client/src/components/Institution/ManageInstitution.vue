@@ -97,7 +97,7 @@
                   :items="states"
                   item-title="label"
                   item-value="value"
-                  :label="$t('institution.state')"
+                  :label="$t('institution.service_building_state')"
                   @update:modelValue="institution.serviceBuildingState = $event"
                 ></Select>
               </v-col>
