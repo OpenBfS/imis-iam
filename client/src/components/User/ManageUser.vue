@@ -185,7 +185,7 @@
               <Select
                 attribute="role"
                 :clearable="profileStore.isAllowedToManage"
-                :disabled="!profileStore.isAllowedToManage"
+                :readonly="!profileStore.isAllowedToManage"
                 :label="$t('user.role')"
                 :items="userRoles"
                 item-value="name"

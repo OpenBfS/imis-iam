@@ -9,12 +9,12 @@
   <v-autocomplete
     :active="props.active"
     :chips="props.chips"
-    :clearable="props.clearable"
+    :clearable="props.clearable && editable"
     :closableChips="props.closableChips"
     :counter="props.counter"
     :counterValue="props.counterValue"
     :density="props.density"
-    :disabled="applicationStore.form?.readonly || props.disabled"
+    :disabled="props.disabled"
     :hint="props.hint"
     :items="props.items"
     :item-title="props.itemTitle"
@@ -30,7 +30,7 @@
     :no-data-text="props.noDataText"
     :persistent-hint="props.persistentHint"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="props.readonly"
+    :readonly="applicationStore.form?.readonly || props.readonly"
     :return-object="props.returnObject"
     :rules="
       applicationStore.clientAndServerRules[props.attribute]
@@ -47,6 +47,7 @@
 <script setup>
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
+import { computed } from "vue";
 
 const { onUpdateModelValue } = useForm();
 
@@ -84,4 +85,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue"]);
+
+const editable = computed(() => {
+  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
+});
 </script>

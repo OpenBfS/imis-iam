@@ -12,16 +12,16 @@
     @keydown.tab="onTab"
     @update:focused="onFocus"
     v-model="input"
-    :clearable="props.clearable"
+    :clearable="props.clearable && editable"
     :density="props.density ?? 'compact'"
-    :disabled="applicationStore.form?.readonly || props.disabled"
+    :disabled="props.disabled"
     :hint="props.hint"
     :label="`${props.label}${props.required ? ' *' : ''}`"
     :name="props.name"
     :persistent-hint="true"
     :persistent-placeholder="entries.length > 0"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="props.readonly"
+    :readonly="applicationStore.form?.readonly || props.readonly"
     :rules="
       applicationStore.clientAndServerRules[props.attribute]
         ? [
@@ -48,7 +48,7 @@
     <v-chip
       v-for="(entry, index) in entries"
       @click:close="() => removeEntry(index)"
-      closable
+      :closable="editable"
       :color="index === indexOfDuplicate ? 'error' : 'default'"
       size="small"
       :key="entry"
@@ -65,7 +65,7 @@
 </style>
 
 <script setup>
-import { onMounted, onUnmounted, ref, unref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, unref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
@@ -113,6 +113,9 @@ const rules = ref([
   },
 ]);
 let isAdding = false;
+const editable = computed(() => {
+  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
+});
 
 onMounted(() => {
   if (props.attribute && applicationStore.managedItem[props.attribute]) {
