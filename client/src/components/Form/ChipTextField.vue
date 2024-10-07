@@ -12,7 +12,7 @@
     @keydown.tab="onTab"
     @update:focused="onFocus"
     v-model="input"
-    :clearable="props.clearable"
+    :clearable="props.clearable && editable"
     :density="props.density ?? 'compact'"
     :disabled="props.disabled"
     :hint="props.hint"
@@ -21,7 +21,7 @@
     :persistent-hint="true"
     :persistent-placeholder="entries.length > 0"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="props.readonly"
+    :readonly="applicationStore.form?.readonly || props.readonly"
     :rules="
       applicationStore.clientAndServerRules[props.attribute]
         ? [
@@ -48,7 +48,7 @@
     <v-chip
       v-for="(entry, index) in entries"
       @click:close="() => removeEntry(index)"
-      closable
+      :closable="editable"
       :color="index === indexOfDuplicate ? 'error' : 'default'"
       size="small"
       :key="entry"
@@ -65,7 +65,7 @@
 </style>
 
 <script setup>
-import { onMounted, onUnmounted, ref, unref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, unref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
@@ -113,13 +113,18 @@ const rules = ref([
   },
 ]);
 let isAdding = false;
-
+const editable = computed(() => {
+  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
+});
+const resetInput = () => {
+  input.value = "";
+};
 onMounted(() => {
   if (props.attribute && applicationStore.managedItem[props.attribute]) {
     entries.value = applicationStore.managedItem[props.attribute];
   }
+  applicationStore.addResetEventListener(resetInput);
 });
-
 onUnmounted(() => {
   applicationStore.removeChangeInField(props.attribute);
 });
@@ -174,7 +179,7 @@ applicationStore.$subscribe((mutation) => {
   }
 });
 
-const addEntry = (moveToNextElement = false) => {
+const addEntry = () => {
   if (isAdding) return;
   isAdding = true;
   if (input.value === "" || entries.value.indexOf(input.value) !== -1) {
@@ -191,12 +196,6 @@ const addEntry = (moveToNextElement = false) => {
     return;
   }
   entries.value = [...entries.value, input.value];
-  if (moveToNextElement) {
-    const index = Array.from(plusButton.value.$el.form).indexOf(
-      plusButton.value.$el
-    );
-    plusButton.value.$el.form[index + 1]?.focus();
-  }
   input.value = "";
   isAdding = false;
 };
@@ -216,6 +215,6 @@ const onFocus = (event) => {
 };
 
 const onTab = () => {
-  addEntry(true);
+  addEntry();
 };
 </script>

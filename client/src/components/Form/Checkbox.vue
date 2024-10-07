@@ -18,7 +18,7 @@
     "
     :name="props.name"
     :persistent-hint="props.persistentHint"
-    :readonly="props.readonly"
+    :readonly="applicationStore.form?.readonly || props.readonly"
     :rules="
       applicationStore.clientAndServerRules[props.attribute]
         ? applicationStore.clientAndServerRules[props.attribute]

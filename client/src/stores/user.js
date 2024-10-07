@@ -11,7 +11,7 @@ export const useUserStore = defineStore("user", {
   namespaced: true,
   state: () => ({
     users: [],
-    roles: [],
+    roles: null,
     foundUsers: [],
     selectedUsers: [],
     offset: 0,

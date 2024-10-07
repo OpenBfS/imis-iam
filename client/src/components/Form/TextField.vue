@@ -7,7 +7,7 @@
  -->
 <template>
   <v-text-field
-    :clearable="props.clearable"
+    :clearable="props.clearable && editable"
     :density="props.density ?? 'compact'"
     :disabled="props.disabled"
     :hint="props.hint"
@@ -19,7 +19,7 @@
     "
     :name="props.name"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="props.readonly"
+    :readonly="applicationStore.form?.readonly || props.readonly"
     ref="textField"
     :rules="
       applicationStore.clientAndServerRules[props.attribute]
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
 
@@ -73,5 +73,9 @@ const validate = () => {
 
 defineExpose({
   validate,
+});
+
+const editable = computed(() => {
+  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
 });
 </script>
