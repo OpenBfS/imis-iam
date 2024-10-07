@@ -278,7 +278,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted } from "vue";
+import { computed, onBeforeMount, onMounted, onUnmounted } from "vue";
 import { useNotification } from "@/lib/use-notification";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
@@ -446,6 +446,9 @@ onMounted(() => {
     applicationStore.clientAndServerRules[key] =
       applicationStore.clientRules[key];
   });
+});
+onUnmounted(() => {
+  applicationStore.removeAllResetEventListeners();
 });
 const user = computed(() => {
   return applicationStore.managedItem;

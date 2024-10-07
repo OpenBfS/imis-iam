@@ -130,6 +130,8 @@ export function useForm(i18n) {
     applicationStore.serverValidationRules = {};
     aggregateRules();
     form.value?.validate();
+    applicationStore.callResetEventListener();
+    hasNoChange.value = true;
   };
 
   const areObjectsDifferent = (a, b) => {

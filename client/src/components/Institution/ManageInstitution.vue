@@ -308,7 +308,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, ref } from "vue";
+import { computed, onBeforeMount, onMounted, onUnmounted, ref } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
@@ -469,6 +469,9 @@ onMounted(() => {
   if (loc || poc || str) {
     triggerLoadCoordinates([loc, poc, str].join(" "));
   }*/
+});
+onUnmounted(() => {
+  applicationStore.removeAllResetEventListeners();
 });
 const sanitizePayload = (payload) => {
   if (payload.measFacilId !== undefined && payload.measFacilId === "") {

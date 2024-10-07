@@ -26,6 +26,7 @@ export const useApplicationStore = defineStore("application", {
     // coming from keycloak.
     serverValidationRules: {},
     attributesOfFieldsThatChanged: [],
+    resetEventListeners: [],
     form: undefined,
     savedItem: {},
     showManageEventDialog: false,
@@ -150,6 +151,17 @@ export const useApplicationStore = defineStore("application", {
           this.serverValidationRules[attribute]
         );
       }
+    },
+    addResetEventListener(listener) {
+      this.resetEventListeners.push(listener);
+    },
+    removeAllResetEventListeners() {
+      this.resetEventListeners = [];
+    },
+    callResetEventListener() {
+      this.resetEventListeners.forEach((listener) => {
+        listener();
+      });
     },
   },
 });

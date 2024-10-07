@@ -116,13 +116,15 @@ let isAdding = false;
 const editable = computed(() => {
   return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
 });
-
+const resetInput = () => {
+  input.value = "";
+};
 onMounted(() => {
   if (props.attribute && applicationStore.managedItem[props.attribute]) {
     entries.value = applicationStore.managedItem[props.attribute];
   }
+  applicationStore.addResetEventListener(resetInput);
 });
-
 onUnmounted(() => {
   applicationStore.removeChangeInField(props.attribute);
 });
