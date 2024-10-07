@@ -47,9 +47,11 @@ export default {
   },
   error: {
     // Keys which Keycloak can return after validations fail.
-    // Source: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_de.properties
+    // Source for attribute names: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_en.properties
     username_invalid_character: "'{0}' enthält ungültige Zeichen.",
     invalid_length_too_short: "'{0}' muss mindestens eine Länge von {1} haben.",
+    invalid_multivalued_size:
+      "'{0}' muss eine Anzahl von {1} bis {2} Werten haben.",
     number_out_of_range_too_big: "'{0}' darf maximal den Wert {1} haben.",
     number_out_of_range_too_small: "'{0}' muss mindestens den Wert {1} haben.",
     user_attribute_required: "Bitte geben Sie '{0}' an.",
