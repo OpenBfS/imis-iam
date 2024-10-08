@@ -107,9 +107,9 @@ export const useInstitutionStore = defineStore("institution", {
       this.totalNumberOfInstitutions--;
     },
     updateFilter(key, term) {
-      if (this.filterBy[key] && term.length === 0) {
+      if (term === null || term.length === 0) {
         delete this.filterBy[key];
-      } else if (term.length > 0) {
+      } else if (!term.length || term.length > 0) {
         this.filterBy[key] = term;
       }
     },

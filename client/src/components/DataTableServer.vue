@@ -65,7 +65,81 @@
       <tr>
         <td></td>
         <td class="pe-2" v-for="header in allHeaders" :key="header">
-          <template v-if="header.key !== 'actions' && header.key !== 'active'">
+          <template v-if="header.key === 'active' || header.key === 'enabled'">
+            <v-select
+              :label="$t('user.enabled')"
+              :items="[
+                { title: t('true'), value: 'true' },
+                { title: t('false'), value: 'false' },
+              ]"
+              class="my-1"
+              clearable
+              hide-details
+              variant="outlined"
+              @update:modelValue="
+                (event) => {
+                  handleFilterInput(header.key, event);
+                }
+              "
+            />
+          </template>
+          <template v-else-if="header.key === 'institutions'">
+            <v-select
+              :label="$t('user.institutions')"
+              :no-data-text="$t('label.no_data_text')"
+              :items="institutionStore.institutions"
+              item-title="name"
+              item-value="name"
+              class="my-1"
+              clearable
+              hide-details
+              variant="outlined"
+              @update:modelValue="
+                (event) => {
+                  handleFilterInput(header.key, event);
+                }
+              "
+            ></v-select>
+          </template>
+          <template v-else-if="header.key === 'role'">
+            <v-select
+              :label="$t('user.role')"
+              :no-data-text="$t('label.no_data_text')"
+              :items="roles"
+              class="my-1"
+              clearable
+              hide-details
+              variant="outlined"
+              @update:modelValue="
+                (event) => {
+                  handleFilterInput(header.key, event);
+                }
+              "
+            ></v-select>
+          </template>
+          <template
+            v-else-if="
+              props.type === 'users' &&
+              profileStore.getAttribute(header.key) &&
+              profileStore.isAttributeSelection(header.key)
+            "
+          >
+            <v-select
+              :label="$t('user.role')"
+              :no-data-text="$t('label.no_data_text')"
+              :items="profileStore.getSelectionItemsOfAttribute(header.key)"
+              class="my-1"
+              clearable
+              hide-details
+              variant="outlined"
+              @update:modelValue="
+                (event) => {
+                  handleFilterInput(header.key, event);
+                }
+              "
+            ></v-select>
+          </template>
+          <template v-else-if="header.key !== 'actions'">
             <v-text-field
               class="my-1"
               density="compact"
@@ -86,6 +160,7 @@
 <script setup>
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
+import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { computed, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -95,6 +170,7 @@ const { t } = useI18n();
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
+const profileStore = useProfileStore();
 const userStore = useUserStore();
 
 const areTableSettingsOpen = ref(false);
@@ -106,6 +182,11 @@ const actionHeader = {
 };
 const allHeaders = computed(() => {
   return [...headers.value.filter((h) => h.visible), actionHeader];
+});
+const roles = computed(() => {
+  return userStore.roles.map((role) => {
+    return { title: t(role.description), value: role.name };
+  });
 });
 const selected = ref([]);
 
@@ -153,6 +234,7 @@ const adjustHeaders = () => {
       sortable: props.type !== "users",
       visible: header.default,
     };
+    // This function decides how the values inside an item are displayed in the UI
     newHeader.value = (item) => {
       if (
         props.type === "users" &&
@@ -165,7 +247,7 @@ const adjustHeaders = () => {
         props.type === "users"
           ? toRaw(item.attributes[headerName] ?? item[headerName])
           : item[headerName];
-      return value ? getDisplayName(toRaw(value)) : undefined;
+      return getDisplayName(toRaw(value));
     };
     newHeaders.push(newHeader);
   });
@@ -182,7 +264,7 @@ const updateTable = (event) => {
 };
 
 function getDisplayName(value) {
-  if (!value) return;
+  if (value === undefined) return;
   if (typeof value === "boolean") {
     return t(`${value}`);
   } else if (Array.isArray(value)) {
@@ -204,10 +286,11 @@ const triggerSearch = debounce(() => {
 }, 500);
 
 const handleFilterInput = (key, value) => {
+  const term = value !== null ? value : "";
   if (props.type === "users") {
-    userStore.updateFilter(key, value);
+    userStore.updateFilter(key, term);
   } else if (props.type === "institutions") {
-    institutionStore.updateFilter(key, value);
+    institutionStore.updateFilter(key, term);
   }
   triggerSearch();
 };

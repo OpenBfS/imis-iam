@@ -125,7 +125,7 @@ public class InstitutionProvider implements RealmResourceProvider {
 
                 } else {
                     predicates.add(cb.like(
-                            cb.lower(root.get(entry.getKey())),
+                            cb.lower(root.get(entry.getKey()).as(String.class)),
                             value
                     ));
                 }
