@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
             openjdk-21-jre-headless maven jq curl \
             postgresql-client wait-for-it
 
-ENV KEYCLOAK_VERSION=25.0.5
+ENV KEYCLOAK_VERSION=26.0.0
 ENV KEYCLOAK_HOME=/opt/keycloak
 
 RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
@@ -33,6 +33,6 @@ RUN ln -fs $SRC_DIR/keycloak.conf $KEYCLOAK_HOME/conf/keycloak.conf
 
 RUN ${KEYCLOAK_HOME}/bin/kc.sh build
 
-ENV KEYCLOAK_ADMIN=admin
-ENV KEYCLOAK_ADMIN_PASSWORD=secret
+ENV KC_BOOTSTRAP_ADMIN_USERNAME=admin
+ENV KC_BOOTSTRAP_ADMIN_PASSWORD=secret
 CMD sh $SRC_DIR/start.sh
