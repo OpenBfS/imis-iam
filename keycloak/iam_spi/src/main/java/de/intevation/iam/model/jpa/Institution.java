@@ -26,6 +26,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -95,6 +96,7 @@ public class Institution {
     private String centralFax;
 
     @NotNull
+    @Email
     @Column(name = "central_mail", nullable = false)
     private String centralMail;
 
@@ -112,7 +114,7 @@ public class Institution {
         joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "mail")
     @UniqueElements
-    private List<String> centralAlarmMailAddresses;
+    private List<@Email String> centralAlarmMailAddresses;
 
     @Size(min = 5, max = 7)
     @Column(name = "meas_facil_id")
