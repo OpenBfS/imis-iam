@@ -6,10 +6,7 @@
  */
 package de.intevation.iam.auth;
 
-import java.util.List;
-
 import jakarta.persistence.EntityManager;
-import jakarta.ws.rs.core.HttpHeaders;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
@@ -17,7 +14,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.Institution;
-import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
 public class InstitutionAuthorizer extends Authorizer<Institution> {
@@ -30,9 +26,8 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
     public boolean isAuthorizedById(
         Institution data,
         RequestMethod requestMethod,
-        HttpHeaders headers
+        String userId
     ) {
-        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
             return false;
         }
@@ -56,13 +51,5 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
             case DELETE: return Role.EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
-    }
-
-    @Override
-    public List<Institution> filter(
-        List<Institution> data,
-        HttpHeaders headers
-    ) {
-        return data;
     }
 }

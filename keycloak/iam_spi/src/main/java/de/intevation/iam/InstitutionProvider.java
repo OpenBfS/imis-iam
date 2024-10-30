@@ -203,7 +203,7 @@ public class InstitutionProvider implements RealmResourceProvider {
         }
         return auth.filterObjectList(
             new ObjectList<Institution>(size, result.getResultList()),
-            headers);
+            headers.getHeaderString(Constants.SHIB_USER_HEADER));
     }
 
     /**
@@ -290,11 +290,11 @@ public class InstitutionProvider implements RealmResourceProvider {
     ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
-        if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         RealmModel realm = session.getContext().getRealm();
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -365,10 +365,10 @@ public class InstitutionProvider implements RealmResourceProvider {
                || em.find(Institution.class, rep.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
@@ -407,7 +407,10 @@ public class InstitutionProvider implements RealmResourceProvider {
             return Response.status(Status.NOT_FOUND).build();
         }
         if (
-            !auth.isAuthorizedById(institution, RequestMethod.DELETE, headers)
+            !auth.isAuthorizedById(
+                institution,
+                RequestMethod.DELETE,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
         ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
