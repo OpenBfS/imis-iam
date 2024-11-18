@@ -6,12 +6,12 @@
  */
 package de.intevation.iam.model.jpa;
 
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.intevation.iam.validation.constraints.MeasFacilOrNone;
@@ -176,6 +176,11 @@ public class Institution {
             institutionTag.setName(tag);
             this.tags.add(institutionTag);
         }
+    }
+
+    @JsonIgnore
+    public Set<InstitutionTag> getInstitutionTags() {
+        return this.tags;
     }
 
     public String getServiceBuildingStreet() {

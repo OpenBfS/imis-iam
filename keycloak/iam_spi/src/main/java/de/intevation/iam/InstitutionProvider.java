@@ -18,6 +18,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -40,6 +41,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
+import de.intevation.iam.auth.Role;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.Institution_;
 import de.intevation.iam.model.jpa.InstitutionTag;
@@ -313,6 +315,8 @@ public class InstitutionProvider implements RealmResourceProvider {
                 .entity(i18n.getString(MEAS_FACIL_NAME_ALREADY_USED))
                 .build();
         }
+
+        mergeTags(rep, em, requestingUser);
         em.persist(rep);
         return Response.ok(rep).build();
     }
@@ -386,6 +390,7 @@ public class InstitutionProvider implements RealmResourceProvider {
                 .build();
         }
 
+        mergeTags(rep, em, requestingUser);
         Institution merged = em.merge(rep);
         return Response.ok(merged).build();
     }
@@ -452,6 +457,25 @@ public class InstitutionProvider implements RealmResourceProvider {
             query.setParameter("id", inst.getId());
         }
         return query.getSingleResult();
+    }
+
+    private void mergeTags(
+        Institution rep,
+        EntityManager em,
+        UserModel requestingUser
+    ) {
+        for (InstitutionTag tag: rep.getInstitutionTags()) {
+            InstitutionTag persistentTag =
+                em.find(InstitutionTag.class, tag.getName());
+            // Allow CHIEF_EDITORs to add new tags
+            if (persistentTag == null) {
+                if (Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+                    em.persist(tag);
+                } else {
+                    throw new ForbiddenException();
+                }
+            }
+        }
     }
 
     @Override
