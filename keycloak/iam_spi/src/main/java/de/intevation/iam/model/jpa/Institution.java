@@ -8,7 +8,9 @@ package de.intevation.iam.model.jpa;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -60,7 +62,7 @@ public class Institution {
         inverseJoinColumns = {@JoinColumn(name = "tag_name")}
     )
     @NotEmpty
-    private List<InstitutionTag> tags;
+    private Set<InstitutionTag> tags = new HashSet<>();
 
     @NotBlank
     @Column(name = "service_building_street", nullable = false)
@@ -154,6 +156,9 @@ public class Institution {
         this.measFacilName = measFacilName;
     }
 
+    /**
+     * @return list of names of associated tags
+     */
     public List<String> getTags() {
         ArrayList<String> names = new ArrayList<>();
         for (InstitutionTag tag : tags) {
@@ -162,14 +167,15 @@ public class Institution {
         return names;
     }
 
+    /**
+     * @param names list of names of tags to be associated
+     */
     public void setTags(List<String> names) {
-        ArrayList<InstitutionTag> tagList = new ArrayList<>();
         for (String tag : names) {
             InstitutionTag institutionTag = new InstitutionTag();
             institutionTag.setName(tag);
-            tagList.add(institutionTag);
+            this.tags.add(institutionTag);
         }
-        this.tags = tagList;
     }
 
     public String getServiceBuildingStreet() {
