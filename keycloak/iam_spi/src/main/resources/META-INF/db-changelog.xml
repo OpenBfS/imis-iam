@@ -203,4 +203,13 @@
                 );
         </sql>
     </changeSet>
+    <changeSet author="tom@intevation.de" id="v0.12">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_institution
+                ALTER COLUMN central_mail DROP NOT NULL,
+                ALTER COLUMN central_phone DROP NOT NULL;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

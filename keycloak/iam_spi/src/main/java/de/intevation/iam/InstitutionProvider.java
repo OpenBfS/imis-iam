@@ -270,9 +270,9 @@ public class InstitutionProvider implements RealmResourceProvider {
      *   addressStreet: [String] Institution address street,
      *   addressPostalCode: [String] Institution address postal code,
      *   addressLocation: [String] Institution address location,
-     *   centralPhone: [String] Central phone, mandatory
+     *   centralPhone: [String] Central phone
      *   centralFax: [String] Central fax
-     *   centralMail: [String] Central mail, mandatory
+     *   centralMail: [String] Central mail
      *   imisId: [String] Institution imis id,
      *   xCoordinate: [Float] X coordinate,
      *   yCoordinate: [Float] Y coordinate,
@@ -341,9 +341,9 @@ public class InstitutionProvider implements RealmResourceProvider {
      *   addressStreet: [String] Institution address street,
      *   addressPostalCode: [String] Institution address postal code,
      *   addressLocation: [String] Institution address location,
-     *   centralPhone: [String] Central phone, mandatory
+     *   centralPhone: [String] Central phone
      *   centralFax: [String] Central fax
-     *   centralMail: [String] Central mail, mandatory
+     *   centralMail: [String] Central mail
      *   imisId: [String] Institution imis id,
      *   xCoordinate: [Float] X coordinate,
      *   yCoordinate: [Float] Y coordinate,

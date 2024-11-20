@@ -170,13 +170,11 @@
                 :label="$t('institution.central_phone')"
                 @update:modelValue="institution.centralPhone = $event"
                 :attribute="'centralPhone'"
-                :required="true"
               ></TextField>
               <TextField
                 :label="$t('institution.central_mail')"
                 :attribute="'centralMail'"
                 @update:modelValue="institution.centralMail = $event"
-                required
               ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
@@ -352,10 +350,8 @@ const {
   form,
   valid,
   hasNoChange,
-  reqValidmail,
   validMail,
   reqField,
-  reqValidPhone,
   validPhone,
   reqValidPostalcode,
   resetForm,
@@ -427,14 +423,11 @@ onBeforeMount(() => {
     serviceBuildingStreet: reqField(
       t("institution.required_service_building_street")
     ),
-    centralPhone: reqValidPhone(
+    centralPhone: validPhone(
       t("institution.required_central_phone"),
       t("error.valid_phone")
     ),
-    centralMail: reqValidmail(
-      t("institution.required_central_email"),
-      t("error.valid_email")
-    ),
+    centralMail: validMail(t("error.valid_email")),
     measFacilId: [
       (v) =>
         !v ||
@@ -480,6 +473,18 @@ const sanitizePayload = (payload) => {
   if (payload.measFacilName !== undefined && payload.measFacilName === "") {
     delete payload.measFacilName;
   }
+  // Remove attributes with empty strings because some lead to a rejection by the backend
+  // if a value has to be null or fulfill a contraint like a minimum length.
+  const keysToDelete = [];
+  const allKeys = Object.keys(payload);
+  allKeys.forEach((key) => {
+    if (payload[key] === "") {
+      keysToDelete.push(key);
+    }
+  });
+  keysToDelete.forEach((key) => {
+    delete payload[key];
+  });
   return payload;
 };
 const createInstitution = () => {

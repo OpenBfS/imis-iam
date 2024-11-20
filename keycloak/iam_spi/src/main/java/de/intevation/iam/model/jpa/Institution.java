@@ -90,15 +90,15 @@ public class Institution {
     private String addressLocation;
 
     @Size(min = 7)
-    @Column(name = "central_phone", nullable = false)
+    @Column(name = "central_phone")
     private String centralPhone;
 
     @Column(name = "central_fax")
     private String centralFax;
 
-    @NotBlank
     @Email
-    @Column(name = "central_mail", nullable = false)
+    @Size(min = 1) // Prevent empty string
+    @Column(name = "central_mail")
     private String centralMail;
 
     @ElementCollection(fetch = FetchType.EAGER)
