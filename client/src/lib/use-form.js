@@ -27,7 +27,7 @@ export function useForm(i18n) {
   };
   const validMail = (validMsg) => {
     return [
-      (v) => doesRegexMatchWholeString(regExprEmail, v) || v == "" || validMsg,
+      (v) => !v || doesRegexMatchWholeString(regExprEmail, v) || validMsg,
     ];
   };
   const reqValidPhone = (reqMsg, validMsg) => {
@@ -43,7 +43,7 @@ export function useForm(i18n) {
   };
   const validPhone = (validMsg) => {
     return [
-      (v) => doesRegexMatchWholeString(regExprPhone, v) || v == "" || validMsg,
+      (v) => !v || doesRegexMatchWholeString(regExprPhone, v) || validMsg,
     ];
   };
   const validPostalcode = (validMsg) => {
