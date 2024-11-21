@@ -146,9 +146,11 @@
       <v-col cols="12" class="mt-6">
         <v-table class="pa-2 ma-2" density="compact">
           <thead>
-            <th class="text-left">{{ $t("mailinglist.subject") }}</th>
-            <th class="text-left">{{ $t("mailinglist.sender") }}</th>
-            <th class="text-left">{{ $t("mailinglist.date") }}</th>
+            <tr>
+              <th class="text-left">{{ $t("mailinglist.subject") }}</th>
+              <th class="text-left">{{ $t("mailinglist.sender") }}</th>
+              <th class="text-left">{{ $t("mailinglist.date") }}</th>
+            </tr>
           </thead>
           <tbody>
             <tr

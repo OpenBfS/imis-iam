@@ -110,7 +110,7 @@
 
 <script setup>
 import { computed, ref, defineAsyncComponent, onMounted, watch } from "vue";
-import { debounce } from "debounce";
+import debounce from "debounce";
 import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
