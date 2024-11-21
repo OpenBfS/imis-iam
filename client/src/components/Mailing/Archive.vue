@@ -201,7 +201,7 @@ import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
 import { useMailStore } from "@/stores/mail";
 import { useRoute } from "vue-router";
-import { debounce } from "debounce";
+import debounce from "debounce";
 import { useI18n } from "vue-i18n";
 const MailContent = defineAsyncComponent(() =>
   import("@/components/Mailing/MailContent.vue")
@@ -224,6 +224,7 @@ const applicationStore = useApplicationStore();
 const mailStore = useMailStore();
 const route = useRoute();
 const { hasLoadingError } = useNotification();
+const selectedMailinglist = ref([]);
 const toggleStartDatePicker = () => {
   isStartDatePickerOpen.value = !isStartDatePickerOpen.value;
 };
@@ -411,7 +412,6 @@ watch(
     }
   }
 );
-const selectedMailinglist = ref([]);
 const mailinglists = computed(() => {
   return mailStore.mailingLists;
 });
