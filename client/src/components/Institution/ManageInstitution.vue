@@ -423,10 +423,7 @@ onBeforeMount(() => {
     serviceBuildingStreet: reqField(
       t("institution.required_service_building_street")
     ),
-    centralPhone: validPhone(
-      t("institution.required_central_phone"),
-      t("error.valid_phone")
-    ),
+    centralPhone: validPhone(t("error.valid_phone")),
     centralMail: validMail(t("error.valid_email")),
     measFacilId: [
       (v) =>
