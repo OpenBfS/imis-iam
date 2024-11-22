@@ -15,8 +15,10 @@ import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.EventAuthorizer;
 import de.intevation.iam.model.jpa.Event;
+import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -80,7 +82,7 @@ public class IamEventProvider implements RealmResourceProvider {
         query.select(root);
         List<Event> result = auth.filter(
             em.createQuery(query).getResultList(),
-            headers
+            headers.getHeaderString(Constants.SHIB_USER_HEADER)
         );
         return Response.ok(result).build();
     }
@@ -103,7 +105,10 @@ public class IamEventProvider implements RealmResourceProvider {
             return Response.status(Status.NOT_FOUND).build();
         }
         event.setReadonly(
-            auth.isAuthorizedById(event, RequestMethod.PUT, headers));
+            auth.isAuthorizedById(
+                event,
+                RequestMethod.PUT,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER)));
         return Response.ok(event).build();
     }
 
@@ -124,7 +129,11 @@ public class IamEventProvider implements RealmResourceProvider {
         if (rep == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
+        if (!auth.isAuthorizedById(
+                rep,
+                RequestMethod.POST,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         rep.setReadonly(false);
@@ -151,7 +160,11 @@ public class IamEventProvider implements RealmResourceProvider {
         if (rep == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
+        if (!auth.isAuthorizedById(
+                rep,
+                RequestMethod.PUT,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         EntityManager em = session.getProvider(
@@ -178,7 +191,11 @@ public class IamEventProvider implements RealmResourceProvider {
         if (event == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (!auth.isAuthorizedById(event, RequestMethod.DELETE, headers)) {
+        if (!auth.isAuthorizedById(
+                event,
+                RequestMethod.DELETE,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         em.remove(event);

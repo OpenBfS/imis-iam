@@ -248,13 +248,13 @@ public class MailProvider implements RealmResourceProvider {
         if (list == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!authList.isAuthorizedById(list, RequestMethod.POST, headers)) {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!authList.isAuthorizedById(list, RequestMethod.POST, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
@@ -318,11 +318,11 @@ public class MailProvider implements RealmResourceProvider {
                 || originalList == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!authList.isAuthorizedById(list, RequestMethod.PUT, headers)) {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!authList.isAuthorizedById(list, RequestMethod.PUT, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         RealmModel realm = session.getContext().getRealm();
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
             = I18nUtils.getI18nBundle(session, realm, requestingUser);
@@ -364,7 +364,11 @@ public class MailProvider implements RealmResourceProvider {
         if (list == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (!authList.isAuthorizedById(list, RequestMethod.DELETE, headers)) {
+        if (!authList.isAuthorizedById(
+                list,
+                RequestMethod.DELETE,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         em.remove(list);
@@ -461,7 +465,11 @@ public class MailProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
-        if (!auth.isAuthorizedById(null, RequestMethod.GET, headers)) {
+        if (!auth.isAuthorizedById(
+                null,
+                RequestMethod.GET,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -560,7 +568,10 @@ public class MailProvider implements RealmResourceProvider {
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
-        if (!auth.isAuthorizedById(mail, RequestMethod.POST, headers)) {
+        if (!auth.isAuthorizedById(
+                mail,
+                RequestMethod.POST,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -614,7 +625,10 @@ public class MailProvider implements RealmResourceProvider {
         if (mail == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (!auth.isAuthorizedById(mail, RequestMethod.POST, headers)) {
+        if (!auth.isAuthorizedById(
+                mail,
+                RequestMethod.POST,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         mail.setArchived(true);

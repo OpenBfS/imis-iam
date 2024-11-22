@@ -9,12 +9,11 @@ package de.intevation.iam.auth;
 
 import java.util.List;
 
-import jakarta.ws.rs.core.HttpHeaders;
-
 import org.keycloak.models.KeycloakSession;
 
 import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.RequestMethod;
+
 
 public abstract class Authorizer<T> {
 
@@ -24,13 +23,13 @@ public abstract class Authorizer<T> {
      * Check if user is authorized for the given data and request method.
      * @param data Data
      * @param requestMethod Request method used
-     * @param headers Request headers
+     * @param userId ID of requesting user
      * @return True if authorized, else false
      */
     public abstract boolean isAuthorizedById(
         T data,
         RequestMethod requestMethod,
-        HttpHeaders headers
+        String userId
     );
 
     /**
@@ -38,12 +37,12 @@ public abstract class Authorizer<T> {
      * The default implementation returns data unchanged.
      *
      * @param data List of objects
-     * @param headers Request headers
+     * @param userId ID of requesting user
      * @return Filtered list
      */
     public List<T> filter(
         List<T> data,
-        HttpHeaders headers
+        String userId
     ) {
         return data;
     }
@@ -53,12 +52,12 @@ public abstract class Authorizer<T> {
      * The default implementation returns data unchanged.
      *
      * @param data List of objects
-     * @param headers Request headers
+     * @param userId ID of requesting user
      * @return Filtered list
      */
     public ObjectList<T> filterObjectList(
         ObjectList<T> data,
-        HttpHeaders headers
+        String userId
     ) {
         return data;
     }

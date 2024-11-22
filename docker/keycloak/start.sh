@@ -42,8 +42,8 @@ do
     echo "Trying to get acess token..."
     TKN=$(curl -sX POST "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" \
     -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "username=${KEYCLOAK_ADMIN}" \
-    -d "password=${KEYCLOAK_ADMIN_PASSWORD}" \
+    -d "username=${KC_BOOTSTRAP_ADMIN_USERNAME}" \
+    -d "password=${KC_BOOTSTRAP_ADMIN_PASSWORD}" \
     -d 'grant_type=password' \
     -d 'client_id=admin-cli' | jq -r '.access_token')
     counter=$((counter+1))
@@ -76,7 +76,7 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/components" \
 
 ${KEYCLOAK_HOME}/bin/kcadm.sh config credentials \
     --server http://localhost:8080 --realm master \
-    --user $KEYCLOAK_ADMIN --password $KEYCLOAK_ADMIN_PASSWORD
+    --user $KC_BOOTSTRAP_ADMIN_USERNAME --password $KC_BOOTSTRAP_ADMIN_PASSWORD
 
 echo "Creating user profile"
 ${KEYCLOAK_HOME}/bin/kcadm.sh update realms/$IMIS_REALM/users/profile \

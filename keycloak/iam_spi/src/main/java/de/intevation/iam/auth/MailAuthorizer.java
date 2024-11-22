@@ -6,14 +6,11 @@
  */
 package de.intevation.iam.auth;
 
-import jakarta.ws.rs.core.HttpHeaders;
-
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.Mail;
-import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 
 public class MailAuthorizer extends Authorizer<Mail> {
@@ -26,9 +23,8 @@ public class MailAuthorizer extends Authorizer<Mail> {
     public boolean isAuthorizedById(
         Mail data,
         RequestMethod requestMethod,
-        HttpHeaders headers
+        String userId
     ) {
-        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
             return false;
         }

@@ -20,7 +20,7 @@ const addressPlace = {
   addressLocation: "",
 };
 const imis = { measFacilId: null };
-const central = { centralMail: "", centralPhone: "", centralFax: "" };
+const central = { centralMail: null, centralPhone: null, centralFax: null };
 const alarm = { centralAlarmMailAddresses: [], centralAlarmPhoneNumbers: [] };
 const expInstitution = {
   name: "",

@@ -208,7 +208,7 @@ public class UserProvider implements RealmResourceProvider {
 
         return auth.filterObjectList(
             new ObjectList<User>(size, userList),
-            headers);
+            headers.getHeaderString(Constants.SHIB_USER_HEADER));
     }
 
     /**
@@ -233,7 +233,10 @@ public class UserProvider implements RealmResourceProvider {
         }
 
         User user = new User(userModel, session);
-        if (!auth.isAuthorizedById(user, RequestMethod.GET, headers)) {
+        if (!auth.isAuthorizedById(
+                user,
+                RequestMethod.GET,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
             throw new ForbiddenException();
         }
         return user;
@@ -257,11 +260,11 @@ public class UserProvider implements RealmResourceProvider {
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             throw new BadRequestException();
         }
-        if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
             throw new ForbiddenException();
         }
 
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
@@ -331,14 +334,14 @@ public class UserProvider implements RealmResourceProvider {
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
-        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
             throw new ForbiddenException();
         }
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, rep.getId());
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, id);
 
         try {

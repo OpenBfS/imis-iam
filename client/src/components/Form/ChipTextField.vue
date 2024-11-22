@@ -10,7 +10,6 @@
     @keydown.enter="addEntry"
     @keydown.delete="onDelete"
     @keydown.tab="onTab"
-    @update:focused="onFocus"
     v-model="input"
     :clearable="props.clearable && editable"
     :density="props.density ?? 'compact'"
@@ -36,7 +35,7 @@
     <template v-slot:append="{ isValid }">
       <v-btn
         ref="plusButton"
-        @click="addEntry"
+        @click="onClickPlusButton"
         size="x-small"
         icon="mdi-plus"
         class="ml-n3"
@@ -210,8 +209,13 @@ const onDelete = () => {
   }
 };
 
-const onFocus = (event) => {
-  if (!event) addEntry();
+const onClickPlusButton = () => {
+  addEntry();
+  // Re-focus text field so user can continue to enter values
+  const index = Array.from(plusButton.value.$el.form).indexOf(
+    plusButton.value.$el
+  );
+  plusButton.value.$el.form[index - 1]?.focus();
 };
 
 const onTab = () => {

@@ -110,11 +110,9 @@ export default {
     required_service_building_postal_code:
       "PLZ des Dienstgebäudes ist erforderlich",
     central_phone: "Zentrales Telefon",
-    required_central_phone: "Zentrales Telefon ist erforderlich",
     central_mail: "Zentrale E-Mail",
     central_alarm_phone_numbers: "Zentrale Alarmierung (Telefon)",
     central_alarm_mail_addresses: "Zentrale Alarmierung (E-Mail)",
-    required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
     street: "Straße",
     postal_code: "PLZ",

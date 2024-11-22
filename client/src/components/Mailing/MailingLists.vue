@@ -33,8 +33,10 @@
       <v-col cols="10" class="mt-6">
         <v-table class="ma-2 pa-2">
           <thead>
-            <th class="text-left">{{ $t("label.name") }}</th>
-            <th class="text-left">{{ $t("label.actions") }}</th>
+            <tr>
+              <th class="text-left">{{ $t("label.name") }}</th>
+              <th class="text-left">{{ $t("label.actions") }}</th>
+            </tr>
           </thead>
           <tbody>
             <tr v-for="list in mailingLists" :key="list.id">
