@@ -271,6 +271,13 @@
       <span class="text-h5">{{
         $t("label.confirm_deletion", { name: institution.name })
       }}</span>
+      <div>
+        <UIAlert
+          v-if="hasRequestError"
+          v-bind:isSuccessful="!hasRequestError"
+          v-bind:message="applicationStore.httpErrorMessage"
+        />
+      </div>
     </v-card-text>
     <v-divider></v-divider>
     <v-card-actions>
@@ -517,8 +524,12 @@ const deleteInstitution = () => {
       applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })
-    .catch(() => {
+    .catch((error) => {
       hasRequestError.value = true;
+      const statusText = error.response?.statusText
+        ? `: ${error.response.statusText}`
+        : "";
+      applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
     });
 };
 
