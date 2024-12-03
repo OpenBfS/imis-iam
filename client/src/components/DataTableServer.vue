@@ -75,6 +75,7 @@
               class="my-1"
               clearable
               hide-details
+              min-width="120"
               variant="outlined"
               @update:modelValue="
                 (event) => {
