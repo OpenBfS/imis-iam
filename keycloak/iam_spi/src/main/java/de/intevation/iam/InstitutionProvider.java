@@ -41,6 +41,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+import org.hibernate.query.criteria.JpaExpression;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -129,13 +130,13 @@ public class InstitutionProvider implements RealmResourceProvider {
                                 value));
                     } else {
                         predicates.add(cb.like(
-                                cb.lower(join.as(String.class)),
+                                cb.lower(((JpaExpression) join).cast(String.class)),
                                 value));
                     }
 
                 } else {
                     predicates.add(cb.like(
-                            cb.lower(root.get(entry.getKey()).as(String.class)),
+                            cb.lower(((JpaExpression) root.get(entry.getKey())).cast(String.class)),
                             value
                     ));
                 }
