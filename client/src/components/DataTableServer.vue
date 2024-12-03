@@ -126,7 +126,7 @@
             "
           >
             <v-select
-              :label="$t('user.role')"
+              :label="$t(`user.${header.key}`)"
               :no-data-text="$t('label.no_data_text')"
               :items="profileStore.getSelectionItemsOfAttribute(header.key)"
               class="my-1"
