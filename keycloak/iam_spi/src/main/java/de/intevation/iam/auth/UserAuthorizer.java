@@ -9,8 +9,6 @@ package de.intevation.iam.auth;
 
 import java.util.List;
 
-import jakarta.ws.rs.core.HttpHeaders;
-
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -31,9 +29,8 @@ public class UserAuthorizer extends Authorizer<User> {
     public boolean isAuthorizedById(
         User data,
         RequestMethod requestMethod,
-        HttpHeaders headers
+        String userId
     ) {
-        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (userId == null) {
             return false;
         }
@@ -61,11 +58,10 @@ public class UserAuthorizer extends Authorizer<User> {
 
     @Override
     public List<User> filter(
-            List<User> data,
-            HttpHeaders headers
+        List<User> data,
+        String userId
     ) {
         RealmModel realm = session.getContext().getRealm();
-        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, userId);
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         data.forEach(user -> {
@@ -78,11 +74,10 @@ public class UserAuthorizer extends Authorizer<User> {
 
     @Override
     public ObjectList<User> filterObjectList(
-            ObjectList<User> data,
-            HttpHeaders headers
+        ObjectList<User> data,
+        String userId
     ) {
         RealmModel realm = session.getContext().getRealm();
-        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         UserModel requestingUser = session.users().getUserById(realm, userId);
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         data.getList().forEach(user -> {

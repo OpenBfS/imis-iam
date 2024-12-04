@@ -1,7 +1,7 @@
 FROM debian:bullseye
-LABEL maintainer tom.gottfried@intevation.de
+LABEL maintainer=tom.gottfried@intevation.de
 
-ENV PG_VERSION 14
+ENV PG_VERSION=14
 
 #
 # Use utf-8
@@ -12,7 +12,7 @@ RUN echo \
     echo "locales locales/default_environment_locale select en_US.UTF-8" | \
     debconf-set-selections
 RUN apt-get update -y && apt-get install -y locales
-ENV LC_ALL en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 #
 # Install packages
@@ -28,9 +28,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #
 # Set environment variables
 #
-ENV PGCONF /etc/postgresql/$PG_VERSION/main/postgresql.conf
-ENV PGBIN /usr/lib/postgresql/$PG_VERSION/bin/
-ENV PGDATA /var/lib/postgresql/$PG_VERSION/main
+ENV PGCONF=/etc/postgresql/$PG_VERSION/main/postgresql.conf
+ENV PGBIN=/usr/lib/postgresql/$PG_VERSION/bin/
+ENV PGDATA=/var/lib/postgresql/$PG_VERSION/main
 
 #
 # Use user postgres to run the next commands

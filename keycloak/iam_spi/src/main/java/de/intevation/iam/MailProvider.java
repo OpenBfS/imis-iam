@@ -46,7 +46,9 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.MailAuthorizer;
 import de.intevation.iam.model.jpa.Mail;
+import de.intevation.iam.model.jpa.Mail_;
 import de.intevation.iam.model.jpa.MailType;
+import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 
@@ -72,6 +74,8 @@ public class MailProvider implements RealmResourceProvider {
 
     private Validator validator;
 
+    private EntityManager entityManager;
+
     /**
      * Constructor.
      * @param session Keycloak session
@@ -80,6 +84,8 @@ public class MailProvider implements RealmResourceProvider {
         this.session = session;
         this.auth = new MailAuthorizer(session);
         this.validator = new Validator();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     @Override
@@ -151,7 +157,11 @@ public class MailProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
-        if (!auth.isAuthorizedById(null, RequestMethod.GET, headers)) {
+        if (!auth.isAuthorizedById(
+                null,
+                RequestMethod.GET,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -159,7 +169,7 @@ public class MailProvider implements RealmResourceProvider {
         CriteriaQuery<Mail> critQuery = cb.createQuery(Mail.class);
         Root<Mail> root = critQuery.from(Mail.class);
         critQuery.select(root);
-        critQuery.orderBy(cb.desc(root.get("sendDate")));
+        critQuery.orderBy(cb.desc(root.get(Mail_.sendDate)));
         Predicate filter;
 
         //Filter by recipients
@@ -171,13 +181,13 @@ public class MailProvider implements RealmResourceProvider {
         }
 
         //Filter by mails according to "archived" value
-        Predicate archiveFilter = cb.equal(root.get("archived"), archived);
+        Predicate archiveFilter = cb.equal(root.get(Mail_.archived), archived);
 
         //Filter by expiry date
         Timestamp now = new Timestamp(new Date().getTime());
         Predicate expiredFilter = cb.greaterThan(
-                root.<Timestamp>get("expiryDate"), now);
-        Predicate noDateFilter = cb.isNull(root.get("expiryDate"));
+                root.<Timestamp>get(Mail_.expiryDate), now);
+        Predicate noDateFilter = cb.isNull(root.get(Mail_.expiryDate));
         Predicate dateExpiredOrNoDateFilter = cb.or(
             expiredFilter, noDateFilter);
 
@@ -188,25 +198,25 @@ public class MailProvider implements RealmResourceProvider {
         if (start != null) {
             Timestamp startTimestamp = Timestamp.from(start.toInstant());
             Predicate dateFilter = cb.greaterThanOrEqualTo(
-                root.<Timestamp>get("sendDate"), startTimestamp);
+                root.<Timestamp>get(Mail_.sendDate), startTimestamp);
             filter = cb.and(filter, dateFilter);
         }
         if (end != null) {
             Timestamp endTimestamp = Timestamp.from(end.toInstant());
             Predicate dateFilter = cb.lessThanOrEqualTo(
-                root.<Timestamp>get("sendDate"), endTimestamp);
+                root.<Timestamp>get(Mail_.sendDate), endTimestamp);
             filter = cb.and(filter, dateFilter);
         }
 
         if (sender != null && !sender.equals("")) {
-            Predicate senderFilter = cb.equal(root.get("sender"), sender);
+            Predicate senderFilter = cb.equal(root.get(Mail_.sender), sender);
             filter = cb.and(filter, senderFilter);
         }
 
         //Filter by mail type
         In<Integer> typeFilter;
         if (types != null && !types.isEmpty()) {
-            typeFilter = cb.in(root.get("type"));
+            typeFilter = cb.in(root.get(Mail_.type));
             for (Integer type: types) {
                 typeFilter.value(type);
             }
@@ -237,12 +247,15 @@ public class MailProvider implements RealmResourceProvider {
         final Mail mail
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(mail, languages.get(0));
+        validator.validate(mail, languages.get(0), entityManager);
         String userId = headers.getHeaderString(USER_ID_HEADER);
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
-        if (!auth.isAuthorizedById(mail, RequestMethod.POST, headers)) {
+        if (!auth.isAuthorizedById(
+                mail,
+                RequestMethod.POST,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -293,7 +306,10 @@ public class MailProvider implements RealmResourceProvider {
         if (mail == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (!auth.isAuthorizedById(mail, RequestMethod.POST, headers)) {
+        if (!auth.isAuthorizedById(
+                mail,
+                RequestMethod.POST,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         mail.setArchived(true);

@@ -10,9 +10,8 @@
     @keydown.enter="addEntry"
     @keydown.delete="onDelete"
     @keydown.tab="onTab"
-    @update:focused="onFocus"
     v-model="input"
-    :clearable="props.clearable"
+    :clearable="props.clearable && editable"
     :density="props.density ?? 'compact'"
     :disabled="props.disabled"
     :hint="props.hint"
@@ -21,7 +20,7 @@
     :persistent-hint="true"
     :persistent-placeholder="entries.length > 0"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="props.readonly"
+    :readonly="applicationStore.form?.readonly || props.readonly"
     :rules="
       applicationStore.clientAndServerRules[props.attribute]
         ? [
@@ -36,7 +35,7 @@
     <template v-slot:append="{ isValid }">
       <v-btn
         ref="plusButton"
-        @click="addEntry"
+        @click="onClickPlusButton"
         size="x-small"
         icon="mdi-plus"
         class="ml-n3"
@@ -48,7 +47,7 @@
     <v-chip
       v-for="(entry, index) in entries"
       @click:close="() => removeEntry(index)"
-      closable
+      :closable="editable"
       :color="index === indexOfDuplicate ? 'error' : 'default'"
       size="small"
       :key="entry"
@@ -65,13 +64,13 @@
 </style>
 
 <script setup>
-import { onMounted, onUnmounted, ref, unref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, unref, watch } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useForm } from "@/lib/use-form";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-const { onUpdateModelValue } = useForm();
+const { areArraysDifferent, onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
@@ -113,13 +112,18 @@ const rules = ref([
   },
 ]);
 let isAdding = false;
-
+const editable = computed(() => {
+  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
+});
+const resetInput = () => {
+  input.value = "";
+};
 onMounted(() => {
   if (props.attribute && applicationStore.managedItem[props.attribute]) {
     entries.value = applicationStore.managedItem[props.attribute];
   }
+  applicationStore.addResetEventListener(resetInput);
 });
-
 onUnmounted(() => {
   applicationStore.removeChangeInField(props.attribute);
 });
@@ -137,6 +141,21 @@ watch(input, (newInput) => {
     applicationStore.removeChangeInField(props.attribute);
   }
 });
+
+// We need this watcher as $subscribe doesn't detect all changes if
+// there are several at the same time.
+watch(
+  // Without structuredClone changes are not detected correctly.
+  () => structuredClone(applicationStore.managedItem),
+  (newValue, oldValue) => {
+    const oldEntries = oldValue[props.attribute];
+    const newEntries = newValue[props.attribute];
+    if (areArraysDifferent(oldEntries, newEntries)) {
+      entries.value = newEntries;
+      input.value = "";
+    }
+  }
+);
 
 applicationStore.$subscribe((mutation) => {
   const key = mutation.events.key;
@@ -159,23 +178,23 @@ applicationStore.$subscribe((mutation) => {
   }
 });
 
-const addEntry = (moveToNextElement = false) => {
+const addEntry = () => {
   if (isAdding) return;
   isAdding = true;
-  if (input.value === "" || entries.value.indexOf(input.value) !== -1) return;
+  if (input.value === "" || entries.value.indexOf(input.value) !== -1) {
+    isAdding = false;
+    return;
+  }
   let isValid = true;
   props.rules.forEach((rule) => {
     const result = rule(input.value);
     if (typeof result !== "boolean" || !result) isValid = false;
   });
-  if (!isValid) return;
-  entries.value = [...entries.value, input.value];
-  if (moveToNextElement) {
-    const index = Array.from(plusButton.value.$el.form).indexOf(
-      plusButton.value.$el
-    );
-    plusButton.value.$el.form[index + 1]?.focus();
+  if (!isValid) {
+    isAdding = false;
+    return;
   }
+  entries.value = [...entries.value, input.value];
   input.value = "";
   isAdding = false;
 };
@@ -190,11 +209,16 @@ const onDelete = () => {
   }
 };
 
-const onFocus = (event) => {
-  if (!event) addEntry();
+const onClickPlusButton = () => {
+  addEntry();
+  // Re-focus text field so user can continue to enter values
+  const index = Array.from(plusButton.value.$el.form).indexOf(
+    plusButton.value.$el
+  );
+  plusButton.value.$el.form[index - 1]?.focus();
 };
 
 const onTab = () => {
-  addEntry(true);
+  addEntry();
 };
 </script>

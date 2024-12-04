@@ -1,5 +1,5 @@
 FROM debian:bookworm
-LABEL maintainer tom@intevation.de
+LABEL maintainer=tom@intevation.de
 
 #
 # Install required packages

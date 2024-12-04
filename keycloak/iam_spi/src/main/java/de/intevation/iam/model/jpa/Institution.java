@@ -6,12 +6,16 @@
  */
 package de.intevation.iam.model.jpa;
 
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import de.intevation.iam.validation.constraints.MeasFacilOrNone;
+import de.intevation.iam.validation.constraints.Unique;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -24,16 +28,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.UniqueElements;
 
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
+@Unique(fields = {"measFacilId"},
+    clazz = Institution.class)
+@MeasFacilOrNone
 public class Institution {
 
     @Id
@@ -44,8 +52,7 @@ public class Institution {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank
-    @Column(name = "meas_facil_name", nullable = false)
+    @Column(name = "meas_facil_name")
     private String measFacilName;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -55,7 +62,7 @@ public class Institution {
         inverseJoinColumns = {@JoinColumn(name = "tag_name")}
     )
     @NotEmpty
-    private List<InstitutionTag> tags;
+    private Set<InstitutionTag> tags = new HashSet<>();
 
     @NotBlank
     @Column(name = "service_building_street", nullable = false)
@@ -70,6 +77,9 @@ public class Institution {
     @Column(name = "service_building_location", nullable = false)
     private String serviceBuildingLocation;
 
+    @Column(name = "service_building_state")
+    private String serviceBuildingState;
+
     @Column(name = "address_street")
     private String addressStreet;
 
@@ -80,26 +90,34 @@ public class Institution {
     private String addressLocation;
 
     @Size(min = 7)
-    @Column(name = "central_phone", nullable = false)
+    @Column(name = "central_phone")
     private String centralPhone;
 
     @Column(name = "central_fax")
     private String centralFax;
 
-    @NotNull
-    @Column(name = "central_mail", nullable = false)
+    @Email
+    @Size(min = 1) // Prevent empty string
+    @Column(name = "central_mail")
     private String centralMail;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "iam_institution_central_alarm_phone_numbers", joinColumns = @JoinColumn(name = "institution_id"))
+    @CollectionTable(
+        name = "iam_institution_central_alarm_phone_numbers",
+        joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
+    @UniqueElements
     private List<String> centralAlarmPhoneNumbers;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "iam_institution_central_alarm_mail_addresses", joinColumns = @JoinColumn(name = "institution_id"))
+    @CollectionTable(
+        name = "iam_institution_central_alarm_mail_addresses",
+        joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "mail")
-    private List<String> centralAlarmMailAddresses;
+    @UniqueElements
+    private List<@Email String> centralAlarmMailAddresses;
 
+    @Size(min = 5, max = 7)
     @Column(name = "meas_facil_id")
     private String measFacilId;
 
@@ -113,17 +131,6 @@ public class Institution {
 
     @Column(name = "active")
     private Boolean active;
-
-    @Transient
-    private Boolean readonly;
-
-    public Boolean getReadonly() {
-        return readonly;
-    }
-
-    public void setReadonly(Boolean readonly) {
-        this.readonly = readonly;
-    }
 
     public Integer getId() {
         return id;
@@ -149,6 +156,9 @@ public class Institution {
         this.measFacilName = measFacilName;
     }
 
+    /**
+     * @return list of names of associated tags
+     */
     public List<String> getTags() {
         ArrayList<String> names = new ArrayList<>();
         for (InstitutionTag tag : tags) {
@@ -157,14 +167,20 @@ public class Institution {
         return names;
     }
 
+    /**
+     * @param names list of names of tags to be associated
+     */
     public void setTags(List<String> names) {
-        ArrayList<InstitutionTag> tagList = new ArrayList<>();
         for (String tag : names) {
             InstitutionTag institutionTag = new InstitutionTag();
             institutionTag.setName(tag);
-            tagList.add(institutionTag);
+            this.tags.add(institutionTag);
         }
-        this.tags = tagList;
+    }
+
+    @JsonIgnore
+    public Set<InstitutionTag> getInstitutionTags() {
+        return this.tags;
     }
 
     public String getServiceBuildingStreet() {
@@ -189,6 +205,14 @@ public class Institution {
 
     public void setServiceBuildingLocation(String serviceBuildingLocation) {
         this.serviceBuildingLocation = serviceBuildingLocation;
+    }
+
+    public String getServiceBuildingState() {
+        return serviceBuildingState;
+    }
+
+    public void setServiceBuildingState(String serviceBuildingState) {
+        this.serviceBuildingState = serviceBuildingState;
     }
 
     public String getAddressStreet() {

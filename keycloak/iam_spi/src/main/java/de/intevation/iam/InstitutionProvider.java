@@ -18,6 +18,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -40,7 +41,9 @@ import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
+import de.intevation.iam.auth.Role;
 import de.intevation.iam.model.jpa.Institution;
+import de.intevation.iam.model.jpa.Institution_;
 import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.Constants;
@@ -71,6 +74,8 @@ public class InstitutionProvider implements RealmResourceProvider {
 
     private Validator validator;
 
+    private EntityManager entityManager;
+
     /**
      * Constructor.
      * @param session Keycloak session
@@ -79,6 +84,8 @@ public class InstitutionProvider implements RealmResourceProvider {
         this.session = session;
         this.auth = new InstitutionAuthorizer(session);
         this.validator = new Validator();
+        this.entityManager = session.getProvider(JpaConnectionProvider.class)
+            .getEntityManager();
     }
 
     /**
@@ -146,10 +153,10 @@ public class InstitutionProvider implements RealmResourceProvider {
             if (!filter.isEmpty()) {
                 cqSize.where(cbSize.or(
                     cbSize.like(
-                        cbSize.lower(rootSize.get("name")),
+                        cbSize.lower(rootSize.get(Institution_.name)),
                         filter),
                     cbSize.like(
-                        cbSize.lower(rootSize.get("imisId")),
+                        cbSize.lower(rootSize.get(Institution_.measFacilId)),
                         filter)
                     )
                 );
@@ -176,10 +183,10 @@ public class InstitutionProvider implements RealmResourceProvider {
         if (!filter.isEmpty()) {
             query.where(cb.or(
                 cb.like(
-                    cb.lower(root.get("name")),
+                    cb.lower(root.get(Institution_.name)),
                     filter),
                 cb.like(
-                    cb.lower(root.get("imisId")),
+                    cb.lower(root.get(Institution_.measFacilId)),
                     filter)
                 )
             );
@@ -198,7 +205,7 @@ public class InstitutionProvider implements RealmResourceProvider {
         }
         return auth.filterObjectList(
             new ObjectList<Institution>(size, result.getResultList()),
-            headers);
+            headers.getHeaderString(Constants.SHIB_USER_HEADER));
     }
 
     /**
@@ -263,9 +270,9 @@ public class InstitutionProvider implements RealmResourceProvider {
      *   addressStreet: [String] Institution address street,
      *   addressPostalCode: [String] Institution address postal code,
      *   addressLocation: [String] Institution address location,
-     *   centralPhone: [String] Central phone, mandatory
+     *   centralPhone: [String] Central phone
      *   centralFax: [String] Central fax
-     *   centralMail: [String] Central mail, mandatory
+     *   centralMail: [String] Central mail
      *   imisId: [String] Institution imis id,
      *   xCoordinate: [Float] X coordinate,
      *   yCoordinate: [Float] Y coordinate,
@@ -284,12 +291,12 @@ public class InstitutionProvider implements RealmResourceProvider {
             @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
-        if (!auth.isAuthorizedById(rep, RequestMethod.POST, headers)) {
+        validator.validate(rep, languages.get(0), entityManager);
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         RealmModel realm = session.getContext().getRealm();
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -308,6 +315,8 @@ public class InstitutionProvider implements RealmResourceProvider {
                 .entity(i18n.getString(MEAS_FACIL_NAME_ALREADY_USED))
                 .build();
         }
+
+        mergeTags(rep, em, requestingUser);
         em.persist(rep);
         return Response.ok(rep).build();
     }
@@ -332,9 +341,9 @@ public class InstitutionProvider implements RealmResourceProvider {
      *   addressStreet: [String] Institution address street,
      *   addressPostalCode: [String] Institution address postal code,
      *   addressLocation: [String] Institution address location,
-     *   centralPhone: [String] Central phone, mandatory
+     *   centralPhone: [String] Central phone
      *   centralFax: [String] Central fax
-     *   centralMail: [String] Central mail, mandatory
+     *   centralMail: [String] Central mail
      *   imisId: [String] Institution imis id,
      *   xCoordinate: [Float] X coordinate,
      *   yCoordinate: [Float] Y coordinate,
@@ -353,17 +362,17 @@ public class InstitutionProvider implements RealmResourceProvider {
             final Institution rep, @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
         List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0));
+        validator.validate(rep, languages.get(0), entityManager);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         if (rep == null || rep.getId() == null
                || em.find(Institution.class, rep.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, headers)) {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, id);
         ResourceBundle i18n
@@ -381,6 +390,7 @@ public class InstitutionProvider implements RealmResourceProvider {
                 .build();
         }
 
+        mergeTags(rep, em, requestingUser);
         Institution merged = em.merge(rep);
         return Response.ok(merged).build();
     }
@@ -402,7 +412,10 @@ public class InstitutionProvider implements RealmResourceProvider {
             return Response.status(Status.NOT_FOUND).build();
         }
         if (
-            !auth.isAuthorizedById(institution, RequestMethod.DELETE, headers)
+            !auth.isAuthorizedById(
+                institution,
+                RequestMethod.DELETE,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
         ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -444,6 +457,25 @@ public class InstitutionProvider implements RealmResourceProvider {
             query.setParameter("id", inst.getId());
         }
         return query.getSingleResult();
+    }
+
+    private void mergeTags(
+        Institution rep,
+        EntityManager em,
+        UserModel requestingUser
+    ) {
+        for (InstitutionTag tag: rep.getInstitutionTags()) {
+            InstitutionTag persistentTag =
+                em.find(InstitutionTag.class, tag.getName());
+            // Allow CHIEF_EDITORs to add new tags
+            if (persistentTag == null) {
+                if (Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+                    em.persist(tag);
+                } else {
+                    throw new ForbiddenException();
+                }
+            }
+        }
     }
 
     @Override

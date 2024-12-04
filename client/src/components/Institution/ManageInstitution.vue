@@ -24,25 +24,47 @@
             ref="form"
             :readonly="!profileStore.isAllowedToManage"
           >
-            <div class="group_class">
-              <TextField
-                :label="$t('label.name')"
-                :attribute="'name'"
-                required
-                @update:modelValue="institution.name = $event"
-              ></TextField>
-              <TextField
-                :label="$t('institution.meas_facil_name')"
-                :attribute="'measFacilName'"
-                required
-                @update:modelValue="institution.measFacilName = $event"
-              ></TextField>
-              <Checkbox
-                attribute="active"
-                v-model="institution.active"
-                :label="$t('institution.active')"
-              ></Checkbox>
-            </div>
+            <v-row>
+              <v-col>
+                <TextField
+                  :label="$t('label.name')"
+                  :attribute="'name'"
+                  @update:modelValue="institution.name = $event"
+                ></TextField>
+              </v-col>
+              <v-col>
+                <Checkbox
+                  attribute="active"
+                  v-model="institution.active"
+                  :label="$t('institution.active')"
+                ></Checkbox>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="3">
+                <TextField
+                  ref="measFacilIdField"
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
+                  :label="$t('institution.meas_facil_id')"
+                  :attribute="'measFacilId'"
+                  @update:modelValue="
+                    institution.measFacilId = $event;
+                    measFacilNameField.validate();
+                  "
+                ></TextField>
+              </v-col>
+              <v-col cols="3">
+                <TextField
+                  ref="measFacilNameField"
+                  :label="$t('institution.meas_facil_name')"
+                  :attribute="'measFacilName'"
+                  @update:modelValue="
+                    institution.measFacilName = $event;
+                    measFacilIdField.validate();
+                  "
+                ></TextField>
+              </v-col>
+            </v-row>
             <div class="group_class">
               <TextField
                 :label="$t('institution.service_building_location')"
@@ -67,6 +89,19 @@
                 @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
+            <v-row>
+              <v-col>
+                <Select
+                  attribute="serviceBuildingState"
+                  clearable
+                  :items="states"
+                  item-title="label"
+                  item-value="value"
+                  :label="$t('institution.service_building_state')"
+                  @update:modelValue="institution.serviceBuildingState = $event"
+                ></Select>
+              </v-col>
+            </v-row>
             <!-- TODO: Geocoding feature delayed to a subsequent date -->
             <!--
             <v-form
@@ -135,13 +170,11 @@
                 :label="$t('institution.central_phone')"
                 @update:modelValue="institution.centralPhone = $event"
                 :attribute="'centralPhone'"
-                :required="true"
               ></TextField>
               <TextField
                 :label="$t('institution.central_mail')"
                 :attribute="'centralMail'"
                 @update:modelValue="institution.centralMail = $event"
-                required
               ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
@@ -176,14 +209,6 @@
             </v-row>
             <v-row>
               <v-col>
-                <TextField
-                  :disabled="profileStore.userData.role !== 'chief_editor'"
-                  :label="$t('institution.meas_facil_id')"
-                  :attribute="'measFacilId'"
-                  @update:modelValue="institution.measFacilId = $event"
-                ></TextField>
-              </v-col>
-              <v-col>
                 <Select
                   attribute="tags"
                   :no-data-text="$t('label.no_data_text')"
@@ -214,9 +239,7 @@
         v-if="profileStore.isAllowedToManage"
         color="accent"
         :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
-        @click="
-          processType == 'add' ? createInstitution() : updateInstitution()
-        "
+        @click="processType == 'add' ? createInstitution() : saveInstitution()"
       >
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
       </v-btn>
@@ -248,6 +271,13 @@
       <span class="text-h5">{{
         $t("label.confirm_deletion", { name: institution.name })
       }}</span>
+      <div>
+        <UIAlert
+          v-if="hasRequestError"
+          v-bind:isSuccessful="!hasRequestError"
+          v-bind:message="applicationStore.httpErrorMessage"
+        />
+      </div>
     </v-card-text>
     <v-divider></v-divider>
     <v-card-actions>
@@ -283,7 +313,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, ref } from "vue";
+import { computed, onBeforeMount, onMounted, onUnmounted, ref } from "vue";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { useForm } from "@/lib/use-form";
@@ -293,6 +323,7 @@ import { useApplicationStore } from "@/stores/application";
 // import { debounce } from "debounce";
 import { useInstitutionStore } from "@/stores/institution";
 import { useProfileStore } from "@/stores/profile";
+import { updateInstitution } from "./institution";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import ChipTextField from "@/components/Form/ChipTextField.vue";
 import TextField from "@/components/Form/TextField.vue";
@@ -311,6 +342,8 @@ const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 
+const measFacilIdField = ref(null);
+const measFacilNameField = ref(null);
 const institution = ref(applicationStore.managedItem);
 const originalInstitution = { ...institution.value };
 const processType = ref(applicationStore.processType);
@@ -324,10 +357,8 @@ const {
   form,
   valid,
   hasNoChange,
-  reqValidmail,
   validMail,
   reqField,
-  reqValidPhone,
   validPhone,
   reqValidPostalcode,
   resetForm,
@@ -348,11 +379,47 @@ const getCategories = () => {
       hasLoadingError.value = true;
     });
 };
+const states = [
+  { value: "baden_wuerttemberg" },
+  { value: "bavaria" },
+  { value: "berlin" },
+  { value: "brandenburg" },
+  { value: "bremen" },
+  { value: "hamburg" },
+  { value: "hesse" },
+  { value: "lower_saxony" },
+  { value: "mecklenburg_vorpommern" },
+  { value: "north_rhine_westphalia" },
+  { value: "rhineland_palatinate" },
+  { value: "saarland" },
+  { value: "saxony" },
+  { value: "saxony_anhalt" },
+  { value: "schleswig_holstein" },
+  { value: "thuringia" },
+];
+
+const measIdAndNameOrNothing = () => {
+  return [
+    () => {
+      const id = institution.value.measFacilId;
+      const name = institution.value.measFacilName;
+      return (
+        (id === "" && name === "") ||
+        (!id && !name) ||
+        ((id || "") !== "" && (name || "") !== "") ||
+        t("error.all_or_nothing", [
+          t("institution.meas_facil_id"),
+          t("institution.meas_facil_name"),
+        ])
+      );
+    },
+  ];
+};
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
     name: reqField(t("institution.required_name")),
-    measFacilName: reqField(t("institution.required_meas_facil_name")),
+    measFacilName: [...measIdAndNameOrNothing()],
     serviceBuildingLocation: reqField(
       t("institution.required_service_building_location")
     ),
@@ -363,21 +430,22 @@ onBeforeMount(() => {
     serviceBuildingStreet: reqField(
       t("institution.required_service_building_street")
     ),
-    centralPhone: reqValidPhone(
-      t("institution.required_central_phone"),
-      t("error.valid_phone")
-    ),
-    centralMail: reqValidmail(
-      t("institution.required_central_email"),
-      t("error.valid_email")
-    ),
+    centralPhone: validPhone(t("error.valid_phone")),
+    centralMail: validMail(t("error.valid_email")),
     measFacilId: [
       (v) =>
         !v ||
-        (v && v.length === 5) ||
-        t("institution.meas_facil_id_length_validation_message"),
+        (v && v.length >= 5 && v.length <= 7) ||
+        t("institution.meas_facil_id_length_validation_message", {
+          minLength: 5,
+          maxLength: 7,
+        }),
+      ...measIdAndNameOrNothing(),
     ],
     tags: reqField(t("error.required_tag")),
+  });
+  states.forEach((state) => {
+    state["label"] = t(`institution.state_${state.value}`);
   });
 });
 onMounted(() => {
@@ -399,8 +467,33 @@ onMounted(() => {
     triggerLoadCoordinates([loc, poc, str].join(" "));
   }*/
 });
+onUnmounted(() => {
+  applicationStore.removeAllResetEventListeners();
+});
+const sanitizePayload = (payload) => {
+  if (payload.measFacilId !== undefined && payload.measFacilId === "") {
+    delete payload.measFacilId;
+  }
+  if (payload.measFacilName !== undefined && payload.measFacilName === "") {
+    delete payload.measFacilName;
+  }
+  // Remove attributes with empty strings because some lead to a rejection by the backend
+  // if a value has to be null or fulfill a contraint like a minimum length.
+  const keysToDelete = [];
+  const allKeys = Object.keys(payload);
+  allKeys.forEach((key) => {
+    if (payload[key] === "") {
+      keysToDelete.push(key);
+    }
+  });
+  keysToDelete.forEach((key) => {
+    delete payload[key];
+  });
+  return payload;
+};
 const createInstitution = () => {
   let payload = { ...institution.value };
+  sanitizePayload(payload);
   HTTP.post("/institution", payload)
     .then((response) => {
       institutionStore.addInstitution(response.data);
@@ -413,24 +506,16 @@ const createInstitution = () => {
         : (hasRequestError.value = true);
     });
 };
-const updateInstitution = () => {
-  let payload = { ...institution.value };
-  if (!showPostalAddress.value) {
-    delete payload.addressLocation;
-    delete payload.addressPostalCode;
-    delete payload.addressStreet;
-  }
-  institutionStore
-    .updateInstitution(payload)
-    .then(() => {
-      applicationStore.searchRequest(["institutions"]);
-      applicationStore.setShowManageInstitutionDialog(false);
-    })
-    .catch((error) => {
-      isServerValidationError(error)
-        ? handleValidationErrorFromServer(error.response.data)
-        : (hasRequestError.value = true);
-    });
+// Cannot call updateInstitution directly in the <template> because then hasRequestError is no ref anymore
+// but a ref is necessary so we can detect any change of it in this component.
+const saveInstitution = () => {
+  updateInstitution(
+    sanitizePayload({ ...institution.value }),
+    showPostalAddress,
+    isServerValidationError,
+    handleValidationErrorFromServer,
+    hasRequestError
+  );
 };
 const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)
@@ -439,8 +524,12 @@ const deleteInstitution = () => {
       applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })
-    .catch(() => {
+    .catch((error) => {
       hasRequestError.value = true;
+      const statusText = error.response?.statusText
+        ? `: ${error.response.statusText}`
+        : "";
+      applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
     });
 };
 

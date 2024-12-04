@@ -47,9 +47,11 @@ export default {
   },
   error: {
     // Keys which Keycloak can return after validations fail.
-    // Source: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_de.properties
+    // Source for attribute names: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_en.properties
     username_invalid_character: "'{0}' enthält ungültige Zeichen.",
     invalid_length_too_short: "'{0}' muss mindestens eine Länge von {1} haben.",
+    invalid_multivalued_size:
+      "'{0}' muss eine Anzahl von {1} bis {2} Werten haben.",
     number_out_of_range_too_big: "'{0}' darf maximal den Wert {1} haben.",
     number_out_of_range_too_small: "'{0}' muss mindestens den Wert {1} haben.",
     user_attribute_required: "Bitte geben Sie '{0}' an.",
@@ -78,6 +80,7 @@ export default {
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
     valid_date: "Datum muss gültig sein",
+    all_or_nothing: "{0} und {1} oder keines angeben",
     only_unique_values: "Bitte geben Sie keine doppelten Werte ein.",
   },
   hints: {
@@ -107,11 +110,9 @@ export default {
     required_service_building_postal_code:
       "PLZ des Dienstgebäudes ist erforderlich",
     central_phone: "Zentrales Telefon",
-    required_central_phone: "Zentrales Telefon ist erforderlich",
     central_mail: "Zentrale E-Mail",
     central_alarm_phone_numbers: "Zentrale Alarmierung (Telefon)",
     central_alarm_mail_addresses: "Zentrale Alarmierung (E-Mail)",
-    required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
     street: "Straße",
     postal_code: "PLZ",
@@ -123,11 +124,28 @@ export default {
     address_location: "Postanschrift: Ort",
     meas_facil_id: "@:meas_facil_id_term",
     meas_facil_id_length_validation_message:
-      "Die @:meas_facil_id_term muss exakt 5 Zeichen beinhalten",
+      "Die @:meas_facil_id_term muss eine Länge von mind. {minLength} und max. {maxLength} Zeichen beinhalten",
     active: "Aktiv",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
     y_coordinate: "Y-Koordinate",
+    service_building_state: "Bundesland",
+    state_baden_wuerttemberg: "Baden Würtemberg",
+    state_bavaria: "Bayern",
+    state_berlin: "Berlin",
+    state_brandenburg: "Brandenburg",
+    state_bremen: "Bremen",
+    state_hamburg: "Hamburg",
+    state_hesse: "Hessen",
+    state_lower_saxony: "Niedersachsen",
+    state_mecklenburg_vorpommern: "Mecklenburg-Vorpommern",
+    state_north_rhine_westphalia: "Nordrhein-Westfalen",
+    state_rhineland_palatinate: "Rheinland-Pfalz",
+    state_saarland: "Saarland",
+    state_saxony: "Sachsen",
+    state_saxony_anhalt: "Sachsen-Anhalt",
+    state_schleswig_holstein: "Schleswig-Holstein",
+    state_thuringia: "Thüringen",
   },
   // Main component
   main: {
@@ -171,6 +189,7 @@ export default {
   // Shared button texts
   button: {
     add: "Hinzufügen",
+    remove: "Entfernen",
     create: "Erstellen",
     cancel: "Abbrechen",
     close: "Schließen",
@@ -254,5 +273,12 @@ export default {
     required_recipient: "Empfänger ist erforderlich",
     message: "Nachricht",
     required_type: "Art der E-Mail ist erforderlich",
+  },
+  search: {
+    edit_tags: "Tags bearbeiten",
+    edit_tags_institutions: "Tags der ausgewählten Institutionen bearbeiten",
+    edit_tags_users: "Tags der ausgewählten Nutzer bearbeiten",
+    didnt_remove:
+      "Der Tag '{tag}' wurde nicht entfernt, da {type} mindestens einen Tag besitzen müssen.",
   },
 };

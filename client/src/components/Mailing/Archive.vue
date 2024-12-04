@@ -185,7 +185,7 @@ import { useNotification } from "@/lib/use-notification";
 import { useApplicationStore } from "@/stores/application";
 import { useMailStore } from "@/stores/mail";
 import { useRoute } from "vue-router";
-import { debounce } from "debounce";
+import debounce from "debounce";
 import { useI18n } from "vue-i18n";
 const MailContent = defineAsyncComponent(() =>
   import("@/components/Mailing/MailContent.vue")
