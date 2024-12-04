@@ -27,7 +27,7 @@ export function useForm(i18n) {
   };
   const validMail = (validMsg) => {
     return [
-      (v) => doesRegexMatchWholeString(regExprEmail, v) || v == "" || validMsg,
+      (v) => !v || doesRegexMatchWholeString(regExprEmail, v) || validMsg,
     ];
   };
   const reqValidPhone = (reqMsg, validMsg) => {
@@ -43,7 +43,7 @@ export function useForm(i18n) {
   };
   const validPhone = (validMsg) => {
     return [
-      (v) => doesRegexMatchWholeString(regExprPhone, v) || v == "" || validMsg,
+      (v) => !v || doesRegexMatchWholeString(regExprPhone, v) || validMsg,
     ];
   };
   const validPostalcode = (validMsg) => {
@@ -130,6 +130,8 @@ export function useForm(i18n) {
     applicationStore.serverValidationRules = {};
     aggregateRules();
     form.value?.validate();
+    applicationStore.callResetEventListener();
+    hasNoChange.value = true;
   };
 
   const areObjectsDifferent = (a, b) => {
@@ -205,17 +207,17 @@ export function useForm(i18n) {
     });
   };
 
-  const translateError = (message, attribute) => {
+  const translateError = (message, parameters) => {
     let translatedMessage;
     // Keycloak error is not translated
     if (message.startsWith("error-")) {
       const stringToTranslate = message.startsWith("error-")
         ? message.replace("error-", "error.").replaceAll("-", "_")
         : message;
-      const messageParameters = [t(`user.${attribute.toLowerCase()}`)];
-      translatedMessage = t(stringToTranslate, messageParameters);
+      parameters[0] = t(`user.${parameters[0].toLowerCase()}`);
+      translatedMessage = t(stringToTranslate, parameters);
     } else if (message.startsWith("error.")) {
-      translatedMessage = t(message, attribute);
+      translatedMessage = t(message, parameters[0]);
     }
     // Keycloak error is already translated
     else {
@@ -239,7 +241,10 @@ export function useForm(i18n) {
       const errorObject = error[i];
       const attribute = errorObject.messageParameters[0];
       const message = errorObject.message;
-      const translatedMessage = translateError(message, attribute);
+      const translatedMessage = translateError(
+        message,
+        errorObject.messageParameters
+      );
       // Create rules that can be used by the validation mechanism of Vuetify.
       applicationStore.serverValidationRules[attribute] = () => {
         return translatedMessage;
@@ -313,6 +318,15 @@ export function useForm(i18n) {
     emit("update:modelValue", event);
   };
 
+  const showFormError = (error, hasRequestError) => {
+    const applicationStore = useApplicationStore();
+    hasRequestError.value = true;
+    const statusText = error.response?.statusText
+      ? `: ${error.response.statusText}`
+      : "";
+    applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
+  };
+
   return {
     form,
     valid,
@@ -343,5 +357,6 @@ export function useForm(i18n) {
     onUpdateModelValue,
     translateError,
     areArraysDifferent,
+    showFormError,
   };
 }

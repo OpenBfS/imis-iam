@@ -20,11 +20,6 @@ const routes = [
     component: () => import("@/components/Search/Search.vue"),
   },
   {
-    path: "/mailinglists",
-    name: "MailingList",
-    component: () => import("@/components/Mailing/MailingLists.vue"),
-  },
-  {
     path: "/archive/:year",
     name: "Archive",
     component: () => import("@/components/Mailing/Archive.vue"),

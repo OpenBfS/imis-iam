@@ -11,30 +11,16 @@ export const useMailStore = defineStore("mail", {
   namespaced: true,
   state: () => ({
     mailTypes: [],
-    mailingLists: [],
   }),
   actions: {
     setMailTypes(data) {
       this.mailTypes = data;
-    },
-    setMailinglists(data) {
-      this.mailingLists = data;
     },
     loadMailTypes() {
       return new Promise((resolve, reject) => {
         HTTP.get("mail/type")
           .then((response) => {
             this.setMailTypes(response.data);
-            resolve(response);
-          })
-          .catch((error) => reject(error));
-      });
-    },
-    loadMailinglists() {
-      return new Promise((resolve, reject) => {
-        HTTP.get("mail/list")
-          .then((response) => {
-            this.setMailinglists(response.data);
             resolve(response);
           })
           .catch((error) => reject(error));

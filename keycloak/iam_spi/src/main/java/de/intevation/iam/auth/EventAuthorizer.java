@@ -14,9 +14,8 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.Event;
-import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
-import jakarta.ws.rs.core.HttpHeaders;
+
 
 /**
  * Authorizer for event entities.
@@ -33,10 +32,10 @@ public class EventAuthorizer extends Authorizer<Event> {
 
     @Override
     public boolean isAuthorizedById(
-            Event data,
-            RequestMethod requestMethod,
-            HttpHeaders headers) {
-        String userId = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        Event data,
+        RequestMethod requestMethod,
+        String userId
+    ) {
         RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, userId);
         if (requestingUser == null) {
@@ -45,22 +44,15 @@ public class EventAuthorizer extends Authorizer<Event> {
         return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
     }
 
-    /**
-     * Filter or modify the given list of objects.
-     * The default implementation returns data unchanged.
-     *
-     * @param data List of objects
-     * @param headers Request headers
-     * @return Filtered list
-     */
+    @Override
     public List<Event> filter(
         List<Event> data,
-        HttpHeaders headers
+        String userId
     ) {
         return data.stream()
             .map((event) -> {
                 event.setReadonly(
-                    !isAuthorizedById(event, null, headers));
+                    !isAuthorizedById(event, null, userId));
                 return event;
             })
             .collect(Collectors.toList());

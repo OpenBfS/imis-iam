@@ -9,7 +9,7 @@
   <v-textarea
     :active="props.active"
     :auto-grow="props.autoGrow"
-    :clearable="props.clearable"
+    :clearable="props.clearable && editable"
     :counter="props.counter"
     :counterValue="props.counterValue"
     :density="props.density"
@@ -24,7 +24,7 @@
     :name="props.name"
     :persistent-hint="props.persistentHint"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="props.readonly"
+    :readonly="applicationStore.form?.readonly || props.readonly"
     :rules="
       applicationStore.clientAndServerRules[props.attribute]
         ? applicationStore.clientAndServerRules[props.attribute]
@@ -40,6 +40,7 @@
 <script setup>
 import { useApplicationStore } from "@/stores/application.js";
 import { useForm } from "@/lib/use-form.js";
+import { computed } from "vue";
 
 const { onUpdateModelValue } = useForm();
 
@@ -69,4 +70,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue"]);
+
+const editable = computed(() => {
+  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
+});
 </script>

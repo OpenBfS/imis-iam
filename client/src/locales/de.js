@@ -47,9 +47,11 @@ export default {
   },
   error: {
     // Keys which Keycloak can return after validations fail.
-    // Source: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_de.properties
+    // Source for attribute names: https://github.com/keycloak/keycloak/blob/main/js/apps/account-ui/maven-resources/theme/keycloak.v3/account/messages/messages_en.properties
     username_invalid_character: "'{0}' enthält ungültige Zeichen.",
     invalid_length_too_short: "'{0}' muss mindestens eine Länge von {1} haben.",
+    invalid_multivalued_size:
+      "'{0}' muss eine Anzahl von {1} bis {2} Werten haben.",
     number_out_of_range_too_big: "'{0}' darf maximal den Wert {1} haben.",
     number_out_of_range_too_small: "'{0}' muss mindestens den Wert {1} haben.",
     user_attribute_required: "Bitte geben Sie '{0}' an.",
@@ -108,11 +110,9 @@ export default {
     required_service_building_postal_code:
       "PLZ des Dienstgebäudes ist erforderlich",
     central_phone: "Zentrales Telefon",
-    required_central_phone: "Zentrales Telefon ist erforderlich",
     central_mail: "Zentrale E-Mail",
     central_alarm_phone_numbers: "Zentrale Alarmierung (Telefon)",
     central_alarm_mail_addresses: "Zentrale Alarmierung (E-Mail)",
-    required_central_email: "Zentrale E-Mail ist erforderlich",
     place: "Ort",
     street: "Straße",
     postal_code: "PLZ",
@@ -124,12 +124,12 @@ export default {
     address_location: "Postanschrift: Ort",
     meas_facil_id: "@:meas_facil_id_term",
     meas_facil_id_length_validation_message:
-      "Die @:meas_facil_id_term muss exakt 5 Zeichen beinhalten",
+      "Die @:meas_facil_id_term muss eine Länge von mind. {minLength} und max. {maxLength} Zeichen beinhalten",
     active: "Aktiv",
     coordinates: "Koordinaten",
     x_coordinate: "X-Koordinate",
     y_coordinate: "Y-Koordinate",
-    state: "Bundesland",
+    service_building_state: "Bundesland",
     state_baden_wuerttemberg: "Baden Würtemberg",
     state_bavaria: "Bayern",
     state_berlin: "Berlin",
@@ -246,15 +246,11 @@ export default {
     items_per_page: "Einträge pro Seite",
     of: "von",
   },
-  // MailingList
-  mailinglist: {
+  // Emails
+  emails: {
     recipient: "Empfänger",
-    required_user: "E-Mail-Verteiler muss mindestens einen Nutzer beinhalten",
-    title: "E-Mail-Verteiler",
     not_found: "",
-    name: "Name des E-Mail-Verteilers ",
-    select_mailing_list: "Name des E-Mail-Verteilers",
-    no_mailing_list: "Keine vorhandenen E-Mail-Verteiler",
+    no_recipients: "Keine Empfänger gefunden",
     write_new_email: "E-Mail erstellen",
     subject: "Betreff",
     date: "Datum",
@@ -262,12 +258,7 @@ export default {
     type: "Art der E-Mail",
     sender: "Absender",
     publish: "E-Mail in Archiv ablegen",
-    enter_mailinglist: "E-Mail-Verteiler beitreten",
-    exit_mailinglist: "E-Mail-Verteiler verlassen",
-    enter: "Beitreten",
-    exit: "Verlassen",
     confirmation_message: "Bitte bestätigen Sie den Vorgang ",
-    add_mailing_list: "E-Mail-Verteiler erstellen",
     failure: "Störungsmeldungen",
     current: "Aktuelles",
     no_mails_available: "Es sind keine Meldungen vorhanden",
@@ -275,15 +266,13 @@ export default {
     filter_by_type: "Filtern nach Typ",
     filter_by_sender: "Filtern nach Absender",
     filter_by_period: "Filtern nach Zeitraum",
-    filter_by_maillist: "Filtern nach E-Mail-Verteiler",
     maintenance: "Wartungsmeldungen",
     expiry_date: "Ablaufdatum",
     required_subject: "Betreff ist erforderlich",
     required_content: "Nachricht ist erforderlich",
-    required_mailing_list: "E-Mail-Verteiler ist erforderlich",
+    required_recipient: "Empfänger ist erforderlich",
     message: "Nachricht",
     required_type: "Art der E-Mail ist erforderlich",
-    required_mailinglist_name: "E-Mail-Verteiler Name ist erforderlich",
   },
   search: {
     edit_tags: "Tags bearbeiten",

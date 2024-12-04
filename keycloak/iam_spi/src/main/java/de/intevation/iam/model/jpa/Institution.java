@@ -6,10 +6,12 @@
  */
 package de.intevation.iam.model.jpa;
 
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import de.intevation.iam.validation.constraints.MeasFacilOrNone;
@@ -26,9 +28,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -60,7 +62,7 @@ public class Institution {
         inverseJoinColumns = {@JoinColumn(name = "tag_name")}
     )
     @NotEmpty
-    private List<InstitutionTag> tags;
+    private Set<InstitutionTag> tags = new HashSet<>();
 
     @NotBlank
     @Column(name = "service_building_street", nullable = false)
@@ -88,14 +90,15 @@ public class Institution {
     private String addressLocation;
 
     @Size(min = 7)
-    @Column(name = "central_phone", nullable = false)
+    @Column(name = "central_phone")
     private String centralPhone;
 
     @Column(name = "central_fax")
     private String centralFax;
 
-    @NotNull
-    @Column(name = "central_mail", nullable = false)
+    @Email
+    @Size(min = 1) // Prevent empty string
+    @Column(name = "central_mail")
     private String centralMail;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -112,8 +115,9 @@ public class Institution {
         joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "mail")
     @UniqueElements
-    private List<String> centralAlarmMailAddresses;
+    private List<@Email String> centralAlarmMailAddresses;
 
+    @Size(min = 5, max = 7)
     @Column(name = "meas_facil_id")
     private String measFacilId;
 
@@ -152,6 +156,9 @@ public class Institution {
         this.measFacilName = measFacilName;
     }
 
+    /**
+     * @return list of names of associated tags
+     */
     public List<String> getTags() {
         ArrayList<String> names = new ArrayList<>();
         for (InstitutionTag tag : tags) {
@@ -160,14 +167,20 @@ public class Institution {
         return names;
     }
 
+    /**
+     * @param names list of names of tags to be associated
+     */
     public void setTags(List<String> names) {
-        ArrayList<InstitutionTag> tagList = new ArrayList<>();
         for (String tag : names) {
             InstitutionTag institutionTag = new InstitutionTag();
             institutionTag.setName(tag);
-            tagList.add(institutionTag);
+            this.tags.add(institutionTag);
         }
-        this.tags = tagList;
+    }
+
+    @JsonIgnore
+    public Set<InstitutionTag> getInstitutionTags() {
+        return this.tags;
     }
 
     public String getServiceBuildingStreet() {

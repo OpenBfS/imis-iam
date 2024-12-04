@@ -185,7 +185,7 @@
               <Select
                 attribute="role"
                 :clearable="profileStore.isAllowedToManage"
-                :disabled="!profileStore.isAllowedToManage"
+                :readonly="!profileStore.isAllowedToManage"
                 :label="$t('user.role')"
                 :items="userRoles"
                 item-value="name"
@@ -214,13 +214,7 @@
         @click="
           ['add', 'copy'].indexOf(processType) !== -1
             ? createUser()
-            : updateUser(
-                user,
-                resetNotification,
-                isServerValidationError,
-                handleValidationErrorFromServer,
-                hasRequestError
-              )
+            : saveUser()
         "
       >
         {{
@@ -284,7 +278,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted } from "vue";
+import { computed, onBeforeMount, onMounted, onUnmounted } from "vue";
 import { useNotification } from "@/lib/use-notification.js";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http.js";
@@ -438,6 +432,9 @@ onBeforeMount(() => {
       t("error.user_attribute_required", [t("user.username")])
     ),
   });
+  if (!userStore.roles) {
+    userStore.loadRoles();
+  }
 });
 
 onMounted(() => {
@@ -450,6 +447,9 @@ onMounted(() => {
       applicationStore.clientRules[key];
   });
 });
+onUnmounted(() => {
+  applicationStore.removeAllResetEventListeners();
+});
 const user = computed(() => {
   return applicationStore.managedItem;
 });
@@ -460,7 +460,7 @@ const processType = computed(() => {
   return applicationStore.processType;
 });
 const userRoles = computed(() => {
-  var roles = userStore.roles;
+  var roles = userStore.roles ?? [];
   // If available, use description field for localization
   roles.forEach(
     (item) => (item.title = item.description ? t(item.description) : item.name)
@@ -490,6 +490,18 @@ const createUser = () => {
         ? handleValidationErrorFromServer(error.response.data)
         : (hasRequestError.value = true);
     });
+};
+
+// Cannot call updateUser directly in the <template> because then hasRequestError is no ref anymore
+// but a ref is necessary so we can detect any change of it in this component.
+const saveUser = () => {
+  updateUser(
+    { ...user.value },
+    resetNotification,
+    isServerValidationError,
+    handleValidationErrorFromServer,
+    hasRequestError
+  );
 };
 
 // Form

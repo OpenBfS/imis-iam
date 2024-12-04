@@ -97,7 +97,7 @@
                   :items="states"
                   item-title="label"
                   item-value="value"
-                  :label="$t('institution.state')"
+                  :label="$t('institution.service_building_state')"
                   @update:modelValue="institution.serviceBuildingState = $event"
                 ></Select>
               </v-col>
@@ -170,13 +170,11 @@
                 :label="$t('institution.central_phone')"
                 @update:modelValue="institution.centralPhone = $event"
                 :attribute="'centralPhone'"
-                :required="true"
               ></TextField>
               <TextField
                 :label="$t('institution.central_mail')"
                 :attribute="'centralMail'"
                 @update:modelValue="institution.centralMail = $event"
-                required
               ></TextField>
               <!--TODO: Add this rule once the validation for
                     optional fields gets implemented by upstream.
@@ -241,17 +239,7 @@
         v-if="profileStore.isAllowedToManage"
         color="accent"
         :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
-        @click="
-          processType == 'add'
-            ? createInstitution()
-            : updateInstitution(
-                sanitizePayload({ ...institution }),
-                showPostalAddress,
-                isServerValidationError,
-                handleValidationErrorFromServer,
-                hasRequestError
-              )
-        "
+        @click="processType == 'add' ? createInstitution() : saveInstitution()"
       >
         {{ processType == "add" ? $t("button.create") : $t("button.save") }}
       </v-btn>
@@ -283,6 +271,13 @@
       <span class="text-h5">{{
         $t("label.confirm_deletion", { name: institution.name })
       }}</span>
+      <div>
+        <UIAlert
+          v-if="hasRequestError"
+          v-bind:isSuccessful="!hasRequestError"
+          v-bind:message="applicationStore.httpErrorMessage"
+        />
+      </div>
     </v-card-text>
     <v-divider></v-divider>
     <v-card-actions>
@@ -318,7 +313,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, ref } from "vue";
+import { computed, onBeforeMount, onMounted, onUnmounted, ref } from "vue";
 import { HTTP } from "@/lib/http.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { useForm } from "@/lib/use-form.js";
@@ -362,10 +357,8 @@ const {
   form,
   valid,
   hasNoChange,
-  reqValidmail,
   validMail,
   reqField,
-  reqValidPhone,
   validPhone,
   reqValidPostalcode,
   resetForm,
@@ -375,6 +368,7 @@ const {
   closeConfirmCancelDialog,
   handleValidationErrorFromServer,
   isServerValidationError,
+  showFormError,
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
@@ -437,19 +431,16 @@ onBeforeMount(() => {
     serviceBuildingStreet: reqField(
       t("institution.required_service_building_street")
     ),
-    centralPhone: reqValidPhone(
-      t("institution.required_central_phone"),
-      t("error.valid_phone")
-    ),
-    centralMail: reqValidmail(
-      t("institution.required_central_email"),
-      t("error.valid_email")
-    ),
+    centralPhone: validPhone(t("error.valid_phone")),
+    centralMail: validMail(t("error.valid_email")),
     measFacilId: [
       (v) =>
         !v ||
-        (v && v.length === 5) ||
-        t("institution.meas_facil_id_length_validation_message"),
+        (v && v.length >= 5 && v.length <= 7) ||
+        t("institution.meas_facil_id_length_validation_message", {
+          minLength: 5,
+          maxLength: 7,
+        }),
       ...measIdAndNameOrNothing(),
     ],
     tags: reqField(t("error.required_tag")),
@@ -477,6 +468,9 @@ onMounted(() => {
     triggerLoadCoordinates([loc, poc, str].join(" "));
   }*/
 });
+onUnmounted(() => {
+  applicationStore.removeAllResetEventListeners();
+});
 const sanitizePayload = (payload) => {
   if (payload.measFacilId !== undefined && payload.measFacilId === "") {
     delete payload.measFacilId;
@@ -484,6 +478,18 @@ const sanitizePayload = (payload) => {
   if (payload.measFacilName !== undefined && payload.measFacilName === "") {
     delete payload.measFacilName;
   }
+  // Remove attributes with empty strings because some lead to a rejection by the backend
+  // if a value has to be null or fulfill a contraint like a minimum length.
+  const keysToDelete = [];
+  const allKeys = Object.keys(payload);
+  allKeys.forEach((key) => {
+    if (payload[key] === "") {
+      keysToDelete.push(key);
+    }
+  });
+  keysToDelete.forEach((key) => {
+    delete payload[key];
+  });
   return payload;
 };
 const createInstitution = () => {
@@ -501,6 +507,17 @@ const createInstitution = () => {
         : (hasRequestError.value = true);
     });
 };
+// Cannot call updateInstitution directly in the <template> because then hasRequestError is no ref anymore
+// but a ref is necessary so we can detect any change of it in this component.
+const saveInstitution = () => {
+  updateInstitution(
+    sanitizePayload({ ...institution.value }),
+    showPostalAddress,
+    isServerValidationError,
+    handleValidationErrorFromServer,
+    hasRequestError
+  );
+};
 const deleteInstitution = () => {
   HTTP.delete("institution/" + institution.value.id)
     .then(() => {
@@ -508,8 +525,8 @@ const deleteInstitution = () => {
       applicationStore.searchRequest(["institutions"]);
       applicationStore.setShowManageInstitutionDialog(false);
     })
-    .catch(() => {
-      hasRequestError.value = true;
+    .catch((error) => {
+      showFormError(error, hasRequestError);
     });
 };
 

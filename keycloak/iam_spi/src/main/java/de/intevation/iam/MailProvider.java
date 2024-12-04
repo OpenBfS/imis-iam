@@ -13,25 +13,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -48,19 +41,14 @@ import org.keycloak.email.EmailException;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.jpa.entities.UserEntity;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.MailAuthorizer;
-import de.intevation.iam.auth.MailListAuthorizer;
 import de.intevation.iam.model.jpa.Mail;
 import de.intevation.iam.model.jpa.Mail_;
-import de.intevation.iam.model.jpa.MailList;
-import de.intevation.iam.model.jpa.MailList_;
 import de.intevation.iam.model.jpa.MailType;
 import de.intevation.iam.util.Constants;
-import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 
@@ -83,7 +71,6 @@ public class MailProvider implements RealmResourceProvider {
     private KeycloakSession session;
 
     private Authorizer<Mail> auth;
-    private Authorizer<MailList> authList;
 
     private Validator validator;
 
@@ -96,7 +83,6 @@ public class MailProvider implements RealmResourceProvider {
     public MailProvider(KeycloakSession session) {
         this.session = session;
         this.auth = new MailAuthorizer(session);
-        this.authList = new MailListAuthorizer(session);
         this.validator = new Validator();
         this.entityManager = session.getProvider(JpaConnectionProvider.class)
             .getEntityManager();
@@ -144,295 +130,6 @@ public class MailProvider implements RealmResourceProvider {
     }
 
     /**
-     * Get mailing lists.
-     *
-     * Request:
-     * <pre>
-     * GET to mail/list?subscribed=true
-     *  Query Params:
-     *    - subscribed: Filter to only show lists
-     *                  the current user is subscribed to, optional
-     * </pre>
-     * Response:
-     * <pre>
-     * <code>
-     *[{
-     *  id: [Integer], //List id
-     *  name: [String] //List name
-     *}, {
-     * //...
-     *}]
-     * </code>
-     * </pre>
-     * @param headers Request headers
-     * @param subscribed If true only list are returned
-     *                   that the user is subscribed to
-     * @return Response containing mailing lists as json array
-     */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/list")
-    public Response getLists(
-            @Context HttpHeaders headers,
-            @QueryParam("subscribed") boolean subscribed) {
-        List<MailList> lists
-            = getMailLists(headers.getHeaderString(USER_ID_HEADER), subscribed);
-        return Response.ok(lists).build();
-    }
-
-    /**
-     * Get a mailing list by given id.
-     *
-     * Request:
-     * GET to mail/list/{id}
-     *
-     * Response:
-     * <pre>
-     * <code>
-     *{
-     *  id: [Integer], //List id
-     *  name: [String] //List name
-     *}
-     * </code>
-     * </pre>
-     *
-     * @param id List id
-     * @return Response containing list as json object
-     */
-    @GET
-    @Path("/list/{id}")
-    public Response getListById(@PathParam("id") Integer id) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        MailList list = em.find(MailList.class, id);
-        if (list == null) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        return Response.ok(list).build();
-    }
-
-    /**
-     * Create a new mailing list.
-     *
-     * Request:
-     * POST to mail/list
-     * Body:
-     * <pre>
-     * <code>
-     *{
-     *  name: [String] //New list name
-     *}
-     * </code>
-     * </pre>
-     *
-     * Response:
-     * <pre>
-     * <code>
-     *{
-     *  id: [Integer], //List id
-     *  name: [String] //List name
-     *}
-     * </code>
-     * </pre>
-     * @param list List model
-     * @param headers Request headers
-     * @return Response containing new list as json
-     */
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/list")
-    public Response createList(final MailList list,
-            @Context HttpHeaders headers) {
-        List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(list, languages.get(0), entityManager);
-        if (list == null) {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
-        if (!authList.isAuthorizedById(list, RequestMethod.POST, headers)) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        RealmModel realm = session.getContext().getRealm();
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
-        UserModel requestingUser = session.users().getUserById(realm, id);
-        ResourceBundle i18n
-            = I18nUtils.getI18nBundle(session, realm, requestingUser);
-
-        if (getMailListByName(list.getName(), em) != null) {
-            return Response.status(Status.CONFLICT)
-            .type(MediaType.APPLICATION_JSON)
-            .entity(i18n.getString(ERROR_LIST_NAME_ALREADY_USED_KEY))
-            .build();
-        }
-        //Update user entities
-        list.updateUserEntities(em);
-        if (list.getUsers() == null
-                || list.getUsers().size() == 0) {
-            return Response.status(Status.BAD_REQUEST)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
-                .build();
-        }
-        em.persist(list);
-        return Response.ok(list).build();
-    }
-
-    /**
-     * Update a mailing list.
-     *
-     * <pre>
-     * Request:
-     * PUT to mail/list
-     * Body:
-     * <code>
-     *{
-     *  id: [Integer], //List id
-     *  name: [String], //List name
-     *}
-     * </code>
-     * Response:
-     * <code>
-     *{
-     *  id: [Integer], //List id
-     *  name: [String], //List name
-     *}
-     * </code>
-     * </pre>
-     * @param list List model
-     * @param headers Request headers
-     * @return Response containing updated list as json
-     */
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/list")
-    public Response updateList(final MailList list,
-            @Context HttpHeaders headers) {
-        List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(list, languages.get(0), entityManager);
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        MailList originalList = em.find(MailList.class, list.getId());
-        list.updateUserEntities(em);
-        if (list == null || list.getId() == null
-                || originalList == null) {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
-        if (!authList.isAuthorizedById(list, RequestMethod.PUT, headers)) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
-        RealmModel realm = session.getContext().getRealm();
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
-        UserModel requestingUser = session.users().getUserById(realm, id);
-        ResourceBundle i18n
-            = I18nUtils.getI18nBundle(session, realm, requestingUser);
-        MailList foundList = getMailListByName(list.getName(), em);
-        if (foundList != null
-            && !foundList.getId().equals(list.getId())) {
-            return Response.status(Status.CONFLICT)
-            .type(MediaType.APPLICATION_JSON)
-            .entity(i18n.getString(ERROR_LIST_NAME_ALREADY_USED_KEY))
-            .build();
-        }
-
-        if (list.getUsers() == null
-                || list.getUsers().size() == 0) {
-            return Response.status(Status.BAD_REQUEST)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(ERROR_EMPTY_LIST_KEY))
-                .build();
-        }
-        MailList mergedList = em.merge(list);
-        return Response.ok(mergedList).build();
-    }
-
-    /**
-     * Delete the mailing list with the given id.
-     *
-     * Request:
-     * DELETE to mail/list/{id}
-     * @param id List id
-     * @return 200 if deleted successfully, 404 if list was not found
-     */
-    @DELETE
-    @Path("/list/{id}")
-    public Response removeList(@PathParam("id") Integer id,
-            @Context HttpHeaders headers) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        MailList list = em.find(MailList.class, id);
-        if (list == null) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        if (!authList.isAuthorizedById(list, RequestMethod.DELETE, headers)) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
-        em.remove(list);
-        return Response.ok().type(MediaType.APPLICATION_JSON).build();
-    }
-
-    /**
-     * Join the mailing list with the given id.
-     *
-     * Request:
-     * GET to mail/list/{id}/join
-     * @param headers Request headers
-     * @param id Mailing list id
-     * @return 200 if joined successfully, 404 if not found
-     */
-    @GET
-    @Path("/list/{id}/join")
-    public Response joinList(
-        @Context HttpHeaders headers,
-        @PathParam("id") Integer id) {
-        String userId = headers.getHeaderString(USER_ID_HEADER);
-        if (userId == null) {
-            return Response.status(Status.FORBIDDEN).build();
-        }
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        MailList list = em.find(MailList.class, id);
-        if (list == null) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        UserEntity user = em.find(UserEntity.class, userId);
-        list.getUserEntities().add(user);
-        em.merge(list);
-        return Response.ok().type(MediaType.APPLICATION_JSON).build();
-    }
-
-    /**
-     * Leave the mailing list with the given id.
-     *
-     * Request:
-     * GET to mail/list/{id}/leave
-     * @param headers Request headers
-     * @param mailListId Mail list id
-     * @return 200 if left successfully, 404 if not found
-     */
-    @GET
-    @Path("/list/{id}/leave")
-    public Response leaveList(
-        @Context HttpHeaders headers,
-        @PathParam("id") Integer mailListId) {
-        String userId = headers.getHeaderString(USER_ID_HEADER);
-        if (userId == null) {
-            return Response.status(Status.FORBIDDEN).build();
-        }
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        MailList list = em.find(MailList.class, mailListId);
-        if (list == null) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        UserEntity user = em.find(UserEntity.class, userId);
-        list.getUserEntities().remove(user);
-        em.merge(list);
-
-        return Response.ok().type(MediaType.APPLICATION_JSON).build();
-    }
-
-    /**
      * Get mails.
      *
      * @param headers Request headers
@@ -455,13 +152,16 @@ public class MailProvider implements RealmResourceProvider {
         @QueryParam("start") OffsetDateTime start,
         @QueryParam("end") OffsetDateTime end,
         @QueryParam("sender") String sender,
-        @QueryParam("list") List<Integer> lists
+        @QueryParam("recipients") List<String> recipients
     ) {
-        String userId = headers.getHeaderString(USER_ID_HEADER);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
-        if (!auth.isAuthorizedById(null, RequestMethod.GET, headers)) {
+        if (!auth.isAuthorizedById(
+                null,
+                RequestMethod.GET,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+        ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -472,20 +172,12 @@ public class MailProvider implements RealmResourceProvider {
         critQuery.orderBy(cb.desc(root.get(Mail_.sendDate)));
         Predicate filter;
 
-        //Filter by mailing lists the user is subscribed to
-        List<MailList> mailLists = getMailLists(userId, true);
-        In<Integer> listFilter = cb.in(root.get(Mail_.recipient));
-        if (lists != null && !lists.isEmpty()) {
-            for (MailList list: mailLists) {
-                if (lists.contains(list.getId())) {
-                    listFilter.value(list.getId());
-                }
+        //Filter by recipients
+        In<String> recipientFilter = cb.in(root.get("recipients"));
+        if (recipients != null && !recipients.isEmpty()) {
+            for (String recipient: recipients) {
+                recipientFilter.value(recipient);
             }
-        } else {
-            for (MailList list: mailLists) {
-                listFilter.value(list.getId());
-            }
-
         }
 
         //Filter by mails according to "archived" value
@@ -499,7 +191,7 @@ public class MailProvider implements RealmResourceProvider {
         Predicate dateExpiredOrNoDateFilter = cb.or(
             expiredFilter, noDateFilter);
 
-        filter = cb.and(listFilter, archiveFilter);
+        filter = cb.and(recipientFilter, archiveFilter);
         filter = cb.and(filter, dateExpiredOrNoDateFilter);
 
         //Filter mails by start and end date
@@ -560,7 +252,10 @@ public class MailProvider implements RealmResourceProvider {
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
-        if (!auth.isAuthorizedById(mail, RequestMethod.POST, headers)) {
+        if (!auth.isAuthorizedById(
+                mail,
+                RequestMethod.POST,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -580,12 +275,9 @@ public class MailProvider implements RealmResourceProvider {
         //Set smtp Config
         smtpConfig.put(FROM_ADDRESS, mail.getSender());
 
-        //Get mail list
-        MailList list = em.find(MailList.class, mail.getRecipient());
-
-        for (UserEntity entity: list.getUserEntities()) {
+        for (String user_id: mail.getRecipients()) {
             UserModel user = session.users()
-                .getUserById(realm, entity.getId());
+                .getUserById(realm, user_id);
             try {
                 senderProvider.send(
                     smtpConfig, user, mail.getSubject(),
@@ -614,42 +306,14 @@ public class MailProvider implements RealmResourceProvider {
         if (mail == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (!auth.isAuthorizedById(mail, RequestMethod.POST, headers)) {
+        if (!auth.isAuthorizedById(
+                mail,
+                RequestMethod.POST,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         mail.setArchived(true);
         em.persist(mail);
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
-    }
-
-    private List<MailList> getMailLists(String userId, boolean subscribed) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MailList> critQuery = cb.createQuery(MailList.class);
-        Root<MailList> root = critQuery.from(MailList.class);
-        critQuery.select(root);
-        if (subscribed) {
-            Join<MailList, UserEntity> join =
-                root.join("userEntities", JoinType.LEFT);
-            Predicate filter = cb.equal(join.get("id"), userId);
-            critQuery.where(filter);
-        }
-        critQuery.orderBy(cb.asc(root.get(MailList_.name)));
-        TypedQuery<MailList> query = em.createQuery(critQuery);
-        List<MailList> lists = query.getResultList();
-        return lists;
-    }
-
-    private MailList getMailListByName(String name, EntityManager em) {
-        String queryString = "from MailList m where m.name = :name";
-        TypedQuery<MailList> query
-            = em.createQuery(queryString, MailList.class);
-        query.setParameter("name", name);
-        try {
-            return query.getSingleResult();
-        } catch (NoResultException nre) {
-            return null;
-        }
     }
 }

@@ -110,7 +110,7 @@
 
 <script setup>
 import { computed, ref, defineAsyncComponent, onMounted, watch } from "vue";
-import { debounce } from "debounce";
+import debounce from "debounce";
 import { useNotification } from "@/lib/use-notification.js";
 import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
@@ -146,7 +146,9 @@ watch(
   }
 );
 onMounted(() => {
-  userStore.loadRoles();
+  if (!userStore.roles) {
+    userStore.loadRoles();
+  }
   Promise.all([
     userStore.loadUsers(),
     institutionStore.loadInstitutions(),

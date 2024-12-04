@@ -7,12 +7,17 @@
 package de.intevation.iam.model.jpa;
 
 import java.sql.Timestamp;
+import java.util.List;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -52,9 +57,10 @@ public class Mail {
     @Column(name = "type", nullable = false)
     private Integer type;
 
-    @NotNull
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "iam_mail_user", joinColumns = @JoinColumn(name = "mail_id"))
     @Column(name = "recipient", nullable = false)
-    private Integer recipient;
+    private List<String> recipients;
 
     @JsonIgnore
     @Column(name = "user_id")
@@ -124,12 +130,12 @@ public class Mail {
         this.type = type;
     }
 
-    public Integer getRecipient() {
-        return recipient;
+    public List<String> getRecipients() {
+        return recipients;
     }
 
-    public void setRecipient(Integer recipient) {
-        this.recipient = recipient;
+    public void setRecipient(List<String> recipients) {
+        this.recipients = recipients;
     }
 
     public String getUserId() {

@@ -33,7 +33,7 @@ INSERT INTO keycloak.iam_institution(
     meas_facil_id
 ) VALUES
     ('Institution 1', 'inst_1', 'Examplestreet 1', '12345', 'ExampleLocation-1', 'berlin', '0123/456789', 'inst1@example.test', 'inst1'),
-    ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', 'berlin', '0123/456789', 'inst2@example.test', 'inst2');
+    ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', 'berlin', '0123/456789', 'inst2@example.test', 'inst1-1');
 
 INSERT INTO keycloak.iam_user_attributes (id, expiry_date)
     SELECT id, current_date + interval '12 month'
