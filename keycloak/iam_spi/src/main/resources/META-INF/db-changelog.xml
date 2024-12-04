@@ -212,4 +212,14 @@
                 ALTER COLUMN central_phone DROP NOT NULL;
         </sql>
     </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.13">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            ALTER TABLE iam_mail
+                DROP COLUMN recipient;
+            DROP TABLE iam_mail_list_user;
+            DROP TABLE iam_mail_list;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

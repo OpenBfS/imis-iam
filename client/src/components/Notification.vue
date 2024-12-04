@@ -10,7 +10,7 @@
     <v-row>
       <v-col cols="10">
         <!-- Failure Mails -->
-        <div class="text-h6">{{ $t("mailinglist.failure") }}</div>
+        <div class="text-h6">{{ $t("emails.failure") }}</div>
         <div
           class="d-flex justify-start align-center"
           v-for="mail in failureMails"
@@ -51,18 +51,18 @@
               >
               </v-btn>
             </template>
-            <span>{{ $t("mailinglist.archive") }}</span>
+            <span>{{ $t("emails.archive") }}</span>
           </v-tooltip>
         </div>
         <div
           class="ml-4 text-caption"
           v-if="failureMails && failureMails.length === 0"
         >
-          {{ $t("mailinglist.no_mails_available") }}
+          {{ $t("emails.no_mails_available") }}
         </div>
         <!-- maintenance Mails -->
         <div class="text-h6 mt-4">
-          {{ $t("mailinglist.maintenance") }}
+          {{ $t("emails.maintenance") }}
         </div>
         <div
           class="d-flex justify-start align-center"
@@ -104,18 +104,18 @@
               >
               </v-btn>
             </template>
-            <span>{{ $t("mailinglist.archive") }}</span>
+            <span>{{ $t("emails.archive") }}</span>
           </v-tooltip>
         </div>
         <div
           class="ml-4 text-caption"
           v-if="maintenanceMails && maintenanceMails.length === 0"
         >
-          {{ $t("mailinglist.no_mails_available") }}
+          {{ $t("emails.no_mails_available") }}
         </div>
         <!-- Rest Mails -->
         <div class="text-h6 mt-4">
-          {{ $t("mailinglist.current") }}
+          {{ $t("emails.current") }}
         </div>
         <div
           class="d-flex justify-start align-center"
@@ -157,14 +157,14 @@
               >
               </v-btn>
             </template>
-            <span>{{ $t("mailinglist.archive") }}</span>
+            <span>{{ $t("emails.archive") }}</span>
           </v-tooltip>
         </div>
         <div
           class="ml-4 text-caption"
           v-if="otherMails && otherMails.length === 0"
         >
-          {{ $t("mailinglist.no_mails_available") }}
+          {{ $t("emails.no_mails_available") }}
         </div>
       </v-col>
       <MailContent

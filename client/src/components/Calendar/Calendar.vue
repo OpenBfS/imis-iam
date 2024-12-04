@@ -146,8 +146,12 @@ const deleteEvent = (event) => {
     .then(() => {
       eventsStore.removeEvent(event);
     })
-    .catch(() => {
+    .catch((error) => {
       hasRequestError.value = true;
+      const statusText = error.response?.statusText
+        ? `: ${error.response.statusText}`
+        : "";
+      applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
     });
 };
 
