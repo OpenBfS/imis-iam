@@ -368,6 +368,7 @@ const {
   closeConfirmCancelDialog,
   handleValidationErrorFromServer,
   isServerValidationError,
+  showFormError,
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
@@ -525,11 +526,7 @@ const deleteInstitution = () => {
       applicationStore.setShowManageInstitutionDialog(false);
     })
     .catch((error) => {
-      hasRequestError.value = true;
-      const statusText = error.response?.statusText
-        ? `: ${error.response.statusText}`
-        : "";
-      applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
+      showFormError(error, hasRequestError);
     });
 };
 
