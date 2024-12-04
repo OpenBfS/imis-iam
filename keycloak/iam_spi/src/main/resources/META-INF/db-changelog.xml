@@ -222,4 +222,14 @@
             DROP TABLE iam_mail_list;
         </sql>
     </changeSet>
+    <changeSet author="tom@intevation.de" id="v0.14">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            UPDATE iam_institution SET active = false WHERE active IS NULL;
+            ALTER TABLE iam_institution
+                ALTER COLUMN active SET DEFAULT false,
+                ALTER COLUMN active SET NOT NULL;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
