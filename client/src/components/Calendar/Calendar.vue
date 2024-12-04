@@ -98,7 +98,7 @@ const hover = true;
 const applicationStore = useApplicationStore();
 const eventsStore = useEventsStore();
 const profileStore = useProfileStore();
-const { hasLoadingError, hasRequestError, resetNotification } =
+const { hasLoadingError, hasRequestError, resetNotification, showFormError } =
   useNotification();
 
 const exampleEvent = ref({ ...expEvent });
@@ -147,11 +147,7 @@ const deleteEvent = (event) => {
       eventsStore.removeEvent(event);
     })
     .catch((error) => {
-      hasRequestError.value = true;
-      const statusText = error.response?.statusText
-        ? `: ${error.response.statusText}`
-        : "";
-      applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
+      showFormError(error, hasRequestError);
     });
 };
 

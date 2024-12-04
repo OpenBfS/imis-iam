@@ -318,6 +318,15 @@ export function useForm(i18n) {
     emit("update:modelValue", event);
   };
 
+  const showFormError = (error, hasRequestError) => {
+    const applicationStore = useApplicationStore();
+    hasRequestError.value = true;
+    const statusText = error.response?.statusText
+      ? `: ${error.response.statusText}`
+      : "";
+    applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
+  };
+
   return {
     form,
     valid,
@@ -348,5 +357,6 @@ export function useForm(i18n) {
     onUpdateModelValue,
     translateError,
     areArraysDifferent,
+    showFormError,
   };
 }
