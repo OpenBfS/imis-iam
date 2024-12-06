@@ -66,61 +66,37 @@
         <td></td>
         <td class="pe-2" v-for="header in allHeaders" :key="header">
           <template v-if="header.key === 'active' || header.key === 'enabled'">
-            <v-select
-              :label="$t('user.enabled')"
+            <Filter
+              :filterKey="header.key"
               :items="[
                 { title: t('true'), value: 'true' },
                 { title: t('false'), value: 'false' },
               ]"
-              class="my-1"
-              clearable
-              hide-details
-              min-width="120"
-              variant="outlined"
-              @update:modelValue="
-                (event) => {
-                  handleFilterInput(header.key, event);
-                }
-              "
-            />
+              :label="$t('user.enabled')"
+              :type="props.type"
+            ></Filter>
           </template>
           <template v-else-if="header.key === 'institutions'">
-            <v-autocomplete
-              :label="$t('user.institutions')"
-              :no-data-text="$t('label.no_data_text')"
+            <Filter
+              :filterKey="header.key"
               :items="institutionStore.institutions"
               item-title="name"
               item-value="name"
-              class="my-1"
-              clearable
-              hide-details
-              variant="outlined"
-              @update:modelValue="
-                (event) => {
-                  handleFilterInput(header.key, event);
-                }
-              "
-            ></v-autocomplete>
+              :label="$t('user.institutions')"
+              :type="props.type"
+            ></Filter>
           </template>
           <template
             v-else-if="props.type === 'institutions' && header.key === 'tags'"
           >
-            <v-autocomplete
-              :label="$t('institution.tags')"
-              :no-data-text="$t('label.no_data_text')"
+            <Filter
+              :filterKey="header.key"
               :items="institutionTags"
               item-title="name"
               item-value="name"
-              class="my-1"
-              clearable
-              hide-details
-              variant="outlined"
-              @update:modelValue="
-                (event) => {
-                  handleFilterInput(header.key, event);
-                }
-              "
-            ></v-autocomplete>
+              :label="$t('institution.tags')"
+              :type="props.type"
+            ></Filter>
           </template>
           <template
             v-else-if="
@@ -128,38 +104,22 @@
               header.key === 'serviceBuildingState'
             "
           >
-            <v-autocomplete
-              :label="$t('institution.service_building_state')"
-              :no-data-text="$t('label.no_data_text')"
+            <Filter
+              :filterKey="header.key"
               :items="states"
               item-title="label"
               item-value="value"
-              class="my-1"
-              clearable
-              hide-details
-              variant="outlined"
-              @update:modelValue="
-                (event) => {
-                  handleFilterInput(header.key, event);
-                }
-              "
-            ></v-autocomplete>
+              :label="$t('institution.service_building_state')"
+              :type="props.type"
+            ></Filter>
           </template>
           <template v-else-if="header.key === 'role'">
-            <v-autocomplete
-              :label="$t('user.role')"
-              :no-data-text="$t('label.no_data_text')"
+            <Filter
+              :filterKey="header.key"
               :items="roles"
-              class="my-1"
-              clearable
-              hide-details
-              variant="outlined"
-              @update:modelValue="
-                (event) => {
-                  handleFilterInput(header.key, event);
-                }
-              "
-            ></v-autocomplete>
+              :label="$t(`user.${header.key}`)"
+              :type="props.type"
+            ></Filter>
           </template>
           <template
             v-else-if="
@@ -168,32 +128,19 @@
               profileStore.isAttributeSelection(header.key)
             "
           >
-            <v-autocomplete
-              :label="$t(`user.${header.key}`)"
-              :no-data-text="$t('label.no_data_text')"
+            <Filter
+              :filterKey="header.key"
               :items="profileStore.getSelectionItemsOfAttribute(header.key)"
-              class="my-1"
-              clearable
-              hide-details
-              variant="outlined"
-              @update:modelValue="
-                (event) => {
-                  handleFilterInput(header.key, event);
-                }
-              "
-            ></v-autocomplete>
+              :label="$t(`user.${header.key}`)"
+              :type="props.type"
+            ></Filter>
           </template>
           <template v-else-if="header.key !== 'actions'">
-            <v-text-field
-              class="my-1"
-              density="compact"
+            <Filter
+              :filterKey="header.key"
               :placeholder="header.title"
-              hide-details
-              variant="outlined"
-              @update:modelValue="
-                (event) => handleFilterInput(header.key, event)
-              "
-            ></v-text-field>
+              :type="props.type"
+            ></Filter>
           </template>
         </td>
       </tr>
@@ -208,10 +155,10 @@ import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { computed, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import debounce from "debounce";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { states } from "./Institution/institution";
+import Filter from "./Search/Filter.vue";
 
 const { t } = useI18n();
 const { hasLoadingError } = useNotification();
@@ -339,18 +286,4 @@ onMounted(() => {
   adjustHeaders();
   getInstitutionTags();
 });
-
-const triggerSearch = debounce(() => {
-  applicationStore.searchRequest([props.type]);
-}, 500);
-
-const handleFilterInput = (key, value) => {
-  const term = value !== null ? value : "";
-  if (props.type === "users") {
-    userStore.updateFilter(key, term);
-  } else if (props.type === "institutions") {
-    institutionStore.updateFilter(key, term);
-  }
-  triggerSearch();
-};
 </script>
