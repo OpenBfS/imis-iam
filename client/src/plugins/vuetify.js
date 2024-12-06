@@ -37,6 +37,9 @@ export default createVuetify({
     },
   },
   defaults: {
+    VAutocomplete: {
+      density: "compact",
+    },
     VCheckbox: {
       density: "compact",
     },

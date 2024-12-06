@@ -85,7 +85,7 @@
             />
           </template>
           <template v-else-if="header.key === 'institutions'">
-            <v-select
+            <v-autocomplete
               :label="$t('user.institutions')"
               :no-data-text="$t('label.no_data_text')"
               :items="institutionStore.institutions"
@@ -100,10 +100,10 @@
                   handleFilterInput(header.key, event);
                 }
               "
-            ></v-select>
+            ></v-autocomplete>
           </template>
           <template v-else-if="header.key === 'role'">
-            <v-select
+            <v-autocomplete
               :label="$t('user.role')"
               :no-data-text="$t('label.no_data_text')"
               :items="roles"
@@ -116,7 +116,7 @@
                   handleFilterInput(header.key, event);
                 }
               "
-            ></v-select>
+            ></v-autocomplete>
           </template>
           <template
             v-else-if="
@@ -125,7 +125,7 @@
               profileStore.isAttributeSelection(header.key)
             "
           >
-            <v-select
+            <v-autocomplete
               :label="$t(`user.${header.key}`)"
               :no-data-text="$t('label.no_data_text')"
               :items="profileStore.getSelectionItemsOfAttribute(header.key)"
@@ -138,7 +138,7 @@
                   handleFilterInput(header.key, event);
                 }
               "
-            ></v-select>
+            ></v-autocomplete>
           </template>
           <template v-else-if="header.key !== 'actions'">
             <v-text-field
