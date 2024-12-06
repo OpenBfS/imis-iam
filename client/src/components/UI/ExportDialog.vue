@@ -82,7 +82,7 @@ import { useApplicationStore } from "@/stores/application";
 import { useUserStore } from "@/stores/user";
 import { useInstitutionStore } from "@/stores/institution";
 import { useNotification } from "@/lib/use-notification";
-import { HTTP, paramsSerializer } from "@/lib/http";
+import { createSearchQueryString, HTTP, paramsSerializer } from "@/lib/http";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -144,6 +144,17 @@ onMounted(() => {
     csvOptions.value["id"] = userStore.selectedUsers;
   } else if (institutionStore.selectedInstitutions.length > 0) {
     csvOptions.value["id"] = institutionStore.selectedInstitutions;
+  }
+  if (applicationStore.listToExport === "users") {
+    csvOptions.value["search"] = createSearchQueryString(
+      undefined,
+      userStore.filterBy
+    );
+  } else if (applicationStore.listToExport === "institutions") {
+    csvOptions.value["search"] = createSearchQueryString(
+      undefined,
+      institutionStore.filterBy
+    );
   }
 });
 
