@@ -134,7 +134,6 @@ const csvOptions = ref({
   rowDelimiter: rowDelimiters[0].value,
   encoding: encoding[0],
   quoteType: quoteTypes[0].value,
-  search: applicationStore.searchString,
 });
 
 onMounted(() => {
