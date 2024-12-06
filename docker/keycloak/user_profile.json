@@ -134,24 +134,6 @@
     "validations" : { },
     "group": "contact"
   }, {
-    "name" : "oe",
-    "displayName" : "${oe}",
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
-    },
-    "annotations" : { },
-    "validations" : { }
-  }, {
-    "name" : "bfslocation",
-    "displayName" : "${bfslocation}",
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
-    },
-    "annotations" : { },
-    "validations" : { }
-  }, {
     "name" : "position",
     "displayName" : "${position}",
     "required" : {
