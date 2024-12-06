@@ -102,6 +102,49 @@
               "
             ></v-autocomplete>
           </template>
+          <template
+            v-else-if="props.type === 'institutions' && header.key === 'tags'"
+          >
+            <v-autocomplete
+              :label="$t('institution.tags')"
+              :no-data-text="$t('label.no_data_text')"
+              :items="institutionTags"
+              item-title="name"
+              item-value="name"
+              class="my-1"
+              clearable
+              hide-details
+              variant="outlined"
+              @update:modelValue="
+                (event) => {
+                  handleFilterInput(header.key, event);
+                }
+              "
+            ></v-autocomplete>
+          </template>
+          <template
+            v-else-if="
+              props.type === 'institutions' &&
+              header.key === 'serviceBuildingState'
+            "
+          >
+            <v-autocomplete
+              :label="$t('institution.service_building_state')"
+              :no-data-text="$t('label.no_data_text')"
+              :items="states"
+              item-title="label"
+              item-value="value"
+              class="my-1"
+              clearable
+              hide-details
+              variant="outlined"
+              @update:modelValue="
+                (event) => {
+                  handleFilterInput(header.key, event);
+                }
+              "
+            ></v-autocomplete>
+          </template>
           <template v-else-if="header.key === 'role'">
             <v-autocomplete
               :label="$t('user.role')"
@@ -166,8 +209,12 @@ import { useUserStore } from "@/stores/user";
 import { computed, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import debounce from "debounce";
+import { HTTP } from "@/lib/http";
+import { useNotification } from "@/lib/use-notification";
+import { states } from "./Institution/institution";
 
 const { t } = useI18n();
+const { hasLoadingError } = useNotification();
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -190,6 +237,16 @@ const roles = computed(() => {
   });
 });
 const selected = ref([]);
+const institutionTags = ref([]);
+const getInstitutionTags = () => {
+  HTTP.get("institution/tag")
+    .then((response) => {
+      institutionTags.value = response.data;
+    })
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+};
 
 const props = defineProps([
   // Vuetify props
@@ -280,6 +337,7 @@ const camelCaseToUnderscore = (text) => {
 
 onMounted(() => {
   adjustHeaders();
+  getInstitutionTags();
 });
 
 const triggerSearch = debounce(() => {
