@@ -17,21 +17,35 @@
     clearable
     hide-details
     min-width="120"
+    :model-value="autocompleteValue"
     variant="outlined"
-    @update:modelValue="(event) => handleFilterInput(event)"
+    @update:modelValue="
+      (event) => {
+        autocompleteValue = event;
+        handleFilterInput(event);
+      }
+    "
   ></v-autocomplete>
   <v-text-field
     v-else
     class="my-1"
+    clearable
     density="compact"
+    :model-value="textFieldValue"
     :placeholder="props.placeholder"
     hide-details
     variant="outlined"
-    @update:modelValue="(event) => handleFilterInput(event)"
+    @update:modelValue="
+      (event) => {
+        textFieldValue = event;
+        handleFilterInput(event);
+      }
+    "
   ></v-text-field>
 </template>
 
 <script setup>
+import { onMounted, ref } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
@@ -50,6 +64,24 @@ const props = defineProps([
   "placeholder",
   "type",
 ]);
+
+const textFieldValue = ref("");
+const autocompleteValue = ref(null);
+
+onMounted(() => {
+  // Restore value when the column containing this filter component was hidden and shown again.
+  let restoredKey = "";
+  if (props.type === "users") {
+    restoredKey = userStore.filterBy[props.filterKey];
+  } else if (props.type === "institutions") {
+    restoredKey = institutionStore.filterBy[props.filterKey];
+  }
+  if (props.items) {
+    autocompleteValue.value = restoredKey;
+  } else {
+    textFieldValue.value = restoredKey;
+  }
+});
 
 const triggerSearch = debounce(() => {
   applicationStore.searchRequest([props.type]);
