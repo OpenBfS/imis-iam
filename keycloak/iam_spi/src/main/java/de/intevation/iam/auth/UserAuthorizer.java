@@ -69,7 +69,8 @@ public class UserAuthorizer extends Authorizer<User> {
                 !authorizeUpdate(
                     user, session, requestingUser, client));
         });
-        return data;
+
+        return filterUserList(data, session, requestingUser);
     }
 
     @Override
@@ -85,7 +86,25 @@ public class UserAuthorizer extends Authorizer<User> {
                 !authorizeUpdate(
                     user, session, requestingUser, client));
         });
-        return data;
+        return filterUserList(data, session, requestingUser);
+    }
+    private ObjectList<User> filterUserList(
+            ObjectList<User> users,
+            KeycloakSession session,
+            UserModel requestingUser
+    ) {
+        List<User> filteredUsers = filterUserList(users.getList(), session, requestingUser);
+        return new ObjectList<>(filteredUsers.size(), filteredUsers);
+    }
+
+    private List<User> filterUserList(
+            List<User> users,
+            KeycloakSession session,
+            UserModel requestingUser
+    ) {
+        return users.stream().filter(
+                user ->
+                        user.isEnabled() || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)).toList();
     }
 
     private boolean authorizeUpdate(
