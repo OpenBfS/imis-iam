@@ -75,7 +75,7 @@ export default {
     required_tag: "@:tag_term ist erforderlich",
     required_email: "Email ist erforderlich",
     valid_email: "Email muss gültig sein",
-    valid_phone: "Bitte geben sie Ihre Telefonnummer in diesem Format ein +4930183336727",
+    valid_phone: "Die Nummer entspricht nicht der Vorgabe",
     required_phone: "Telefon ist erforderlich",
     valid_fax: "Faxnummer muss gültig sein",
     valid_postalcode: "PLZ muss gültig sein",
