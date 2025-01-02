@@ -36,16 +36,12 @@
 </template>
 
 <script setup>
-import { ref, defineAsyncComponent } from "vue";
+import { ref } from "vue";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
 
 const institutionStore = useInstitutionStore();
 const userStore = useUserStore();
-
-const ResultTable = defineAsyncComponent(() =>
-  import("@/components/Search/ResultTable.vue")
-);
 const tab = ref(null);
 
 const emit = defineEmits(["onSelectedTab"]);

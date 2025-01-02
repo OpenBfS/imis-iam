@@ -193,14 +193,10 @@ import { HTTP } from "@/lib/http.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
-import { ref, onMounted, defineAsyncComponent } from "vue";
+import { ref, onMounted } from "vue";
 
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
-
-const MailContent = defineAsyncComponent(() =>
-  import("@/components/Mailing/MailContent.vue")
-);
 const { hasRequestError, resetNotification } = useNotification();
 const showMailContent = ref(false);
 const selectedMail = ref();

@@ -178,7 +178,7 @@ tr {
 }
 </style>
 <script setup>
-import { onMounted, ref, defineAsyncComponent, computed, watch } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { HTTP } from "@/lib/http.js";
 import { useForm } from "@/lib/use-form.js";
 import { useNotification } from "@/lib/use-notification.js";
@@ -187,9 +187,7 @@ import { useMailStore } from "@/stores/mail.js";
 import { useRoute } from "vue-router";
 import debounce from "debounce";
 import { useI18n } from "vue-i18n";
-const MailContent = defineAsyncComponent(() =>
-  import("@/components/Mailing/MailContent.vue")
-);
+
 const {
   dateStringToDate,
   validGermanDate,

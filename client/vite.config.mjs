@@ -23,9 +23,4 @@ export default defineConfig({
     },
     extensions: [".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".vue"],
   },
-  server: {
-    warmup: {
-      clientFiles: ["./src/components/Search/Search.vue"],
-    },
-  },
 });

@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { computed, ref, defineAsyncComponent, onMounted, watch } from "vue";
+import { computed, ref, onMounted, watch } from "vue";
 import debounce from "debounce";
 import { useNotification } from "@/lib/use-notification.js";
 import { useApplicationStore } from "@/stores/application.js";
@@ -122,9 +122,6 @@ import EditTags from "@/components/UI/EditTags.vue";
 
 const { hasLoadingError, hasRequestError } = useNotification();
 
-const Results = defineAsyncComponent(() =>
-  import("@/components/Search/Results.vue")
-);
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const userStore = useUserStore();

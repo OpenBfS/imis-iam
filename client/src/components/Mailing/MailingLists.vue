@@ -158,17 +158,11 @@
 
 <script setup>
 import { useNotification } from "@/lib/use-notification.js";
-import { onMounted, ref, defineAsyncComponent, computed } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useApplicationStore } from "@/stores/application.js";
 import { useMailStore } from "@/stores/mail.js";
 import { useProfileStore } from "@/stores/profile.js";
 
-const ManageMailing = defineAsyncComponent(() =>
-  import("@/components/Mailing/ManageMailing.vue")
-);
-const MailDialog = defineAsyncComponent(() =>
-  import("@/components/Mailing/MailDialog.vue")
-);
 const applicationStore = useApplicationStore();
 const mailStore = useMailStore();
 const profileStore = useProfileStore();
