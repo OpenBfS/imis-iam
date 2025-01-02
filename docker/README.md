@@ -52,6 +52,12 @@ See ldap/users.ldif for credentials (uid, userPassword).
 
 Authenticated access to the client is given under localhost:48081.
 
+### Mode of setup
+
+To decide if the client should be started in development or production mode
+the environment variable `CLIENT_MODE` can be set. Per default it's set to
+`development` in the `.env` file.
+
 
 ## Testing E-Mail
 
