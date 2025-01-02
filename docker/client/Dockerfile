@@ -36,4 +36,4 @@ RUN ln -sf /usr/local/iamdocker/shibboleth/shibboleth2.xml \
 
 RUN cp /usr/local/iamdocker/shibboleth/etc/*.pem /etc/shibboleth
 
-CMD sh /usr/local/iamdocker/start.sh
+CMD bash /usr/local/iamdocker/start.sh

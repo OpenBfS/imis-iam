@@ -59,6 +59,7 @@ services:
       - ${SP_PORT}:80
     environment:
       - CLIENT_HOST=${CLIENT_HOST}
+      - CLIENT_MODE=${CLIENT_MODE}
       - PROTOCOLL
       - SP_HOSTNAME=${HOSTNAME}
       - SP_PORT
