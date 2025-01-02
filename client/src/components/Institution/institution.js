@@ -7,6 +7,9 @@
 
 import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
+import i18n from "@/i18n";
+
+const { t } = i18n.global;
 
 const serviceBuildingPlace = {
   serviceBuildingLocation: "",
@@ -74,4 +77,28 @@ function updateInstitution(
   });
 }
 
-export { getExpInstitution, updateInstitution };
+const states = [
+  { value: "baden_wuerttemberg" },
+  { value: "bavaria" },
+  { value: "berlin" },
+  { value: "brandenburg" },
+  { value: "bremen" },
+  { value: "hamburg" },
+  { value: "hesse" },
+  { value: "lower_saxony" },
+  { value: "mecklenburg_vorpommern" },
+  { value: "north_rhine_westphalia" },
+  { value: "rhineland_palatinate" },
+  { value: "saarland" },
+  { value: "saxony" },
+  { value: "saxony_anhalt" },
+  { value: "schleswig_holstein" },
+  { value: "thuringia" },
+].map((state) => {
+  return {
+    label: t(`institution.state_${state.value}`),
+    value: state.value,
+  };
+});
+
+export { getExpInstitution, updateInstitution, states };

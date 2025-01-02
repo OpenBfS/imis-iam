@@ -6,7 +6,7 @@
  */
 import { defineStore } from "pinia";
 import { Promise } from "core-js";
-import { HTTP } from "../lib/http.js";
+import { createSearchQueryString, HTTP } from "../lib/http.js";
 
 export const useInstitutionStore = defineStore("institution", {
   namespaced: true,
@@ -24,6 +24,7 @@ export const useInstitutionStore = defineStore("institution", {
     selectedInstitutions: [],
     offset: 0,
     itemsPerPage: 25,
+    filterBy: {},
     // Object with keys "key" and "order"
     sortBy: null,
     totalNumberOfInstitutions: 0,
@@ -63,14 +64,15 @@ export const useInstitutionStore = defineStore("institution", {
     },
     loadInstitutions(searchString) {
       return new Promise((resolve, reject) => {
+        const params = {
+          search: createSearchQueryString(searchString, this.filterBy),
+          firstResult: this.offset,
+          maxResults: this.itemsPerPage,
+          sortBy: this.sortBy?.key,
+          order: this.sortBy?.order,
+        };
         HTTP.get("/institution", {
-          params: {
-            search: searchString,
-            firstResult: this.offset,
-            maxResults: this.itemsPerPage,
-            sortBy: this.sortBy?.key,
-            order: this.sortBy?.order,
-          },
+          params,
         })
           .then((response) => {
             this.totalNumberOfInstitutions = response.data.size;
@@ -103,6 +105,13 @@ export const useInstitutionStore = defineStore("institution", {
       const index = this.institutions.findIndex((inst) => inst.id === data.id);
       this.institutions.splice(index, 1);
       this.totalNumberOfInstitutions--;
+    },
+    updateFilter(key, term) {
+      if (term === null || term.length === 0) {
+        delete this.filterBy[key];
+      } else if (!term.length || term.length > 0) {
+        this.filterBy[key] = term;
+      }
     },
   },
 });

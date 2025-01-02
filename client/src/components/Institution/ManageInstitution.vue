@@ -330,6 +330,7 @@ import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 import { useI18n } from "vue-i18n";
+import { states } from "./institution";
 
 const { t } = useI18n();
 
@@ -380,24 +381,6 @@ const getCategories = () => {
       hasLoadingError.value = true;
     });
 };
-const states = [
-  { value: "baden_wuerttemberg" },
-  { value: "bavaria" },
-  { value: "berlin" },
-  { value: "brandenburg" },
-  { value: "bremen" },
-  { value: "hamburg" },
-  { value: "hesse" },
-  { value: "lower_saxony" },
-  { value: "mecklenburg_vorpommern" },
-  { value: "north_rhine_westphalia" },
-  { value: "rhineland_palatinate" },
-  { value: "saarland" },
-  { value: "saxony" },
-  { value: "saxony_anhalt" },
-  { value: "schleswig_holstein" },
-  { value: "thuringia" },
-];
 
 const measIdAndNameOrNothing = () => {
   return [
@@ -444,9 +427,6 @@ onBeforeMount(() => {
       ...measIdAndNameOrNothing(),
     ],
     tags: reqField(t("error.required_tag")),
-  });
-  states.forEach((state) => {
-    state["label"] = t(`institution.state_${state.value}`);
   });
 });
 onMounted(() => {

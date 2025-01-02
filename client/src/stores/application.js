@@ -41,7 +41,6 @@ export const useApplicationStore = defineStore("application", {
       socialMedia: import.meta.env.VITE_FOOTER_SOCIALMEDIA,
     },
     reportMail: import.meta.env.VITE_REPORT_MAIL,
-    searchString: "",
     ownAccount: false,
     isLoading: false,
   }),
@@ -54,9 +53,6 @@ export const useApplicationStore = defineStore("application", {
     },
     setShowManageEventDialog(data) {
       this.showManageEventDialog = data;
-    },
-    setSearchString(data) {
-      this.searchString = data;
     },
     setSavedItem(data) {
       this.savedItem = data;
@@ -107,10 +103,10 @@ export const useApplicationStore = defineStore("application", {
       return new Promise((resolve, reject) => {
         const promises = [];
         if (listOfTypes.includes("users")) {
-          promises.push(userStore.loadUsers(this.searchString));
+          promises.push(userStore.loadUsers());
         }
         if (listOfTypes.includes("institutions")) {
-          promises.push(institutionStore.loadInstitutions(this.searchString));
+          promises.push(institutionStore.loadInstitutions());
         }
         Promise.all(promises)
           .then(() => resolve())

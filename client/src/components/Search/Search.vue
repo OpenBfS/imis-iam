@@ -10,16 +10,7 @@
     <UIHeader>
       {{ $t("label.search") }}
     </UIHeader>
-    <v-row justify="space-between" class="mt-6">
-      <v-col col="8" sm="7" md="4" lg="4" xl="3" xxl="2">
-        <v-text-field
-          prepend-inner-icon="mdi-magnify"
-          v-model="applicationStore.searchString"
-          clearable
-          density="compact"
-        >
-        </v-text-field>
-      </v-col>
+    <v-row justify="space-between" class="mt-6 mb-2">
       <v-spacer></v-spacer>
       <v-tooltip location="top">
         <template v-slot:activator="{ props }">
@@ -109,8 +100,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, watch } from "vue";
-import debounce from "debounce";
+import { computed, ref, onMounted } from "vue";
 import { useNotification } from "@/lib/use-notification.js";
 import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
@@ -131,17 +121,7 @@ const isAllowedToAdd = computed(() => {
 });
 const selectedTab = ref("users");
 const showEditTags = ref(false);
-const triggerSearch = debounce(() => {
-  applicationStore.searchRequest(["users", "institutions"], true);
-}, 500);
-watch(
-  () => applicationStore.searchString,
-  (oldV, newV) => {
-    if (oldV !== newV) {
-      triggerSearch();
-    }
-  }
-);
+
 onMounted(() => {
   if (!userStore.roles) {
     userStore.loadRoles();

@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { defineStore } from "pinia";
-import { HTTP } from "../lib/http.js";
+import { createSearchQueryString, HTTP } from "../lib/http.js";
 
 export const useUserStore = defineStore("user", {
   namespaced: true,
@@ -16,6 +16,7 @@ export const useUserStore = defineStore("user", {
     selectedUsers: [],
     offset: 0,
     itemsPerPage: 25,
+    filterBy: {},
     // Object with keys "key" and "order"
     sortBy: null,
     totalNumberOfUsers: 0,
@@ -39,14 +40,15 @@ export const useUserStore = defineStore("user", {
     },
     loadUsers(searchString) {
       return new Promise((resolve, reject) => {
+        const params = {
+          search: createSearchQueryString(searchString, this.filterBy),
+          firstResult: this.offset,
+          maxResults: this.itemsPerPage,
+          sortBy: this.sortBy?.key,
+          order: this.sortBy?.order,
+        };
         HTTP.get("/iamuser", {
-          params: {
-            search: searchString,
-            firstResult: this.offset,
-            maxResults: this.itemsPerPage,
-            sortBy: this.sortBy?.key,
-            order: this.sortBy?.order,
-          },
+          params,
         })
           .then((response) => {
             this.totalNumberOfUsers = response.data.size;
@@ -90,6 +92,13 @@ export const useUserStore = defineStore("user", {
       const index = this.users.findIndex((user) => user.id === data.id);
       this.users.splice(index, 1);
       this.totalNumberOfUsers--;
+    },
+    updateFilter(key, term) {
+      if (term === null || term.length === 0) {
+        delete this.filterBy[key];
+      } else if (!term.length || term.length > 0) {
+        this.filterBy[key] = term;
+      }
     },
   },
 });

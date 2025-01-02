@@ -130,7 +130,7 @@ public class Institution {
     private Float yCoordinate;
 
     @Column(name = "active")
-    private Boolean active;
+    private boolean active;
 
     public Integer getId() {
         return id;
@@ -303,11 +303,11 @@ public class Institution {
         this.yCoordinate = yCoordinate;
     }
 
-    public Boolean getActive() {
+    public boolean getActive() {
         return active;
     }
 
-    public void setActive(Boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 }

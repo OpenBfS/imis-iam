@@ -9,11 +9,13 @@ package de.intevation.iam;
 import static org.keycloak.userprofile.UserProfileContext.USER_API;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,6 +59,8 @@ import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
+import org.keycloak.utils.SearchQueryUtils;
+
 public class UserProvider implements RealmResourceProvider {
 
     private static final String MAIL_ALREADY_USED_KEY
@@ -137,13 +141,28 @@ public class UserProvider implements RealmResourceProvider {
             @QueryParam("maxResults") Integer maxResults) {
         RealmModel realm = session.getContext().getRealm();
 
-        Map<String, String> attributes = new HashMap<>();
-        if (search != null && !search.isEmpty()) {
-            attributes.put(UserModel.SEARCH, search);
+        Map<String, String> attributes = search == null
+                ? Collections.emptyMap()
+                : SearchQueryUtils.getFields(search);
+        String generalSearch = attributes.get("search");
+        if (generalSearch != null) {
+            attributes.put(UserModel.SEARCH, generalSearch);
+            attributes.remove("search");
         }
+
+        Map<String, String> customAttributes = new HashMap<>();
+
+        for (String customAttribute : new String[]{"institutions", "role"}) {
+           String value = attributes.get(customAttribute);
+           if (value != null) {
+               customAttributes.put(customAttribute, value);
+               attributes.remove(customAttribute);
+           }
+        }
+
         long size = 0;
         Stream<UserModel> userModels;
-        if (firstResult != null || maxResults != null) {
+        if ((firstResult != null || maxResults != null) && customAttributes.isEmpty()) {
             size = session.users()
                 .searchForUserStream(realm, attributes).count();
             userModels = session.users()
@@ -156,13 +175,37 @@ public class UserProvider implements RealmResourceProvider {
             userModels = session.users()
                 .searchForUserStream(realm, attributes);
         }
+
+        Predicate<User> userFilter = u -> true;
+        if (!customAttributes.isEmpty()) {
+            String institution = customAttributes.get("institutions");
+            String role = customAttributes.get("role");
+            userFilter = u -> (institution == null || u.getInstitutions().contains(institution))
+                    && (role == null || u.getRole().equals(role));
+        }
+
         List<User> userList = userModels.map(userEntity -> new User(
-                session.users()
-                .getUserById(realm, userEntity.getId()), session))
-                .collect(Collectors.toList());
+            session.users()
+            .getUserById(realm, userEntity.getId()), session))
+            .filter(userFilter)
+            .collect(Collectors.toList());
         if (size == 0) {
             size = userList.size();
         }
+        if ((firstResult != null || maxResults != null) && !customAttributes.isEmpty()) {
+            if (firstResult == null) {
+                firstResult = 0;
+            } else {
+                firstResult = firstResult > userList.size() ? userList.size() : firstResult;
+            }
+            if (maxResults == null) {
+                maxResults = userList.size();
+            } else {
+                maxResults = maxResults > userList.size() ? userList.size() : maxResults;
+            }
+            userList = userList.subList(firstResult, firstResult + maxResults);
+        }
+
         return auth.filterObjectList(
             new ObjectList<User>(size, userList),
             headers.getHeaderString(Constants.SHIB_USER_HEADER));

@@ -82,7 +82,7 @@ import { useApplicationStore } from "@/stores/application.js";
 import { useUserStore } from "@/stores/user.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useNotification } from "@/lib/use-notification.js";
-import { HTTP, paramsSerializer } from "@/lib/http.js";
+import { createSearchQueryString, HTTP, paramsSerializer } from "@/lib/http.js";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -134,7 +134,6 @@ const csvOptions = ref({
   rowDelimiter: rowDelimiters[0].value,
   encoding: encoding[0],
   quoteType: quoteTypes[0].value,
-  search: applicationStore.searchString,
 });
 
 onMounted(() => {
@@ -145,6 +144,17 @@ onMounted(() => {
     csvOptions.value["id"] = userStore.selectedUsers;
   } else if (institutionStore.selectedInstitutions.length > 0) {
     csvOptions.value["id"] = institutionStore.selectedInstitutions;
+  }
+  if (applicationStore.listToExport === "users") {
+    csvOptions.value["search"] = createSearchQueryString(
+      undefined,
+      userStore.filterBy
+    );
+  } else if (applicationStore.listToExport === "institutions") {
+    csvOptions.value["search"] = createSearchQueryString(
+      undefined,
+      institutionStore.filterBy
+    );
   }
 });
 

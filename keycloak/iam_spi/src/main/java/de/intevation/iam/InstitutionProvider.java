@@ -8,7 +8,13 @@ package de.intevation.iam;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Map;
 import java.util.List;
+import java.util.Set;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -16,6 +22,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.ForbiddenException;
@@ -33,6 +41,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+import org.hibernate.query.criteria.JpaExpression;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -43,13 +52,13 @@ import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
 import de.intevation.iam.auth.Role;
 import de.intevation.iam.model.jpa.Institution;
-import de.intevation.iam.model.jpa.Institution_;
 import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
+import org.keycloak.utils.SearchQueryUtils;
 
 /**
  * Class providing rest interfaces to create, get and delete Institutions.
@@ -58,7 +67,7 @@ import de.intevation.iam.validation.Validator;
 @Produces(MediaType.APPLICATION_JSON)
 public class InstitutionProvider implements RealmResourceProvider {
 
-    enum SortOrder {
+    public enum SortOrder {
         asc,
         desc
     }
@@ -86,6 +95,54 @@ public class InstitutionProvider implements RealmResourceProvider {
         this.validator = new Validator();
         this.entityManager = session.getProvider(JpaConnectionProvider.class)
             .getEntityManager();
+    }
+
+    private Predicate getFilterQuery(Root<Institution> root, CriteriaBuilder cb, Map<String, String> attributes) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        String generalSearch = attributes.get("search");
+        if (generalSearch != null) {
+            String value = "%" + generalSearch.toLowerCase() + "%";
+            predicates.add(cb.or(
+                    cb.like(
+                            cb.lower(root.get("name")),
+                            value),
+                    cb.like(
+                            cb.lower(root.get("measFacilId")),
+                            value)
+            ));
+        }
+
+        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+            if (entry.getKey().equals("search")) {
+                continue;
+            }
+
+            String value = "%" + entry.getValue().toLowerCase() + "%";
+            try {
+                Field field = Institution.class.getDeclaredField(entry.getKey());
+                if (field.getType().isAssignableFrom(List.class)
+                    || field.getType().isAssignableFrom(Set.class)) {
+                    Join<Institution, ?> join = root.join(entry.getKey());
+                    if (Objects.equals(entry.getKey(), "tags")) {
+                        predicates.add(cb.like(
+                                cb.lower(join.get("name")),
+                                value));
+                    } else {
+                        predicates.add(cb.like(
+                                cb.lower(((JpaExpression) join).cast(String.class)),
+                                value));
+                    }
+
+                } else {
+                    predicates.add(cb.like(
+                            cb.lower(((JpaExpression) root.get(entry.getKey())).cast(String.class)),
+                            value
+                    ));
+                }
+            } catch (NoSuchFieldException ignored) { }
+        }
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 
     /**
@@ -135,14 +192,14 @@ public class InstitutionProvider implements RealmResourceProvider {
             @QueryParam("maxResults") Integer maxResults,
             @QueryParam("sortBy") String sortBy,
             @QueryParam("order") SortOrder order) {
-        String filter = search != null && !search.isEmpty()
-            ? "%" + search.toLowerCase() + "%" : "";
+        Map<String, String> attributes = search == null
+                ? Collections.emptyMap()
+                : SearchQueryUtils.getFields(search);
+
+
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
-        Root<Institution> root = query.from(Institution.class);
-        query.select(root);
+
 
         long size = 0;
         if (firstResult != null || maxResults != null) {
@@ -150,16 +207,8 @@ public class InstitutionProvider implements RealmResourceProvider {
             CriteriaQuery<Long> cqSize = cbSize.createQuery(Long.class);
             Root<Institution> rootSize = cqSize.from(Institution.class);
             cqSize.select(cbSize.count(rootSize));
-            if (!filter.isEmpty()) {
-                cqSize.where(cbSize.or(
-                    cbSize.like(
-                        cbSize.lower(rootSize.get(Institution_.name)),
-                        filter),
-                    cbSize.like(
-                        cbSize.lower(rootSize.get(Institution_.measFacilId)),
-                        filter)
-                    )
-                );
+            if (!attributes.isEmpty()) {
+                cqSize.where(getFilterQuery(rootSize, cbSize, attributes));
             }
             size = em.createQuery(cqSize).getSingleResult();
         }
@@ -180,17 +229,15 @@ public class InstitutionProvider implements RealmResourceProvider {
             order = SortOrder.asc;
         }
 
-        if (!filter.isEmpty()) {
-            query.where(cb.or(
-                cb.like(
-                    cb.lower(root.get(Institution_.name)),
-                    filter),
-                cb.like(
-                    cb.lower(root.get(Institution_.measFacilId)),
-                    filter)
-                )
-            );
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Institution> query = cb.createQuery(Institution.class);
+        Root<Institution> root = query.from(Institution.class);
+        query.select(root);
+
+        if (!attributes.isEmpty()) {
+            query.where(cb.and(getFilterQuery(root, cb, attributes)));
         }
+
         if (order == SortOrder.asc) {
             query.orderBy(cb.asc(root.get(sortByAttribute)));
         } else {
@@ -204,7 +251,7 @@ public class InstitutionProvider implements RealmResourceProvider {
             size = result.getResultList().size();
         }
         return auth.filterObjectList(
-            new ObjectList<Institution>(size, result.getResultList()),
+                new ObjectList<>(size, result.getResultList()),
             headers.getHeaderString(Constants.SHIB_USER_HEADER));
     }
 

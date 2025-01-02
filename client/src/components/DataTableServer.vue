@@ -60,20 +60,112 @@
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"
       ><slot :name="slot" v-bind="scope"
     /></template>
+
+    <template v-slot:thead>
+      <tr>
+        <td></td>
+        <td class="pe-2" v-for="header in allHeaders" :key="header">
+          <template v-if="header.key === 'active' || header.key === 'enabled'">
+            <Filter
+              :filterKey="header.key"
+              :items="[
+                { title: t('true'), value: 'true' },
+                { title: t('false'), value: 'false' },
+              ]"
+              :label="$t('user.enabled')"
+              :type="props.type"
+            ></Filter>
+          </template>
+          <template v-else-if="header.key === 'institutions'">
+            <Filter
+              :filterKey="header.key"
+              :items="institutionStore.institutions"
+              item-title="name"
+              item-value="name"
+              :label="$t('user.institutions')"
+              :type="props.type"
+            ></Filter>
+          </template>
+          <template
+            v-else-if="props.type === 'institutions' && header.key === 'tags'"
+          >
+            <Filter
+              :filterKey="header.key"
+              :items="institutionTags"
+              item-title="name"
+              item-value="name"
+              :label="$t('institution.tags')"
+              :type="props.type"
+            ></Filter>
+          </template>
+          <template
+            v-else-if="
+              props.type === 'institutions' &&
+              header.key === 'serviceBuildingState'
+            "
+          >
+            <Filter
+              :filterKey="header.key"
+              :items="states"
+              item-title="label"
+              item-value="value"
+              :label="$t('institution.service_building_state')"
+              :type="props.type"
+            ></Filter>
+          </template>
+          <template v-else-if="header.key === 'role'">
+            <Filter
+              :filterKey="header.key"
+              :items="roles"
+              :label="$t(`user.${header.key}`)"
+              :type="props.type"
+            ></Filter>
+          </template>
+          <template
+            v-else-if="
+              props.type === 'users' &&
+              profileStore.getAttribute(header.key) &&
+              profileStore.isAttributeSelection(header.key)
+            "
+          >
+            <Filter
+              :filterKey="header.key"
+              :items="profileStore.getSelectionItemsOfAttribute(header.key)"
+              :label="$t(`user.${header.key}`)"
+              :type="props.type"
+            ></Filter>
+          </template>
+          <template v-else-if="header.key !== 'actions'">
+            <Filter
+              :filterKey="header.key"
+              :placeholder="header.title"
+              :type="props.type"
+            ></Filter>
+          </template>
+        </td>
+      </tr>
+    </template>
   </v-data-table-server>
 </template>
 
 <script setup>
 import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
+import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
 import { computed, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { HTTP } from "@/lib/http";
+import { useNotification } from "@/lib/use-notification";
+import { states } from "./Institution/institution";
+import Filter from "./Search/Filter.vue";
 
 const { t } = useI18n();
+const { hasLoadingError } = useNotification();
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
+const profileStore = useProfileStore();
 const userStore = useUserStore();
 
 const areTableSettingsOpen = ref(false);
@@ -86,7 +178,22 @@ const actionHeader = {
 const allHeaders = computed(() => {
   return [...headers.value.filter((h) => h.visible), actionHeader];
 });
+const roles = computed(() => {
+  return userStore.roles.map((role) => {
+    return { title: t(role.description), value: role.name };
+  });
+});
 const selected = ref([]);
+const institutionTags = ref([]);
+const getInstitutionTags = () => {
+  HTTP.get("institution/tag")
+    .then((response) => {
+      institutionTags.value = response.data;
+    })
+    .catch(() => {
+      hasLoadingError.value = true;
+    });
+};
 
 const props = defineProps([
   // Vuetify props
@@ -132,6 +239,7 @@ const adjustHeaders = () => {
       sortable: props.type !== "users",
       visible: header.default,
     };
+    // This function decides how the values inside an item are displayed in the UI
     newHeader.value = (item) => {
       if (
         props.type === "users" &&
@@ -144,7 +252,7 @@ const adjustHeaders = () => {
         props.type === "users"
           ? toRaw(item.attributes[headerName] ?? item[headerName])
           : item[headerName];
-      return value ? getDisplayName(toRaw(value)) : undefined;
+      return getDisplayName(toRaw(value));
     };
     newHeaders.push(newHeader);
   });
@@ -161,7 +269,7 @@ const updateTable = (event) => {
 };
 
 function getDisplayName(value) {
-  if (!value) return;
+  if (value === undefined) return;
   if (typeof value === "boolean") {
     return t(`${value}`);
   } else if (Array.isArray(value)) {
@@ -176,5 +284,6 @@ const camelCaseToUnderscore = (text) => {
 
 onMounted(() => {
   adjustHeaders();
+  getInstitutionTags();
 });
 </script>

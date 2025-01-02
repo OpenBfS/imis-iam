@@ -19,6 +19,26 @@ export const useProfileStore = defineStore("profile", {
     attributes: (state) => {
       return state.userProfileMetadata.attributes;
     },
+    getAttribute: (state) => {
+      return (name) => {
+        return state.attributes.find((attribute) => attribute.name === name);
+      };
+    },
+    isAttributeSelection: (state) => {
+      return (name) => {
+        return state.getAttribute(name)?.validations?.options !== undefined;
+      };
+    },
+    // Returns array of items that can be used by select components
+    getSelectionItemsOfAttribute: (state) => {
+      return (name) => {
+        return state
+          .getAttribute(name)
+          .validations.options?.options.map((option) => {
+            return { title: option, value: option };
+          });
+      };
+    },
     attributeGroups: (state) => {
       return state.userProfileMetadata.groups;
     },
