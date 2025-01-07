@@ -38,49 +38,6 @@ public class ExportProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
 
-    private enum CsvOptions {
-        comma(","), period("."), semicolon(";"), space(" "),
-        singlequote("'"), doublequote("\""),
-        linux("\n"), windows("\r\n");
-
-        private final String value;
-
-        CsvOptions(String v) {
-            this.value = v;
-        }
-
-        public char getChar() {
-            return this.value.charAt(0);
-        }
-    }
-
-    private Boolean isAccepted(String name, CsvOptions[] options) {
-        for (CsvOptions opt : options) {
-            if (opt.equals(CsvOptions.valueOf(name))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Boolean isValidFieldSeperator(String fieldSeparator) {
-        CsvOptions[] fieldSperators = {CsvOptions.comma,
-                CsvOptions.period, CsvOptions.semicolon, CsvOptions.space };
-        return isAccepted(fieldSeparator, fieldSperators);
-    }
-
-    private Boolean isValidQuoteType(String quoteType) {
-        CsvOptions[] quoteTypes = {CsvOptions.singlequote,
-                CsvOptions.doublequote };
-        return isAccepted(quoteType, quoteTypes);
-    }
-
-    private Boolean isValidRowDelimiter(String rowDelimiter) {
-        CsvOptions[] rowFelimiters = {CsvOptions.windows,
-                CsvOptions.linux };
-        return isAccepted(rowDelimiter, rowFelimiters);
-    }
-
     /**
      * Constructor.
      *
@@ -191,16 +148,16 @@ public class ExportProvider implements RealmResourceProvider {
         String rowDelimiter,
         String encoding
     ) {
-        if (fieldSeparator == null || !isValidFieldSeperator(fieldSeparator)
-            || quoteType == null || !isValidQuoteType(quoteType)
-            || rowDelimiter == null || !isValidRowDelimiter(rowDelimiter)
+        if (fieldSeparator == null || !(fieldSeparator.length() == 1)
+            || quoteType == null || !(quoteType.length() == 1)
+            || rowDelimiter == null || !(rowDelimiter.length() == 1)
         ) {
             throw new IllegalArgumentException();
         }
         exporter.setFieldSeparator(
-            CsvOptions.valueOf(fieldSeparator).getChar());
-        exporter.setQuoteType(CsvOptions.valueOf(quoteType).getChar());
-        exporter.setRowDelimiter(CsvOptions.valueOf(rowDelimiter).getChar());
+            fieldSeparator.charAt(0));
+        exporter.setQuoteType(quoteType.charAt(0));
+        exporter.setRowDelimiter(rowDelimiter.charAt(0));
         exporter.setEncoding(Charset.forName(encoding));
     }
 
