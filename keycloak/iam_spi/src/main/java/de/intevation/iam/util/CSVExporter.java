@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,7 +23,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -37,23 +37,25 @@ public class CSVExporter<T> {
     private char fieldSeparator = ',';
     private char quoteType = '\"';
     private char rowDelimiter = '\n';
-    private Charset encoding = Charset.forName("UTF-8");
+    private Charset encoding = StandardCharsets.UTF_8;
 
     /**
      * Export objects.
-     * @param objects
+     * @param objects Objects to export
+     * @param exportAttributes Attributes that are exported, if empty all
+     *                         attributes are exported
      * @return Export as InputStream
-     * @throws IOException Thrown if an error during csv printing occured
+     * @throws IOException Thrown if an error during csv printing occurred
      * @throws InvocationTargetException Thrown if attributes could not be read
      * @throws IllegalArgumentException Thrown if the csv options are invalid
      * @throws IllegalAccessException Thrown if attributes could not be read
      * @throws IntrospectionException
      */
-    public InputStream export(List<T> objects)
+    public InputStream export(List<T> objects, Set<String> exportAttributes)
             throws IOException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException,
             IntrospectionException {
-        if (objects.size() == 0) {
+        if (objects.isEmpty()) {
             return null;
         }
         StringBuffer result = new StringBuffer();
@@ -63,7 +65,10 @@ public class CSVExporter<T> {
         List<String> header = new ArrayList<>();
         header.addAll(attributes);
         header.addAll(propertyDescriptors.stream().map(d -> d.getName())
-            .collect(Collectors.toList()));
+            .toList());
+        if (exportAttributes != null && !exportAttributes.isEmpty()) {
+            header.retainAll(exportAttributes);
+        }
         CSVFormat format = CSVFormat.DEFAULT
             .withDelimiter(fieldSeparator)
             .withQuote(quoteType)
@@ -76,6 +81,9 @@ public class CSVExporter<T> {
                 Map<String, List<String>> objectAttributes =
                     getObjectAttributes(object);
                 for (String attribute : attributes) {
+                    if (!header.contains(attribute)) {
+                        continue;
+                    }
                     String values = "";
                     if (objectAttributes.containsKey(attribute)) {
                         List<String> attributeList =
@@ -91,6 +99,9 @@ public class CSVExporter<T> {
                 for (
                     PropertyDescriptor propertyDescriptor : propertyDescriptors
                 ) {
+                    if (!header.contains(propertyDescriptor.getName())) {
+                        continue;
+                    }
                     Object value = propertyDescriptor.getReadMethod()
                         .invoke(object);
                     row.add(value != null ? value.toString() : "");
@@ -138,7 +149,7 @@ public class CSVExporter<T> {
             = new ArrayList<>(Arrays.asList(Introspector.getBeanInfo(
                         object.getClass()).getPropertyDescriptors()));
 
-        // User Profile attribures are handled separately,
+        // User Profile attributes are handled separately,
         // database IDs should not be exported
         final Set<String> skipAttrs = Set.of(
             "class", ATTRIBUTES_PROPERTY_NAME, "id");
