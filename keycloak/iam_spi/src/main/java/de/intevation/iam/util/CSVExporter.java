@@ -36,7 +36,7 @@ public class CSVExporter<T> {
 
     private char fieldSeparator = ',';
     private char quoteType = '\"';
-    private char rowDelimiter = '\n';
+    private String rowDelimiter = "\n";
     private Charset encoding = StandardCharsets.UTF_8;
 
     /**
@@ -186,11 +186,11 @@ public class CSVExporter<T> {
         this.quoteType = quoteType;
     }
 
-    public char getRowDelimiter() {
+    public String getRowDelimiter() {
         return rowDelimiter;
     }
 
-    public void setRowDelimiter(char rowDelimiter) {
+    public void setRowDelimiter(String rowDelimiter) {
         this.rowDelimiter = rowDelimiter;
     }
 

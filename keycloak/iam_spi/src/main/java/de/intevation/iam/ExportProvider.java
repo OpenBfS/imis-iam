@@ -157,14 +157,14 @@ public class ExportProvider implements RealmResourceProvider {
     ) {
         if (fieldSeparator == null || !(fieldSeparator.length() == 1)
             || quoteType == null || !(quoteType.length() == 1)
-            || rowDelimiter == null || !(rowDelimiter.length() == 1)
+            || rowDelimiter == null || rowDelimiter.isEmpty()
         ) {
             throw new IllegalArgumentException();
         }
         exporter.setFieldSeparator(
             fieldSeparator.charAt(0));
         exporter.setQuoteType(quoteType.charAt(0));
-        exporter.setRowDelimiter(rowDelimiter.charAt(0));
+        exporter.setRowDelimiter(rowDelimiter);
         exporter.setEncoding(Charset.forName(encoding));
     }
 
