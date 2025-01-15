@@ -12,7 +12,7 @@
     <v-container class="mt-4">
       <v-row justify="center">
         <v-col cols="10">
-          <v-select
+          <v-combobox
             :no-data-text="$t('label.no_data_text')"
             :label="$t('label.field_seperator')"
             :items="fieldSeparators"
@@ -20,8 +20,8 @@
             item-title="name"
             item-value="value"
           >
-          </v-select>
-          <v-select
+          </v-combobox>
+          <v-combobox
             :no-data-text="$t('label.no_data_text')"
             :label="$t('label.row_delimiter')"
             :items="rowDelimiters"
@@ -30,7 +30,7 @@
             v-model="csvOptions.rowDelimiter"
             persistent-hint
           >
-          </v-select>
+          </v-combobox>
           <v-combobox
             :no-data-text="$t('label.no_data_text')"
             :label="$t('label.encoding')"
@@ -93,47 +93,47 @@ const { hasRequestError } = useNotification();
 const fieldSeparators = [
   {
     name: t("label.semicolon"),
-    value: "semicolon",
+    value: ";",
   },
   {
     name: t("label.comma"),
-    value: "comma",
+    value: ",",
   },
   {
     name: t("label.space"),
-    value: "space",
+    value: " ",
   },
   {
     name: t("label.period"),
-    value: "period",
+    value: ".",
   },
 ];
 const quoteTypes = [
   {
     name: t("label.doublequote"),
-    value: "doublequote",
+    value: '"',
   },
   {
     name: t("label.singlequote"),
-    value: "singlequote",
+    value: "'",
   },
 ];
 const rowDelimiters = [
   {
     name: t("label.windows"),
-    value: "windows",
+    value: "\n\r",
   },
   {
     name: t("label.linux"),
-    value: "linux",
+    value: "\r",
   },
 ];
 const encoding = ["iso-8859-15", "utf-16", "utf-8", "ascii"];
 const csvOptions = ref({
-  fieldSeparator: fieldSeparators[0].value,
-  rowDelimiter: rowDelimiters[0].value,
+  fieldSeparator: fieldSeparators[0],
+  rowDelimiter: rowDelimiters[0],
   encoding: encoding[0],
-  quoteType: quoteTypes[0].value,
+  quoteType: quoteTypes[0],
 });
 
 onMounted(() => {
@@ -159,8 +159,18 @@ onMounted(() => {
 });
 
 const exportRequest = (itemsName) => {
+  const options = structuredClone(csvOptions.value);
+  const params = {};
+  const keys = Object.keys(options);
+  for (const key of keys) {
+    if (typeof options[key] === "object") {
+      params[key] = encodeURIComponent(options[key].value);
+    } else {
+      params[key] = encodeURIComponent(options[key]);
+    }
+  }
   HTTP.get(`/export/${itemsName}`, {
-    params: structuredClone(csvOptions.value),
+    params,
     paramsSerializer,
     // responseEncoding and responseType are necessary so axios doesn't decode the response
     // what would lead to a wrong encoding of the download.
