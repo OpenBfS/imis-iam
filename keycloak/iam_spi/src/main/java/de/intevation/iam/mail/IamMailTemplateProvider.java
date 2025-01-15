@@ -168,6 +168,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
                     locale.toLanguageTag()));
             attributes.put("msg", new MessageFormatterMethod(locale, rb));
             attributes.put("properties", theme.getProperties());
+            attributes.put("realmName", getRealmName());
             String subject = new MessageFormat(
                     rb.getProperty(subjectKey, subjectKey), locale)
                     .format(subjectAttributes.toArray());
