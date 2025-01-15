@@ -42,18 +42,17 @@ public class UserAuthorizer extends Authorizer<User> {
             return false;
         }
 
-        switch (requestMethod) {
-            case GET: return Role.USER.isRoleOf(requestingUser, session);
-            case PUT: return authorizeUpdate(
-                data, session, requestingUser, client);
-            case POST:
-                return (!data.isEnabled()
+        return switch (requestMethod) {
+            case GET -> isVisible(data, session, requestingUser);
+            case PUT -> authorizeUpdate(
+                    data, session, requestingUser, client);
+            case POST -> (!data.isEnabled()
                     && Role.EDITOR.isRoleOf(requestingUser, session)
                     || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session))
                     // Not allowed granting roles superior to own role
                     && requestingUser.hasRole(client.getRole(data.getRole()));
-            default: return false;
-        }
+            default -> false;
+        };
     }
 
     @Override
@@ -104,7 +103,15 @@ public class UserAuthorizer extends Authorizer<User> {
     ) {
         return users.stream().filter(
                 user ->
-                        user.isEnabled() || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)).toList();
+                        isVisible(user, session, requestingUser)).toList();
+    }
+
+    private boolean isVisible(
+            User user,
+            KeycloakSession session,
+            UserModel requestingUser
+    ) {
+        return user.isEnabled() || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
     }
 
     private boolean authorizeUpdate(
