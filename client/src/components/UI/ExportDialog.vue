@@ -164,10 +164,21 @@ const exportRequest = (itemsName) => {
   const keys = Object.keys(options);
   for (const key of keys) {
     if (typeof options[key] === "object") {
-      params[key] = encodeURIComponent(options[key].value);
+      params[key] = options[key].value;
     } else {
-      params[key] = encodeURIComponent(options[key]);
+      params[key] = options[key];
     }
+  }
+  if (
+    applicationStore.listToExport === "users" &&
+    userStore.selectedTableColumns?.length > 0
+  ) {
+    params["attributes"] = userStore.selectedTableColumns;
+  } else if (
+    applicationStore.listToExport === "institutions" &&
+    institutionStore.selectedTableColumns?.length > 0
+  ) {
+    params["attributes"] = institutionStore.selectedTableColumns;
   }
   HTTP.get(`/export/${itemsName}`, {
     params,
