@@ -21,4 +21,10 @@ public class IamMailTemplateProviderFactory
     public String getId() {
         return "iam-mail-template-provider";
     }
+
+    @Override
+    public int order() {
+        // All providers with priority <= 0 are ignored for automatic selection
+        return 1;
+    }
 }
