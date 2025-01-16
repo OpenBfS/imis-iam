@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.keycloak.models.KeycloakSession;
 
-import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.RequestMethod;
 
 
@@ -34,7 +33,7 @@ public abstract class Authorizer<T> {
 
     /**
      * Filter or modify the given list of objects.
-     * The default implementation returns data unchanged.
+     * The default implementation returns all elements authorized for GET.
      *
      * @param data List of objects
      * @param userId ID of requesting user
@@ -44,21 +43,7 @@ public abstract class Authorizer<T> {
         List<T> data,
         String userId
     ) {
-        return data;
-    }
-
-    /**
-     * Filter or modify the given list of objects.
-     * The default implementation returns data unchanged.
-     *
-     * @param data List of objects
-     * @param userId ID of requesting user
-     * @return Filtered list
-     */
-    public ObjectList<T> filterObjectList(
-        ObjectList<T> data,
-        String userId
-    ) {
-        return data;
+        return data.stream().filter(object -> isAuthorizedById(
+                object, RequestMethod.GET, userId)).toList();
     }
 }

@@ -7,14 +7,11 @@
 
 package de.intevation.iam.auth;
 
-import java.util.List;
-
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
-import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
@@ -53,45 +50,6 @@ public class UserAuthorizer extends Authorizer<User> {
                     && requestingUser.hasRole(client.getRole(data.getRole()));
             default -> false;
         };
-    }
-
-    @Override
-    public List<User> filter(
-        List<User> data,
-        String userId
-    ) {
-        RealmModel realm = session.getContext().getRealm();
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-
-        return filterUserList(data, session, requestingUser);
-    }
-
-    @Override
-    public ObjectList<User> filterObjectList(
-        ObjectList<User> data,
-        String userId
-    ) {
-        RealmModel realm = session.getContext().getRealm();
-        UserModel requestingUser = session.users().getUserById(realm, userId);
-        return filterUserList(data, session, requestingUser);
-    }
-    private ObjectList<User> filterUserList(
-            ObjectList<User> users,
-            KeycloakSession session,
-            UserModel requestingUser
-    ) {
-        List<User> filteredUsers = filterUserList(users.getList(), session, requestingUser);
-        return new ObjectList<>(filteredUsers.size(), filteredUsers);
-    }
-
-    private List<User> filterUserList(
-            List<User> users,
-            KeycloakSession session,
-            UserModel requestingUser
-    ) {
-        return users.stream().filter(
-                user ->
-                        isVisible(user, session, requestingUser)).toList();
     }
 
     private boolean isVisible(

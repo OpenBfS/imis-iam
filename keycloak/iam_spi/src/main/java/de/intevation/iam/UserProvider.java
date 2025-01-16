@@ -215,9 +215,8 @@ public class UserProvider implements RealmResourceProvider {
             userList = userList.subList(firstResult, firstResult + maxResults);
         }
 
-        return auth.filterObjectList(
-            new ObjectList<User>(size, userList),
-            headers.getHeaderString(Constants.SHIB_USER_HEADER));
+        return new ObjectList<User>(size, auth.filter(userList,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER)));
     }
 
     /**
