@@ -34,12 +34,13 @@
   justify-content: flex-start;
   position: fixed;
   box-shadow: 0 2px rgba(3, 3, 3, 0.2);
-  bottom: 5px;
-  left: 5px;
-  right: 5px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background-color: white;
   padding: 0 20px;
   padding-left: 5px;
+  padding-bottom: 5px;
   border-top: 4px solid;
   border-color: #5b8445;
 }
