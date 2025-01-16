@@ -244,11 +244,10 @@ public class InstitutionProvider implements RealmResourceProvider {
             query.orderBy(cb.desc(root.get(sortByAttribute)));
         }
 
-        List<Institution> result = auth.filter(em.createQuery(query)
+        List<Institution> result = em.createQuery(query)
             .setFirstResult(firstResult)
             .setMaxResults(maxResults)
-            .getResultList(),
-            headers.getHeaderString(Constants.SHIB_USER_HEADER));
+            .getResultList();
         if (size == 0) {
             size = result.size();
         }
