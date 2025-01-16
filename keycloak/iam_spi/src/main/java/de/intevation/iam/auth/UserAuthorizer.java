@@ -62,12 +62,6 @@ public class UserAuthorizer extends Authorizer<User> {
     ) {
         RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, userId);
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        data.forEach(user -> {
-            user.setReadonly(
-                !authorizeUpdate(
-                    user, session, requestingUser, client));
-        });
 
         return filterUserList(data, session, requestingUser);
     }
@@ -79,12 +73,6 @@ public class UserAuthorizer extends Authorizer<User> {
     ) {
         RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, userId);
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        data.getList().forEach(user -> {
-            user.setReadonly(
-                !authorizeUpdate(
-                    user, session, requestingUser, client));
-        });
         return filterUserList(data, session, requestingUser);
     }
     private ObjectList<User> filterUserList(

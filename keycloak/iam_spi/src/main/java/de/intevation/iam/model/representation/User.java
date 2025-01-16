@@ -50,7 +50,6 @@ public class User {
     @NotBlank
     private String role;
 
-    private Boolean readonly;
     private boolean enabled;
 
     /**
@@ -92,13 +91,6 @@ public class User {
                         inst.getName()));
             }
         }
-    }
-
-    public Boolean getReadonly() {
-        return readonly;
-    }
-    public void setReadonly(Boolean readonly) {
-        this.readonly = readonly;
     }
 
     public boolean isEnabled() {
