@@ -120,6 +120,9 @@ public class UserAuthorizer extends Authorizer<User> {
         UserModel requestingUser,
         ClientModel client
     ) {
+        if (!isVisible(user, session, requestingUser)) {
+            return false;
+        }
         RealmModel realm = session.getContext().getRealm();
         UserModel oldUserModel
             = session.users().getUserById(realm, user.getId());
