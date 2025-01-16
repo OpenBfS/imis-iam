@@ -38,30 +38,13 @@
 </style>
 
 <script setup>
-import { defineAsyncComponent, onMounted } from "vue";
-import { useApplicationStore } from "@/stores/application";
-import { useProfileStore } from "@/stores/profile";
-import { useNotification } from "./lib/use-notification";
+import { onMounted } from "vue";
+import { useApplicationStore } from "@/stores/application.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { useNotification } from "./lib/use-notification.js";
 
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
-
-const ManageUser = defineAsyncComponent(() =>
-  import("@/components/User/ManageUser.vue")
-);
-const ManageInstitution = defineAsyncComponent(() =>
-  import("@/components/Institution/ManageInstitution.vue")
-);
-const ManageEvent = defineAsyncComponent(() =>
-  import("@/components/Calendar/ManageEvent.vue")
-);
-const Appbar = defineAsyncComponent(() => import("@/components/UI/Appbar.vue"));
-const Appfooter = defineAsyncComponent(() =>
-  import("@/components/UI/Appfooter.vue")
-);
-const ExportDialog = defineAsyncComponent(() =>
-  import("@/components/UI/ExportDialog.vue")
-);
 
 const { hasLoadingError } = useNotification();
 

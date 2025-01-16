@@ -4,7 +4,7 @@
  * This file is Free Software under the GNU GPL (v>=3)
  * and comes with ABSOLUTELY NO WARRANTY!
  */
-import { useApplicationStore } from "@/stores/application";
+import { useApplicationStore } from "@/stores/application.js";
 import axios from "axios";
 import qs from "qs";
 

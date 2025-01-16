@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { defineStore } from "pinia";
-import { createSearchQueryString, HTTP } from "../lib/http";
+import { createSearchQueryString, HTTP } from "../lib/http.js";
 
 export const useUserStore = defineStore("user", {
   namespaced: true,

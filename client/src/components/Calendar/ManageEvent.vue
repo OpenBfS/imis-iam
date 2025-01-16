@@ -102,13 +102,13 @@
   ></ConfirmCancelDialog>
 </template>
 <script setup>
-import { HTTP } from "@/lib/http";
+import { HTTP } from "@/lib/http.js";
 import { onBeforeMount, ref } from "vue";
-import { useForm } from "@/lib/use-form";
-import { useNotification } from "@/lib/use-notification";
-import { useApplicationStore } from "@/stores/application";
-import { useEventsStore } from "@/stores/events";
-import { useProfileStore } from "@/stores/profile";
+import { useForm } from "@/lib/use-form.js";
+import { useNotification } from "@/lib/use-notification.js";
+import { useApplicationStore } from "@/stores/application.js";
+import { useEventsStore } from "@/stores/events.js";
+import { useProfileStore } from "@/stores/profile.js";
 import Textarea from "@/components/Form/Textarea.vue";
 import TextField from "@/components/Form/TextField.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";

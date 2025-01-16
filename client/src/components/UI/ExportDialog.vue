@@ -78,11 +78,11 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useApplicationStore } from "@/stores/application";
-import { useUserStore } from "@/stores/user";
-import { useInstitutionStore } from "@/stores/institution";
-import { useNotification } from "@/lib/use-notification";
-import { createSearchQueryString, HTTP, paramsSerializer } from "@/lib/http";
+import { useApplicationStore } from "@/stores/application.js";
+import { useUserStore } from "@/stores/user.js";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useNotification } from "@/lib/use-notification.js";
+import { createSearchQueryString, HTTP, paramsSerializer } from "@/lib/http.js";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();

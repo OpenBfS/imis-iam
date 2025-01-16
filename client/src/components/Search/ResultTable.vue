@@ -18,19 +18,11 @@
 </template>
 
 <script setup>
-import { defineAsyncComponent } from "vue";
-import { useInstitutionStore } from "@/stores/institution";
-import { useUserStore } from "@/stores/user";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useUserStore } from "@/stores/user.js";
 
 const institutionStore = useInstitutionStore();
 const userStore = useUserStore();
-
-const InstitutionTable = defineAsyncComponent(() =>
-  import("@/components/Institution/InstitutionTable.vue")
-);
-const UserTable = defineAsyncComponent(() =>
-  import("@/components/User/UserTable.vue")
-);
 
 const props = defineProps({
   type: {

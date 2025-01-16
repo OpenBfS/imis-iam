@@ -279,15 +279,15 @@ form > div {
 </style>
 <script setup>
 import { computed, onBeforeMount, onMounted, onUnmounted } from "vue";
-import { useNotification } from "@/lib/use-notification";
+import { useNotification } from "@/lib/use-notification.js";
 import { useI18n } from "vue-i18n";
-import { HTTP } from "@/lib/http";
-import { useApplicationStore } from "@/stores/application";
-import { useInstitutionStore } from "@/stores/institution";
-import { useProfileStore } from "@/stores/profile";
-import { useUserStore } from "@/stores/user";
-import { useForm } from "@/lib/use-form";
-import { handleDisplayName, updateUser } from "@/components/User/user";
+import { HTTP } from "@/lib/http.js";
+import { useApplicationStore } from "@/stores/application.js";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { useUserStore } from "@/stores/user.js";
+import { useForm } from "@/lib/use-form.js";
+import { handleDisplayName, updateUser } from "@/components/User/user.js";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";

@@ -7,7 +7,7 @@
 
 import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { useApplicationStore } from "@/stores/application";
+import { useApplicationStore } from "@/stores/application.js";
 
 export function useForm(i18n) {
   const { t } = i18n?.global ?? useI18n();

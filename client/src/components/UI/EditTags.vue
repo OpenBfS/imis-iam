@@ -57,16 +57,16 @@
 
 <script setup>
 import { onBeforeMount, onUpdated, ref, watch } from "vue";
-import { HTTP } from "@/lib/http";
-import { useForm } from "@/lib/use-form";
-import { useNotification } from "@/lib/use-notification";
-import { updateInstitution } from "@/components/Institution/institution";
-import { updateUser } from "@/components/User/user";
-import { useApplicationStore } from "@/stores/application";
-import { useInstitutionStore } from "@/stores/institution";
-import { useProfileStore } from "@/stores/profile";
-import { useUserStore } from "@/stores/user";
-import Select from "@/components/Form/Select";
+import { HTTP } from "@/lib/http.js";
+import { useForm } from "@/lib/use-form.js";
+import { useNotification } from "@/lib/use-notification.js";
+import { updateInstitution } from "@/components/Institution/institution.js";
+import { updateUser } from "@/components/User/user.js";
+import { useApplicationStore } from "@/stores/application.js";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { useUserStore } from "@/stores/user.js";
+import Select from "@/components/Form/Select.vue";
 import { useI18n } from "vue-i18n";
 
 const props = defineProps(["close", "isActive", "type"]);

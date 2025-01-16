@@ -5,8 +5,8 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { defineStore } from "pinia";
-import { useInstitutionStore } from "@/stores/institution";
-import { useUserStore } from "@/stores/user";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useUserStore } from "@/stores/user.js";
 import { nextTick } from "vue";
 
 export const useApplicationStore = defineStore("application", {
@@ -34,13 +34,13 @@ export const useApplicationStore = defineStore("application", {
     showManageInstitutionDialog: false,
     processType: "",
     footerLinks: {
-      contact: process.env.VUE_APP_FOOTER_CONTACT,
-      help: process.env.VUE_APP_FOOTER_HELP,
-      accessibility: process.env.VUE_APP_FOOTER_ACCESSIBILITY,
-      privacy: process.env.VUE_APP_FOOTER_PRIVACY,
-      socialMedia: process.env.VUE_APP_FOOTER_SOCIALMEDIA,
+      contact: import.meta.env.VITE_FOOTER_CONTACT,
+      help: import.meta.env.VITE_FOOTER_HELP,
+      accessibility: import.meta.env.VITE_FOOTER_ACCESSIBILITY,
+      privacy: import.meta.env.VITE_FOOTER_PRIVACY,
+      socialMedia: import.meta.env.VITE_FOOTER_SOCIALMEDIA,
     },
-    reportMail: process.env.VUE_APP_REPORT_MAIL,
+    reportMail: import.meta.env.VITE_REPORT_MAIL,
     ownAccount: false,
     isLoading: false,
   }),

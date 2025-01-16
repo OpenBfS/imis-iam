@@ -149,10 +149,10 @@
 </template>
 
 <script setup>
-import { useApplicationStore } from "@/stores/application";
-import { useInstitutionStore } from "@/stores/institution";
-import { useProfileStore } from "@/stores/profile";
-import { useUserStore } from "@/stores/user";
+import { useApplicationStore } from "@/stores/application.js";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { useUserStore } from "@/stores/user.js";
 import { computed, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";

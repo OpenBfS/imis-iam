@@ -100,21 +100,18 @@
 </template>
 
 <script setup>
-import { computed, ref, defineAsyncComponent, onMounted } from "vue";
-import { useNotification } from "@/lib/use-notification";
-import { useApplicationStore } from "@/stores/application";
-import { useInstitutionStore } from "@/stores/institution";
-import { useUserStore } from "@/stores/user";
-import { useProfileStore } from "@/stores/profile";
-import { getExpInstitution } from "@/components/Institution/institution";
-import { getExpUser } from "@/components/User/user";
+import { computed, ref, onMounted } from "vue";
+import { useNotification } from "@/lib/use-notification.js";
+import { useApplicationStore } from "@/stores/application.js";
+import { useInstitutionStore } from "@/stores/institution.js";
+import { useUserStore } from "@/stores/user.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { getExpInstitution } from "@/components/Institution/institution.js";
+import { getExpUser } from "@/components/User/user.js";
 import EditTags from "@/components/UI/EditTags.vue";
 
 const { hasLoadingError, hasRequestError } = useNotification();
 
-const Results = defineAsyncComponent(() =>
-  import("@/components/Search/Results.vue")
-);
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const userStore = useUserStore();

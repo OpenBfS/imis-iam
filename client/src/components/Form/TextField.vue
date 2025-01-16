@@ -36,8 +36,8 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { useApplicationStore } from "@/stores/application";
-import { useForm } from "@/lib/use-form";
+import { useApplicationStore } from "@/stores/application.js";
+import { useForm } from "@/lib/use-form.js";
 
 const { onUpdateModelValue } = useForm();
 

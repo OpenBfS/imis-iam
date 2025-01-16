@@ -184,12 +184,12 @@
 
 <script setup>
 import { onBeforeMount, onMounted, ref, computed } from "vue";
-import { HTTP } from "@/lib/http";
-import { useApplicationStore } from "@/stores/application";
-import { useMailStore } from "@/stores/mail";
-import { useProfileStore } from "@/stores/profile";
-import { useNotification } from "@/lib/use-notification";
-import { useForm } from "@/lib/use-form";
+import { HTTP } from "@/lib/http.js";
+import { useApplicationStore } from "@/stores/application.js";
+import { useMailStore } from "@/stores/mail.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { useNotification } from "@/lib/use-notification.js";
+import { useForm } from "@/lib/use-form.js";
 import { useI18n } from "vue-i18n";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import Textarea from "@/components/Form/Textarea.vue";

@@ -5,9 +5,9 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import i18n from "@/i18n";
-import { useApplicationStore } from "@/stores/application";
-import { useProfileStore } from "@/stores/profile";
-import { useUserStore } from "@/stores/user";
+import { useApplicationStore } from "@/stores/application.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { useUserStore } from "@/stores/user.js";
 
 const expUser = {
   attributes: {},

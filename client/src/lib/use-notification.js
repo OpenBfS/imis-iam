@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { ref } from "vue";
-import { useApplicationStore } from "@/stores/application";
+import { useApplicationStore } from "@/stores/application.js";
 
 export function useNotification() {
   const hasRequestError = ref(false);

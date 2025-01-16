@@ -56,11 +56,11 @@
 </template>
 
 <script setup>
-import { useApplicationStore } from "@/stores/application";
-import { useProfileStore } from "@/stores/profile";
-import { useUserStore } from "@/stores/user";
+import { useApplicationStore } from "@/stores/application.js";
+import { useProfileStore } from "@/stores/profile.js";
+import { useUserStore } from "@/stores/user.js";
 import { computed, ref, toRaw } from "vue";
-import { getExpUser } from "@/components/User/user";
+import { getExpUser } from "@/components/User/user.js";
 import DataTableServer from "@/components/DataTableServer.vue";
 
 const props = defineProps({
