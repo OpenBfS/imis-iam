@@ -162,7 +162,9 @@ public class UserProvider implements RealmResourceProvider {
 
         long size = 0;
         Stream<UserModel> userModels;
-        if ((firstResult != null || maxResults != null) && customAttributes.isEmpty()) {
+        if ((firstResult != null || maxResults != null)
+            && customAttributes.isEmpty()
+        ) {
             size = session.users()
                 .searchForUserStream(realm, attributes).count();
             userModels = session.users()
@@ -180,8 +182,9 @@ public class UserProvider implements RealmResourceProvider {
         if (!customAttributes.isEmpty()) {
             String institution = customAttributes.get("institutions");
             String role = customAttributes.get("role");
-            userFilter = u -> (institution == null || u.getInstitutions().contains(institution))
-                    && (role == null || u.getRole().equals(role));
+            userFilter = u -> (institution == null
+                || u.getInstitutions().contains(institution))
+                && (role == null || u.getRole().equals(role));
         }
 
         List<User> userList = userModels.map(userEntity -> new User(
@@ -192,16 +195,22 @@ public class UserProvider implements RealmResourceProvider {
         if (size == 0) {
             size = userList.size();
         }
-        if ((firstResult != null || maxResults != null) && !customAttributes.isEmpty()) {
+        if ((firstResult != null || maxResults != null)
+            && !customAttributes.isEmpty()
+        ) {
             if (firstResult == null) {
                 firstResult = 0;
             } else {
-                firstResult = firstResult > userList.size() ? userList.size() : firstResult;
+                firstResult = firstResult > userList.size()
+                    ? userList.size()
+                    : firstResult;
             }
             if (maxResults == null) {
                 maxResults = userList.size();
             } else {
-                maxResults = maxResults > userList.size() ? userList.size() : maxResults;
+                maxResults = maxResults > userList.size()
+                    ? userList.size()
+                    : maxResults;
             }
             userList = userList.subList(firstResult, firstResult + maxResults);
         }
