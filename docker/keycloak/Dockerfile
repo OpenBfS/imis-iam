@@ -3,22 +3,23 @@ FROM ubuntu:24.04
 LABEL maintainer=awoestmann@intevation.de
 
 RUN apt-get update && apt-get install -y \
-            openjdk-21-jre-headless maven jq curl \
+            libxml2-utils openjdk-21-jre-headless maven jq curl \
             postgresql-client wait-for-it
 
-ENV KEYCLOAK_VERSION=26.0.8
 ENV KEYCLOAK_HOME=/opt/keycloak
 
-RUN curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
+ENV SPI_SRC=/opt/iam_spi
+WORKDIR ${SPI_SRC}
+ADD keycloak/iam_spi/pom.xml ${SPI_SRC}/
+
+RUN KEYCLOAK_VERSION=$(xmllint --xpath "//*[local-name()='keycloak.version']/text()" $SPI_SRC/pom.xml); \
+    curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
     | tar zx && mv keycloak-${KEYCLOAK_VERSION} ${KEYCLOAK_HOME}
 
 ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
 
 # Deploy SPI
-ENV SPI_SRC=/opt/iam_spi
-WORKDIR ${SPI_SRC}
 # Download dependencies before adding sources to leverage build cache
-ADD keycloak/iam_spi/pom.xml ${SPI_SRC}/
 RUN mvn -q dependency:go-offline
 ADD keycloak/iam_spi ${SPI_SRC}
 RUN mvn -q package
