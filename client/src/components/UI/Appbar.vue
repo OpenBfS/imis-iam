@@ -6,7 +6,7 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-app-bar dark id="theme" app clipped-left>
+  <v-app-bar dark id="theme" app clipped-left class="position-static p-0 m-0">
     <v-toolbar-title
       style="cursor: pointer"
       @click="$route.path == '/' ? '' : $router.push('/')"

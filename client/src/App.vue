@@ -7,27 +7,34 @@
  -->
 <template>
   <v-app>
-    <Appbar />
-    <v-main>
-      <router-view />
-      <UIAlert
-        v-if="hasLoadingError"
-        v-bind:message="applicationStore.httpErrorMessage"
-      />
-      <v-dialog v-model="applicationStore.showExportDialog">
-        <ExportDialog />
-      </v-dialog>
-      <v-dialog v-model="applicationStore.showManageUserDialog">
-        <ManageUser />
-      </v-dialog>
-      <v-dialog v-model="applicationStore.showManageInstitutionDialog">
-        <ManageInstitution />
-      </v-dialog>
-      <v-dialog v-model="applicationStore.showManageEventDialog">
-        <ManageEvent />
-      </v-dialog>
-    </v-main>
-    <Appfooter />
+    <div
+      class="d-flex flex-column flex-grow-1 h-100 overflow-y-hidden"
+      style="max-height: 100vh"
+    >
+      <Appbar />
+      <v-container class="h-100 pb-10 overflow-y-hidden flex-grow-1">
+        <v-main class="d-flex flex-column pt-0 h-100 overflow-y-hidden">
+          <router-view />
+          <UIAlert
+            v-if="hasLoadingError"
+            v-bind:message="applicationStore.httpErrorMessage"
+          />
+          <v-dialog v-model="applicationStore.showExportDialog">
+            <ExportDialog />
+          </v-dialog>
+          <v-dialog v-model="applicationStore.showManageUserDialog">
+            <ManageUser />
+          </v-dialog>
+          <v-dialog v-model="applicationStore.showManageInstitutionDialog">
+            <ManageInstitution />
+          </v-dialog>
+          <v-dialog v-model="applicationStore.showManageEventDialog">
+            <ManageEvent />
+          </v-dialog>
+        </v-main>
+      </v-container>
+      <Appfooter />
+    </div>
   </v-app>
 </template>
 

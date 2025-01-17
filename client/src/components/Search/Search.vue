@@ -84,14 +84,14 @@
         <span>{{ $t("user.export") }}</span>
       </v-tooltip>
     </v-row>
-    <v-row>
-      <Results @onSelectedTab="onSelectedTab" class="v-col v-col-11" />
-    </v-row>
-    <UIAlert
-      v-if="hasLoadingError || hasRequestError"
-      v-bind:message="applicationStore.httpErrorMessage"
-    />
   </v-container>
+  <div class="d-flex justify-center" style="min-height: 0">
+    <Results @onSelectedTab="onSelectedTab" class="v-col v-col-11" />
+  </div>
+  <UIAlert
+    v-if="hasLoadingError || hasRequestError"
+    v-bind:message="applicationStore.httpErrorMessage"
+  />
   <EditTags
     :close="() => toggleEditTags()"
     :isActive="showEditTags"

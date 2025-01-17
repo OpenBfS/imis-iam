@@ -6,33 +6,36 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-card flat>
-    <v-tabs
-      density="compact"
-      v-model="tab"
-      grow
-      @update:modelValue="emit('onSelectedTab', $event)"
-    >
-      <v-tab value="users"
-        >{{ $t("main.users") }} ({{ userStore.foundUsers.length }})</v-tab
+  <v-container
+    class="mx-0 px-0 h-100 overflow-y-hidden flex-grow-1 d-flex flex-column"
+  >
+    <!-- div is necessary because of the parent flexbox so the line indicating the active tab is always visible -->
+    <div>
+      <v-tabs
+        density="compact"
+        v-model="tab"
+        grow
+        @update:modelValue="emit('onSelectedTab', $event)"
       >
-      <v-tab value="institutions"
-        >{{ $t("institutions") }} ({{
-          institutionStore.foundInstitutions.length
-        }})</v-tab
-      >
-    </v-tabs>
-    <v-card-text>
-      <v-window v-model="tab">
-        <v-window-item value="users">
-          <ResultTable v-bind:type="'users'" />
-        </v-window-item>
-        <v-window-item value="institutions">
-          <ResultTable v-bind:type="'institutions'" />
-        </v-window-item>
-      </v-window>
-    </v-card-text>
-  </v-card>
+        <v-tab value="users"
+          >{{ $t("main.users") }} ({{ userStore.foundUsers.length }})</v-tab
+        >
+        <v-tab value="institutions"
+          >{{ $t("institutions") }} ({{
+            institutionStore.foundInstitutions.length
+          }})</v-tab
+        >
+      </v-tabs>
+    </div>
+    <v-window v-model="tab" class="h-100 flex-grow-1 overflow-y-hidden" style="min-height: 0">
+      <v-window-item value="users" style="min-height: 0">
+        <ResultTable v-bind:type="'users'" />
+      </v-window-item>
+      <v-window-item value="institutions" style="min-height: 0">
+        <ResultTable v-bind:type="'institutions'" />
+      </v-window-item>
+    </v-window>
+  </v-container>
 </template>
 
 <script setup>

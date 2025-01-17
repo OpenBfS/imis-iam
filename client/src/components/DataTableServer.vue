@@ -40,7 +40,9 @@
         ? userStore.foundUsers
         : institutionStore.foundInstitutions
     "
-    class="ma-2 pa-2"
+    class="mt-4"
+    style="min-height: 0; max-height: 100%"
+    fixed-header
     :headers="allHeaders"
     :items="props.items"
     :items-length="totalNumberOfItems"
