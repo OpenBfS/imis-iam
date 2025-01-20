@@ -21,7 +21,7 @@ export const useProfileStore = defineStore("profile", {
     },
     getAttribute: (state) => {
       return (name) => {
-        return state.attributes.find((attribute) => attribute.name === name);
+        return state.attributes?.find((attribute) => attribute.name === name);
       };
     },
     isAttributeSelection: (state) => {

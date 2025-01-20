@@ -405,10 +405,10 @@ const getUserAttributeRules = (userAttribute) => {
             length.min,
           ]);
         } else {
-          message = t("error.invalid_length_too_long", [
-            displayName,
-            length.max,
-          ]);
+          message = t("error.invalid_length_too_long", {
+            attribute: displayName,
+            max: length.max,
+          });
         }
         tmpRules.push(...validLength(length.min, length.max, message));
       }

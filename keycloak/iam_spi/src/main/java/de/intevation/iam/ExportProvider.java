@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.ResourceBundle;
 
 import jakarta.ws.rs.GET;
@@ -38,49 +39,6 @@ public class ExportProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
 
-    private enum CsvOptions {
-        comma(","), period("."), semicolon(";"), space(" "),
-        singlequote("'"), doublequote("\""),
-        linux("\n"), windows("\r\n");
-
-        private final String value;
-
-        CsvOptions(String v) {
-            this.value = v;
-        }
-
-        public char getChar() {
-            return this.value.charAt(0);
-        }
-    }
-
-    private Boolean isAccepted(String name, CsvOptions[] options) {
-        for (CsvOptions opt : options) {
-            if (opt.equals(CsvOptions.valueOf(name))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Boolean isValidFieldSeperator(String fieldSeparator) {
-        CsvOptions[] fieldSperators = {CsvOptions.comma,
-                CsvOptions.period, CsvOptions.semicolon, CsvOptions.space };
-        return isAccepted(fieldSeparator, fieldSperators);
-    }
-
-    private Boolean isValidQuoteType(String quoteType) {
-        CsvOptions[] quoteTypes = {CsvOptions.singlequote,
-                CsvOptions.doublequote };
-        return isAccepted(quoteType, quoteTypes);
-    }
-
-    private Boolean isValidRowDelimiter(String rowDelimiter) {
-        CsvOptions[] rowFelimiters = {CsvOptions.windows,
-                CsvOptions.linux };
-        return isAccepted(rowDelimiter, rowFelimiters);
-    }
-
     /**
      * Constructor.
      *
@@ -99,11 +57,13 @@ public class ExportProvider implements RealmResourceProvider {
      * @param encoding Encoding to use
      * @param search Optional search parameter (ignored if IDs are given)
      * @param ids Multiple user-IDs can be given to export specific users
+     * @param attributes Attributes that are exported, if empty all attributes are exported
      * @param headers Request headers
      * @return Resulting csv data
      */
     @GET
     @Path("/user")
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response exportUsers(
             @QueryParam("fieldSeparator") String fieldSeparator,
             @QueryParam("quoteType") String quoteType,
@@ -111,6 +71,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("encoding") String encoding,
             @QueryParam("search") String search,
             @QueryParam("id") List<String> ids,
+            @QueryParam("attributes") Set<String> attributes,
             @Context HttpHeaders headers
     ) {
         CSVExporter<User> exporter = new CSVExporter<>();
@@ -134,7 +95,7 @@ public class ExportProvider implements RealmResourceProvider {
             users = userProvider.getUsers(headers, search, null, null)
                 .getList();
         }
-        return doExport(exporter, users, i18n);
+        return doExport(exporter, users, attributes, i18n);
     }
 
     /**
@@ -146,11 +107,13 @@ public class ExportProvider implements RealmResourceProvider {
      * @param encoding Encoding to use
      * @param search Optional search parameter (ignored if IDs are given)
      * @param ids Multiple institution-IDs can be given to export specific institutions
+     * @param attributes Attributes that are exported, if empty all attributes are exported
      * @param headers Request headers
      * @return Institutions as CSV
      */
     @GET
     @Path("/institution")
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Response exportInstitutions(
             @QueryParam("fieldSeparator") String fieldSeparator,
             @QueryParam("quoteType") String quoteType,
@@ -158,6 +121,7 @@ public class ExportProvider implements RealmResourceProvider {
             @QueryParam("encoding") String encoding,
             @QueryParam("search") String search,
             @QueryParam("id") List<Integer> ids,
+            @QueryParam("attributes") Set<String> attributes,
             @Context HttpHeaders headers
     ) {
         CSVExporter<Institution> exporter = new CSVExporter<>();
@@ -181,7 +145,7 @@ public class ExportProvider implements RealmResourceProvider {
             institutions = instProvider.getInstitutions(headers, search, null, null, null, null)
                 .getList();
         }
-        return doExport(exporter, institutions, i18n);
+        return doExport(exporter, institutions, attributes, i18n);
     }
 
     private <T> void setCsvOptions(
@@ -191,27 +155,28 @@ public class ExportProvider implements RealmResourceProvider {
         String rowDelimiter,
         String encoding
     ) {
-        if (fieldSeparator == null || !isValidFieldSeperator(fieldSeparator)
-            || quoteType == null || !isValidQuoteType(quoteType)
-            || rowDelimiter == null || !isValidRowDelimiter(rowDelimiter)
+        if (fieldSeparator == null || !(fieldSeparator.length() == 1)
+            || quoteType == null || !(quoteType.length() == 1)
+            || rowDelimiter == null || rowDelimiter.isEmpty()
         ) {
             throw new IllegalArgumentException();
         }
         exporter.setFieldSeparator(
-            CsvOptions.valueOf(fieldSeparator).getChar());
-        exporter.setQuoteType(CsvOptions.valueOf(quoteType).getChar());
-        exporter.setRowDelimiter(CsvOptions.valueOf(rowDelimiter).getChar());
+            fieldSeparator.charAt(0));
+        exporter.setQuoteType(quoteType.charAt(0));
+        exporter.setRowDelimiter(rowDelimiter);
         exporter.setEncoding(Charset.forName(encoding));
     }
 
     private <T> Response doExport(
         CSVExporter<T> exporter,
         List<T> objects,
+        Set<String> attributes,
         ResourceBundle i18n
     ) {
         InputStream result;
         try {
-            result = exporter.export(objects);
+            result = exporter.export(objects, attributes);
         } catch (IllegalAccessException | InvocationTargetException
                 | IOException | IntrospectionException e) {
             e.printStackTrace();

@@ -22,6 +22,11 @@
           <v-list-item>
             <v-checkbox
               v-for="item in headers"
+              @update:modelValue="
+                () => {
+                  updateSelectedColumns();
+                }
+              "
               v-model="item.visible"
               v-bind:key="item.key"
               density="compact"
@@ -155,7 +160,7 @@ import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
-import { computed, onMounted, ref, toRaw, watch } from "vue";
+import { computed, nextTick, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
@@ -284,8 +289,26 @@ const camelCaseToUnderscore = (text) => {
   return text.replace(/([A-Z])/g, "_$1").toLowerCase();
 };
 
+const updateSelectedColumns = async () => {
+  await nextTick();
+  if (props.type === "users") {
+    userStore.selectedTableColumns = headers.value
+      .filter((header) => header.visible === true)
+      .map((header) => {
+        return header.key;
+      });
+  } else {
+    institutionStore.selectedTableColumns = headers.value
+      .filter((header) => header.visible === true)
+      .map((header) => {
+        return header.key;
+      });
+  }
+};
+
 onMounted(() => {
   adjustHeaders();
   getInstitutionTags();
+  updateSelectedColumns();
 });
 </script>
