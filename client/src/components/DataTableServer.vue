@@ -22,6 +22,11 @@
           <v-list-item>
             <v-checkbox
               v-for="item in headers"
+              @update:modelValue="
+                () => {
+                  updateSelectedColumns();
+                }
+              "
               v-model="item.visible"
               v-bind:key="item.key"
               density="compact"
@@ -40,7 +45,9 @@
         ? userStore.foundUsers
         : institutionStore.foundInstitutions
     "
-    class="ma-2 pa-2"
+    class="mt-4"
+    style="min-height: 0; max-height: 100%"
+    fixed-header
     :headers="allHeaders"
     :items="props.items"
     :items-length="totalNumberOfItems"
@@ -63,8 +70,16 @@
 
     <template v-slot:thead>
       <tr>
-        <td></td>
-        <td class="pe-2" v-for="header in allHeaders" :key="header">
+        <td
+          class="pe-2 position-sticky"
+          style="top: 42pt; z-index: 3; background-color: white"
+        ></td>
+        <td
+          class="pe-2 position-sticky"
+          style="top: 42pt; z-index: 3; background-color: white"
+          v-for="header in allHeaders"
+          :key="header"
+        >
           <template v-if="header.key === 'active' || header.key === 'enabled'">
             <Filter
               :filterKey="header.key"
@@ -153,7 +168,7 @@ import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
-import { computed, onMounted, ref, toRaw, watch } from "vue";
+import { computed, nextTick, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
@@ -282,8 +297,26 @@ const camelCaseToUnderscore = (text) => {
   return text.replace(/([A-Z])/g, "_$1").toLowerCase();
 };
 
+const updateSelectedColumns = async () => {
+  await nextTick();
+  if (props.type === "users") {
+    userStore.selectedTableColumns = headers.value
+      .filter((header) => header.visible === true)
+      .map((header) => {
+        return header.key;
+      });
+  } else {
+    institutionStore.selectedTableColumns = headers.value
+      .filter((header) => header.visible === true)
+      .map((header) => {
+        return header.key;
+      });
+  }
+};
+
 onMounted(() => {
   adjustHeaders();
   getInstitutionTags();
+  updateSelectedColumns();
 });
 </script>

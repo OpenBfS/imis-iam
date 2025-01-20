@@ -22,6 +22,7 @@ export const useInstitutionStore = defineStore("institution", {
     },
     foundInstitutions: [],
     selectedInstitutions: [],
+    selectedTableColumns: [],
     offset: 0,
     itemsPerPage: 25,
     filterBy: {},

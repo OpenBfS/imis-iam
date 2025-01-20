@@ -60,7 +60,8 @@ export default {
     invalid_blank: "Bitte geben Sie einen Wert für '{0}' an.",
     number_out_of_range: "'{0}' muss eine Zahl zwischen {1} und {2} sein.",
     invalid_email: "Ungültige E-Mail.",
-    invalid_length_too_long: "'{0}' darf maximal eine Länge von {max} haben.",
+    invalid_length_too_long:
+      "'{attribute}' darf maximal eine Länge von {max} haben.",
     invalid_value: "'{0}' hat einen ungültigen Wert.",
     invalid_number: "'{0}' ist eine ungültige Zahl.",
     invalid_uri_scheme: "'{0}' ist ein ungültiges URL-Schema.",
@@ -82,6 +83,12 @@ export default {
     valid_date: "Datum muss gültig sein",
     all_or_nothing: "{0} und {1} oder keines angeben",
     only_unique_values: "Bitte geben Sie keine doppelten Werte ein.",
+  },
+  export: {
+    required_field_encoding: "Encoding ist erforderlich",
+    required_field_seperator: "Feldtrenner ist erforderlich",
+    required_row_delimiter: "Zeilenende ist erforderlich",
+    required_quote_type: "Textbegrenzung ist erforderlich",
   },
   hints: {
     date_format: "Format: dd.mm.jjjj",
