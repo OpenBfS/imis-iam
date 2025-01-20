@@ -6,19 +6,32 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-row class="px-2" align-content="end">
-    <v-spacer></v-spacer>
+  <div class="d-flex justify-end overflow-visible pe-4" align-content="end">
     <v-menu
       v-model="areTableSettingsOpen"
       :close-on-content-click="false"
       location="end"
     >
       <template v-slot:activator="{ props }">
-        <v-btn icon="mdi-cog" v-bind="props"></v-btn>
+        <v-badge
+          v-if="areFiltersForHiddenColumnsAvailable"
+          color="accent"
+          style="z-index: 10"
+        >
+          <template v-slot:badge>
+            <div>
+              <v-icon icon="mdi-filter"></v-icon>
+            </div>
+          </template>
+          <v-btn icon="mdi-cog" v-bind="props"></v-btn>
+        </v-badge>
+        <v-btn v-else icon="mdi-cog" v-bind="props"></v-btn>
       </template>
       <v-card min-width="380">
         <v-list>
-          <v-list-item title="Spalten"></v-list-item>
+          <v-list-item
+            :title="`${$t('label.columns')} (${$t('label.filters')})`"
+          ></v-list-item>
           <v-list-item>
             <v-checkbox
               v-for="item in headers"
@@ -30,7 +43,7 @@
               v-model="item.visible"
               v-bind:key="item.key"
               density="compact"
-              :label="item.title"
+              :label="`${item.title} ${getColumnCheckboxLabel(item.key)}`"
               hide-details
             >
             </v-checkbox>
@@ -38,7 +51,7 @@
         </v-list>
       </v-card>
     </v-menu>
-  </v-row>
+  </div>
   <v-data-table-server
     :model-value="
       props.type === 'users'
@@ -198,6 +211,17 @@ const roles = computed(() => {
     return { title: t(role.description), value: role.name };
   });
 });
+const getFilters = () => {
+  return props.type === "users"
+    ? userStore.filterBy
+    : institutionStore.filterBy;
+};
+const areFiltersForHiddenColumnsAvailable = computed(() => {
+  const filters = Object.keys(getFilters());
+  return headers.value.some(
+    (header) => header.visible === false && filters.includes(header.key)
+  );
+});
 const selected = ref([]);
 const institutionTags = ref([]);
 const getInstitutionTags = () => {
@@ -208,6 +232,19 @@ const getInstitutionTags = () => {
     .catch(() => {
       hasLoadingError.value = true;
     });
+};
+
+const getFilterValue = (key) => {
+  return getFilters()?.[key];
+};
+
+const getColumnCheckboxLabel = (key) => {
+  const value = getFilterValue(key);
+  if (value === undefined) {
+    return "";
+  } else {
+    return `(${value})`;
+  }
 };
 
 const props = defineProps([

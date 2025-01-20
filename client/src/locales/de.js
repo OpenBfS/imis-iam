@@ -254,6 +254,8 @@ export default {
     description: "Beschreibung",
     items_per_page: "Einträge pro Seite",
     of: "von",
+    columns: "Spalten",
+    filters: "Filter",
   },
   // Emails
   emails: {
