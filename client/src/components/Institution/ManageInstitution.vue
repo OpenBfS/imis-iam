@@ -186,24 +186,45 @@
               ></TextField>
             </div>
             <v-row>
+              <v-label>{{
+                $t("institution.operation_mode_change_contact")
+              }}</v-label>
+            </v-row>
+            <v-row>
               <v-col>
                 <ChipTextField
-                  :label="$t('institution.central_alarm_phone_numbers')"
+                  :label="$t('institution.operation_mode_change_phone_numbers')"
                   :rules="validPhone($t('error.valid_phone'))"
                   @update:modelValue="
-                    institution.centralAlarmPhoneNumbers = $event
+                    institution.operationModeChangePhoneNumbers = $event
                   "
-                  :attribute="'centralAlarmPhoneNumbers'"
+                  :attribute="'operationModeChangePhoneNumbers'"
                 ></ChipTextField>
               </v-col>
               <v-col>
                 <ChipTextField
-                  :label="$t('institution.central_alarm_mail_addresses')"
+                  :label="
+                    $t('institution.operation_mode_change_sms_phone_numbers')
+                  "
+                  :rules="validPhone($t('error.valid_phone'))"
+                  @update:modelValue="
+                    institution.operationModeChangeSmsPhoneNumbers = $event
+                  "
+                  :attribute="'operationModeChangeSmsPhoneNumbers'"
+                ></ChipTextField>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="6">
+                <ChipTextField
+                  :label="
+                    $t('institution.operation_mode_change_mail_addresses')
+                  "
                   :rules="validMail($t('error.valid_email'))"
                   @update:modelValue="
-                    institution.centralAlarmMailAddresses = $event
+                    institution.operationModeChangeMailAddresses = $event
                   "
-                  :attribute="'centralAlarmMailAddresses'"
+                  :attribute="'operationModeChangeMailAddresses'"
                 ></ChipTextField>
               </v-col>
             </v-row>

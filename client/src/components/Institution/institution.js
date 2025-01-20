@@ -24,12 +24,16 @@ const addressPlace = {
 };
 const imis = { measFacilId: null };
 const central = { centralMail: null, centralPhone: null, centralFax: null };
-const alarm = { centralAlarmMailAddresses: [], centralAlarmPhoneNumbers: [] };
+const operationModeChange = {
+  operationModeChangeMailAddresses: [],
+  operationModeChangePhoneNumbers: [],
+  operationModeChangeSmsPhoneNumbers: [],
+};
 const expInstitution = {
   name: "",
   measFacilName: "",
   ...central,
-  ...alarm,
+  ...operationModeChange,
   ...imis,
   ...serviceBuildingPlace,
   ...addressPlace,

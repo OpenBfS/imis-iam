@@ -232,4 +232,19 @@
                 ALTER COLUMN active SET NOT NULL;
         </sql>
     </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.15">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            CREATE TABLE iam_institution_operation_mode_change_sms_phone_numbers (
+                institution_id INTEGER REFERENCES iam_institution,
+                phone VARCHAR,
+                PRIMARY KEY(institution_id, phone)
+            );
+            ALTER TABLE iam_institution_central_alarm_mail_addresses
+                RENAME TO iam_institution_operation_mode_change_mail_addresses;
+            ALTER TABLE iam_institution_central_alarm_phone_numbers
+                RENAME TO iam_institution_operation_mode_change_phone_numbers;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
