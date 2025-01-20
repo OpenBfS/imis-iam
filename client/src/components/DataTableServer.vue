@@ -70,8 +70,16 @@
 
     <template v-slot:thead>
       <tr>
-        <td></td>
-        <td class="pe-2" v-for="header in allHeaders" :key="header">
+        <td
+          class="pe-2 position-sticky"
+          style="top: 42pt; z-index: 3; background-color: white"
+        ></td>
+        <td
+          class="pe-2 position-sticky"
+          style="top: 42pt; z-index: 3; background-color: white"
+          v-for="header in allHeaders"
+          :key="header"
+        >
           <template v-if="header.key === 'active' || header.key === 'enabled'">
             <Filter
               :filterKey="header.key"
