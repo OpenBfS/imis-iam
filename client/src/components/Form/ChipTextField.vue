@@ -25,10 +25,10 @@
       applicationStore.clientAndServerRules[props.attribute]
         ? [
             ...applicationStore.clientAndServerRules[props.attribute],
-            ...props.rules,
+            ...(props.rules ?? []),
             ...rules,
           ]
-        : [...props.rules, ...rules]
+        : [...(props.rules ?? []), ...rules]
     "
     :variant="props.variant ?? 'underlined'"
   >
@@ -186,7 +186,7 @@ const addEntry = () => {
     return;
   }
   let isValid = true;
-  props.rules.forEach((rule) => {
+  props.rules?.forEach((rule) => {
     const result = rule(input.value);
     if (typeof result !== "boolean" || !result) isValid = false;
   });
