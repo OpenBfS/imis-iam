@@ -4,8 +4,7 @@ services:
       context: ./mailhog
     image: "iam_mailhog"
     ports:
-      - 48082:8025
-      - 41025:1025
+      - ${MAILHOG_PORT}:8025
   ldap:
     build:
       context: ./ldap
