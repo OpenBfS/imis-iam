@@ -11,7 +11,7 @@ export PGPASSWORD=secret
 wait_for_db () {
     wait=10
     waited=0
-    until psql -h iam_db -U keycloak -wl > /dev/null; do
+    until psql -h db -U keycloak -wl > /dev/null; do
         sleep 1
         waited=$(($waited + 1))
         if [ $waited -gt $wait ]; then
@@ -143,7 +143,7 @@ curl -sX POST "${KEYCLOAK_URL}/admin/realms/$IMIS_REALM/users/$chiefEditorUserId
         -d "$chiefEditorRole"
 
 # Add example data
-psql -h iam_db -U keycloak -d keycloak -a -f ${DIR}/add_example_data.sql -w
+psql -h db -U keycloak -d keycloak -a -f ${DIR}/add_example_data.sql -w
 
 echo "... done"
 

@@ -1,6 +1,5 @@
 services:
   mailhog:
-    container_name: "iam_mailhog"
     build:
       context: ./mailhog
     image: "iam_mailhog"
@@ -8,19 +7,16 @@ services:
       - 48082:8025
       - 41025:1025
   ldap:
-    container_name: "iam-ldap"
     build:
       context: ./ldap
     image: "iam_ldap"
   db:
-    container_name: "iam_db"
     build:
       context: ./db
     image: "iam_db"
     ports:
       - 2345:5432
   keycloak:
-    container_name: "iam-keycloak"
     build:
       context: ../
       dockerfile: ./docker/keycloak/Dockerfile

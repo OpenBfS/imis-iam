@@ -607,7 +607,7 @@
     "starttls": "",
     "auth": "",
     "port": "1025",
-    "host": "iam_mailhog",
+    "host": "mailhog",
     "from": "iam-keycloak@example.test",
     "ssl": ""
   },
