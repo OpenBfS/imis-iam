@@ -255,14 +255,15 @@ public class UserProvider implements RealmResourceProvider {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public User createUser(@Context HttpHeaders headers, final User rep) {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
+            throw new ForbiddenException();
+        }
+
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
         if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
             throw new BadRequestException();
-        }
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
-        if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
-            throw new ForbiddenException();
         }
 
         RealmModel realm = session.getContext().getRealm();
@@ -332,12 +333,14 @@ public class UserProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final User rep
     ) {
-        List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0), entityManager);
         String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
             throw new ForbiddenException();
         }
+
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(rep, languages.get(0), entityManager);
+
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();

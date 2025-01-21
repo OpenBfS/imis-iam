@@ -337,12 +337,13 @@ public class InstitutionProvider implements RealmResourceProvider {
     public Response createInstitution(final Institution rep,
             @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
-        List<Locale> languages = headers.getAcceptableLanguages();
-        validator.validate(rep, languages.get(0), entityManager);
         String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
+
+        List<Locale> languages = headers.getAcceptableLanguages();
+        validator.validate(rep, languages.get(0), entityManager);
 
         RealmModel realm = session.getContext().getRealm();
         EntityManager em = session.getProvider(
@@ -408,17 +409,19 @@ public class InstitutionProvider implements RealmResourceProvider {
     public Response updateInstitution(
             final Institution rep, @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
+        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
+
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         if (rep == null || rep.getId() == null
                || em.find(Institution.class, rep.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
-        }
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
-        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
-            return Response.status(Status.UNAUTHORIZED).build();
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, id);
