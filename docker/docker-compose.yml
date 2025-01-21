@@ -14,7 +14,7 @@ services:
       context: ./db
     image: "iam_db"
     ports:
-      - 2345:5432
+      - ${DB_PORT}:5432
   keycloak:
     build:
       context: ../
