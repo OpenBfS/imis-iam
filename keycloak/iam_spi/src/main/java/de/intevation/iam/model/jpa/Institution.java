@@ -103,19 +103,27 @@ public class Institution {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-        name = "iam_institution_central_alarm_phone_numbers",
+        name = "iam_institution_operation_mode_change_phone_numbers",
         joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
     @UniqueElements
-    private List<String> centralAlarmPhoneNumbers;
+    private List<String> operationModeChangePhoneNumbers;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-        name = "iam_institution_central_alarm_mail_addresses",
+        name = "iam_institution_operation_mode_change_sms_phone_numbers",
+        joinColumns = @JoinColumn(name = "institution_id"))
+    @Column(name = "phone")
+    @UniqueElements
+    private List<String> operationModeChangeSmsPhoneNumbers;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "iam_institution_operation_mode_change_mail_addresses",
         joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "mail")
     @UniqueElements
-    private List<@Email String> centralAlarmMailAddresses;
+    private List<@Email String> operationModeChangeMailAddresses;
 
     @Size(min = 5, max = 7)
     @Column(name = "meas_facil_id")
@@ -263,20 +271,28 @@ public class Institution {
         this.centralMail = centralMail;
     }
 
-    public void setCentralAlarmPhoneNumbers(List<String> centralAlarmPhoneNumbers) {
-        this.centralAlarmPhoneNumbers = centralAlarmPhoneNumbers;
+    public void setOperationModeChangePhoneNumbers(List<String> operationModeChangePhoneNumbers) {
+        this.operationModeChangePhoneNumbers = operationModeChangePhoneNumbers;
     }
 
-    public void setCentralAlarmMailAddresses(List<String> centralAlarmMailAddresses) {
-        this.centralAlarmMailAddresses = centralAlarmMailAddresses;
+    public void setOperationModeChangeSmsPhoneNumbers(List<String> operationModeChangeSmsPhoneNumbers) {
+        this.operationModeChangeSmsPhoneNumbers = operationModeChangeSmsPhoneNumbers;
     }
 
-    public List<String> getCentralAlarmPhoneNumbers() {
-        return centralAlarmPhoneNumbers;
+    public void setOperationModeChangeMailAddresses(List<String> operationModeChangeMailAddresses) {
+        this.operationModeChangeMailAddresses = operationModeChangeMailAddresses;
     }
 
-    public List<String> getCentralAlarmMailAddresses() {
-        return centralAlarmMailAddresses;
+    public List<String> getOperationModeChangePhoneNumbers() {
+        return operationModeChangePhoneNumbers;
+    }
+
+    public List<String> getOperationModeChangeSmsPhoneNumbers() {
+        return operationModeChangeSmsPhoneNumbers;
+    }
+
+    public List<String> getOperationModeChangeMailAddresses() {
+        return operationModeChangeMailAddresses;
     }
 
     public String getMeasFacilId() {

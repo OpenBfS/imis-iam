@@ -67,7 +67,7 @@
         <MetadataProvider
             type="XML"
             validate="true"
-            url="http://iam-keycloak:8080/realms/imis3/protocol/saml/descriptor"
+            url="http://keycloak:8080/realms/imis3/protocol/saml/descriptor"
             maxRefreshDelay="7200"
             minRefreshDelay="1"
             />

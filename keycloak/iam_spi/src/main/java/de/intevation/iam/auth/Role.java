@@ -32,7 +32,8 @@ public enum Role {
      * @return true if user has this role, else false.
      */
     public boolean isRoleOf(UserModel user, KeycloakSession session) {
-        return user.hasRole(session.getContext().getRealm().getClientByClientId(
+        return user != null
+            && user.hasRole(session.getContext().getRealm().getClientByClientId(
                 Constants.IAM_CLIENT_ID).getRole(this.toString()));
     }
 }

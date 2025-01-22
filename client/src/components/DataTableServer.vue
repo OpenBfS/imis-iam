@@ -6,26 +6,44 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-row class="px-2" align-content="end">
-    <v-spacer></v-spacer>
+  <div class="d-flex justify-end overflow-visible pe-4" align-content="end">
     <v-menu
       v-model="areTableSettingsOpen"
       :close-on-content-click="false"
       location="end"
     >
       <template v-slot:activator="{ props }">
-        <v-btn icon="mdi-cog" v-bind="props"></v-btn>
+        <v-badge
+          v-if="areFiltersForHiddenColumnsAvailable"
+          color="accent"
+          style="z-index: 10"
+        >
+          <template v-slot:badge>
+            <div>
+              <v-icon icon="mdi-filter"></v-icon>
+            </div>
+          </template>
+          <v-btn icon="mdi-cog" v-bind="props"></v-btn>
+        </v-badge>
+        <v-btn v-else icon="mdi-cog" v-bind="props"></v-btn>
       </template>
       <v-card min-width="380">
         <v-list>
-          <v-list-item title="Spalten"></v-list-item>
+          <v-list-item
+            :title="`${$t('label.columns')} (${$t('label.filters')})`"
+          ></v-list-item>
           <v-list-item>
             <v-checkbox
               v-for="item in headers"
+              @update:modelValue="
+                () => {
+                  updateSelectedColumns();
+                }
+              "
               v-model="item.visible"
               v-bind:key="item.key"
               density="compact"
-              :label="item.title"
+              :label="`${item.title} ${getColumnCheckboxLabel(item.key)}`"
               hide-details
             >
             </v-checkbox>
@@ -33,14 +51,16 @@
         </v-list>
       </v-card>
     </v-menu>
-  </v-row>
+  </div>
   <v-data-table-server
     :model-value="
       props.type === 'users'
         ? userStore.foundUsers
         : institutionStore.foundInstitutions
     "
-    class="ma-2 pa-2"
+    class="mt-4"
+    style="min-height: 0; max-height: 100%"
+    fixed-header
     :headers="allHeaders"
     :items="props.items"
     :items-length="totalNumberOfItems"
@@ -63,8 +83,16 @@
 
     <template v-slot:thead>
       <tr>
-        <td></td>
-        <td class="pe-2" v-for="header in allHeaders" :key="header">
+        <td
+          class="pe-2 position-sticky"
+          style="top: 42pt; z-index: 3; background-color: white"
+        ></td>
+        <td
+          class="pe-2 position-sticky"
+          style="top: 42pt; z-index: 3; background-color: white"
+          v-for="header in allHeaders"
+          :key="header"
+        >
           <template v-if="header.key === 'active' || header.key === 'enabled'">
             <Filter
               :filterKey="header.key"
@@ -153,7 +181,7 @@ import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
-import { computed, onMounted, ref, toRaw, watch } from "vue";
+import { computed, nextTick, onMounted, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
@@ -183,6 +211,17 @@ const roles = computed(() => {
     return { title: t(role.description), value: role.name };
   });
 });
+const getFilters = () => {
+  return props.type === "users"
+    ? userStore.filterBy
+    : institutionStore.filterBy;
+};
+const areFiltersForHiddenColumnsAvailable = computed(() => {
+  const filters = Object.keys(getFilters());
+  return headers.value.some(
+    (header) => header.visible === false && filters.includes(header.key)
+  );
+});
 const selected = ref([]);
 const institutionTags = ref([]);
 const getInstitutionTags = () => {
@@ -193,6 +232,19 @@ const getInstitutionTags = () => {
     .catch(() => {
       hasLoadingError.value = true;
     });
+};
+
+const getFilterValue = (key) => {
+  return getFilters()?.[key];
+};
+
+const getColumnCheckboxLabel = (key) => {
+  const value = getFilterValue(key);
+  if (value === undefined) {
+    return "";
+  } else {
+    return `(${value})`;
+  }
 };
 
 const props = defineProps([
@@ -282,8 +334,26 @@ const camelCaseToUnderscore = (text) => {
   return text.replace(/([A-Z])/g, "_$1").toLowerCase();
 };
 
+const updateSelectedColumns = async () => {
+  await nextTick();
+  if (props.type === "users") {
+    userStore.selectedTableColumns = headers.value
+      .filter((header) => header.visible === true)
+      .map((header) => {
+        return header.key;
+      });
+  } else {
+    institutionStore.selectedTableColumns = headers.value
+      .filter((header) => header.visible === true)
+      .map((header) => {
+        return header.key;
+      });
+  }
+};
+
 onMounted(() => {
   adjustHeaders();
   getInstitutionTags();
+  updateSelectedColumns();
 });
 </script>

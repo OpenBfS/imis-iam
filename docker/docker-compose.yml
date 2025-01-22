@@ -1,38 +1,25 @@
 services:
   mailhog:
-    container_name: "iam_mailhog"
     build:
       context: ./mailhog
     image: "iam_mailhog"
-    networks:
-      - imis3
     ports:
-      - 48082:8025
-      - 41025:1025
+      - ${MAILHOG_PORT}:8025
   ldap:
-    container_name: "iam-ldap"
     build:
       context: ./ldap
     image: "iam_ldap"
-    networks:
-      - imis3
   db:
-    container_name: "iam_db"
     build:
       context: ./db
     image: "iam_db"
-    networks:
-      - imis3
     ports:
-      - 2345:5432
+      - ${DB_PORT}:5432
   keycloak:
-    container_name: "iam-keycloak"
     build:
       context: ../
       dockerfile: ./docker/keycloak/Dockerfile
     image: "iam_keycloak"
-    networks:
-      - imis3
     depends_on:
       - db
       - ldap
@@ -51,8 +38,6 @@ services:
       context: ../
       dockerfile: ./docker/client/Dockerfile
     image: "iam_client"
-    networks:
-      - imis3
     depends_on:
       - keycloak
     ports:
@@ -66,6 +51,3 @@ services:
       - HOSTNAME
       - PORT
       - PHOTON_URL
-networks:
-  imis3:
-    name: imis3

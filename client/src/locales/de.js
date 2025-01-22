@@ -60,7 +60,8 @@ export default {
     invalid_blank: "Bitte geben Sie einen Wert für '{0}' an.",
     number_out_of_range: "'{0}' muss eine Zahl zwischen {1} und {2} sein.",
     invalid_email: "Ungültige E-Mail.",
-    invalid_length_too_long: "'{0}' darf maximal eine Länge von {max} haben.",
+    invalid_length_too_long:
+      "'{attribute}' darf maximal eine Länge von {max} haben.",
     invalid_value: "'{0}' hat einen ungültigen Wert.",
     invalid_number: "'{0}' ist eine ungültige Zahl.",
     invalid_uri_scheme: "'{0}' ist ein ungültiges URL-Schema.",
@@ -83,6 +84,12 @@ export default {
     all_or_nothing: "{0} und {1} oder keines angeben",
     only_unique_values: "Bitte geben Sie keine doppelten Werte ein.",
   },
+  export: {
+    required_field_encoding: "Encoding ist erforderlich",
+    required_field_seperator: "Feldtrenner ist erforderlich",
+    required_row_delimiter: "Zeilenende ist erforderlich",
+    required_quote_type: "Textbegrenzung ist erforderlich",
+  },
   hints: {
     date_format: "Format: dd.mm.jjjj",
     required_fields: "Erforderliche Felder",
@@ -96,7 +103,7 @@ export default {
     add_institution: "Institution Hinzufügen",
     no_institutions_available: "Es sind keine Institutionen vorhanden",
     fax: "Fax",
-    phone: "Telephon",
+    phone: "Telefon",
     meas_facil_name: "Messstellen-Bezeichnung",
     required_name: "Institutionsname ist erfoderlich",
     required_meas_facil_name: "Messstellen-Bezeichnung ist erforderlich",
@@ -111,8 +118,10 @@ export default {
       "PLZ des Dienstgebäudes ist erforderlich",
     central_phone: "Zentrales Telefon",
     central_mail: "Zentrale E-Mail",
-    central_alarm_phone_numbers: "Zentrale Alarmierung (Telefon)",
-    central_alarm_mail_addresses: "Zentrale Alarmierung (E-Mail)",
+    operation_mode_change_contact: "Kontaktdaten IMIS-Betriebsartenwechsel",
+    operation_mode_change_mail_addresses: "E-Mail",
+    operation_mode_change_phone_numbers: "Telefon",
+    operation_mode_change_sms_phone_numbers: "SMS",
     place: "Ort",
     street: "Straße",
     postal_code: "PLZ",
@@ -245,6 +254,8 @@ export default {
     description: "Beschreibung",
     items_per_page: "Einträge pro Seite",
     of: "von",
+    columns: "Spalten",
+    filters: "Filter",
   },
   // Emails
   emails: {

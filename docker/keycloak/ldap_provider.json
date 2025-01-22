@@ -52,7 +52,7 @@
       "inetOrgPerson, organizationalPerson"
     ],
     "connectionUrl": [
-      "ldap://iam-ldap"
+      "ldap://ldap"
     ],
     "usersDn": [
       "cn=users,dc=iam"
