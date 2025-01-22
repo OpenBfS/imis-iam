@@ -160,23 +160,8 @@ public class UserProvider implements RealmResourceProvider {
            }
         }
 
-        long size = 0;
-        Stream<UserModel> userModels;
-        if ((firstResult != null || maxResults != null)
-            && customAttributes.isEmpty()
-        ) {
-            size = session.users()
-                .searchForUserStream(realm, attributes).count();
-            userModels = session.users()
-                .searchForUserStream(
-                    realm,
-                    attributes,
-                    firstResult,
-                    maxResults);
-        } else {
-            userModels = session.users()
+        Stream<UserModel> userModels = session.users()
                 .searchForUserStream(realm, attributes);
-        }
 
         Predicate<User> userFilter = u -> true;
         if (!customAttributes.isEmpty()) {
@@ -192,12 +177,12 @@ public class UserProvider implements RealmResourceProvider {
             .getUserById(realm, userEntity.getId()), session))
             .filter(userFilter)
             .collect(Collectors.toList());
-        if (size == 0) {
-            size = userList.size();
-        }
-        if ((firstResult != null || maxResults != null)
-            && !customAttributes.isEmpty()
-        ) {
+        // Filter hidden users
+        userList = auth.filter(userList,
+                headers.getHeaderString(Constants.SHIB_USER_HEADER));
+
+        long size = userList.size();
+        if (firstResult != null || maxResults != null) {
             if (firstResult == null) {
                 firstResult = 0;
             } else {
@@ -208,15 +193,12 @@ public class UserProvider implements RealmResourceProvider {
             if (maxResults == null) {
                 maxResults = userList.size();
             } else {
-                maxResults = maxResults > userList.size()
-                    ? userList.size()
-                    : maxResults;
+                maxResults = Math.min(firstResult + maxResults, userList.size());
             }
-            userList = userList.subList(firstResult, firstResult + maxResults);
+            userList = userList.subList(firstResult, maxResults);
         }
 
-        return new ObjectList<User>(size, auth.filter(userList,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER)));
+        return new ObjectList<User>(size, userList);
     }
 
     /**
