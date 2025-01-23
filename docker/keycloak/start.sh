@@ -8,28 +8,13 @@ then
 fi
 export PGPASSWORD=secret
 
-wait_for_db () {
-    wait=10
-    waited=0
-    until psql -h db -U keycloak -wl > /dev/null; do
-        sleep 1
-        waited=$(($waited + 1))
-        if [ $waited -gt $wait ]; then
-            echo "Could not connect to PostgreSQL database"
-            exit 1
-        fi
-    done
-}
-
 # Start Keycloak
-wait_for_db
 ${KEYCLOAK_HOME}/bin/kc.sh --verbose start --optimized &
 wait-for-it localhost:8080 -t 120 || { echo "Failed starting Keycloak"; exit 1; }
 
 echo "Configure realm, SAML client and example account if not existing ..."
 KEYCLOAK_URL=http://localhost:8080
 KEYCLOAK_REALM=master
-IMIS_REALM=imis3
 IMIS_CLIENT=iam-client
 IMIS_CLIENT_ID=$(jq .id ${DIR}/iam_client.json | tr -d '"')
 

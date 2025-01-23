@@ -65,6 +65,8 @@ RUN $PGBIN/pg_ctl start -so "-c config_file=$PGCONF" && \
     ./setup-db.sh && \
     $PGBIN/pg_ctl stop
 
+HEALTHCHECK CMD psql -l || exit 1
+
 #
 # Set the default command to run when starting the container
 #
