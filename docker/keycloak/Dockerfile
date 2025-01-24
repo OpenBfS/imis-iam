@@ -37,6 +37,4 @@ RUN ${KEYCLOAK_HOME}/bin/kc.sh build
 ENV IMIS_REALM=imis3
 HEALTHCHECK CMD curl -f http://localhost:8080/realms/$IMIS_REALM || exit 1
 
-ENV KC_BOOTSTRAP_ADMIN_USERNAME=admin
-ENV KC_BOOTSTRAP_ADMIN_PASSWORD=secret
 CMD sh $SRC_DIR/start.sh

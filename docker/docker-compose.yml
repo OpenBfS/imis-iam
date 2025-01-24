@@ -34,6 +34,8 @@ services:
       - KC_HOSTNAME=${PROTOCOLL}://${HOSTNAME}:${PORT}
       - SP_HOSTNAME=${HOSTNAME}
       - SP_PORT
+      - KC_BOOTSTRAP_ADMIN_USERNAME
+      - KC_BOOTSTRAP_ADMIN_PASSWORD
     env_file:
       - keycloak/.env
   client:
