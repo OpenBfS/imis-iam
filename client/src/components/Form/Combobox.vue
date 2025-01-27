@@ -31,11 +31,12 @@
     :readonly="applicationStore.form?.readonly || props.readonly"
     :return-object="props.returnObject"
     ref="combobox"
-    :rules="
-      applicationStore.clientAndServerRules[props.attribute]
+    :rules="[
+      ...rules,
+      ...(applicationStore.clientAndServerRules[props.attribute]
         ? applicationStore.clientAndServerRules[props.attribute]
-        : props.rules
-    "
+        : props.rules ?? []),
+    ]"
     :type="props.type ?? 'text'"
     :variant="props.variant ?? 'underlined'"
     @update:model-value="
@@ -45,11 +46,11 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import { useApplicationStore } from "@/stores/application.js";
 import { useForm } from "@/lib/use-form.js";
 
-const { onUpdateModelValue } = useForm();
+const { createRequiredRule, onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
@@ -93,6 +94,10 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 const combobox = ref(null);
+const translationCategory = inject("translationCategory");
+const rules = ref(
+  createRequiredRule(props.required, props.attribute, translationCategory)
+);
 
 const validate = () => {
   combobox.value.validate();

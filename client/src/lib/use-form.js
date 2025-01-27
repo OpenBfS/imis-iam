@@ -19,26 +19,9 @@ export function useForm(i18n) {
   const regExprEmail = /^\S+@\S+\.\S+$/;
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
   // Validation rules
-  const reqValidmail = (reqMsg, validMsg) => {
-    return [
-      (v) => !!v || reqMsg,
-      (v) => doesRegexMatchWholeString(regExprEmail, v) || validMsg,
-    ];
-  };
   const validMail = (validMsg) => {
     return [
       (v) => !v || doesRegexMatchWholeString(regExprEmail, v) || validMsg,
-    ];
-  };
-  const reqValidPhone = (reqMsg, validMsg) => {
-    return [
-      (v) => !!v || reqMsg,
-      (v) =>
-        (v &&
-          v.toString().match(regExprPhone)?.[0] === v.toString() &&
-          v.toString().match(regExprPhone)?.[0].length ===
-            v.toString().length) ||
-        validMsg,
     ];
   };
   const validPhone = (validMsg) => {
@@ -70,12 +53,6 @@ export function useForm(i18n) {
         (doesRegexMatchWholeString(germanDateRegex, v) &&
           dateStringToDate(v) !== undefined) ||
         t("error.valid_date"),
-    ];
-  };
-  const reqValidPostalcode = (reqMsg, validMsg) => {
-    return [
-      (v) => !!v || reqMsg,
-      (v) => /^\d{5}$/.test(v) || v == "" || validMsg,
     ];
   };
   const reqField = (reqMsg) => {
@@ -327,18 +304,47 @@ export function useForm(i18n) {
     applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
   };
 
+  const camelCaseToUnderscore = (text) => {
+    return text.replace(/([A-Z])/g, "_$1").toLowerCase();
+  };
+
+  // Creates a rule for required fields with a specific message if possible.
+  // "translationCategory" is the top-level property in the locale file, e.g. "institution".
+  const createRequiredRule = (required, attribute, translationCategory) => {
+    const newRules = [];
+    if (required === true) {
+      if (attribute && translationCategory) {
+        const translatedAttribute = t(
+          `${translationCategory}.${camelCaseToUnderscore(attribute)}`
+        );
+        const fullTranslation = t("error.required_field", [
+          translatedAttribute,
+        ]);
+        if (
+          translationCategory !== undefined &&
+          translatedAttribute?.length > 0 &&
+          fullTranslation?.length > 0
+        ) {
+          newRules.push(...reqField(fullTranslation));
+        } else {
+          newRules.push(...reqField(t("error.required_field_generic")));
+        }
+      } else {
+        newRules.push(...reqField(t("error.required_field_generic")));
+      }
+    }
+    return newRules;
+  };
+
   return {
     form,
     valid,
     hasNoChange,
-    reqValidmail,
     validMail,
     reqField,
-    reqValidPhone,
     validPhone,
     validPostalcode,
     validGermanDate,
-    reqValidPostalcode,
     reqMultipleSelect,
     dateStringToDate,
     doesRegexMatchWholeString,
@@ -358,5 +364,7 @@ export function useForm(i18n) {
     translateError,
     areArraysDifferent,
     showFormError,
+    camelCaseToUnderscore,
+    createRequiredRule,
   };
 }

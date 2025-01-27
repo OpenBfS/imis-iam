@@ -25,11 +25,12 @@
     :persistent-hint="props.persistentHint"
     :prepend-inner-icon="props.prependInnerIcon"
     :readonly="applicationStore.form?.readonly || props.readonly"
-    :rules="
-      applicationStore.clientAndServerRules[props.attribute]
+    :rules="[
+      ...rules,
+      ...(applicationStore.clientAndServerRules[props.attribute]
         ? applicationStore.clientAndServerRules[props.attribute]
-        : props.rules
-    "
+        : props.rules ?? []),
+    ]"
     :variant="props.variant"
     @update:model-value="
       (event) => onUpdateModelValue(event, emit, props.attribute)
@@ -40,9 +41,9 @@
 <script setup>
 import { useApplicationStore } from "@/stores/application.js";
 import { useForm } from "@/lib/use-form.js";
-import { computed } from "vue";
+import { computed, inject, ref } from "vue";
 
-const { onUpdateModelValue } = useForm();
+const { createRequiredRule, onUpdateModelValue } = useForm();
 
 const applicationStore = useApplicationStore();
 
@@ -70,6 +71,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue"]);
+const translationCategory = inject("translationCategory");
+const rules = ref(
+  createRequiredRule(props.required, props.attribute, translationCategory)
+);
 
 const editable = computed(() => {
   return !props.disabled && !props.readonly && !applicationStore.form?.readonly;

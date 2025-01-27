@@ -7,14 +7,14 @@
  -->
 <template>
   <v-card min-width="460px">
-    <v-card-title>{{ $t("label.csv_options") }}</v-card-title>
+    <v-card-title>{{ $t("export.csv_options") }}</v-card-title>
     <v-divider></v-divider>
     <v-container class="mt-4">
       <v-row justify="center">
         <v-col cols="10">
           <v-form v-model="valid" ref="form">
             <Combobox
-              :label="$t('label.field_seperator')"
+              :label="$t('export.field_separator')"
               :items="fieldSeparators"
               attribute="fieldSeparator"
               item-title="name"
@@ -23,7 +23,7 @@
               @update:modelValue="csvOptions.fieldSeparator = $event"
             ></Combobox>
             <Combobox
-              :label="$t('label.row_delimiter')"
+              :label="$t('export.row_delimiter')"
               :items="rowDelimiters"
               attribute="rowDelimiter"
               item-title="name"
@@ -33,7 +33,7 @@
               @update:modelValue="csvOptions.rowDelimiter = $event"
             ></Combobox>
             <Combobox
-              :label="$t('label.encoding')"
+              :label="$t('export.encoding')"
               :items="encoding"
               item-title="name"
               item-value="value"
@@ -45,7 +45,7 @@
             <Combobox
               attribute="quoteType"
               :no-data-text="$t('label.no_data_text')"
-              :label="$t('label.quote_type')"
+              :label="$t('export.quote_type')"
               :items="quoteTypes"
               item-title="name"
               item-value="value"
@@ -79,7 +79,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onMounted, onUnmounted, ref } from "vue";
+import { onBeforeMount, onMounted, onUnmounted, provide, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application.js";
 import { useUserStore } from "@/stores/user.js";
@@ -97,39 +97,39 @@ const { hasRequestError } = useNotification();
 // Use array of objects to enable translation of the itemes in <v-select> element
 const fieldSeparators = [
   {
-    name: t("label.semicolon"),
+    name: t("export.semicolon"),
     value: ";",
   },
   {
-    name: t("label.comma"),
+    name: t("export.comma"),
     value: ",",
   },
   {
-    name: t("label.space"),
+    name: t("export.space"),
     value: " ",
   },
   {
-    name: t("label.period"),
+    name: t("export.period"),
     value: ".",
   },
 ];
 const quoteTypes = [
   {
-    name: t("label.doublequote"),
+    name: t("export.doublequote"),
     value: '"',
   },
   {
-    name: t("label.singlequote"),
+    name: t("export.singlequote"),
     value: "'",
   },
 ];
 const rowDelimiters = [
   {
-    name: t("label.windows"),
+    name: t("export.windows"),
     value: "\n\r",
   },
   {
-    name: t("label.linux"),
+    name: t("export.linux"),
     value: "\r",
   },
 ];
@@ -140,14 +140,14 @@ const csvOptions = ref({
   encoding: encoding[0],
   quoteType: quoteTypes[0].value,
 });
-const { form, valid, reqField, validLength } = useForm();
+const { form, valid, validLength } = useForm();
+
+provide("translationCategory", "export");
 
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
-    encoding: [...reqField(t("export.required_field_encoding"))],
     fieldSeparator: [
-      ...reqField(t("export.required_field_seperator")),
       ...validLength(
         undefined,
         1,
@@ -157,9 +157,7 @@ onBeforeMount(() => {
         })
       ),
     ],
-    rowDelimiter: [...reqField(t("export.required_row_delimiter"))],
     quoteType: [
-      ...reqField(t("export.required_quote_type")),
       ...validLength(
         undefined,
         1,

@@ -25,6 +25,7 @@
             <v-row>
               <v-col v-if="processType !== 'edit'">
                 <TextField
+                  attribute="username"
                   density="compact"
                   :ref="'username'"
                   :variant="
@@ -34,7 +35,6 @@
                   "
                   :label="$t('user.username')"
                   :model-value="user.attributes.username"
-                  :rules="applicationStore.clientAndServerRules['username']"
                   required
                   @update:model-value="
                     clearValidationError('username');
@@ -68,6 +68,7 @@
                   <v-col cols="6">
                     <TextField
                       v-if="isTextField(attribute.annotations?.inputType)"
+                      :attribute="attribute.name"
                       density="compact"
                       :required="isUserAttributeRequired(attribute)"
                       variant="underlined"
@@ -79,9 +80,6 @@
                         clearValidationError(attribute.name);
                       "
                       :type="getTextFieldType(attribute.name)"
-                      :rules="
-                        applicationStore.clientAndServerRules[attribute.name]
-                      "
                     ></TextField>
                     <Select
                       v-else-if="isSelection(attribute.annotations?.inputType)"
@@ -119,6 +117,7 @@
                 <v-col v-if="attribute.name !== 'username'" cols="6">
                   <TextField
                     v-if="isTextField(attribute.annotations?.inputType)"
+                    :attribute="attribute.name"
                     density="compact"
                     :required="isUserAttributeRequired(attribute)"
                     variant="underlined"
@@ -278,7 +277,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, onUnmounted } from "vue";
+import { computed, provide, onBeforeMount, onMounted, onUnmounted } from "vue";
 import { useNotification } from "@/lib/use-notification.js";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http.js";
@@ -301,6 +300,8 @@ const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
+
+provide("translationCategory", "user");
 
 function setUserAttribute(name, value) {
   const attrs = user.value.attributes;
@@ -356,6 +357,11 @@ const getTextFieldType = (nameOfAttribute) => {
 };
 
 const isUserAttributeRequired = (userAttribute) => {
+  // In Keycloak it is not possible to choose if email
+  // is a required attribute so it won't appear in the
+  // UserProfileMetadata. That's why we can't handle it the "generic"
+  // way.
+  if (userAttribute.name === "email") return true;
   return userAttribute.required?.roles?.includes("user");
 };
 
@@ -364,74 +370,43 @@ const getUserAttributeRules = (userAttribute) => {
   const tmpRules = [];
   // Rules for text field components
   if (!userAttribute.validations?.options) {
-    if (
-      // In Keycloak it is not possible to choose if email
-      // is a required attribute so it won't appear in the
-      // UserProfileMetadata. That's why we can't handle it the "generic"
-      // way.
-      // TODO: Add rules for pattern and length as optional even when
-      // attribute is not required (when optional rules are supported
-      // by Vuetify)
-      userAttribute.name === "email" ||
-      isUserAttributeRequired(userAttribute)
-    ) {
-      tmpRules.push(
-        ...reqField(
-          t("error.user_attribute_required", [
-            handleDisplayName(userAttribute.displayName),
-          ])
-        )
-      );
-
-      if (userAttribute.validations?.pattern) {
-        const pattern = userAttribute.validations.pattern.pattern;
-        const errorMessage = userAttribute.validations.pattern["error-message"];
-        tmpRules.push(...validRegex(pattern, t(errorMessage)));
-      }
-
-      if (userAttribute.validations?.length) {
-        const length = userAttribute.validations.length;
-        let message;
-        const displayName = handleDisplayName(userAttribute.displayName);
-        if (length.min && length.max) {
-          message = t("error.invalid_length", [
-            displayName,
-            length.min,
-            length.max,
-          ]);
-        } else if (length.min) {
-          message = t("error.invalid_length_too_short", [
-            displayName,
-            length.min,
-          ]);
-        } else {
-          message = t("error.invalid_length_too_long", {
-            attribute: displayName,
-            max: length.max,
-          });
-        }
-        tmpRules.push(...validLength(length.min, length.max, message));
-      }
+    if (userAttribute.validations?.pattern) {
+      const pattern = userAttribute.validations.pattern.pattern;
+      const errorMessage = userAttribute.validations.pattern["error-message"];
+      tmpRules.push(...validRegex(pattern, t(errorMessage)));
     }
-  }
-  // Rules for select components
-  else {
-    tmpRules.push(
-      ...reqField(t("error.user_attribute_required", [userAttribute.name]))
-    );
+
+    if (userAttribute.validations?.length) {
+      const length = userAttribute.validations.length;
+      let message;
+      const displayName = handleDisplayName(userAttribute.displayName);
+      if (length.min && length.max) {
+        message = t("error.invalid_length", [
+          displayName,
+          length.min,
+          length.max,
+        ]);
+      } else if (length.min) {
+        message = t("error.invalid_length_too_short", [
+          displayName,
+          length.min,
+        ]);
+      } else {
+        message = t("error.invalid_length_too_long", {
+          attribute: displayName,
+          max: length.max,
+        });
+      }
+      tmpRules.push(...validLength(length.min, length.max, message));
+    }
+  } else {
+    // Rules for select components
   }
   return tmpRules;
 };
 
 onBeforeMount(() => {
   applicationStore.setForm(form);
-  applicationStore.initClientRules({
-    institutions: reqMultipleSelect(t("user.required_institution")),
-    role: reqField(t("user.required_roles")),
-    username: reqField(
-      t("error.user_attribute_required", [t("user.username")])
-    ),
-  });
   if (!userStore.roles) {
     userStore.loadRoles();
   }
@@ -509,8 +484,6 @@ const {
   form,
   valid,
   hasNoChange,
-  reqField,
-  reqMultipleSelect,
   validRegex,
   validLength,
   resetForm,

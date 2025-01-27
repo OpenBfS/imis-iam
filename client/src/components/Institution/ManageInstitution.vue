@@ -29,6 +29,7 @@
                 <TextField
                   :label="$t('label.name')"
                   :attribute="'name'"
+                  required
                   @update:modelValue="institution.name = $event"
                 ></TextField>
               </v-col>
@@ -146,9 +147,6 @@
               :label="$t('institution.differing_postal_address')"
             ></v-checkbox>
             <div v-if="showPostalAddress" class="group_class">
-              <!-- TODO: Add this rules once the validation for
-                    optional fields gets implemented by upstream.
-                    :rules="validPostalcode($t('error.valid_postalcode'))" -->
               <TextField
                 :label="$t('institution.address_location')"
                 :attribute="'addressLocation'"
@@ -176,9 +174,6 @@
                 :attribute="'centralMail'"
                 @update:modelValue="institution.centralMail = $event"
               ></TextField>
-              <!--TODO: Add this rule once the validation for
-                    optional fields gets implemented by upstream.
-                    :rules="validPhone($t('error.valid_fax'))" -->
               <TextField
                 :label="$t('institution.central_fax')"
                 @update:modelValue="institution.centralFax = $event"
@@ -334,7 +329,14 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, onBeforeMount, onMounted, onUnmounted, ref } from "vue";
+import {
+  computed,
+  onBeforeMount,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+} from "vue";
 import { HTTP } from "@/lib/http.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { useForm } from "@/lib/use-form.js";
@@ -364,6 +366,8 @@ const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 
+provide("translationCategory", "institution");
+
 const measFacilIdField = ref(null);
 const measFacilNameField = ref(null);
 const institution = ref(applicationStore.managedItem);
@@ -380,9 +384,8 @@ const {
   valid,
   hasNoChange,
   validMail,
-  reqField,
   validPhone,
-  reqValidPostalcode,
+  validPostalcode,
   resetForm,
   watchChange,
   onCancel,
@@ -423,19 +426,11 @@ const measIdAndNameOrNothing = () => {
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
-    name: reqField(t("institution.required_name")),
     measFacilName: [...measIdAndNameOrNothing()],
-    serviceBuildingLocation: reqField(
-      t("institution.required_service_building_location")
-    ),
-    serviceBuildingPostalCode: reqValidPostalcode(
-      t("institution.required_service_building_postal_code"),
-      t("error.valid_postalcode")
-    ),
-    serviceBuildingStreet: reqField(
-      t("institution.required_service_building_street")
-    ),
+    serviceBuildingPostalCode: validPostalcode(t("error.valid_postalcode")),
+    addressPostalCode: validPostalcode(t("error.valid_postalcode")),
     centralPhone: validPhone(t("error.valid_phone")),
+    centralFax: validPhone(t("error.valid_fax")),
     centralMail: validMail(t("error.valid_email")),
     measFacilId: [
       (v) =>
@@ -447,7 +442,6 @@ onBeforeMount(() => {
         }),
       ...measIdAndNameOrNothing(),
     ],
-    tags: reqField(t("error.required_tag")),
   });
 });
 onMounted(() => {
