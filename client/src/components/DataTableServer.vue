@@ -43,9 +43,26 @@
               v-model="item.visible"
               v-bind:key="item.key"
               density="compact"
-              :label="`${item.title} ${getColumnCheckboxLabel(item.key)}`"
               hide-details
             >
+              <template v-slot:label>
+                <div class="d-flex gap-2">
+                  <span class="me-2">{{ `${item.title}` }}</span>
+                  <div v-if="getColumnCheckboxLabel(item.key)?.length > 0">
+                    (
+                    <v-chip
+                      class="me-2 px-1"
+                      color="accent"
+                      size="x-small"
+                      variant="flat"
+                    >
+                      <v-icon icon="mdi-filter"></v-icon>
+                    </v-chip>
+                    <span>{{ getColumnCheckboxLabel(item.key) }}</span
+                    >)
+                  </div>
+                </div>
+              </template>
             </v-checkbox>
           </v-list-item>
         </v-list>
@@ -243,7 +260,7 @@ const getColumnCheckboxLabel = (key) => {
   if (value === undefined) {
     return "";
   } else {
-    return `(${value})`;
+    return value;
   }
 };
 
