@@ -38,6 +38,8 @@ services:
       - KC_BOOTSTRAP_ADMIN_PASSWORD
     env_file:
       - keycloak/.env
+    volumes:
+      - ./keycloak/data:/opt/keycloak/data/import
   client:
     build:
       context: ../
