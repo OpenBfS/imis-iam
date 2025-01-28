@@ -12,7 +12,7 @@
       style="max-height: 100vh"
     >
       <Appbar />
-      <v-container class="h-100 pb-10 overflow-y-hidden flex-grow-1">
+      <div class="h-100 pb-8 pa-3 overflow-y-hidden flex-grow-1">
         <v-main class="d-flex flex-column pt-0 h-100 overflow-y-hidden">
           <router-view />
           <UIAlert
@@ -32,7 +32,7 @@
             <ManageEvent />
           </v-dialog>
         </v-main>
-      </v-container>
+      </div>
       <Appfooter />
     </div>
   </v-app>

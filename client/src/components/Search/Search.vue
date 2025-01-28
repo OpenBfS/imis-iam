@@ -88,6 +88,7 @@
   <div class="d-flex justify-center" style="min-height: 0">
     <Results @onSelectedTab="onSelectedTab" class="v-col v-col-11" />
   </div>
+  <Results @onSelectedTab="onSelectedTab" />
   <UIAlert
     v-if="hasLoadingError || hasRequestError"
     v-bind:message="applicationStore.httpErrorMessage"

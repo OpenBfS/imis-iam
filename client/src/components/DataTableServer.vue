@@ -75,7 +75,7 @@
         ? userStore.foundUsers
         : institutionStore.foundInstitutions
     "
-    class="mt-4"
+    density="compact"
     style="min-height: 0; max-height: 100%"
     fixed-header
     :headers="allHeaders"
@@ -102,11 +102,11 @@
       <tr>
         <td
           class="pe-2 position-sticky"
-          style="top: 42pt; z-index: 3; background-color: white"
+          style="top: 30pt; z-index: 3; background-color: white"
         ></td>
         <td
           class="pe-2 position-sticky"
-          style="top: 42pt; z-index: 3; background-color: white"
+          style="top: 30pt; z-index: 3; background-color: white"
           v-for="header in allHeaders"
           :key="header"
         >
@@ -192,6 +192,12 @@
     </template>
   </v-data-table-server>
 </template>
+
+<style>
+.v-data-table-footer {
+  padding: 2px 4px;
+}
+</style>
 
 <script setup>
 import { useApplicationStore } from "@/stores/application.js";

@@ -6,8 +6,8 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-container
-    class="mx-0 px-0 h-100 overflow-y-hidden flex-grow-1 d-flex flex-column"
+  <div
+    class="mx-0 px-0 pb-0 h-100 overflow-y-hidden flex-grow-1 d-flex flex-column"
   >
     <!-- div is necessary because of the parent flexbox so the line indicating the active tab is always visible -->
     <div>
@@ -27,7 +27,11 @@
         >
       </v-tabs>
     </div>
-    <v-window v-model="tab" class="h-100 flex-grow-1 overflow-y-hidden" style="min-height: 0">
+    <v-window
+      v-model="tab"
+      class="h-100 flex-grow-1 overflow-y-hidden"
+      style="min-height: 0"
+    >
       <v-window-item value="users" style="min-height: 0">
         <ResultTable v-bind:type="'users'" />
       </v-window-item>
@@ -35,7 +39,7 @@
         <ResultTable v-bind:type="'institutions'" />
       </v-window-item>
     </v-window>
-  </v-container>
+  </div>
 </template>
 
 <script setup>
