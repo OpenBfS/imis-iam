@@ -7,7 +7,7 @@
  -->
 <template>
   <DataTableServer
-    :headers="tableHeaders"
+    :headers="userStore.tableHeaders"
     :items="props.users"
     :items-per-page="userStore.itemsPerPage"
     :no-data-text="$t('user.no_users_available')"
@@ -59,9 +59,10 @@
 import { useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
-import { computed, ref, toRaw } from "vue";
+import { onMounted, ref, toRaw } from "vue";
 import { getExpUser } from "@/components/User/user.js";
 import DataTableServer from "@/components/DataTableServer.vue";
+import { createHeaders } from "@/lib/utils";
 
 const props = defineProps({
   users: Array,
@@ -71,8 +72,12 @@ const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
 const savedUser = ref();
-const tableHeaders = computed(() => {
-  return profileStore.attributes
+
+onMounted(async () => {
+  if (!profileStore.attributes) {
+    await profileStore.loadUserProfileMetadata();
+  }
+  const columns = profileStore.attributes
     ? [
         ...profileStore.attributes.map((attr) => {
           const rawAttr = toRaw(attr);
@@ -88,6 +93,7 @@ const tableHeaders = computed(() => {
         { name: "enabled", default: false },
       ]
     : [];
+  userStore.tableHeaders = createHeaders(columns, "users");
 });
 
 // Deep Copy for objects

@@ -255,6 +255,7 @@ export default {
     items_per_page: "Einträge pro Seite",
     of: "von",
     columns: "Spalten",
+    columns_selection: "Spaltenauswahl",
     filters: "Filter",
   },
   // Emails

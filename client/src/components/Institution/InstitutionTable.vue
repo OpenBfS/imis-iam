@@ -7,7 +7,7 @@
  -->
 <template>
   <DataTableServer
-    :headers="tableHeaders"
+    :headers="institutionStore.tableHeaders"
     :items="props.institutions"
     :items-per-page="institutionStore.itemsPerPage"
     :no-data-text="$t('institution.no_institutions_available')"
@@ -71,12 +71,13 @@ import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import DataTableServer from "@/components/DataTableServer.vue";
 import { getExpInstitution } from "@/components/Institution/institution.js";
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
+import { createHeaders } from "@/lib/utils";
+
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
-const tableHeaders = ref([]);
 const defaultHeaders = [
   "name",
   "measFacilName",
@@ -91,11 +92,12 @@ const props = defineProps({
 });
 
 onMounted(() => {
-  tableHeaders.value = Object.keys(getExpInstitution()).map((key) => {
+  const columns = Object.keys(getExpInstitution()).map((key) => {
     return {
       name: key,
       default: defaultHeaders.includes(key),
     };
   });
+  institutionStore.tableHeaders = createHeaders(columns, "institutions");
 });
 </script>

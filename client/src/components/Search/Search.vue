@@ -6,87 +6,78 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-container>
-    <UIHeader>
-      {{ $t("label.search") }}
-    </UIHeader>
-    <v-row justify="space-between" class="mt-6 mb-2">
-      <v-spacer></v-spacer>
-      <v-tooltip location="top">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            color="accent"
-            class="mr-4"
-            v-bind="props"
-            icon="mdi-tag-edit"
-            :disabled="
-              (selectedTab === 'users' &&
-                userStore.selectedUsers.length === 0) ||
-              (selectedTab === 'institutions' &&
-                institutionStore.selectedInstitutions.length === 0)
-            "
-            @click="toggleEditTags"
-          >
-          </v-btn>
-        </template>
-        <span>{{ $t("search.edit_tags") }}</span>
-      </v-tooltip>
-      <v-tooltip v-if="selectedTab === 'users'" location="top">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-if="profileStore.isAllowedToManage"
-            color="accent"
-            class="mr-4"
-            v-bind="props"
-            icon="mdi-account-plus"
-            @click="
-              applicationStore.setManagedItem(getExpUser());
-              applicationStore.setProcessType('add');
-              applicationStore.setShowManageUserDialog(true);
-            "
-          >
-          </v-btn>
-        </template>
-        <span>{{ $t("user.add_user") }}</span>
-      </v-tooltip>
-      <v-tooltip v-if="selectedTab === 'institutions'" location="top">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            color="accent"
-            v-if="isAllowedToAdd"
-            class="mr-4"
-            v-bind="props"
-            @click="
-              applicationStore.setManagedItem(getExpInstitution());
-              applicationStore.setProcessType('add');
-              applicationStore.setShowManageInstitutionDialog(true);
-            "
-            icon="mdi-office-building-plus"
-          >
-          </v-btn>
-        </template>
-        <span>{{ $t("institution.add_institution") }}</span>
-      </v-tooltip>
-      <v-tooltip location="top">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            color="accent"
-            class="mr-4"
-            v-bind="props"
-            icon="mdi-import"
-            @click="
-              applicationStore.setlistToExport(selectedTab);
-              applicationStore.setShowExportDialog(true);
-            "
-          >
-          </v-btn>
-        </template>
-        <span>{{ $t("user.export") }}</span>
-      </v-tooltip>
-    </v-row>
-  </v-container>
-  <div class="d-flex justify-center" style="min-height: 0">
-    <Results @onSelectedTab="onSelectedTab" class="v-col v-col-11" />
+  <div class="d-flex justify-end my-1">
+    <v-tooltip location="top">
+      <template v-slot:activator="{ props }">
+        <v-btn
+          color="accent"
+          class="ms-4"
+          v-bind="props"
+          icon="mdi-tag-edit"
+          :disabled="
+            (selectedTab === 'users' && userStore.selectedUsers.length === 0) ||
+            (selectedTab === 'institutions' &&
+              institutionStore.selectedInstitutions.length === 0)
+          "
+          @click="toggleEditTags"
+        >
+        </v-btn>
+      </template>
+      <span>{{ $t("search.edit_tags") }}</span>
+    </v-tooltip>
+    <v-tooltip v-if="selectedTab === 'users'" location="top">
+      <template v-slot:activator="{ props }">
+        <v-btn
+          v-if="profileStore.isAllowedToManage"
+          color="accent"
+          class="ms-4"
+          v-bind="props"
+          icon="mdi-account-plus"
+          @click="
+            applicationStore.setManagedItem(getExpUser());
+            applicationStore.setProcessType('add');
+            applicationStore.setShowManageUserDialog(true);
+          "
+        >
+        </v-btn>
+      </template>
+      <span>{{ $t("user.add_user") }}</span>
+    </v-tooltip>
+    <v-tooltip v-if="selectedTab === 'institutions'" location="top">
+      <template v-slot:activator="{ props }">
+        <v-btn
+          color="accent"
+          v-if="isAllowedToAdd"
+          class="ms-4"
+          v-bind="props"
+          @click="
+            applicationStore.setManagedItem(getExpInstitution());
+            applicationStore.setProcessType('add');
+            applicationStore.setShowManageInstitutionDialog(true);
+          "
+          icon="mdi-office-building-plus"
+        >
+        </v-btn>
+      </template>
+      <span>{{ $t("institution.add_institution") }}</span>
+    </v-tooltip>
+    <v-tooltip location="top">
+      <template v-slot:activator="{ props }">
+        <v-btn
+          color="accent"
+          class="ms-4"
+          v-bind="props"
+          icon="mdi-import"
+          @click="
+            applicationStore.setlistToExport(selectedTab);
+            applicationStore.setShowExportDialog(true);
+          "
+        >
+        </v-btn>
+      </template>
+      <span>{{ $t("user.export") }}</span>
+    </v-tooltip>
+    <ColumnSelection :type="selectedTab"></ColumnSelection>
   </div>
   <Results @onSelectedTab="onSelectedTab" />
   <UIAlert
