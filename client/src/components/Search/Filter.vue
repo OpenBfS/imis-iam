@@ -6,6 +6,7 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
+<div class="table-filter">
   <v-autocomplete
     v-if="props.items"
     :label="props.label"
@@ -13,7 +14,7 @@
     :item-title="props.itemTitle"
     :item-value="props.itemValue"
     :no-data-text="$t('label.no_data_text')"
-    class="my-1"
+    class="my-1 overflow-hidden"
     clearable
     hide-details
     min-width="120"
@@ -28,12 +29,13 @@
   ></v-autocomplete>
   <v-text-field
     v-else
-    class="my-1"
+    class="my-1 overflow-hidden"
     clearable
     density="compact"
     :model-value="textFieldValue"
     :placeholder="props.placeholder"
     hide-details
+    min-width="40"
     variant="outlined"
     @update:modelValue="
       (event) => {
@@ -42,7 +44,18 @@
       }
     "
   ></v-text-field>
+  </div>
 </template>
+
+<style>
+.table-filter .v-field__input {
+  padding-inline: 6pt 6pt !important;
+}
+
+.table-filter .v-autocomplete .v-field label {
+  margin-inline-start: 6pt;
+}
+</style>
 
 <script setup>
 import { onMounted, ref } from "vue";
