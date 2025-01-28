@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,15 +55,11 @@ import de.intevation.iam.model.representation.Role;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
-import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 import org.keycloak.utils.SearchQueryUtils;
 
 public class UserProvider implements RealmResourceProvider {
-
-    private static final String MAIL_ALREADY_USED_KEY
-        = "error_mail_already_used";
 
     private KeycloakSession session;
 
@@ -252,39 +247,32 @@ public class UserProvider implements RealmResourceProvider {
 
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
-        if (rep.getUsername() == null || rep.getUsername().isEmpty()) {
-            throw new BadRequestException();
-        }
 
         RealmModel realm = session.getContext().getRealm();
-        UserModel requestingUser = session.users().getUserById(realm, id);
-        ResourceBundle i18n
-            = I18nUtils.getI18nBundle(session, realm, requestingUser);
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
-        if (isEmailAlreadyUsed(realm, rep)) {
-            throw new ClientErrorException(Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
-                .build());
-        }
-        if (isUsernameAlreadyUsed(realm, rep)) {
-            throw new ClientErrorException(Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString("error_username_already_used"))
-                .build());
-        }
-
         //Add keycloak user
-        UserModel newUserModel
-                = session.users().addUser(realm, rep.getUsername());
+        UserModel newUserModel;
+        try {
+            newUserModel = this.userProfileProvider
+            .create(USER_API, rep.getAttributes()).create();
+        } catch (ValidationException ve) {
+            if (session.getTransactionManager().isActive()) {
+                session.getTransactionManager().setRollbackOnly();
+            }
+            throw new BadRequestException(
+                Response.status(Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(ve.getErrors())
+                    .build(),
+                ve);
+        }
 
         newUserModel.setEnabled(rep.isEnabled());
         rep.setId(newUserModel.getId());
 
         //Create attributes
-        handleUserProfile(rep.getAttributes(), newUserModel);
         UserAttributes attributes = rep.createOrUpdateJpaModel(em);
 
         newUserModel.grantRole(realm.getClientByClientId(
@@ -335,18 +323,32 @@ public class UserProvider implements RealmResourceProvider {
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         UserModel user = session.users().getUserById(realm, rep.getId());
-        UserModel requestingUser = session.users().getUserById(realm, id);
 
+        //Update user
         try {
-            user = updateUser(realm, rep, user);
-        } catch (InvalidUserPropertiesException e) {
-            ResourceBundle i18n
-                = I18nUtils.getI18nBundle(session, realm, requestingUser);
+            this.userProfileProvider
+                .create(USER_API, rep.getAttributes(), user).update();
+        } catch (ValidationException ve) {
+            if (session.getTransactionManager().isActive()) {
+                session.getTransactionManager().setRollbackOnly();
+            }
+            throw new BadRequestException(
+                Response.status(Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(ve.getErrors())
+                    .build(),
+                ve);
+        }
+        user.setEnabled(rep.isEnabled());
 
-            throw new ClientErrorException(Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(MAIL_ALREADY_USED_KEY))
-                .build());
+        //Update role
+        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
+        RoleModel oldRole = user.getClientRoleMappingsStream(client)
+            .findFirst().orElse(null);
+        String newRole = rep.getRole();
+        if (oldRole == null || !oldRole.getName().equals(newRole)) {
+            user.deleteRoleMapping(oldRole);
+            user.grantRole(client.getRole(newRole));
         }
 
         UserAttributes attributes = rep.createOrUpdateJpaModel(em);
@@ -381,98 +383,6 @@ public class UserProvider implements RealmResourceProvider {
             roleNames.add(new Role(role));
         });
         return Response.ok(roleNames).build();
-    }
-
-    /**
-     * Update the given Keycloak usermodel with the data from the new one.
-     * @param realm Realm
-     * @param newUser User containing new data
-     * @param oldUser Old keycloak user model
-     * @return Updated user
-     * @throws InvalidUserPropertiesException Thrown if new user contains
-     * email address already in use
-     */
-    private UserModel updateUser(
-        RealmModel realm,
-        User newUser,
-        UserModel oldUser
-    ) throws InvalidUserPropertiesException {
-        if (isEmailAlreadyUsed(realm, newUser)) {
-            throw new InvalidUserPropertiesException("Email already in use");
-        }
-        //Update user
-        handleUserProfile(newUser.getAttributes(), oldUser);
-        oldUser.setEnabled(newUser.isEnabled());
-
-        //Update role
-        ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        RoleModel oldRole = oldUser.getClientRoleMappingsStream(client)
-            .findFirst().orElse(null);
-        String newRole = newUser.getRole();
-        if (oldRole == null || !oldRole.getName().equals(newRole)) {
-            oldUser.deleteRoleMapping(oldRole);
-            oldUser.grantRole(client.getRole(newRole));
-        }
-
-        return oldUser;
-    }
-
-    /**
-     * Check if the email address of the given user rep is already used.
-     * @param realm Realm
-     * @param user User representation
-     * @return true if already used, else false
-     */
-    private boolean isEmailAlreadyUsed(RealmModel realm, User user) {
-        //Search for user with the given email
-        UserModel u = session.users().getUserByEmail(
-            realm, user.getAttributes().get("email").get(0));
-        if (u == null) {
-            return false;
-        }
-        //If user shall be created
-        if (user.getId() == null || user.getId().isEmpty()) {
-            return true;
-        }
-        //else check if the found user equals the user to be modified
-        return !u.getId().equals(user.getId());
-    }
-
-    /**
-     * Check if username is already used.
-     * @param realm Realm
-     * @param user User representation to be created
-     * @return True if username is already used, else false
-     */
-    private boolean isUsernameAlreadyUsed(RealmModel realm, User user) {
-        return session.users().getUserByUsername(realm, user.getUsername())
-            != null;
-    }
-
-    private class InvalidUserPropertiesException extends Exception {
-        InvalidUserPropertiesException(String message) {
-            super(message);
-        }
-    }
-
-    private void handleUserProfile(
-        Map<String, List<String>> attributes,
-        UserModel user
-    ) {
-        try {
-            this.userProfileProvider
-                .create(USER_API, attributes, user).update();
-        } catch (ValidationException ve) {
-            if (session.getTransactionManager().isActive()) {
-                session.getTransactionManager().setRollbackOnly();
-            }
-            throw new BadRequestException(
-                Response.status(Status.BAD_REQUEST)
-                    .type(MediaType.APPLICATION_JSON)
-                    .entity(ve.getErrors())
-                    .build(),
-                ve);
-        }
     }
 
     @Override

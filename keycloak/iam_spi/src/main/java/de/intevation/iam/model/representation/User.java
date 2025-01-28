@@ -24,8 +24,6 @@ import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.Institution_;
 import de.intevation.iam.model.jpa.UserAttributes;
@@ -105,11 +103,6 @@ public class User {
     }
     public void setId(String id) {
         this.id = id;
-    }
-
-    @JsonIgnore
-    public String getUsername() {
-        return attributes.get("username").get(0);
     }
 
     public Map<String, List<String>> getAttributes() {
