@@ -32,8 +32,8 @@ public class MailAuthorizer extends Authorizer<Mail> {
         UserModel requestingUser = session.users().getUserById(realm, userId);
 
         switch (requestMethod) {
-            case GET: return Role.USER.isRoleOf(requestingUser, session);
-            case POST: return Role.EDITOR.isRoleOf(requestingUser, session);
+            case GET: return IaMRole.USER.isRoleOf(requestingUser, session);
+            case POST: return IaMRole.EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
     }

@@ -41,7 +41,7 @@ public class EventAuthorizer extends Authorizer<Event> {
         if (requestingUser == null) {
             return false;
         }
-        return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+        return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
     }
 
     @Override

@@ -14,7 +14,7 @@ import de.intevation.iam.util.Constants;
 /**
  * The user roles known to this application.
  */
-public enum Role {
+public enum IaMRole {
     USER,
     EDITOR,
     CHIEF_EDITOR;

@@ -46,8 +46,8 @@ public class UserAuthorizer extends Authorizer<User> {
             case PUT -> authorizeUpdate(
                     data, session, requestingUser, client);
             case POST -> (!data.isEnabled()
-                    && Role.EDITOR.isRoleOf(requestingUser, session)
-                    || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session))
+                    && IaMRole.EDITOR.isRoleOf(requestingUser, session)
+                    || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session))
                     // Not allowed granting roles superior to own role
                     && requestingUser.hasRole(client.getRole(data.getRole()));
             default -> false;
@@ -66,10 +66,10 @@ public class UserAuthorizer extends Authorizer<User> {
         String requestingUserNetwork =
             requestingUser.getFirstAttribute(NETWORK_ATTRIBUTE_KEY);
         return user.isEnabled()
-            || Role.EDITOR.isRoleOf(requestingUser, session)
+            || IaMRole.EDITOR.isRoleOf(requestingUser, session)
             && requestingUserNetwork != null
             && requestingUserNetwork.equals(userNetwork)
-            || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+            || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
     }
 
     private boolean authorizeUpdate(
@@ -85,7 +85,7 @@ public class UserAuthorizer extends Authorizer<User> {
         UserModel oldUserModel
             = session.users().getUserById(realm, user.getId());
         if (user.isEnabled() != oldUserModel.isEnabled()
-            && !Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            && !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
             return false;
         }
         //If role shall be changed:
@@ -93,11 +93,11 @@ public class UserAuthorizer extends Authorizer<User> {
         String oldRole = oldUserModel.getClientRoleMappingsStream(client)
             .map(role -> role.getName()).findFirst().orElse(null);
         if (oldRole == null || !oldRole.equals(user.getRole())) {
-            return Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+            return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
         }
         // Else only allow users with other roles than user to edit
         // or allow users to edit their own profile
-        return Role.EDITOR.isRoleOf(requestingUser, session)
+        return IaMRole.EDITOR.isRoleOf(requestingUser, session)
             || user.getId().equals(requestingUser.getId());
     }
 }

@@ -47,7 +47,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
-import de.intevation.iam.auth.Role;
+import de.intevation.iam.auth.IaMRole;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.representation.ObjectList;
@@ -462,7 +462,7 @@ public class InstitutionProvider implements RealmResourceProvider {
                 em.find(InstitutionTag.class, tag.getName());
             // Allow CHIEF_EDITORs to add new tags
             if (persistentTag == null) {
-                if (Role.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+                if (IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
                     em.persist(tag);
                 } else {
                     throw new ForbiddenException();
