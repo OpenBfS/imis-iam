@@ -31,6 +31,7 @@ ENV SRC_DIR=/opt/src
 ADD docker/keycloak ${SRC_DIR}
 
 RUN ln -fs $SRC_DIR/keycloak.conf $KEYCLOAK_HOME/conf/keycloak.conf
+RUN ln -fs $SRC_DIR/data $KEYCLOAK_HOME/data/import
 
 RUN ${KEYCLOAK_HOME}/bin/kc.sh build
 
