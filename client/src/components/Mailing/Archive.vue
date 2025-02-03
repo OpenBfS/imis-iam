@@ -132,9 +132,11 @@
       <v-col cols="12" class="mt-6">
         <v-table class="pa-2 ma-2" density="compact">
           <thead>
-            <th class="text-left">{{ $t("emails.subject") }}</th>
-            <th class="text-left">{{ $t("emails.sender") }}</th>
-            <th class="text-left">{{ $t("emails.date") }}</th>
+            <tr>
+              <th class="text-left">{{ $t("emails.subject") }}</th>
+              <th class="text-left">{{ $t("emails.sender") }}</th>
+              <th class="text-left">{{ $t("emails.date") }}</th>
+            </tr>
           </thead>
           <tbody>
             <tr
