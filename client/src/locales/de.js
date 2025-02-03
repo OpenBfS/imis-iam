@@ -72,6 +72,9 @@ export default {
     pattern_no_match: "'{0}' entspricht nicht dem erforderlichen Format.",
     person_name_invalid_character: "'{0}' enthält ungültige Zeichen.",
 
+    usernameExistsMessage: "Diese IMIS-Kennung existiert bereits",
+    emailExistsMessage: "Diese Email-Adresse existiert bereits",
+
     // Custom errors
     required_field: "{0} ist erforderlich",
     required_field_generic: "Feld ist erforderlich",

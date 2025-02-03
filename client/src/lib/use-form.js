@@ -195,10 +195,15 @@ export function useForm(i18n) {
       translatedMessage = t(stringToTranslate, parameters);
     } else if (message.startsWith("error.")) {
       translatedMessage = t(message, parameters[0]);
-    }
-    // Keycloak error is already translated
-    else {
-      translatedMessage = message;
+    } else {
+      const triedTranslation = t(`error.${message}`);
+      // If t() returns the translation key the translation was not successful
+      if (triedTranslation !== `error.${message}`) {
+        translatedMessage = triedTranslation;
+      } else {
+        // Fallback
+        translatedMessage = message;
+      }
     }
     return translatedMessage;
   };
