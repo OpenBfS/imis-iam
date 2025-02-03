@@ -7,17 +7,47 @@
 import { vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
 import { useApplicationStore } from "@/stores/application";
+import { useProfileStore } from "@/stores/profile";
 import { mount } from "@vue/test-utils";
 import UserTable from "@/components/User/UserTable.vue";
 import global from "@/test/components/global";
 import { test, expect } from "vitest";
+import { HTTP } from "@/lib/http";
 
 setActivePinia(createPinia());
 
 const applicationStore = useApplicationStore();
+const profileStore = useProfileStore();
 
 // Mock HTTP request/response
+vi.spyOn(HTTP, "get").mockResolvedValue({});
 vi.spyOn(applicationStore, "searchRequest").mockResolvedValue({});
+
+profileStore.setUserProfileMetadata({
+  attributes: [
+    {
+      name: "username",
+      displayName: "${username}",
+      annotations: {
+        defaultField: "true",
+      },
+    },
+    {
+      name: "firstName",
+      displayName: "${first_name}",
+      annotations: {
+        defaultField: "true",
+      },
+    },
+    {
+      name: "lastName",
+      displayName: "${last_name}",
+      annotations: {
+        defaultField: "true",
+      },
+    },
+  ],
+});
 
 // Test data
 const users = [
