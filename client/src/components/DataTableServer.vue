@@ -145,13 +145,11 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
-import { useForm } from "@/lib/use-form";
 import { states } from "./Institution/institution";
 import Filter from "./Search/Filter.vue";
 
 const { t } = useI18n();
 const { hasLoadingError } = useNotification();
-const { camelCaseToUnderscore } = useForm();
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();

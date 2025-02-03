@@ -57,7 +57,7 @@
 <script setup>
 import { useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
-import { computed } from "@vue/reactivity";
+import { computed } from "vue";
 
 const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));

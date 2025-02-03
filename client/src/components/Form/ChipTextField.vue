@@ -26,9 +26,9 @@
         ? [
             ...applicationStore.clientAndServerRules[props.attribute],
             ...(props.rules ?? []),
-            ...rules,
+            ...internalRules,
           ]
-        : [...(props.rules ?? []), ...rules]
+        : [...(props.rules ?? []), ...internalRules]
     "
     :variant="props.variant ?? 'underlined'"
   >
@@ -100,7 +100,7 @@ const input = ref("");
 const plusButton = ref(null);
 const entries = ref([]);
 const indexOfDuplicate = ref(-1);
-const rules = ref([
+const internalRules = ref([
   (v) => {
     const index = entries.value.indexOf(v);
     indexOfDuplicate.value = index;

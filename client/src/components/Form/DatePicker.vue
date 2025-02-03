@@ -34,7 +34,7 @@
           include: includedElements,
         }"
         :hide-header="true"
-        :model-value="date"
+        :model-value="internalDate"
         v-show="isDatePickerOpen"
         :id="`date-picker-${id}`"
         landscape
@@ -79,7 +79,7 @@ const {
 } = useForm();
 const { d, t } = useI18n();
 const id = ref();
-const date = ref(new Date());
+const internalDate = ref(new Date());
 const dateString = ref(null);
 const isDatePickerOpen = ref(false);
 const dateTextfield = ref(null);
@@ -88,9 +88,9 @@ onMounted(() => {
   id.value = Math.floor(Math.random() * 1000000).toString();
   if (props.date) {
     dateString.value = d(new Date(props.date));
-    date.value = new Date(props.date);
+    internalDate.value = new Date(props.date);
   } else if (props.prefill) {
-    handleDateUpdate(date.value);
+    handleDateUpdate(internalDate.value);
   }
 });
 
@@ -115,7 +115,7 @@ const handleInputForDate = (event) => {
   }
 };
 const handleDateUpdate = (event) => {
-  date.value = event;
+  internalDate.value = event;
   setDateString(event);
   props.dateUpdatedCallback(event);
 };
@@ -148,7 +148,7 @@ watch(
   () => props.date,
   (newDate) => {
     setDateString(newDate);
-    date.value = newDate;
+    internalDate.value = newDate;
   }
 );
 </script>
