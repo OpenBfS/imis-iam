@@ -18,6 +18,8 @@ import de.intevation.iam.util.RequestMethod;
 
 public class UserAuthorizer extends Authorizer<User> {
 
+    private static final String NETWORK_ATTRIBUTE_KEY = "network";
+
     public UserAuthorizer(KeycloakSession session) {
         this.session = session;
     }
@@ -57,7 +59,17 @@ public class UserAuthorizer extends Authorizer<User> {
             KeycloakSession session,
             UserModel requestingUser
     ) {
-        return user.isEnabled() || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+        String userNetwork =
+            user.getAttributes().get(NETWORK_ATTRIBUTE_KEY) != null
+            ? user.getAttributes().get(NETWORK_ATTRIBUTE_KEY).get(0)
+            : null;
+        String requestingUserNetwork =
+            requestingUser.getFirstAttribute(NETWORK_ATTRIBUTE_KEY);
+        return user.isEnabled()
+            || Role.EDITOR.isRoleOf(requestingUser, session)
+            && requestingUserNetwork != null
+            && requestingUserNetwork.equals(userNetwork)
+            || Role.CHIEF_EDITOR.isRoleOf(requestingUser, session);
     }
 
     private boolean authorizeUpdate(

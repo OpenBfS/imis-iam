@@ -170,6 +170,24 @@
       }
     },
     "multivalued": true
+  }, {
+    "name" : "network",
+    "displayName" : "${network}",
+    "required" : {
+      "roles" : [ "admin", "user" ]
+    },
+    "permissions" : {
+      "edit" : [ "admin", "user" ],
+      "view" : [ "user", "admin" ]
+    },
+    "annotations" : {
+      "inputType" : "select"
+    },
+    "validations" : {
+      "options" : {
+        "options" : [ "08", "30", "02", "20", "07", "11"]
+      }
+    }
   } ],
   "groups": [
     {

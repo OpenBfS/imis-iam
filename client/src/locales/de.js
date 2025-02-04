@@ -199,6 +199,7 @@ export default {
     position: "Position",
     misc: "Weiteres",
     tags: "Tags",
+    network: "Netzbetreiber",
     label_positions: "Positionen",
     role: "Rolle im IdM",
     no_users_available: "Es sind keine @:user_term vorhanden",
