@@ -2049,6 +2049,7 @@
       "position" : [ "Leiter" ],
       "fax" : [ "0123-654" ],
       "phone" : [ "01234 123456" ],
+      "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
     "createdTimestamp" : 1737732486482,
@@ -2081,6 +2082,7 @@
       "position" : [ "Leiter" ],
       "fax" : [ "0123-654" ],
       "phone" : [ "01234 123456" ],
+      "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
     "createdTimestamp" : 1737732481696,
@@ -2113,6 +2115,7 @@
       "position" : [ "Leiter" ],
       "fax" : [ "0123-654" ],
       "phone" : [ "01234 123456" ],
+      "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
     "createdTimestamp" : 1737732484097,
