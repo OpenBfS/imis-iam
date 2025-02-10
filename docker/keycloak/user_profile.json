@@ -1,7 +1,7 @@
 {
   "attributes" : [ {
     "name": "username",
-    "displayName": "${profile.attributes.username}",
+    "displayName": "${username}",
     "permissions": {
       "view": ["admin", "user"],
       "edit": ["admin", "user"]
@@ -16,7 +16,7 @@
     }
   }, {
     "name" : "email",
-    "displayName" : "${profile.attributes.email}",
+    "displayName" : "${email}",
     "permissions" : {
       "view" : [ "admin", "user" ],
       "edit" : [ "admin", "user" ]
@@ -40,7 +40,7 @@
     "group": "contact"
   }, {
     "name" : "title",
-    "displayName" : "${profile.attributes.title}",
+    "displayName" : "${title}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -50,7 +50,7 @@
     "group": "name"
   }, {
     "name" : "firstName",
-    "displayName" : "${profile.attributes.first_name}",
+    "displayName" : "${first_name}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -71,7 +71,7 @@
     "group": "name"
   }, {
     "name" : "lastName",
-    "displayName" : "${profile.attributes.last_name}",
+    "displayName" : "${last_name}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -91,7 +91,7 @@
     "group": "name"
   }, {
     "name" : "phone",
-    "displayName" : "${profile.attributes.phone}",
+    "displayName" : "${phone}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -111,7 +111,7 @@
     "group": "contact"
   }, {
     "name" : "mobile",
-    "displayName" : "${profile.attributes.mobile}",
+    "displayName" : "${mobile}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -123,7 +123,7 @@
     "group": "contact"
   }, {
     "name" : "fax",
-    "displayName" : "${profile.attributes.fax}",
+    "displayName" : "${fax}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -135,7 +135,7 @@
     "group": "contact"
   }, {
     "name" : "position",
-    "displayName" : "${profile.attributes.position}",
+    "displayName" : "${position}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -153,7 +153,7 @@
     }
   }, {
     "name" : "tags",
-    "displayName" : "${profile.attributes.tags}",
+    "displayName" : "${tags}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -172,7 +172,7 @@
     "multivalued": true
   }, {
     "name" : "network",
-    "displayName" : "${profile.attributes.network}",
+    "displayName" : "${network}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
