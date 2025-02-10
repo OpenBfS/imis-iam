@@ -388,7 +388,21 @@
   "otpPolicyPeriod" : 30,
   "otpPolicyCodeReusable" : false,
   "otpSupportedApplications" : [ "totpAppFreeOTPName", "totpAppGoogleName", "totpAppMicrosoftAuthenticatorName" ],
-  "localizationTexts" : { },
+  "localizationTexts": {
+    "de": {
+      "profile.attributes.fax": "Fax",
+      "profile.attributes.position": "Position",
+      "profile.attributes.tags": "Tags",
+      "profile.attributes.network": "Netzwerk",
+      "profile.attributes.mobile": "Mobil",
+      "profile.attributes.phone": "Telefon",
+      "profile.attributes.lastName": "Nachname",
+      "profile.attributes.username": "Nutzername",
+      "profile.attributes.email": "E-Mail",
+      "profile.attributes.title": "Titel",
+      "profile.attributes.firstName": "Vorname"
+    }
+  },
   "webAuthnPolicyRpEntityName" : "keycloak",
   "webAuthnPolicySignatureAlgorithms" : [ "ES256" ],
   "webAuthnPolicyRpId" : "",
@@ -2026,7 +2040,7 @@
     "cibaInterval" : "5",
     "realmReusableOtpCode" : "false"
   },
-  "keycloakVersion" : "26.1.0",
+  "keycloakVersion" : "26.1.1",
   "userManagedAccessAllowed" : false,
   "organizationsEnabled" : false,
   "verifiableCredentialsEnabled" : false,
