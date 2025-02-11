@@ -63,9 +63,6 @@ public class MailProvider implements RealmResourceProvider {
 
     private static final String FROM_ADDRESS = "from";
     private static final String USER_ID_HEADER = "X-SHIB-user";
-    private static final String ERROR_EMPTY_LIST_KEY = "error_mail_list_empty";
-    private static final String ERROR_LIST_NAME_ALREADY_USED_KEY
-        = "error_mail_list_name_already_used";
 
     //Keycloak session
     private KeycloakSession session;
