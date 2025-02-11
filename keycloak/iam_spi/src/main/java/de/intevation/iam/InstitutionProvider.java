@@ -7,7 +7,6 @@
 package de.intevation.iam;
 
 import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,10 +15,8 @@ import java.util.Map;
 import java.util.List;
 import java.util.Set;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -55,7 +52,6 @@ import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.representation.ObjectList;
 import de.intevation.iam.util.Constants;
-import de.intevation.iam.util.I18nUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 import org.keycloak.utils.SearchQueryUtils;
@@ -75,11 +71,6 @@ public class InstitutionProvider implements RealmResourceProvider {
     private KeycloakSession session;
 
     private Authorizer<Institution> auth;
-
-    private static final String NAME_ALREADY_USED_KEY
-        = "error_name_already_used";
-    private static final String MEAS_FACIL_NAME_ALREADY_USED
-        = "error_meas_facil_name_already_used";
 
     private Validator validator;
 
@@ -348,20 +339,6 @@ public class InstitutionProvider implements RealmResourceProvider {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         UserModel requestingUser = session.users().getUserById(realm, id);
-        ResourceBundle i18n
-            = I18nUtils.getI18nBundle(session, realm, requestingUser);
-        if (isAlreadyUsed("name", rep, em)) {
-            return Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(NAME_ALREADY_USED_KEY))
-                .build();
-        }
-        if (isAlreadyUsed("measFacilName", rep, em)) {
-            return Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(MEAS_FACIL_NAME_ALREADY_USED))
-                .build();
-        }
 
         mergeTags(rep, em, requestingUser);
         em.persist(rep);
@@ -424,20 +401,6 @@ public class InstitutionProvider implements RealmResourceProvider {
         }
         RealmModel realm = session.getContext().getRealm();
         UserModel requestingUser = session.users().getUserById(realm, id);
-        ResourceBundle i18n
-            = I18nUtils.getI18nBundle(session, realm, requestingUser);
-        if (isAlreadyUsed("name", rep, em)) {
-            return Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(NAME_ALREADY_USED_KEY))
-                .build();
-        }
-        if (isAlreadyUsed("measFacilName", rep, em)) {
-            return Response.status(Status.CONFLICT)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(i18n.getString(MEAS_FACIL_NAME_ALREADY_USED))
-                .build();
-        }
 
         mergeTags(rep, em, requestingUser);
         Institution merged = em.merge(rep);
@@ -487,25 +450,6 @@ public class InstitutionProvider implements RealmResourceProvider {
         Root<InstitutionTag> root = query.from(InstitutionTag.class);
         query.select(root);
         return em.createQuery(query).getResultList();
-    }
-
-    private boolean isAlreadyUsed(
-        String attributeName, Institution inst, EntityManager em
-    ) throws IntrospectionException, ReflectiveOperationException {
-        TypedQuery<Boolean> query = em.createQuery(
-            String.format(
-                "SELECT EXISTS(SELECT 1 FROM Institution i "
-                + "WHERE i.%s=:value "
-                + (inst.getId() != null ? "AND i.id<>:id)" : ")"),
-                attributeName),
-            Boolean.class)
-            .setParameter("value", new PropertyDescriptor(
-                    attributeName, Institution.class
-                ).getReadMethod().invoke(inst));
-        if (inst.getId() != null) {
-            query.setParameter("id", inst.getId());
-        }
-        return query.getSingleResult();
     }
 
     private void mergeTags(

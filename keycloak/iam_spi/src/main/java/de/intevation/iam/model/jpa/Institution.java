@@ -39,8 +39,9 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
 @Table(name = "iam_institution", schema = "keycloak")
-@Unique(fields = {"measFacilId"},
-    clazz = Institution.class)
+@Unique(fields = {"name"}, clazz = Institution.class)
+@Unique(fields = {"measFacilId"}, clazz = Institution.class)
+@Unique(fields = {"measFacilName"}, clazz = Institution.class)
 @MeasFacilOrNone
 public class Institution {
 
