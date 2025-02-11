@@ -152,7 +152,7 @@ onBeforeMount(() => {
         undefined,
         1,
         t("error.invalid_length_too_long", {
-          attribute: t("label.field_seperator"),
+          attribute: t("export.field_separator"),
           max: 1,
         })
       ),
@@ -162,7 +162,7 @@ onBeforeMount(() => {
         undefined,
         1,
         t("error.invalid_length_too_long", {
-          attribute: t("label.quote_type"),
+          attribute: t("export.quote_type"),
           max: 1,
         })
       ),

@@ -47,13 +47,12 @@ public class CSVExporter<T> {
      * @return Export as InputStream
      * @throws IOException Thrown if an error during csv printing occurred
      * @throws InvocationTargetException Thrown if attributes could not be read
-     * @throws IllegalArgumentException Thrown if the csv options are invalid
      * @throws IllegalAccessException Thrown if attributes could not be read
      * @throws IntrospectionException
      */
     public InputStream export(List<T> objects, Set<String> exportAttributes)
             throws IOException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException,
+            InvocationTargetException,
             IntrospectionException {
         if (objects.isEmpty()) {
             return null;

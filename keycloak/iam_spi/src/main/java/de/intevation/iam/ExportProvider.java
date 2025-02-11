@@ -14,9 +14,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.ResourceBundle;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
@@ -30,10 +31,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.CSVExporter;
-import de.intevation.iam.util.Constants;
-import de.intevation.iam.util.I18nUtils;
 
-import jakarta.ws.rs.core.Response.Status;
 
 public class ExportProvider implements RealmResourceProvider {
 
@@ -75,15 +73,8 @@ public class ExportProvider implements RealmResourceProvider {
             @Context HttpHeaders headers
     ) {
         CSVExporter<User> exporter = new CSVExporter<>();
-        try {
-            setCsvOptions(
-                exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
-        } catch (IllegalArgumentException iae) {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
-
-        ResourceBundle i18n = I18nUtils.getI18nBundle(session,
-            headers.getHeaderString(Constants.SHIB_USER_HEADER));
+        setCsvOptions(
+            exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
 
         UserProvider userProvider = new UserProvider(session);
         List<User> users = new ArrayList<>();
@@ -95,7 +86,7 @@ public class ExportProvider implements RealmResourceProvider {
             users = userProvider.getUsers(headers, search, null, null)
                 .getList();
         }
-        return doExport(exporter, users, attributes, i18n);
+        return doExport(exporter, users, attributes);
     }
 
     /**
@@ -125,15 +116,8 @@ public class ExportProvider implements RealmResourceProvider {
             @Context HttpHeaders headers
     ) {
         CSVExporter<Institution> exporter = new CSVExporter<>();
-        try {
-            setCsvOptions(
-                exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
-        } catch (IllegalArgumentException iae) {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
-
-        ResourceBundle i18n = I18nUtils.getI18nBundle(session,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER));
+        setCsvOptions(
+            exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
 
         InstitutionProvider instProvider = new InstitutionProvider(session);
         List<Institution> institutions = new ArrayList<>();
@@ -145,7 +129,7 @@ public class ExportProvider implements RealmResourceProvider {
             institutions = instProvider.getInstitutions(headers, search, null, null, null, null)
                 .getList();
         }
-        return doExport(exporter, institutions, attributes, i18n);
+        return doExport(exporter, institutions, attributes);
     }
 
     private <T> void setCsvOptions(
@@ -159,7 +143,7 @@ public class ExportProvider implements RealmResourceProvider {
             || quoteType == null || !(quoteType.length() == 1)
             || rowDelimiter == null || rowDelimiter.isEmpty()
         ) {
-            throw new IllegalArgumentException();
+            throw new BadRequestException();
         }
         exporter.setFieldSeparator(
             fieldSeparator.charAt(0));
@@ -171,8 +155,7 @@ public class ExportProvider implements RealmResourceProvider {
     private <T> Response doExport(
         CSVExporter<T> exporter,
         List<T> objects,
-        Set<String> attributes,
-        ResourceBundle i18n
+        Set<String> attributes
     ) {
         InputStream result;
         try {
@@ -180,13 +163,7 @@ public class ExportProvider implements RealmResourceProvider {
         } catch (IllegalAccessException | InvocationTargetException
                 | IOException | IntrospectionException e) {
             e.printStackTrace();
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                .entity(i18n.getString("error_csv_generic"))
-                .build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Status.BAD_REQUEST)
-                .entity(i18n.getString("error_csv_options"))
-                .build();
+            throw new InternalServerErrorException();
         }
 
         return Response.ok(result, new MediaType(

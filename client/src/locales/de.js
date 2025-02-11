@@ -104,7 +104,7 @@ export default {
     linux: "Linux",
     windows: "Windows",
     required_field_encoding: "Encoding ist erforderlich",
-    required_field_seperator: "Feldtrenner ist erforderlich",
+    required_field_separator: "Feldtrenner ist erforderlich",
     required_row_delimiter: "Zeilenende ist erforderlich",
     required_quote_type: "Textbegrenzung ist erforderlich",
   },
