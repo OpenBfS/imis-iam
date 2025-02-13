@@ -9,7 +9,6 @@ fi
 export PGPASSWORD=secret
 
 # Environment variables used in import file
-export SP_URL="${PROTOCOLL}://${SP_HOSTNAME}:${SP_PORT}"
 # Keycloak expects User Profile config as string
 export USER_PROFILE="$(jq -c '.' $DIR/user_profile.json | sed 's/\\/\\\\/g;s/\"/\\\"/g')"
 

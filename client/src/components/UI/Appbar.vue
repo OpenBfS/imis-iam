@@ -69,7 +69,7 @@ const savedUser = computed(() => {
 });
 
 const logout = () => {
-  window.location.assign("Shibboleth.sso/Logout");
+  window.location.assign("/Shibboleth.sso/Logout");
 };
 
 const editProfile = () => {

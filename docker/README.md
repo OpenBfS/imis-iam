@@ -50,7 +50,7 @@ the client application with the roles according to the usernames:
 Further, the users provided by the LDAP container can be used to login.
 See ldap/users.ldif for credentials (uid, userPassword).
 
-Authenticated access to the client is given under localhost:48081.
+Authenticated access to the client is given under localhost:48080.
 
 ### Mode of setup
 
