@@ -21,6 +21,9 @@ To mount local repository checkouts into the containers for development use
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
+The configuration assumes a TLS endpoint is operated in front of the
+Compose stack, if used for production.
+
 ## Keycloak
 
 The Keycloak admin UI can then be reached under http://localhost:48080/admin.

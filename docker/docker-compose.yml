@@ -28,8 +28,7 @@ services:
       mailhog:
         condition: service_started
     environment:
-      - PROTOCOLL
-      - KC_HOSTNAME=${PROTOCOLL}://${HOSTNAME}:${PORT}
+      - KC_HOSTNAME=http://${HOSTNAME}:${PORT}
       - KC_BOOTSTRAP_ADMIN_USERNAME
       - KC_BOOTSTRAP_ADMIN_PASSWORD
       - CLIENT_PATH=${CLIENT_PATH}
@@ -51,7 +50,6 @@ services:
       - CLIENT_HOST=${CLIENT_HOST}
       - CLIENT_PATH=${CLIENT_PATH}
       - CLIENT_MODE=${CLIENT_MODE}
-      - PROTOCOLL
       - HOSTNAME
       - PORT
       - PHOTON_URL
