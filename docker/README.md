@@ -22,7 +22,8 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
 The configuration assumes a TLS endpoint is operated in front of the
-Compose stack, if used for production.
+Compose stack, if used for production. The environment variable `PROTOCOLL`
+has to be set to `https` in this case.
 
 ## Keycloak
 
