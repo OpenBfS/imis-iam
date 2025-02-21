@@ -327,7 +327,7 @@ public class InstitutionProvider implements RealmResourceProvider {
     public Response createInstitution(final Institution rep,
             @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.USER_HEADER);
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -385,7 +385,7 @@ public class InstitutionProvider implements RealmResourceProvider {
     public Response updateInstitution(
             final Institution rep, @Context HttpHeaders headers
     ) throws IntrospectionException, ReflectiveOperationException {
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.USER_HEADER);
         if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -427,7 +427,7 @@ public class InstitutionProvider implements RealmResourceProvider {
             !auth.isAuthorizedById(
                 institution,
                 RequestMethod.DELETE,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+                headers.getHeaderString(Constants.USER_HEADER))
         ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }

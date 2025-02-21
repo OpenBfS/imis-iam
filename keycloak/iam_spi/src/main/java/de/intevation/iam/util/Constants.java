@@ -15,5 +15,5 @@ public class Constants {
     /**
      * Header containing userid.
      */
-    public static final String SHIB_USER_HEADER = "X-SHIB-user";
+    public static final String USER_HEADER = "X-user";
 }

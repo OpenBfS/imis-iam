@@ -19,9 +19,10 @@ services:
       keycloak:
         condition: service_healthy
     ports:
-      - ${PORT}:80
+      - ${PORT}:${PORT}
     environment:
       - CLIENT_PATH
+      - CLIENT_SECRET
       - PROTOCOLL
       - HOSTNAME
       - PORT

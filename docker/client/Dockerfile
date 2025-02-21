@@ -5,7 +5,7 @@ LABEL maintainer=tom@intevation.de
 # Install required packages
 #
 RUN mkdir -p /usr/share/man/man1/ && apt-get -qq update && apt-get -qq install \
-    curl unzip git npm libapache2-mod-shib && \
+    curl unzip git npm apache2 libapache2-mod-auth-openidc && \
     apt-get -qq clean && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 80
@@ -25,15 +25,5 @@ WORKDIR /usr/local/iamclient
 
 ADD docker/client/ /usr/local/iamdocker/
 RUN ln -s /usr/local/iamdocker/custom-vhosts.conf /etc/apache2/sites-enabled/
-
-#Shibboleth config
-RUN ln -sf /usr/local/iamdocker/shibboleth/shibboleth2.xml \
-       /etc/shibboleth/shibboleth2.xml && \
-    ln -sf /usr/local/iamdocker/shibboleth/attribute-map.xml \
-          /etc/shibboleth/attribute-map.xml && \
-    ln -sf /usr/local/iamdocker/shibboleth/shibd.logger \
-          /etc/shibboleth/shibd.logger
-
-RUN cp /usr/local/iamdocker/shibboleth/etc/*.pem /etc/shibboleth
 
 CMD bash /usr/local/iamdocker/start.sh

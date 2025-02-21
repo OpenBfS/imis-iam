@@ -111,7 +111,7 @@ public class UserProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
     public User getProfile(@Context HttpHeaders headers) {
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.USER_HEADER);
         if (id == null) {
             throw new ForbiddenException();
         }
@@ -174,7 +174,7 @@ public class UserProvider implements RealmResourceProvider {
             .collect(Collectors.toList());
         // Filter hidden users
         userList = auth.filter(userList,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER));
+                headers.getHeaderString(Constants.USER_HEADER));
 
         long size = userList.size();
         if (firstResult != null || maxResults != null) {
@@ -221,7 +221,7 @@ public class UserProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(
                 user,
                 RequestMethod.GET,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
+                headers.getHeaderString(Constants.USER_HEADER))) {
             throw new ForbiddenException();
         }
         return user;
@@ -240,7 +240,7 @@ public class UserProvider implements RealmResourceProvider {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public User createUser(@Context HttpHeaders headers, final User rep) {
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.USER_HEADER);
         if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
             throw new ForbiddenException();
         }
@@ -311,7 +311,7 @@ public class UserProvider implements RealmResourceProvider {
         @Context HttpHeaders headers,
         final User rep
     ) {
-        String id = headers.getHeaderString(Constants.SHIB_USER_HEADER);
+        String id = headers.getHeaderString(Constants.USER_HEADER);
         if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
             throw new ForbiddenException();
         }

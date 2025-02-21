@@ -157,7 +157,7 @@ public class MailProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(
                 null,
                 RequestMethod.GET,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+                headers.getHeaderString(Constants.USER_HEADER))
         ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -252,7 +252,7 @@ public class MailProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(
                 mail,
                 RequestMethod.POST,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
+                headers.getHeaderString(Constants.USER_HEADER))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -306,7 +306,7 @@ public class MailProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(
                 mail,
                 RequestMethod.POST,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER))) {
+                headers.getHeaderString(Constants.USER_HEADER))) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         mail.setArchived(true);

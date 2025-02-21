@@ -82,7 +82,7 @@ public class IamEventProvider implements RealmResourceProvider {
         query.select(root);
         List<Event> result = auth.filter(
             em.createQuery(query).getResultList(),
-            headers.getHeaderString(Constants.SHIB_USER_HEADER)
+            headers.getHeaderString(Constants.USER_HEADER)
         );
         return Response.ok(result).build();
     }
@@ -108,7 +108,7 @@ public class IamEventProvider implements RealmResourceProvider {
             auth.isAuthorizedById(
                 event,
                 RequestMethod.PUT,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER)));
+                headers.getHeaderString(Constants.USER_HEADER)));
         return Response.ok(event).build();
     }
 
@@ -132,7 +132,7 @@ public class IamEventProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(
                 rep,
                 RequestMethod.POST,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+                headers.getHeaderString(Constants.USER_HEADER))
         ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -163,7 +163,7 @@ public class IamEventProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(
                 rep,
                 RequestMethod.PUT,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+                headers.getHeaderString(Constants.USER_HEADER))
         ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -194,7 +194,7 @@ public class IamEventProvider implements RealmResourceProvider {
         if (!auth.isAuthorizedById(
                 event,
                 RequestMethod.DELETE,
-                headers.getHeaderString(Constants.SHIB_USER_HEADER))
+                headers.getHeaderString(Constants.USER_HEADER))
         ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
