@@ -1,11 +1,8 @@
-FROM ubuntu:24.04
+FROM golang:latest
 
-LABEL maintainer=awoestmannn@intevation
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get -y update && apt-get -y install golang-go git
+LABEL maintainer=mlechner@bfs.de
 
 RUN go install github.com/mailhog/MailHog@v1.0.1
 
-CMD /root/go/bin/MailHog
+CMD /go/bin/MailHog
+
