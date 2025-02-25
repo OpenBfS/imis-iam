@@ -27,7 +27,7 @@ has to be set to `https` in this case.
 
 ## Keycloak
 
-The Keycloak admin UI can then be reached under http://localhost:48080/admin.
+The Keycloak admin UI can then be reached under http://localhost:48080.
 An initial user is created during the setup:
 
 * Username: admin
@@ -54,7 +54,7 @@ the client application with the roles according to the usernames:
 Further, the users provided by the LDAP container can be used to login.
 See ldap/users.ldif for credentials (uid, userPassword).
 
-Authenticated access to the client is given under localhost:48080.
+Authenticated access to the client is given under http://localhost:48081.
 
 ### Mode of setup
 
