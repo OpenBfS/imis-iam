@@ -104,7 +104,7 @@
     },
     "validations" : {
       "pattern": {
-        "pattern": "(\\(?([\\d \\-)–+/(]+){6,}\\)?([ .\\-–/]?)([\\d]+))",
+        "pattern": "^\\+?[1-9][0-9]{7,16}$",
         "error-message": "error.valid_phone"
       }
     },
@@ -131,7 +131,12 @@
     "annotations": {
       "inputType": "html5-tel"
     },
-    "validations" : { },
+    "validations" : { 
+      "pattern": {
+        "pattern": "^\\+?[1-9][0-9]{7,16}$",
+        "error-message": "error.valid_fax"
+      }
+    },
     "group": "contact"
   }, {
     "name" : "position",
