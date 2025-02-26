@@ -34,8 +34,8 @@ services:
       - KC_HOSTNAME_ADMIN=${PROTOCOLL}://${HOSTNAME}:${ADMIN_PORT}
       - KC_BOOTSTRAP_ADMIN_USERNAME
       - KC_BOOTSTRAP_ADMIN_PASSWORD
-      - KC_DB_URL=${KC_DB_URL}
-      - CLIENT_PATH=${CLIENT_PATH}
+      - KC_DB_URL
+      - CLIENT_PATH
     env_file:
       - keycloak/.env
 #    volumes:
@@ -51,9 +51,9 @@ services:
     ports:
       - ${PORT}:80
     environment:
-      - CLIENT_HOST=${CLIENT_HOST}
-      - CLIENT_PATH=${CLIENT_PATH}
-      - CLIENT_MODE=${CLIENT_MODE}
+      - CLIENT_HOST
+      - CLIENT_PATH
+      - CLIENT_MODE
       - PROTOCOLL
       - HOSTNAME
       - PORT
