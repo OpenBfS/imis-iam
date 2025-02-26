@@ -115,13 +115,10 @@ public class UserProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/profile")
     public User getProfile(@Context HttpHeaders headers) {
-        String id = headers.getHeaderString(Constants.USER_HEADER);
-        if (id == null) {
-            throw new ForbiddenException();
-        }
-        RealmModel realm = session.getContext().getRealm();
-        UserModel user = session.users().getUserById(realm, id);
-        return new User(user, session);
+        authenticate();
+        return new User(
+            session.getContext().getUserSession().getUser(),
+            session);
     }
 
     /**
