@@ -1,6 +1,6 @@
 # Docker Setup
 
-Use docker-compose to build/start the whole IAM stack at once, e.g. with
+Use docker-compose to build/start the IAM stack, e.g. with
 
 ```bash
 cd docker
@@ -15,10 +15,11 @@ change the respective environment variables, e.g. using:
 HOSTNAME=docker-host docker compose up -d
 ```
 
-To mount local repository checkouts into the containers for development use
+To mount local repository checkouts into the containers and start specific
+services for development use
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+docker compose --profile dev -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
 The configuration assumes a TLS endpoint is operated in front of the
