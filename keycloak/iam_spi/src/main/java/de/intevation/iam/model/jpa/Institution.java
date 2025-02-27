@@ -90,17 +90,24 @@ public class Institution {
     @Column(name = "address_location")
     private String addressLocation;
 
-    @Size(min = 7)
-    @Column(name = "central_phone")
-    private String centralPhone;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "iam_institution_phone",
+            joinColumns = @JoinColumn(name = "institution_id"))
+    @Column(name = "phone")
+    @UniqueElements
+    private List<@Size(min = 7) String> phoneNumbers;
 
     @Column(name = "central_fax")
     private String centralFax;
 
-    @Email
-    @Size(min = 1) // Prevent empty string
-    @Column(name = "central_mail")
-    private String centralMail;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "iam_institution_mail",
+            joinColumns = @JoinColumn(name = "institution_id"))
+    @Column(name = "mail")
+    @UniqueElements
+    private List<@Email String> mailAddresses;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -248,12 +255,12 @@ public class Institution {
         this.addressLocation = addressLocation;
     }
 
-    public String getCentralPhone() {
-        return centralPhone;
+    public List<String> getPhoneNumbers() {
+        return phoneNumbers;
     }
 
-    public void setCentralPhone(String centralPhone) {
-        this.centralPhone = centralPhone;
+    public void setPhoneNumbers(List<String> phones) {
+        this.phoneNumbers = phones;
     }
 
     public String getCentralFax() {
@@ -264,12 +271,12 @@ public class Institution {
         this.centralFax = centralFax;
     }
 
-    public String getCentralMail() {
-        return centralMail;
+    public List<String> getMailAddresses() {
+        return mailAddresses;
     }
 
-    public void setCentralMail(String centralMail) {
-        this.centralMail = centralMail;
+    public void setMailAddresses(List<String> mailAddresses) {
+        this.mailAddresses = mailAddresses;
     }
 
     public void setOperationModeChangePhoneNumbers(List<String> operationModeChangePhoneNumbers) {

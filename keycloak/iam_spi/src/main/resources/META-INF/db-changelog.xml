@@ -247,4 +247,29 @@
                 RENAME TO iam_institution_operation_mode_change_phone_numbers;
         </sql>
     </changeSet>
+    <changeSet author="pschwabauer@intevation.de" id="v0.16">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+            CREATE TABLE iam_institution_mail (
+                institution_id INTEGER REFERENCES iam_institution,
+                mail VARCHAR NOT NULL,
+                PRIMARY KEY(institution_id, mail)
+            );
+            CREATE TABLE iam_institution_phone (
+                institution_id INTEGER REFERENCES iam_institution,
+                phone VARCHAR NOT NULL,
+                PRIMARY KEY(institution_id, phone)
+            );
+
+            INSERT INTO iam_institution_mail (institution_id, mail)
+                SELECT id, central_mail FROM iam_institution WHERE central_mail IS NOT NULL;
+
+            INSERT INTO iam_institution_phone (institution_id, phone)
+                SELECT id, central_phone FROM iam_institution WHERE central_phone IS NOT NULL;
+
+            ALTER TABLE iam_institution DROP COLUMN central_mail;
+            ALTER TABLE iam_institution DROP COLUMN central_phone;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

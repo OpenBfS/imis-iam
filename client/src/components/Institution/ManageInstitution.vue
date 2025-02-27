@@ -164,16 +164,16 @@
               ></TextField>
             </div>
             <div class="group_class">
-              <TextField
-                :label="$t('institution.central_phone')"
-                @update:modelValue="institution.centralPhone = $event"
-                :attribute="'centralPhone'"
-              ></TextField>
-              <TextField
-                :label="$t('institution.central_mail')"
-                :attribute="'centralMail'"
-                @update:modelValue="institution.centralMail = $event"
-              ></TextField>
+              <ChipTextField
+                :label="$t('institution.phoneNumbers')"
+                @update:modelValue="institution.phoneNumbers = $event"
+                :attribute="'phoneNumbers'"
+              ></ChipTextField>
+              <ChipTextField
+                :label="$t('institution.mailAddresses')"
+                :attribute="'mailAddresses'"
+                @update:modelValue="institution.mailAddresses = $event"
+              ></ChipTextField>
               <TextField
                 :label="$t('institution.central_fax')"
                 @update:modelValue="institution.centralFax = $event"

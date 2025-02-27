@@ -28,12 +28,10 @@ INSERT INTO keycloak.iam_institution(
     service_building_postal_code,
     service_building_location,
     service_building_state,
-    central_phone,
-    central_mail,
     meas_facil_id
 ) VALUES
-    ('Institution 1', 'inst_1', 'Examplestreet 1', '12345', 'ExampleLocation-1', 'berlin', '0123/456789', 'inst1@example.test', 'inst1'),
-    ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', 'berlin', '0123/456789', 'inst2@example.test', 'inst1-1');
+    ('Institution 1', 'inst_1', 'Examplestreet 1', '12345', 'ExampleLocation-1', 'berlin', 'inst1'),
+    ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', 'berlin', 'inst1-1');
 
 INSERT INTO keycloak.iam_user_attributes (id, expiry_date)
     SELECT id, current_date + interval '12 month'
@@ -52,6 +50,14 @@ INSERT INTO keycloak.iam_institution_tags(institution_id, tag_name) VALUES
 INSERT INTO keycloak.iam_institution_operation_mode_change_mail_addresses(institution_id, mail) VALUES
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), 'inst1_alert@example.test'),
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), 'inst2_alert@example.test');
+
+INSERT INTO keycloak.iam_institution_mail(institution_id, mail) VALUES
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), 'inst1@example.test'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), 'inst2@example.test');
+
+INSERT INTO keycloak.iam_institution_phone(institution_id, phone) VALUES
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/456789'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), '0123/456789');
 
 INSERT INTO keycloak.iam_institution_operation_mode_change_phone_numbers(institution_id, phone) VALUES
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/111111'),
