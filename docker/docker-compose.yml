@@ -5,28 +5,27 @@ services:
     image: "iam_mailhog"
     ports:
       - ${MAILHOG_PORT}:8025
+    profiles:
+      - dev
   ldap:
     build:
       context: ./ldap
     image: "iam_ldap"
+    profiles:
+      - dev
   db:
     build:
       context: ./db
     image: "iam_db"
     ports:
       - ${DB_PORT}:5432
+    profiles:
+      - dev
   keycloak:
     build:
       context: ../
       dockerfile: ./docker/keycloak/Dockerfile
     image: "iam_keycloak"
-    depends_on:
-      db:
-        condition: service_healthy
-      ldap:
-        condition: service_started
-      mailhog:
-        condition: service_started
     ports:
       - ${ADMIN_PORT}:8080
     environment:
@@ -35,7 +34,8 @@ services:
       - KC_HOSTNAME_ADMIN=${PROTOCOLL}://${HOSTNAME}:${ADMIN_PORT}
       - KC_BOOTSTRAP_ADMIN_USERNAME
       - KC_BOOTSTRAP_ADMIN_PASSWORD
-      - CLIENT_PATH=${CLIENT_PATH}
+      - KC_DB_URL
+      - CLIENT_PATH
     env_file:
       - keycloak/.env
 #    volumes:
@@ -51,9 +51,9 @@ services:
     ports:
       - ${PORT}:80
     environment:
-      - CLIENT_HOST=${CLIENT_HOST}
-      - CLIENT_PATH=${CLIENT_PATH}
-      - CLIENT_MODE=${CLIENT_MODE}
+      - CLIENT_HOST
+      - CLIENT_PATH
+      - CLIENT_MODE
       - PROTOCOLL
       - HOSTNAME
       - PORT

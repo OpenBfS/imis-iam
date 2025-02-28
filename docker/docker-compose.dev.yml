@@ -1,5 +1,12 @@
 services:
   keycloak:
+    depends_on:
+      db:
+        condition: service_healthy
+      ldap:
+        condition: service_started
+      mailhog:
+        condition: service_started
     volumes:
       - ./keycloak:/opt/src
       - ../keycloak/iam_theme:/opt/keycloak/themes/iam_theme
