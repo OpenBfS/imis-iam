@@ -23,7 +23,7 @@ const addressPlace = {
   addressLocation: "",
 };
 const imis = { measFacilId: null };
-const central = { centralMail: null, centralPhone: null, centralFax: null };
+const central = { mailAddresses: null, phoneNumbers: null, centralFax: null };
 const operationModeChange = {
   operationModeChangeMailAddresses: [],
   operationModeChangePhoneNumbers: [],

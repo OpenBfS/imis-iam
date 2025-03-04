@@ -165,12 +165,12 @@
             </div>
             <div class="group_class">
               <ChipTextField
-                :label="$t('institution.phoneNumbers')"
+                :label="$t('institution.phone_numbers')"
                 @update:modelValue="institution.phoneNumbers = $event"
                 :attribute="'phoneNumbers'"
               ></ChipTextField>
               <ChipTextField
-                :label="$t('institution.mailAddresses')"
+                :label="$t('institution.mail_addresses')"
                 :attribute="'mailAddresses'"
                 @update:modelValue="institution.mailAddresses = $event"
               ></ChipTextField>
