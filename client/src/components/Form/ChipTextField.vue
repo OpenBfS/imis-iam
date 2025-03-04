@@ -150,7 +150,7 @@ watch(
   (newValue, oldValue) => {
     const oldEntries = oldValue[props.attribute];
     const newEntries = newValue[props.attribute];
-    if (areArraysDifferent(oldEntries, newEntries)) {
+    if (areArraysDifferent(oldEntries ?? [], newEntries ?? [])) {
       entries.value = newEntries;
       input.value = "";
     }
