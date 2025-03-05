@@ -166,11 +166,13 @@
             <div class="group_class">
               <ChipTextField
                 :label="$t('institution.phone_numbers')"
+                :rules="validPhone($t('error.valid_phone'))"
                 @update:modelValue="institution.phoneNumbers = $event"
                 :attribute="'phoneNumbers'"
               ></ChipTextField>
               <ChipTextField
                 :label="$t('institution.mail_addresses')"
+                :rules="validMail($t('error.valid_email'))"
                 :attribute="'mailAddresses'"
                 @update:modelValue="institution.mailAddresses = $event"
               ></ChipTextField>

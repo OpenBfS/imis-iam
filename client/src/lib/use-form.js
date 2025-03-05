@@ -221,7 +221,8 @@ export function useForm(i18n) {
     const applicationStore = useApplicationStore();
     for (let i = 0; i < error.length; i++) {
       const errorObject = error[i];
-      const attribute = errorObject.messageParameters[0];
+      // If error is a list element, ignore element position.
+      const attribute = errorObject.messageParameters[0].split("[")[0];
       const message = errorObject.message;
       const translatedMessage = translateError(
         message,
