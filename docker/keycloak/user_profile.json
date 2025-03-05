@@ -1,7 +1,7 @@
 {
   "attributes" : [ {
     "name": "username",
-    "displayName": "${username}",
+    "displayName": "${profile.attributes.username}",
     "permissions": {
       "view": ["admin", "user"],
       "edit": ["admin", "user"]
@@ -16,7 +16,7 @@
     }
   }, {
     "name" : "email",
-    "displayName" : "${email}",
+    "displayName" : "${profile.attributes.email}",
     "permissions" : {
       "view" : [ "admin", "user" ],
       "edit" : [ "admin", "user" ]
@@ -40,7 +40,7 @@
     "group": "contact"
   }, {
     "name" : "title",
-    "displayName" : "${title}",
+    "displayName" : "${profile.attributes.title}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -50,7 +50,7 @@
     "group": "name"
   }, {
     "name" : "firstName",
-    "displayName" : "${first_name}",
+    "displayName" : "${profile.attributes.first_name}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -71,7 +71,7 @@
     "group": "name"
   }, {
     "name" : "lastName",
-    "displayName" : "${last_name}",
+    "displayName" : "${profile.attributes.last_name}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -91,7 +91,7 @@
     "group": "name"
   }, {
     "name" : "phone",
-    "displayName" : "${phone}",
+    "displayName" : "${profile.attributes.phone}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -104,14 +104,14 @@
     },
     "validations" : {
       "pattern": {
-        "pattern": "(\\(?([\\d \\-)–+/(]+){6,}\\)?([ .\\-–/]?)([\\d]+))",
+        "pattern": "^\\+[1-9][0-9]{7,16}$",
         "error-message": "error.valid_phone"
       }
     },
     "group": "contact"
   }, {
     "name" : "mobile",
-    "displayName" : "${mobile}",
+    "displayName" : "${profile.attributes.mobile}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -119,11 +119,16 @@
     "annotations": {
       "inputType": "html5-tel"
     },
-    "validations" : { },
+    "validations" : { 
+      "pattern": {
+        "pattern": "^\\+[1-9][0-9]{7,16}$",
+        "error-message": "error.valid_mobile"
+      }
+},
     "group": "contact"
   }, {
     "name" : "fax",
-    "displayName" : "${fax}",
+    "displayName" : "${profile.attributes.fax}",
     "permissions" : {
       "edit" : [ "admin", "user" ],
       "view" : [ "user", "admin" ]
@@ -131,11 +136,16 @@
     "annotations": {
       "inputType": "html5-tel"
     },
-    "validations" : { },
+    "validations" : { 
+      "pattern": {
+        "pattern": "^\\+[1-9][0-9]{7,16}$",
+        "error-message": "error.valid_fax"
+      }
+    },
     "group": "contact"
   }, {
     "name" : "position",
-    "displayName" : "${position}",
+    "displayName" : "${profile.attributes.position}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -153,7 +163,7 @@
     }
   }, {
     "name" : "tags",
-    "displayName" : "${tags}",
+    "displayName" : "${profile.attributes.tags}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
@@ -172,7 +182,7 @@
     "multivalued": true
   }, {
     "name" : "network",
-    "displayName" : "${network}",
+    "displayName" : "${profile.attributes.network}",
     "required" : {
       "roles" : [ "admin", "user" ]
     },
