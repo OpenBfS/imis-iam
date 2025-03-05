@@ -22,8 +22,8 @@ function getExpUser() {
 
 function handleDisplayName(displayName) {
   const { t } = i18n.global;
-  if (displayName.startsWith("${") && displayName.endsWith("}")) {
-    return t(`user.${displayName.replace("${", "").slice(0, -1)}`);
+  if (displayName.startsWith("${profile.attributes.") && displayName.endsWith("}")) {
+    return t(`user.${displayName.replace("${profile.attributes.", "").slice(0, -1)}`);
   }
   return displayName;
 }
