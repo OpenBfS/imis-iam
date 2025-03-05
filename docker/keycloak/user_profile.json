@@ -144,6 +144,27 @@
     },
     "group": "contact"
   }, {
+    "name" : "operation_mode_change_mail_addresses",
+    "displayName" : "${profile.attributes.operation_mode_change_mail_addresses}",
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "annotations": {
+      "inputType": "html5-email"
+    },
+    "validations" : {
+      "email" : { },
+      "length" : {
+        "max" : 255
+      },
+      "pattern": {
+        "pattern": "\\S+@\\S+\\.\\S+",
+        "error-message": "error.valid_email"
+      }
+    },
+    "group": "operation_mode_change_contact"
+  }, {
     "name" : "position",
     "displayName" : "${profile.attributes.position}",
     "required" : {
@@ -208,6 +229,12 @@
     },
     {
       "name": "contact",
+      "displayHeader": "",
+      "displayDescription": "",
+      "annotations": {}
+    },
+    {
+      "name": "operation_mode_change_contact",
       "displayHeader": "",
       "displayDescription": "",
       "annotations": {}

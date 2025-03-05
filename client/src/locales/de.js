@@ -130,7 +130,7 @@ export default {
     service_building_postal_code: "PLZ des Dienstgebäudes",
     phone_numbers: "Telefon",
     mail_addresses: "E-Mail",
-    operation_mode_change_contact: "Kontaktdaten IMIS-Betriebsartenwechsel",
+    operation_mode_change_contact: "Kontaktdaten IMIS-Betriebsartenwechsel (BAW)",
     operation_mode_change_mail_addresses: "BAW-E-Mail",
     operation_mode_change_phone_numbers: "BAW-Telefon",
     operation_mode_change_sms_phone_numbers: "BAW-SMS",
@@ -204,6 +204,10 @@ export default {
     label_positions: "Positionen",
     role: "Rolle im IdM",
     no_users_available: "Es sind keine @:user_term vorhanden",
+    operation_mode_change_contact: "Kontaktdaten IMIS-Betriebsartenwechsel (BAW)",
+    operation_mode_change_mail_addresses: "BAW-E-Mail",
+    operation_mode_change_phone_numbers: "BAW-Telefon",
+    operation_mode_change_sms_phone_numbers: "BAW-SMS"
   },
   // Shared button texts
   button: {
