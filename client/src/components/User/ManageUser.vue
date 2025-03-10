@@ -66,8 +66,31 @@
                   :key="attribute.name"
                 >
                   <v-col cols="6">
+                    <ChipTextField
+                      v-if="
+                        getFormFieldType(
+                          attribute.annotations?.inputType,
+                          attribute.multivalued
+                        ) === FORM_FIELD_TYPE_CHIPTEXTFIELD
+                      "
+                      :attribute="attribute.name"
+                      :required="isUserAttributeRequired(attribute)"
+                      :label="handleDisplayName(attribute.displayName)"
+                      :name="attribute.name"
+                      :model-value="user.attributes[attribute.name]"
+                      @update:model-value="
+                        setUserAttribute(attribute.name, $event);
+                        clearValidationError(attribute.name);
+                      "
+                      :rules="
+                        applicationStore.clientAndServerRules[attribute.name]
+                      "
+                    ></ChipTextField>
                     <TextField
-                      v-if="isTextField(attribute.annotations?.inputType)"
+                      v-else-if="
+                        getFormFieldType(attribute.annotations?.inputType) ===
+                        FORM_FIELD_TYPE_TEXTFIELD
+                      "
                       :attribute="attribute.name"
                       density="compact"
                       :required="isUserAttributeRequired(attribute)"
@@ -82,7 +105,10 @@
                       :type="getTextFieldType(attribute.name)"
                     ></TextField>
                     <Select
-                      v-else-if="isSelection(attribute.annotations?.inputType)"
+                      v-else-if="
+                        getFormFieldType(attribute.annotations?.inputType) ===
+                        FORM_FIELD_TYPE_SELECTION
+                      "
                       :label="handleDisplayName(attribute.displayName)"
                       :attribute="attribute.name"
                       item-title="name"
@@ -115,8 +141,31 @@
                 :key="attribute.name"
               >
                 <v-col v-if="attribute.name !== 'username'" cols="6">
+                  <ChipTextField
+                    v-if="
+                      getFormFieldType(
+                        attribute.annotations?.inputType,
+                        attribute.multivalued
+                      ) === FORM_FIELD_TYPE_CHIPTEXTFIELD
+                    "
+                    :attribute="attribute.name"
+                    :required="isUserAttributeRequired(attribute)"
+                    :label="handleDisplayName(attribute.displayName)"
+                    :name="attribute.name"
+                    :model-value="user.attributes[attribute.name]"
+                    @update:model-value="
+                      setUserAttribute(attribute.name, $event);
+                      clearValidationError(attribute.name);
+                    "
+                    :rules="
+                      applicationStore.clientAndServerRules[attribute.name]
+                    "
+                  ></ChipTextField>
                   <TextField
-                    v-if="isTextField(attribute.annotations?.inputType)"
+                    v-else-if="
+                      getFormFieldType(attribute.annotations?.inputType) ===
+                      FORM_FIELD_TYPE_TEXTFIELD
+                    "
                     :attribute="attribute.name"
                     density="compact"
                     :required="isUserAttributeRequired(attribute)"
@@ -135,9 +184,8 @@
                   ></TextField>
                   <Select
                     v-else-if="
-                      ['select', 'multiselect'].includes(
-                        attribute.annotations.inputType
-                      )
+                      getFormFieldType(attribute.annotations?.inputType) ===
+                      FORM_FIELD_TYPE_SELECTION
                     "
                     :label="handleDisplayName(attribute.displayName)"
                     item-title="name"
@@ -303,6 +351,10 @@ const userStore = useUserStore();
 
 provide("translationCategory", "user");
 
+const FORM_FIELD_TYPE_TEXTFIELD = "textfield";
+const FORM_FIELD_TYPE_SELECTION = "selection";
+const FORM_FIELD_TYPE_CHIPTEXTFIELD = "chiptextfield";
+
 function setUserAttribute(name, value) {
   const attrs = user.value.attributes;
   if (
@@ -324,27 +376,26 @@ const getMetaDataAttribute = (nameOfAttribute) => {
     (attribute) => attribute.name === nameOfAttribute
   );
 };
-const isTextField = (inputType) => {
+const getFormFieldType = (inputType, multivalued) => {
+  // textfield is the fallback if an attribute from user-profile.json contains combinations of values
+  // for which we don't have a special field yet.
+  if (!inputType) return FORM_FIELD_TYPE_TEXTFIELD;
   if (
-    !inputType ||
     ["text", "html5-email", "html5-tel", "html5-url", "html5-number"].includes(
       inputType
     )
   ) {
-    return true;
-  } else {
-    return false;
-  }
-};
-const isSelection = (inputType) => {
-  if (inputType && ["select", "multiselect"].includes(inputType)) {
-    return true;
-  } else {
-    return false;
-  }
+    if (multivalued) {
+      return FORM_FIELD_TYPE_CHIPTEXTFIELD;
+    } else {
+      return FORM_FIELD_TYPE_TEXTFIELD;
+    }
+  } else if (["select", "multiselect"].includes(inputType)) {
+    return FORM_FIELD_TYPE_SELECTION;
+  } else return FORM_FIELD_TYPE_TEXTFIELD;
 };
 
-// Convert the input type that Keycloak uses to a type that can be used by Vuetify.
+// Get the input type that Keycloak uses to a type that can be used by Vuetify's v-text-field.
 const getTextFieldType = (nameOfAttribute) => {
   const attribute = getMetaDataAttribute(nameOfAttribute);
   if (attribute.annotations?.inputType === "html5-email") {

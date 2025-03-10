@@ -100,6 +100,8 @@ const input = ref("");
 const plusButton = ref(null);
 const entries = ref([]);
 const indexOfDuplicate = ref(-1);
+
+// Prevent duplicates
 const internalRules = ref([
   (v) => {
     const index = entries.value.indexOf(v);
@@ -119,7 +121,9 @@ const resetInput = () => {
   input.value = "";
 };
 onMounted(() => {
-  if (props.attribute && applicationStore.managedItem[props.attribute]) {
+  if (props.modelValue) {
+    entries.value = props.modelValue;
+  } else if (props.attribute && applicationStore.managedItem[props.attribute]) {
     entries.value = applicationStore.managedItem[props.attribute];
   }
   applicationStore.addResetEventListener(resetInput);
