@@ -75,7 +75,6 @@ function updateInstitution(
         isServerValidationError(error)
           ? handleValidationErrorFromServer(error.response.data)
           : (hasRequestError.value = true);
-        console.error(error.response);
         resolve(error);
       });
   });
