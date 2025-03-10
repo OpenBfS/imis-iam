@@ -2059,10 +2059,10 @@
     "email" : "example@chefredakteur.com",
     "emailVerified" : false,
     "attributes" : {
-      "mobile" : [ "0654-321" ],
+      "mobile" : [ "+49654321" ],
       "position" : [ "Leiter" ],
-      "fax" : [ "0123-654" ],
-      "phone" : [ "01234 123456" ],
+      "fax" : [ "+49123654" ],
+      "phone" : [ "+491234123456" ],
       "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
@@ -2092,10 +2092,10 @@
     "email" : "example@user.com",
     "emailVerified" : false,
     "attributes" : {
-      "mobile" : [ "0654-321" ],
+      "mobile" : [ "+49654321" ],
       "position" : [ "Leiter" ],
-      "fax" : [ "0123-654" ],
-      "phone" : [ "01234 123456" ],
+      "fax" : [ "+49123654" ],
+      "phone" : [ "+491234123456" ],
       "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
@@ -2125,10 +2125,10 @@
     "email" : "example@redakteur.com",
     "emailVerified" : false,
     "attributes" : {
-      "mobile" : [ "0654-321" ],
+      "mobile" : [ "+49654321" ],
       "position" : [ "Leiter" ],
-      "fax" : [ "0123-654" ],
-      "phone" : [ "01234 123456" ],
+      "fax" : [ "+49123654" ],
+      "phone" : [ "+491234123456" ],
       "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
