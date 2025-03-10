@@ -163,6 +163,43 @@
         "error-message": "error.valid_email"
       }
     },
+    "multivalued": true,
+    "group": "operation_mode_change_contact"
+  }, {
+    "name" : "operation_mode_change_phone_numbers",
+    "displayName" : "${profile.attributes.operation_mode_change_phone_numbers}",
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "annotations": {
+      "inputType": "html5-tel"
+    },
+    "validations" : {
+      "pattern": {
+        "pattern": "^\\+[1-9][0-9]{7,16}$",
+        "error-message": "error.valid_phone"
+      }
+    },
+    "multivalued": true,
+    "group": "operation_mode_change_contact"
+  }, {
+    "name" : "operation_mode_change_sms_phone_numbers",
+    "displayName" : "${profile.attributes.operation_mode_change_sms_phone_numbers}",
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "annotations": {
+      "inputType": "html5-tel"
+    },
+    "validations" : {
+      "pattern": {
+        "pattern": "^\\+[1-9][0-9]{7,16}$",
+        "error-message": "error.valid_phone"
+      }
+    },
+    "multivalued": true,
     "group": "operation_mode_change_contact"
   }, {
     "name" : "position",
