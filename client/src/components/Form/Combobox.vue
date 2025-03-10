@@ -57,7 +57,7 @@ const applicationStore = useApplicationStore();
 const props = defineProps({
   active: Boolean,
   autofocus: Boolean,
-  autoSelectFirst: Boolean | "next",
+  autoSelectFirst: [Boolean, String],
   baseColor: String,
   bgColor: String,
   centerAffix: Boolean,
@@ -67,7 +67,7 @@ const props = defineProps({
   clearOnSelect: Boolean,
   closableChips: Boolean,
   color: String,
-  counter: String | Number | Boolean,
+  counter: [String, Number, Boolean],
   density: String,
   disabled: Boolean,
   hint: String,
