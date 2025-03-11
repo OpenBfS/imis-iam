@@ -26,14 +26,13 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.CSVExporter;
 
 
-public class ExportProvider implements RealmResourceProvider {
+public class ExportResource {
 
     private KeycloakSession session;
 
@@ -42,7 +41,7 @@ public class ExportProvider implements RealmResourceProvider {
      *
      * @param session
      */
-    public ExportProvider(KeycloakSession session) {
+    public ExportResource(KeycloakSession session) {
         this.session = session;
     }
 
@@ -76,7 +75,7 @@ public class ExportProvider implements RealmResourceProvider {
         setCsvOptions(
             exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
 
-        UserProvider userProvider = new UserProvider(session);
+        UserResource userProvider = new UserResource(this.session);
         List<User> users = new ArrayList<>();
         if (ids != null && !ids.isEmpty()) {
             for (String id: ids) {
@@ -119,7 +118,7 @@ public class ExportProvider implements RealmResourceProvider {
         setCsvOptions(
             exporter, fieldSeparator, quoteType, rowDelimiter, encoding);
 
-        InstitutionProvider instProvider = new InstitutionProvider(session);
+        InstitutionResource instProvider = new InstitutionResource(session);
         List<Institution> institutions = new ArrayList<>();
         if (ids != null && !ids.isEmpty()) {
             for (Integer id: ids) {
@@ -171,14 +170,5 @@ public class ExportProvider implements RealmResourceProvider {
             .header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"export.csv\"")
             .build();
-    }
-
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public Object getResource() {
-        return this;
     }
 }

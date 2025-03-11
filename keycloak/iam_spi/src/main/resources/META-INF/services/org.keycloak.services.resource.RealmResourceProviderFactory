@@ -1,5 +1,1 @@
-de.intevation.iam.ExportProviderFactory
-de.intevation.iam.InstitutionProviderFactory
-de.intevation.iam.IamEventProviderFactory
-de.intevation.iam.MailProviderFactory
-de.intevation.iam.UserProviderFactory
+de.intevation.iam.IamResourceProviderFactory

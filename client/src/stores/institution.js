@@ -73,7 +73,7 @@ export const useInstitutionStore = defineStore("institution", {
           sortBy: this.sortBy?.key,
           order: this.sortBy?.order,
         };
-        HTTP.get("/institution", {
+        HTTP.get("/iam/institution", {
           params,
         })
           .then((response) => {
@@ -91,7 +91,7 @@ export const useInstitutionStore = defineStore("institution", {
     },
     updateInstitution(institution) {
       return new Promise((resolve, reject) => {
-        HTTP.put("/institution", institution)
+        HTTP.put("/iam/institution", institution)
           .then((response) => {
             this.updateInstitutionEntity(response.data);
             resolve(response);

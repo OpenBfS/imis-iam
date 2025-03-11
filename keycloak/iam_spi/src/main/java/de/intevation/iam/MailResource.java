@@ -41,7 +41,6 @@ import org.keycloak.email.EmailException;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.MailAuthorizer;
@@ -57,7 +56,7 @@ import de.intevation.iam.validation.Validator;
  * @author Alexander Woestmann<awoestmann@intevation>
  */
 @Produces(MediaType.APPLICATION_JSON)
-public class MailProvider implements RealmResourceProvider {
+public class MailResource {
 
     private static final Logger LOG = Logger.getLogger("MailProvider");
 
@@ -77,20 +76,12 @@ public class MailProvider implements RealmResourceProvider {
      * Constructor.
      * @param session Keycloak session
      */
-    public MailProvider(KeycloakSession session) {
+    public MailResource(KeycloakSession session) {
         this.session = session;
         this.auth = new MailAuthorizer(session);
         this.validator = new Validator();
         this.entityManager = session.getProvider(JpaConnectionProvider.class)
             .getEntityManager();
-    }
-
-    @Override
-    public void close() {}
-
-    @Override
-    public Object getResource() {
-        return this;
     }
 
     /**
@@ -136,7 +127,6 @@ public class MailProvider implements RealmResourceProvider {
      * @param start Return only mails send after given timestamp
      * @param end Return only mails send before given timestamp
      * @param sender Return only mails from given sender
-     * @param lists Filter by mailing list IDs given with URL parameter "list"
      * @return Response containing mails as json array
      */
     @GET

@@ -343,7 +343,7 @@ const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const createUser = () => {
-  HTTP.post("/iamuser", user.value)
+  HTTP.post("/iam/user", user.value)
     .then((response) => {
       userStore.addUser(response.data);
       applicationStore.setOwnAccount(true);

@@ -142,7 +142,7 @@ const itemClicked = (id) => {
 };
 
 const deleteEvent = (event) => {
-  HTTP.delete("event/" + event.id)
+  HTTP.delete("iam/event/" + event.id)
     .then(() => {
       eventsStore.removeEvent(event);
     })

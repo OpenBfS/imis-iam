@@ -219,7 +219,7 @@ const exportRequest = (itemsName) => {
   ) {
     params["attributes"] = institutionStore.selectedTableColumns;
   }
-  HTTP.get(`/export/${itemsName}`, {
+  HTTP.get(`/iam/export/${itemsName}`, {
     params,
     paramsSerializer,
     // responseEncoding and responseType are necessary so axios doesn't decode the response

@@ -109,7 +109,7 @@ watch(
 );
 
 const loadInstitutionTags = () => {
-  HTTP.get("institution/tag")
+  HTTP.get("iam/institution/tag")
     .then((response) => {
       institutionTags.value = response.data;
     })

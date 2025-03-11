@@ -31,7 +31,7 @@ export const useEventsStore = defineStore("events", {
     },
     loadEvents(searchString) {
       return new Promise((resolve, reject) => {
-        HTTP.get("/event", {
+        HTTP.get("/iam/event", {
           params: { search: searchString },
         })
           .then((response) => {
@@ -43,7 +43,7 @@ export const useEventsStore = defineStore("events", {
     },
     updateEvent(event) {
       return new Promise((resolve, reject) => {
-        HTTP.put("/event", event)
+        HTTP.put("/iam/event", event)
           .then((response) => {
             this.updateEventEntity(response.data);
             resolve(response);

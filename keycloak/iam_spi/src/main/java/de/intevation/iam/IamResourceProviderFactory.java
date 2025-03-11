@@ -17,9 +17,9 @@ import org.keycloak.services.resource.RealmResourceProviderFactory;
  *
  * @author Alexander Woestmann <awoestmann@intevation.de>
  */
-public class UserProviderFactory implements RealmResourceProviderFactory {
+public class IamResourceProviderFactory implements RealmResourceProviderFactory {
 
-    public static final String ID = "iamuser";
+    public static final String ID = "iam";
 
     @Override
     public String getId() {
@@ -28,7 +28,7 @@ public class UserProviderFactory implements RealmResourceProviderFactory {
 
     @Override
     public RealmResourceProvider create(KeycloakSession session) {
-        return new UserProvider(session);
+        return new IamResourceProvider(session);
     }
 
     @Override

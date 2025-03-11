@@ -18,7 +18,7 @@ export const useMailStore = defineStore("mail", {
     },
     loadMailTypes() {
       return new Promise((resolve, reject) => {
-        HTTP.get("mail/type")
+        HTTP.get("iam/mail/type")
           .then((response) => {
             this.setMailTypes(response.data);
             resolve(response);

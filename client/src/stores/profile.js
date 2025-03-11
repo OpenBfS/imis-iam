@@ -72,7 +72,7 @@ export const useProfileStore = defineStore("profile", {
     },
     loadProfile() {
       return new Promise((resolve, reject) => {
-        HTTP.get("/iamuser/profile")
+        HTTP.get("/iam/user/profile")
           .then((response) => {
             this.setUserData(response.data);
             this.setIsAllowedToManage(response.data.role !== "user");
@@ -83,7 +83,7 @@ export const useProfileStore = defineStore("profile", {
     },
     loadUserProfileMetadata() {
       return new Promise((resolve, reject) => {
-        HTTP.get("/iamuser/userprofilemetadata")
+        HTTP.get("/iam/user/userprofilemetadata")
           .then((response) => {
             this.setUserProfileMetadata(response.data);
             resolve(response);
@@ -93,7 +93,7 @@ export const useProfileStore = defineStore("profile", {
     },
     getMyMailingLists() {
       return new Promise((resolve, reject) => {
-        HTTP.get("mail/list?subscribed=true")
+        HTTP.get("iam/mail/list?subscribed=true")
           .then((response) => {
             this.setMyMailingLists(response.data);
             resolve(response);

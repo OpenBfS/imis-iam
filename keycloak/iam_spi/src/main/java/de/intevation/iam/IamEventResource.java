@@ -11,7 +11,6 @@ import java.util.Locale;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.EventAuthorizer;
 import de.intevation.iam.model.jpa.Event;
@@ -37,7 +36,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 
-public class IamEventProvider implements RealmResourceProvider {
+public class IamEventResource {
 
     private KeycloakSession session;
     private EventAuthorizer auth;
@@ -46,19 +45,11 @@ public class IamEventProvider implements RealmResourceProvider {
 
     private EntityManager entityManager;
 
-    @Override
-    public void close() { }
-
-    @Override
-    public Object getResource() {
-        return this;
-    }
-
     /**
      * Constructor.
      * @param session Keycloak session
      */
-    public IamEventProvider(KeycloakSession session) {
+    public IamEventResource(KeycloakSession session) {
         this.session = session;
         this.auth = new EventAuthorizer(session);
         this.validator = new Validator();

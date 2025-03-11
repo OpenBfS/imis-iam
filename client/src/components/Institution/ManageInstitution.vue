@@ -395,7 +395,7 @@ const {
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
-  HTTP.get("institution/tag")
+  HTTP.get("iam/institution/tag")
     .then((response) => {
       categories.value = response.data;
     })
@@ -488,7 +488,7 @@ const sanitizePayload = (payload) => {
 const createInstitution = () => {
   let payload = { ...institution.value };
   sanitizePayload(payload);
-  HTTP.post("/institution", payload)
+  HTTP.post("/iam/institution", payload)
     .then((response) => {
       institutionStore.addInstitution(response.data);
       applicationStore.searchRequest(["institutions"]);
@@ -512,7 +512,7 @@ const saveInstitution = () => {
   );
 };
 const deleteInstitution = () => {
-  HTTP.delete("institution/" + institution.value.id)
+  HTTP.delete("iam/institution/" + institution.value.id)
     .then(() => {
       institutionStore.removeInstitution(institution.value);
       applicationStore.searchRequest(["institutions"]);

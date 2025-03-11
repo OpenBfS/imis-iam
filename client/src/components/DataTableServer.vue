@@ -176,7 +176,7 @@ const roles = computed(() => {
 const selected = ref([]);
 const institutionTags = ref([]);
 const getInstitutionTags = () => {
-  HTTP.get("institution/tag")
+  HTTP.get("iam/institution/tag")
     .then((response) => {
       institutionTags.value = response.data;
     })

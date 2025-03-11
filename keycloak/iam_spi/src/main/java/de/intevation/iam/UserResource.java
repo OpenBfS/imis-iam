@@ -22,7 +22,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -37,21 +36,17 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-import org.keycloak.authorization.util.Tokens;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.representations.AccessToken;
-import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.keycloak.userprofile.UserProfileProvider;
 import org.keycloak.userprofile.ValidationException;
 
 import de.intevation.iam.auth.Authorizer;
-import de.intevation.iam.auth.IaMRole;
 import de.intevation.iam.auth.UserAuthorizer;
 import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.model.representation.ObjectList;
@@ -63,7 +58,8 @@ import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 import org.keycloak.utils.SearchQueryUtils;
 
-public class UserProvider implements RealmResourceProvider {
+
+public class UserResource {
 
     private KeycloakSession session;
 
@@ -74,16 +70,11 @@ public class UserProvider implements RealmResourceProvider {
 
     private EntityManager entityManager;
 
-    enum SortOrder {
-        asc,
-        desc
-    }
-
     /**
      * Constructor.
      * @param session Session
      */
-    public UserProvider(KeycloakSession session) {
+    public UserResource(KeycloakSession session) {
         this.session = session;
         this.auth = new UserAuthorizer(session);
         this.userProfileProvider =
@@ -99,7 +90,7 @@ public class UserProvider implements RealmResourceProvider {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/userprofilemetadata")
+    @Path("userprofilemetadata")
     public UPConfig getUserProfileMetadata() {
         return this.userProfileProvider.getConfiguration();
     }
@@ -113,27 +104,11 @@ public class UserProvider implements RealmResourceProvider {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/profile")
+    @Path("profile")
     public User getProfile(@Context HttpHeaders headers) {
-        authenticate();
         return new User(
             session.getContext().getUserSession().getUser(),
             session);
-    }
-
-    /**
-     * Authenticate that user is granted access to this application.
-     */
-    private void authenticate() {
-        AccessToken accessToken = Tokens.getAccessToken(session);
-        if (accessToken == null) {
-            throw new NotAuthorizedException("Bearer token required");
-        }
-        if (!IaMRole.USER.isRoleOf(
-                session.getContext().getUserSession().getUser(),
-                session)) {
-            throw new ForbiddenException();
-        }
     }
 
     /**
@@ -150,7 +125,6 @@ public class UserProvider implements RealmResourceProvider {
             @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults) {
-        authenticate();
         RealmModel realm = session.getContext().getRealm();
 
         Map<String, String> attributes = search == null
@@ -223,7 +197,7 @@ public class UserProvider implements RealmResourceProvider {
      * view the requested data.
      */
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     public User getUserById(
         @PathParam("id") String id,
         @Context HttpHeaders headers
@@ -389,7 +363,7 @@ public class UserProvider implements RealmResourceProvider {
      * @return Roles as JSON array
      */
     @GET
-    @Path("/roles")
+    @Path("roles")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRoles() {
         RealmModel realm = session.getContext().getRealm();
@@ -400,13 +374,5 @@ public class UserProvider implements RealmResourceProvider {
             roleNames.add(new Role(role));
         });
         return Response.ok(roleNames).build();
-    }
-
-    @Override
-    public void close() { }
-
-    @Override
-    public Object getResource() {
-        return this;
     }
 }

@@ -291,7 +291,7 @@ const includeExpiryDatePicker = () => {
 };
 const sendMail = () => {
   resetNotification();
-  HTTP.post("mail", {
+  HTTP.post("iam/mail", {
     sender: mail.value.selectedSender,
     text: mail.value.text,
     subject: mail.value.subject,

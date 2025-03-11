@@ -207,7 +207,7 @@ const failureMails = ref([]);
 const maintenanceMails = ref([]);
 const restTypes = [1, 2, 5, 6, 7, 8];
 const getMailsbyTypes = (types, count) => {
-  let path = "mail?";
+  let path = "iam/mail?";
   if (count) {
     path += "count=" + count;
   }
@@ -243,7 +243,7 @@ const checkChildObject = (e) => {
 };
 const archiveMail = (id, type) => {
   resetNotification();
-  HTTP.get("mail/archive/" + id)
+  HTTP.get("iam/mail/archive/" + id)
     .then(() => {
       if ([3, 4].indexOf(type) !== -1) {
         getMailsbyTypes([type]);

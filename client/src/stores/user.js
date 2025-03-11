@@ -49,7 +49,7 @@ export const useUserStore = defineStore("user", {
           sortBy: this.sortBy?.key,
           order: this.sortBy?.order,
         };
-        HTTP.get("/iamuser", {
+        HTTP.get("/iam/user", {
           params,
         })
           .then((response) => {
@@ -67,7 +67,7 @@ export const useUserStore = defineStore("user", {
     },
     loadRoles() {
       return new Promise((resolve, reject) => {
-        HTTP.get("iamuser/roles")
+        HTTP.get("iam/user/roles")
           .then((response) => {
             this.setRoles(response.data);
             resolve(response);
@@ -77,7 +77,7 @@ export const useUserStore = defineStore("user", {
     },
     updateUser(user) {
       return new Promise((resolve, reject) => {
-        HTTP.put("iamuser", user)
+        HTTP.put("iam/user", user)
           .then((response) => {
             //Update the stored entity using repsonse data
             this.updateUserEntity(response.data);

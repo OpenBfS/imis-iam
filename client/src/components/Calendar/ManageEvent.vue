@@ -153,7 +153,7 @@ const createEvent = () => {
   let payload = { ...event.value };
   payload.startDate = payload.startDate.toISOString();
   payload.endDate = payload.endDate.toISOString();
-  HTTP.post("/event", payload)
+  HTTP.post("/iam/event", payload)
     .then((response) => {
       eventsStore.addEvent(response.data);
       applicationStore.setShowManageEventDialog(false);

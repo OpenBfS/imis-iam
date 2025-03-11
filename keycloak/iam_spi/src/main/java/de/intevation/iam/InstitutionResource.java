@@ -43,7 +43,6 @@ import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.services.resource.RealmResourceProvider;
 
 import de.intevation.iam.auth.Authorizer;
 import de.intevation.iam.auth.InstitutionAuthorizer;
@@ -61,7 +60,7 @@ import org.keycloak.utils.SearchQueryUtils;
  * @author Alexander Woestmann <awoestmann@intevation.de>
  */
 @Produces(MediaType.APPLICATION_JSON)
-public class InstitutionProvider implements RealmResourceProvider {
+public class InstitutionResource {
 
     public enum SortOrder {
         asc,
@@ -80,7 +79,7 @@ public class InstitutionProvider implements RealmResourceProvider {
      * Constructor.
      * @param session Keycloak session
      */
-    public InstitutionProvider(KeycloakSession session) {
+    public InstitutionResource(KeycloakSession session) {
         this.session = session;
         this.auth = new InstitutionAuthorizer(session);
         this.validator = new Validator();
@@ -470,13 +469,4 @@ public class InstitutionProvider implements RealmResourceProvider {
             }
         }
     }
-
-    @Override
-    public void close() { }
-
-    @Override
-    public Object getResource() {
-        return this;
-    }
-
 }
