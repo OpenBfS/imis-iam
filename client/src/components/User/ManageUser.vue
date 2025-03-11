@@ -66,67 +66,12 @@
                   :key="attribute.name"
                 >
                   <v-col cols="6">
-                    <ChipTextField
-                      v-if="
-                        getFormFieldType(
-                          attribute.annotations?.inputType,
-                          attribute.multivalued
-                        ) === FORM_FIELD_TYPE_CHIPTEXTFIELD
-                      "
-                      :attribute="attribute.name"
-                      :required="isUserAttributeRequired(attribute)"
-                      :label="handleDisplayName(attribute.displayName)"
-                      :name="attribute.name"
-                      :model-value="user.attributes[attribute.name]"
-                      @update:model-value="
-                        setUserAttribute(attribute.name, $event);
-                        clearValidationError(attribute.name);
-                      "
-                      :rules="
-                        applicationStore.clientAndServerRules[attribute.name]
-                      "
-                    ></ChipTextField>
-                    <TextField
-                      v-else-if="
-                        getFormFieldType(attribute.annotations?.inputType) ===
-                        FORM_FIELD_TYPE_TEXTFIELD
-                      "
-                      :attribute="attribute.name"
-                      density="compact"
-                      :required="isUserAttributeRequired(attribute)"
-                      variant="underlined"
-                      :label="handleDisplayName(attribute.displayName)"
-                      :name="attribute.name"
-                      :model-value="user.attributes[attribute.name]"
-                      @update:model-value="
-                        setUserAttribute(attribute.name, $event);
-                        clearValidationError(attribute.name);
-                      "
-                      :type="getTextFieldType(attribute.name)"
-                    ></TextField>
-                    <Select
-                      v-else-if="
-                        getFormFieldType(attribute.annotations?.inputType) ===
-                        FORM_FIELD_TYPE_SELECTION
-                      "
-                      :label="handleDisplayName(attribute.displayName)"
-                      :attribute="attribute.name"
-                      item-title="name"
-                      item-value="id"
-                      :name="attribute.name"
-                      :items="attribute.validations.options.options"
-                      :model-value="user.attributes[attribute.name]"
-                      :clearable="
-                        attribute.annotations.inputType === 'multiselect'
-                      "
-                      :multiple="
-                        attribute.annotations.inputType === 'multiselect'
-                      "
-                      :required="isUserAttributeRequired(attribute)"
-                      @update:model-value="
-                        setUserAttribute(attribute.name, $event)
-                      "
-                    ></Select>
+                    <GenericUserFormField
+                      :attribute="attribute"
+                      :clearValidationError="clearValidationError"
+                      :setUserAttribute="setUserAttribute"
+                      :user="user"
+                    />
                   </v-col>
                 </template>
               </v-row>
@@ -141,70 +86,12 @@
                 :key="attribute.name"
               >
                 <v-col v-if="attribute.name !== 'username'" cols="6">
-                  <ChipTextField
-                    v-if="
-                      getFormFieldType(
-                        attribute.annotations?.inputType,
-                        attribute.multivalued
-                      ) === FORM_FIELD_TYPE_CHIPTEXTFIELD
-                    "
-                    :attribute="attribute.name"
-                    :required="isUserAttributeRequired(attribute)"
-                    :label="handleDisplayName(attribute.displayName)"
-                    :name="attribute.name"
-                    :model-value="user.attributes[attribute.name]"
-                    @update:model-value="
-                      setUserAttribute(attribute.name, $event);
-                      clearValidationError(attribute.name);
-                    "
-                    :rules="
-                      applicationStore.clientAndServerRules[attribute.name]
-                    "
-                  ></ChipTextField>
-                  <TextField
-                    v-else-if="
-                      getFormFieldType(attribute.annotations?.inputType) ===
-                      FORM_FIELD_TYPE_TEXTFIELD
-                    "
-                    :attribute="attribute.name"
-                    density="compact"
-                    :required="isUserAttributeRequired(attribute)"
-                    variant="underlined"
-                    :label="handleDisplayName(attribute.displayName)"
-                    :name="attribute.name"
-                    :model-value="user.attributes[attribute.name]"
-                    @update:model-value="
-                      setUserAttribute(attribute.name, $event);
-                      clearValidationError(attribute.name);
-                    "
-                    :type="getTextFieldType(attribute.name)"
-                    :rules="
-                      applicationStore.clientAndServerRules[attribute.name]
-                    "
-                  ></TextField>
-                  <Select
-                    v-else-if="
-                      getFormFieldType(attribute.annotations?.inputType) ===
-                      FORM_FIELD_TYPE_SELECTION
-                    "
-                    :label="handleDisplayName(attribute.displayName)"
-                    item-title="name"
-                    item-value="id"
-                    :attribute="attribute.name"
-                    :items="attribute.validations.options.options"
-                    :name="attribute.name"
-                    :model-value="user.attributes[attribute.name]"
-                    :clearable="
-                      attribute.annotations.inputType === 'multiselect'
-                    "
-                    :multiple="
-                      attribute.annotations.inputType === 'multiselect'
-                    "
-                    :required="isUserAttributeRequired(attribute)"
-                    @update:model-value="
-                      setUserAttribute(attribute.name, $event)
-                    "
-                  ></Select>
+                  <GenericUserFormField
+                    :attribute="attribute"
+                    :clearValidationError="clearValidationError"
+                    :setUserAttribute="setUserAttribute"
+                    :user="user"
+                  />
                   <p
                     :id="`${attribute.name}-validation-error`"
                     class="validation-error"
@@ -339,6 +226,7 @@ import Checkbox from "@/components/Form/Checkbox.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
+import GenericUserFormField from "../Form/GenericUserFormField.vue";
 
 const { t } = useI18n();
 const { hasLoadingError, hasRequestError, resetNotification } =
@@ -350,10 +238,6 @@ const profileStore = useProfileStore();
 const userStore = useUserStore();
 
 provide("translationCategory", "user");
-
-const FORM_FIELD_TYPE_TEXTFIELD = "textfield";
-const FORM_FIELD_TYPE_SELECTION = "selection";
-const FORM_FIELD_TYPE_CHIPTEXTFIELD = "chiptextfield";
 
 function setUserAttribute(name, value) {
   const attrs = user.value.attributes;
@@ -370,51 +254,6 @@ function setUserAttribute(name, value) {
     delete attrs[name];
   }
 }
-
-const getMetaDataAttribute = (nameOfAttribute) => {
-  return profileStore.attributes.find(
-    (attribute) => attribute.name === nameOfAttribute
-  );
-};
-const getFormFieldType = (inputType, multivalued) => {
-  // textfield is the fallback if an attribute from user-profile.json contains combinations of values
-  // for which we don't have a special field yet.
-  if (!inputType) return FORM_FIELD_TYPE_TEXTFIELD;
-  if (
-    ["text", "html5-email", "html5-tel", "html5-url", "html5-number"].includes(
-      inputType
-    )
-  ) {
-    if (multivalued) {
-      return FORM_FIELD_TYPE_CHIPTEXTFIELD;
-    } else {
-      return FORM_FIELD_TYPE_TEXTFIELD;
-    }
-  } else if (["select", "multiselect"].includes(inputType)) {
-    return FORM_FIELD_TYPE_SELECTION;
-  } else return FORM_FIELD_TYPE_TEXTFIELD;
-};
-
-// Get the input type that Keycloak uses to a type that can be used by Vuetify's v-text-field.
-const getTextFieldType = (nameOfAttribute) => {
-  const attribute = getMetaDataAttribute(nameOfAttribute);
-  if (attribute.annotations?.inputType === "html5-email") {
-    return "email";
-  } else if (attribute.annotations?.inputType === "html5-tel") {
-    return "tel";
-  } else {
-    return "text";
-  }
-};
-
-const isUserAttributeRequired = (userAttribute) => {
-  // In Keycloak it is not possible to choose if email
-  // is a required attribute so it won't appear in the
-  // UserProfileMetadata. That's why we can't handle it the "generic"
-  // way.
-  if (userAttribute.name === "email") return true;
-  return userAttribute.required?.roles?.includes("user");
-};
 
 // Creating rules for the validation of form components.
 const getUserAttributeRules = (userAttribute) => {
