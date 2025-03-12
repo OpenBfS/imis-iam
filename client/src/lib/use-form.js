@@ -212,7 +212,7 @@ export function useForm(i18n) {
         }
         index = translationKey.indexOf("-");
       }
-      parameters[0] = t(`user.${parameters[0].toLowerCase()}`);
+      parameters[0] = t(`user.${parameters[0]}`);
       translatedMessage = t(translationKey, parameters);
     } else if (message.startsWith("error.")) {
       translatedMessage = t(message, parameters[0]);
