@@ -184,6 +184,17 @@ export function useForm(i18n) {
     });
   };
 
+  /**
+   * Uses "message" and "messageParameters" returned from Keycloak to convert them to a translated
+   * error message.
+   *
+   * There are three cases which need different handling:
+   * 1. Keycloak returns a string which is already translated.
+   * 2. Keycloak returns a string that we can control and that can directly be used as
+   *    a translation key (starts with "error.").
+   * 3. Keycloak returns a string that we do not control and which isn't translated
+   *    (starts with "error-").
+   */
   const translateError = (message, parameters) => {
     let translatedMessage;
     // Keycloak error is not translated
