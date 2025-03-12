@@ -26,7 +26,7 @@
           >
           </v-btn>
         </template>
-        <span>{{ $t("button.new_email") }}</span>
+        <span>{{ $t("button.newEmail") }}</span>
       </v-tooltip>
     </v-row>
     <v-row>

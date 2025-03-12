@@ -23,7 +23,7 @@
         >
         </v-btn>
       </template>
-      <span>{{ $t("search.edit_tags") }}</span>
+      <span>{{ $t("search.editTags") }}</span>
     </v-tooltip>
     <v-tooltip v-if="selectedTab === 'users'" location="top">
       <template v-slot:activator="{ props }">
@@ -41,7 +41,7 @@
         >
         </v-btn>
       </template>
-      <span>{{ $t("user.add_user") }}</span>
+      <span>{{ $t("user.addUser") }}</span>
     </v-tooltip>
     <v-tooltip v-if="selectedTab === 'institutions'" location="top">
       <template v-slot:activator="{ props }">
@@ -59,7 +59,7 @@
         >
         </v-btn>
       </template>
-      <span>{{ $t("institution.add_institution") }}</span>
+      <span>{{ $t("institution.addInstitution") }}</span>
     </v-tooltip>
     <v-tooltip location="top">
       <template v-slot:activator="{ props }">

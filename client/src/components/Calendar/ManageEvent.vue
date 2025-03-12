@@ -12,11 +12,11 @@
     v-if="['add', 'edit', 'show'].indexOf(processType) !== -1"
   >
     <v-card-title v-if="processType === 'add'">
-      <span class="text-h5">{{ $t("calendar.create_title") }}</span>
+      <span class="text-h5">{{ $t("calendar.createTitle") }}</span>
     </v-card-title>
     <v-card-title v-if="processType === 'edit'">
       <span class="text-h5">
-        {{ $t("calendar.edit_title", { title: event.title }) }}
+        {{ $t("calendar.editTitle", { title: event.title }) }}
       </span>
     </v-card-title>
     <v-divider></v-divider>
@@ -143,9 +143,9 @@ const {
 onBeforeMount(() => {
   applicationStore.setForm(form);
   initClientRules({
-    description: reqField(t("calendar.required_description")),
-    site: reqField(t("calendar.required_site")),
-    title: reqField(t("calendar.required_title")),
+    description: reqField(t("calendar.requiredDescription")),
+    site: reqField(t("calendar.requiredSite")),
+    title: reqField(t("calendar.requiredTitle")),
   });
 });
 

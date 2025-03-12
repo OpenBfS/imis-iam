@@ -34,7 +34,7 @@
       },
       "pattern": {
         "pattern": "\\S+@\\S+\\.\\S+",
-        "error-message": "error.valid_email"
+        "error-message": "error.validEmail"
       }
     },
     "group": "contact"
@@ -50,7 +50,7 @@
     "group": "name"
   }, {
     "name" : "firstName",
-    "displayName" : "${profile.attributes.first_name}",
+    "displayName" : "${profile.attributes.firstName}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -71,7 +71,7 @@
     "group": "name"
   }, {
     "name" : "lastName",
-    "displayName" : "${profile.attributes.last_name}",
+    "displayName" : "${profile.attributes.lastName}",
     "required" : {
       "roles" : [ "user" ]
     },
@@ -105,7 +105,7 @@
     "validations" : {
       "pattern": {
         "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.valid_phone"
+        "error-message": "error.validPhone"
       }
     },
     "group": "contact"
@@ -122,7 +122,7 @@
     "validations" : {
       "pattern": {
         "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.valid_mobile"
+        "error-message": "error.validMobile"
       }
 },
     "group": "contact"
@@ -139,7 +139,7 @@
     "validations" : {
       "pattern": {
         "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.valid_fax"
+        "error-message": "error.validFax"
       }
     },
     "group": "contact"
@@ -160,11 +160,11 @@
       },
       "pattern": {
         "pattern": "\\S+@\\S+\\.\\S+",
-        "error-message": "error.valid_email"
+        "error-message": "error.validEmail"
       }
     },
     "multivalued": true,
-    "group": "operation_mode_change_contact"
+    "group": "operationModeChangeContact"
   }, {
     "name" : "operationModeChangePhoneNumbers",
     "displayName" : "${profile.attributes.operationModeChangePhoneNumbers}",
@@ -178,11 +178,11 @@
     "validations" : {
       "pattern": {
         "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.valid_phone"
+        "error-message": "error.validPhone"
       }
     },
     "multivalued": true,
-    "group": "operation_mode_change_contact"
+    "group": "operationModeChangeContact"
   }, {
     "name" : "operationModeChangeSmsPhoneNumbers",
     "displayName" : "${profile.attributes.operationModeChangeSmsPhoneNumbers}",
@@ -196,11 +196,11 @@
     "validations" : {
       "pattern": {
         "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.valid_phone"
+        "error-message": "error.validPhone"
       }
     },
     "multivalued": true,
-    "group": "operation_mode_change_contact"
+    "group": "operationModeChangeContact"
   }, {
     "name" : "position",
     "displayName" : "${profile.attributes.position}",
@@ -271,7 +271,7 @@
       "annotations": {}
     },
     {
-      "name": "operation_mode_change_contact",
+      "name": "operationModeChangeContact",
       "displayHeader": "",
       "displayDescription": "",
       "annotations": {}

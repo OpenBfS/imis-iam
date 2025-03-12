@@ -52,7 +52,7 @@ export function useForm(i18n) {
         v.length === 0 ||
         (doesRegexMatchWholeString(germanDateRegex, v) &&
           dateStringToDate(v) !== undefined) ||
-        t("error.valid_date"),
+        t("error.validDate"),
     ];
   };
   const reqField = (reqMsg) => {
@@ -188,11 +188,21 @@ export function useForm(i18n) {
     let translatedMessage;
     // Keycloak error is not translated
     if (message.startsWith("error-")) {
-      const stringToTranslate = message.startsWith("error-")
-        ? message.replace("error-", "error.").replaceAll("-", "_")
-        : message;
+      // Need to convert the key from Keycloak because the translation keys use camelCase.
+      let translationKey = message.replace("error-", "error.");
+      let index = translationKey.indexOf("-");
+      while (index !== -1) {
+        if (index < translationKey.length - 1) {
+          const charAfterDash = translationKey.charAt(index + 1);
+          translationKey = translationKey.replace(
+            `-${charAfterDash}`,
+            charAfterDash.toUpperCase()
+          );
+        }
+        index = translationKey.indexOf("-");
+      }
       parameters[0] = t(`user.${parameters[0].toLowerCase()}`);
-      translatedMessage = t(stringToTranslate, parameters);
+      translatedMessage = t(translationKey, parameters);
     } else if (message.startsWith("error.")) {
       translatedMessage = t(message, parameters[0]);
     } else {
@@ -310,22 +320,14 @@ export function useForm(i18n) {
     applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
   };
 
-  const camelCaseToUnderscore = (text) => {
-    return text.replace(/([A-Z])/g, "_$1").toLowerCase();
-  };
-
   // Creates a rule for required fields with a specific message if possible.
   // "translationCategory" is the top-level property in the locale file, e.g. "institution".
   const createRequiredRule = (required, attribute, translationCategory) => {
     const newRules = [];
     if (required === true) {
       if (attribute && translationCategory) {
-        const translatedAttribute = t(
-          `${translationCategory}.${camelCaseToUnderscore(attribute)}`
-        );
-        const fullTranslation = t("error.required_field", [
-          translatedAttribute,
-        ]);
+        const translatedAttribute = t(`${translationCategory}.${attribute}`);
+        const fullTranslation = t("error.requiredField", [translatedAttribute]);
         if (
           translationCategory !== undefined &&
           translatedAttribute?.length > 0 &&
@@ -333,10 +335,10 @@ export function useForm(i18n) {
         ) {
           newRules.push(...reqField(fullTranslation));
         } else {
-          newRules.push(...reqField(t("error.required_field_generic")));
+          newRules.push(...reqField(t("error.requiredFieldGeneric")));
         }
       } else {
-        newRules.push(...reqField(t("error.required_field_generic")));
+        newRules.push(...reqField(t("error.requiredFieldGeneric")));
       }
     }
     return newRules;
@@ -370,7 +372,6 @@ export function useForm(i18n) {
     translateError,
     areArraysDifferent,
     showFormError,
-    camelCaseToUnderscore,
     createRequiredRule,
   };
 }

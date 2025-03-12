@@ -7,7 +7,7 @@
 
 import i18n from "@/i18n";
 
-const { t } = i18n.global
+const { t } = i18n.global;
 
 // Creates headers that can be inserted into a Vuetify table.
 const createHeaders = (columns, type) => {
@@ -18,7 +18,7 @@ const createHeaders = (columns, type) => {
     const translationKey =
       headerName === "name"
         ? "label.name"
-        : `${translationPrefix}.${camelCaseToUnderscore(headerName)}`;
+        : `${translationPrefix}.${headerName}`;
 
     const header = {
       title: t(translationKey),
@@ -46,10 +46,6 @@ const createHeaders = (columns, type) => {
   return newHeaders;
 };
 
-const camelCaseToUnderscore = (text) => {
-  return text.replace(/([A-Z])/g, "_$1").toLowerCase();
-};
-
 // Format and translate values where necessary.
 function createLabelForTableCell(value) {
   if (value === undefined) return;
@@ -64,4 +60,4 @@ function createLabelForTableCell(value) {
   return value;
 }
 
-export { createHeaders, camelCaseToUnderscore };
+export { createHeaders };

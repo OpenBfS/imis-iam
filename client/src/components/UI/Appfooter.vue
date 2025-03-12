@@ -14,7 +14,7 @@
       $t("label.contact")
     }}</a>
     <a size="small" :href="links.privacy" variant="text">
-      {{ $t("label.data_privacy") }}</a
+      {{ $t("label.dataPrivacy") }}</a
     >
     <a size="small" :href="links.accessibility" variant="text">
       {{ $t("label.accessibility") }}</a
@@ -23,7 +23,7 @@
       {{ $t("label.help") }}
     </a>
     <a size="small" :href="links.socialMedia" variant="text">
-      {{ $t("label.social_media") }}
+      {{ $t("label.socialMedia") }}
     </a>
   </div>
 </template>

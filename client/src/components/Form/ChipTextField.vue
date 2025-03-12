@@ -109,7 +109,7 @@ const internalRules = ref([
     if (index === -1) {
       return true;
     } else {
-      return t("error.only_unique_values");
+      return t("error.onlyUniqueValues");
     }
   },
 ]);

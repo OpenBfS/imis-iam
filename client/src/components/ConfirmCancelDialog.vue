@@ -10,9 +10,9 @@
     <v-card
       width="50vw"
       class="mx-auto"
-      :title="$t('label.confirm_cancel_header')"
+      :title="$t('label.confirmCancelHeader')"
     >
-      <v-card-text> {{ $t("label.confirm_cancel_explanation") }} </v-card-text>
+      <v-card-text> {{ $t("label.confirmCancelExplanation") }} </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>

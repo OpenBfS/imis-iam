@@ -41,7 +41,7 @@ test("Test error handling", () => {
     response: {
       data: [
         {
-          message: "error.valid_email",
+          message: "error.validEmail",
         },
       ],
       statusText: "Bad Request",

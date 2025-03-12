@@ -12,7 +12,7 @@
     </UIHeader>
     <v-row class="mt-6" align="center">
       <v-autocomplete
-        :no-data-text="$t('label.no_data_text')"
+        :no-data-text="$t('label.noDataText')"
         class="mx-1"
         style="max-width: 20%"
         v-model="selectedFilter"
@@ -22,7 +22,7 @@
         return-object
         multiple
         density="compact"
-        :hint="$t('emails.filter_by_type')"
+        :hint="$t('emails.filterByType')"
         persistent-hint
       ></v-autocomplete>
       <div class="d-flex mx-3 flex-column" style="width: 20%">
@@ -32,7 +32,7 @@
               v-model="startDateString"
               clearable
               prepend-inner-icon="mdi-calendar-blank"
-              :hint="$t('hints.date_format')"
+              :hint="$t('hints.dateFormat')"
               :label="$t('label.from')"
               :rules="validGermanDate()"
               @click="isStartDatePickerOpen = true"
@@ -78,7 +78,7 @@
               v-model="endDateString"
               clearable
               prepend-inner-icon="mdi-calendar-blank"
-              :hint="$t('hints.date_format')"
+              :hint="$t('hints.dateFormat')"
               :label="$t('label.to')"
               :rules="validGermanDate()"
               @click="isEndDatePickerOpen = true"
@@ -124,7 +124,7 @@
         class="mx-1"
         variant="underlined"
         style="max-width: 20%"
-        :label="$t('emails.filter_by_sender')"
+        :label="$t('emails.filterBySender')"
         v-model="sender"
       ></v-text-field>
     </v-row>
@@ -152,7 +152,7 @@
               <td>{{ new Date(mail.sendDate).toLocaleDateString() }}</td>
             </tr>
             <tr v-if="mails && !mails.length">
-              <td colspan="3">{{ $t("emails.no_mails_available") }}</td>
+              <td colspan="3">{{ $t("emails.noMailsAvailable") }}</td>
             </tr>
           </tbody>
         </v-table>

@@ -10,7 +10,7 @@
     :headers="userStore.tableHeaders"
     :items="props.users"
     :items-per-page="userStore.itemsPerPage"
-    :no-data-text="$t('user.no_users_available')"
+    :no-data-text="$t('user.noUsersAvailable')"
     :offset="userStore.offset"
     :total-number-of-items="userStore.totalNumberOfUsers"
     type="users"
@@ -33,7 +33,7 @@
         <span>{{
           profileStore.isAllowedToManage
             ? $t("label.edit")
-            : $t("label.show_info")
+            : $t("label.showInfo")
         }}</span>
       </v-tooltip>
       <v-tooltip>

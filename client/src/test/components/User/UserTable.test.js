@@ -34,14 +34,14 @@ profileStore.setUserProfileMetadata({
     },
     {
       name: "firstName",
-      displayName: "${first_name}",
+      displayName: "${firstName}",
       annotations: {
         defaultField: "true",
       },
     },
     {
       name: "lastName",
-      displayName: "${last_name}",
+      displayName: "${lastName}",
       annotations: {
         defaultField: "true",
       },

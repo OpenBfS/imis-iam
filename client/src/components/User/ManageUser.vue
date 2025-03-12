@@ -10,11 +10,11 @@
 <template>
   <v-card width="80vw">
     <v-card-title v-if="['add', 'copy'].indexOf(processType) !== -1">
-      <span class="text-h5">{{ $t("user.create_title") }}</span>
+      <span class="text-h5">{{ $t("user.createTitle") }}</span>
     </v-card-title>
     <v-card-title v-if="processType === 'edit'">
       <span class="text-h5">{{
-        $t("user.edit_title", { name: user.attributes.username[0] })
+        $t("user.editTitle", { name: user.attributes.username[0] })
       }}</span>
     </v-card-title>
     <v-divider></v-divider>
@@ -104,7 +104,7 @@
               <Select
                 attribute="institutions"
                 :clearable="profileStore.isAllowedToManage"
-                :no-data-text="$t('label.no_data_text')"
+                :no-data-text="$t('label.noDataText')"
                 :label="$t('user.institutions')"
                 :items="institutionStore.institutions"
                 v-model="user.institutions"
@@ -130,7 +130,7 @@
               ></Select>
             </div>
           </v-form>
-          <v-label>* {{ $t("hints.required_fields") }}</v-label>
+          <v-label>* {{ $t("hints.requiredFields") }}</v-label>
           <UIAlert
             v-if="hasLoadingError || hasRequestError"
             v-bind:message="applicationStore.httpErrorMessage"
@@ -271,18 +271,18 @@ const getUserAttributeRules = (userAttribute) => {
       let message;
       const displayName = handleDisplayName(userAttribute.displayName);
       if (length.min && length.max) {
-        message = t("error.invalid_length", [
+        message = t("error.invalidLength", [
           displayName,
           length.min,
           length.max,
         ]);
       } else if (length.min) {
-        message = t("error.invalid_length_too_short", [
+        message = t("error.invalidLengthTooShort", [
           displayName,
           length.min,
         ]);
       } else {
-        message = t("error.invalid_length_too_long", {
+        message = t("error.invalidLengthTooLong", {
           attribute: displayName,
           max: length.max,
         });

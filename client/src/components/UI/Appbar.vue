@@ -20,11 +20,11 @@
         class="me-4"
         link
         :href="`mailto:${applicationStore.reportMail}`"
-        :title="$t('label.report_problem')"
+        :title="$t('label.reportProblem')"
       ></v-list-item>
     </v-list>
     <div>
-      {{ $t("appbar.text_login") }}
+      {{ $t("appbar.textLogin") }}
       {{
         savedUser.attributes
           ? savedUser.attributes.firstName[0] +
@@ -44,10 +44,10 @@
       </template>
       <v-list dense>
         <v-list-item link @click="editProfile">
-          {{ $t("appbar.button_profile") }}
+          {{ $t("appbar.buttonProfile") }}
         </v-list-item>
         <v-list-item link @click="logout">
-          {{ $t("appbar.button_logout") }}</v-list-item
+          {{ $t("appbar.buttonLogout") }}</v-list-item
         >
       </v-list>
     </v-menu>

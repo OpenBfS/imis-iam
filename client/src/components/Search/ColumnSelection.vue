@@ -7,7 +7,7 @@
  -->
 <template>
   <v-tooltip activator="#column-selection" location="top">
-    <span>{{ $t("label.columns_selection") }}</span>
+    <span>{{ $t("label.columnsSelection") }}</span>
   </v-tooltip>
   <v-menu
     v-model="areTableSettingsOpen"

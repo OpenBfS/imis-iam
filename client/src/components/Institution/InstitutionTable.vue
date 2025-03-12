@@ -10,7 +10,7 @@
     :headers="institutionStore.tableHeaders"
     :items="props.institutions"
     :items-per-page="institutionStore.itemsPerPage"
-    :no-data-text="$t('institution.no_institutions_available')"
+    :no-data-text="$t('institution.noInstitutionsAvailable')"
     :offset="institutionStore.offset"
     :total-number-of-items="institutionStore.totalNumberOfInstitutions"
     type="institutions"
@@ -39,7 +39,7 @@
         <span>{{
           profileStore.isAllowedToManage
             ? $t("label.edit")
-            : $t("label.show_info")
+            : $t("label.showInfo")
         }}</span>
       </v-tooltip>
       <v-tooltip location="top">

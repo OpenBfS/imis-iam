@@ -7,14 +7,14 @@
  -->
 <template>
   <v-card min-width="460px">
-    <v-card-title>{{ $t("export.csv_options") }}</v-card-title>
+    <v-card-title>{{ $t("export.csvOptions") }}</v-card-title>
     <v-divider></v-divider>
     <v-container class="mt-4">
       <v-row justify="center">
         <v-col cols="10">
           <v-form v-model="valid" ref="form">
             <Combobox
-              :label="$t('export.field_separator')"
+              :label="$t('export.fieldSeparator')"
               :items="fieldSeparators"
               attribute="fieldSeparator"
               item-title="name"
@@ -23,7 +23,7 @@
               @update:modelValue="csvOptions.fieldSeparator = $event"
             ></Combobox>
             <Combobox
-              :label="$t('export.row_delimiter')"
+              :label="$t('export.rowDelimiter')"
               :items="rowDelimiters"
               attribute="rowDelimiter"
               item-title="name"
@@ -44,8 +44,8 @@
             ></Combobox>
             <Combobox
               attribute="quoteType"
-              :no-data-text="$t('label.no_data_text')"
-              :label="$t('export.quote_type')"
+              :no-data-text="$t('label.noDataText')"
+              :label="$t('export.quoteType')"
               :items="quoteTypes"
               item-title="name"
               item-value="value"
@@ -151,8 +151,8 @@ onBeforeMount(() => {
       ...validLength(
         undefined,
         1,
-        t("error.invalid_length_too_long", {
-          attribute: t("export.field_separator"),
+        t("error.invalidLengthTooLong", {
+          attribute: t("export.fieldSeparator"),
           max: 1,
         })
       ),
@@ -161,8 +161,8 @@ onBeforeMount(() => {
       ...validLength(
         undefined,
         1,
-        t("error.invalid_length_too_long", {
-          attribute: t("export.quote_type"),
+        t("error.invalidLengthTooLong", {
+          attribute: t("export.quoteType"),
           max: 1,
         })
       ),

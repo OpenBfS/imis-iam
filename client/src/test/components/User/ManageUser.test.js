@@ -62,9 +62,9 @@ const userProfileMetadata = {
   ],
 };
 const roles = [
-  { name: "chief_editor", description: "role_iam_chief_editor" },
-  { name: "editor", description: "role_iam_editor" },
-  { name: "user", description: "role_iam_user" },
+  { name: "chief_editor", description: "roleIamChiefEditor" },
+  { name: "editor", description: "roleIamEditor" },
+  { name: "user", description: "roleIamUser" },
 ];
 applicationStore.managedItem = user;
 userStore.setRoles(roles);

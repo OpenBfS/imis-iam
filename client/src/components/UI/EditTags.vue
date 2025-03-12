@@ -12,14 +12,14 @@
       class="mx-auto"
       :title="
         props.type === 'institutions'
-          ? $t('search.edit_tags_institutions')
-          : $t('search.edit_tags_users')
+          ? $t('search.editTags_institutions')
+          : $t('search.editTags_users')
       "
     >
       <v-card-text>
         <v-form v-model="valid" ref="form" class="v-col v-col-10">
           <Select
-            :no-data-text="$t('label.no_data_text')"
+            :no-data-text="$t('label.noDataText')"
             :label="$t('institution.tags')"
             :items="props.type === 'institutions' ? institutionTags : userTags"
             v-model="selectedTags"

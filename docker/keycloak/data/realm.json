@@ -252,7 +252,7 @@
       "iam-client" : [ {
         "id" : "77d19cde-d841-4de7-967d-fda1d8f26157",
         "name" : "editor",
-        "description" : "role_iam_editor",
+        "description" : "roleIamEditor",
         "composite" : true,
         "composites" : {
           "client" : {
@@ -265,7 +265,7 @@
       }, {
         "id" : "568307a2-6201-403b-917f-590abaa56162",
         "name" : "chief_editor",
-        "description" : "role_iam_chief_editor",
+        "description" : "roleIamChiefEditor",
         "composite" : true,
         "composites" : {
           "client" : {
@@ -278,7 +278,7 @@
       }, {
         "id" : "3d953015-584f-4c49-84c8-da9f7297594e",
         "name" : "user",
-        "description" : "role_iam_user",
+        "description" : "roleIamUser",
         "composite" : false,
         "clientRole" : true,
         "containerId" : "74b4a894-7aae-4049-975f-28f3be199c76",

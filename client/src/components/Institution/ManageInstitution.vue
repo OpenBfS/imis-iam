@@ -8,11 +8,11 @@
 <template>
   <v-card width="80vw" v-if="['add', 'edit'].indexOf(processType) !== -1">
     <v-card-title v-if="processType === 'add'">
-      <span class="text-h5">{{ $t("institution.create_title") }}</span>
+      <span class="text-h5">{{ $t("institution.createTitle") }}</span>
     </v-card-title>
     <v-card-title v-if="processType === 'edit'">
       <span class="text-h5">
-        {{ $t("institution.edit_title", { name: institution.name }) }}
+        {{ $t("institution.editTitle", { name: institution.name }) }}
       </span>
     </v-card-title>
     <v-divider></v-divider>
@@ -46,7 +46,7 @@
                 <TextField
                   ref="measFacilIdField"
                   :disabled="profileStore.userData.role !== 'chief_editor'"
-                  :label="$t('institution.meas_facil_id')"
+                  :label="$t('institution.measFacilId')"
                   :attribute="'measFacilId'"
                   @update:modelValue="
                     institution.measFacilId = $event;
@@ -57,7 +57,7 @@
               <v-col cols="3">
                 <TextField
                   ref="measFacilNameField"
-                  :label="$t('institution.meas_facil_name')"
+                  :label="$t('institution.measFacilName')"
                   :attribute="'measFacilName'"
                   @update:modelValue="
                     institution.measFacilName = $event;
@@ -68,7 +68,7 @@
             </v-row>
             <div class="group_class">
               <TextField
-                :label="$t('institution.service_building_location')"
+                :label="$t('institution.serviceBuildingLocation')"
                 :attribute="'serviceBuildingLocation'"
                 required
                 @update:modelValue="
@@ -76,7 +76,7 @@
                 "
               ></TextField>
               <TextField
-                :label="$t('institution.service_building_postal_code')"
+                :label="$t('institution.serviceBuildingPostalCode')"
                 :attribute="'serviceBuildingPostalCode'"
                 required
                 @update:modelValue="
@@ -84,7 +84,7 @@
                 "
               ></TextField>
               <TextField
-                :label="$t('institution.service_building_street')"
+                :label="$t('institution.serviceBuildingStreet')"
                 :attribute="'serviceBuildingStreet'"
                 required
                 @update:modelValue="institution.serviceBuildingStreet = $event"
@@ -98,7 +98,7 @@
                   :items="states"
                   item-title="label"
                   item-value="value"
-                  :label="$t('institution.service_building_state')"
+                  :label="$t('institution.serviceBuildingState')"
                   @update:modelValue="institution.serviceBuildingState = $event"
                 ></Select>
               </v-col>
@@ -108,7 +108,7 @@
             <v-form
               ><v-row>
                 <v-select
-                  :no-data-text="$t('label.no_data_text')"
+                  :no-data-text="$t('label.noDataText')"
                   v-model="selectedCoordinates"
                   clearable
                   dense
@@ -129,13 +129,13 @@
             <div class="group_class">
               <TextField
                 disabled
-                :label="$t('institution.x_coordinate')"
+                :label="$t('institution.xCoordinate')"
                 :modelValue="institution.xCoordinate"
                 @update:modelValue="institution.xCoordinate = $event"
               ></TextField>
               <TextField
                 disabled
-                :label="$t('institution.y_coordinate')"
+                :label="$t('institution.yCoordinate')"
                 :modelValue="institution.yCoordinate"
                 @update:modelValue="institution.yCoordinate = $event"
               ></TextField>
@@ -144,54 +144,54 @@
 
             <v-checkbox
               v-model="showPostalAddress"
-              :label="$t('institution.differing_postal_address')"
+              :label="$t('institution.differingPostalAddress')"
             ></v-checkbox>
             <div v-if="showPostalAddress" class="group_class">
               <TextField
-                :label="$t('institution.address_location')"
+                :label="$t('institution.addressLocation')"
                 :attribute="'addressLocation'"
                 @update:modelValue="institution.addressLocation = $event"
               ></TextField>
               <TextField
-                :label="$t('institution.address_postal_code')"
+                :label="$t('institution.address_postalCode')"
                 :attribute="'addressPostalCode'"
                 @update:modelValue="institution.addressPostalCode = $event"
               ></TextField>
               <TextField
-                :label="$t('institution.address_street')"
+                :label="$t('institution.addressStreet')"
                 :attribute="'addressStreet'"
                 @update:modelValue="institution.addressStreet = $event"
               ></TextField>
             </div>
             <div class="group_class">
               <ChipTextField
-                :label="$t('institution.phone_numbers')"
-                :rules="validPhone($t('error.valid_phone'))"
+                :label="$t('institution.phoneNumbers')"
+                :rules="validPhone($t('error.validPhone'))"
                 @update:modelValue="institution.phoneNumbers = $event"
                 :attribute="'phoneNumbers'"
               ></ChipTextField>
               <ChipTextField
-                :label="$t('institution.mail_addresses')"
-                :rules="validMail($t('error.valid_email'))"
+                :label="$t('institution.mailAddresses')"
+                :rules="validMail($t('error.validEmail'))"
                 :attribute="'mailAddresses'"
                 @update:modelValue="institution.mailAddresses = $event"
               ></ChipTextField>
               <TextField
-                :label="$t('institution.central_fax')"
+                :label="$t('institution.centralFax')"
                 @update:modelValue="institution.centralFax = $event"
                 :attribute="'centralFax'"
               ></TextField>
             </div>
             <v-row>
               <v-label>{{
-                $t("institution.operation_mode_change_contact")
+                $t("institution.operationModeChangeContact")
               }}</v-label>
             </v-row>
             <v-row>
               <v-col>
                 <ChipTextField
-                  :label="$t('institution.operation_mode_change_phone_numbers')"
-                  :rules="validPhone($t('error.valid_phone'))"
+                  :label="$t('institution.operationModeChangePhoneNumbers')"
+                  :rules="validPhone($t('error.validPhone'))"
                   @update:modelValue="
                     institution.operationModeChangePhoneNumbers = $event
                   "
@@ -200,10 +200,8 @@
               </v-col>
               <v-col>
                 <ChipTextField
-                  :label="
-                    $t('institution.operation_mode_change_sms_phone_numbers')
-                  "
-                  :rules="validPhone($t('error.valid_phone'))"
+                  :label="$t('institution.operationModeChangeSmsPhoneNumbers')"
+                  :rules="validPhone($t('error.validPhone'))"
                   @update:modelValue="
                     institution.operationModeChangeSmsPhoneNumbers = $event
                   "
@@ -214,10 +212,8 @@
             <v-row>
               <v-col cols="6">
                 <ChipTextField
-                  :label="
-                    $t('institution.operation_mode_change_mail_addresses')
-                  "
-                  :rules="validMail($t('error.valid_email'))"
+                  :label="$t('institution.operationModeChangeMailAddresses')"
+                  :rules="validMail($t('error.validEmail'))"
                   @update:modelValue="
                     institution.operationModeChangeMailAddresses = $event
                   "
@@ -229,7 +225,7 @@
               <v-col>
                 <Select
                   attribute="tags"
-                  :no-data-text="$t('label.no_data_text')"
+                  :no-data-text="$t('label.noDataText')"
                   :label="$t('institution.tags')"
                   :items="categories"
                   v-model="institution.tags"
@@ -244,7 +240,7 @@
           </v-form>
         </v-col>
       </v-row>
-      <v-label>* {{ $t("hints.required_fields") }}</v-label>
+      <v-label>* {{ $t("hints.requiredFields") }}</v-label>
       <UIAlert
         v-if="hasLoadingError || hasRequestError"
         v-bind:message="applicationStore.httpErrorMessage"
@@ -287,7 +283,7 @@
   <v-card v-else width="50vw">
     <v-card-text>
       <span class="text-h5">{{
-        $t("label.confirm_deletion", { name: institution.name })
+        $t("label.confirmDeletion", { name: institution.name })
       }}</span>
       <div>
         <UIAlert
@@ -417,9 +413,9 @@ const measIdAndNameOrNothing = () => {
         (id === "" && name === "") ||
         (!id && !name) ||
         ((id || "") !== "" && (name || "") !== "") ||
-        t("error.all_or_nothing", [
-          t("institution.meas_facil_id"),
-          t("institution.meas_facil_name"),
+        t("error.allOrNothing", [
+          t("institution.measFacilId"),
+          t("institution.measFacilName"),
         ])
       );
     },
@@ -429,16 +425,16 @@ onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
     measFacilName: [...measIdAndNameOrNothing()],
-    serviceBuildingPostalCode: validPostalcode(t("error.valid_postalcode")),
-    addressPostalCode: validPostalcode(t("error.valid_postalcode")),
-    centralPhone: validPhone(t("error.valid_phone")),
-    centralFax: validPhone(t("error.valid_fax")),
-    centralMail: validMail(t("error.valid_email")),
+    serviceBuildingPostalCode: validPostalcode(t("error.validPostalcode")),
+    addressPostalCode: validPostalcode(t("error.validPostalcode")),
+    centralPhone: validPhone(t("error.validPhone")),
+    centralFax: validPhone(t("error.validFax")),
+    centralMail: validMail(t("error.validEmail")),
     measFacilId: [
       (v) =>
         !v ||
         (v && v.length >= 5 && v.length <= 7) ||
-        t("institution.meas_facil_id_length_validation_message", {
+        t("institution.measFacilIdLengthValidationMessage", {
           minLength: 5,
           maxLength: 7,
         }),

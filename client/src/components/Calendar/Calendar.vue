@@ -8,7 +8,7 @@
 <template>
   <v-container>
     <UIHeader>
-      {{ $t("calendar.component_title") }}
+      {{ $t("calendar.componentTitle") }}
     </UIHeader>
     <v-row justify="end" class="mt-6">
       <v-tooltip location="top">
@@ -28,7 +28,7 @@
           >
           </v-btn>
         </template>
-        <span>{{ $t("calendar.add_entry") }}</span>
+        <span>{{ $t("calendar.addEntry") }}</span>
       </v-tooltip>
     </v-row>
     <v-row>

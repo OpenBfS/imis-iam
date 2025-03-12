@@ -81,25 +81,25 @@ function updateInstitution(
 }
 
 const states = [
-  { value: "baden_wuerttemberg" },
-  { value: "bavaria" },
-  { value: "berlin" },
-  { value: "brandenburg" },
-  { value: "bremen" },
-  { value: "hamburg" },
-  { value: "hesse" },
-  { value: "lower_saxony" },
-  { value: "mecklenburg_vorpommern" },
-  { value: "north_rhine_westphalia" },
-  { value: "rhineland_palatinate" },
-  { value: "saarland" },
-  { value: "saxony" },
-  { value: "saxony_anhalt" },
-  { value: "schleswig_holstein" },
-  { value: "thuringia" },
+  { value: "BadenWuerttemberg" },
+  { value: "Bavaria" },
+  { value: "Berlin" },
+  { value: "Brandenburg" },
+  { value: "Bremen" },
+  { value: "Hamburg" },
+  { value: "Hesse" },
+  { value: "LowerSaxony" },
+  { value: "MecklenburgVorpommern" },
+  { value: "NorthRhineWestphalia" },
+  { value: "RhinelandPalatinate" },
+  { value: "Saarland" },
+  { value: "Saxony" },
+  { value: "SaxonyAnhalt" },
+  { value: "SchleswigHolstein" },
+  { value: "Thuringia" },
 ].map((state) => {
   return {
-    label: t(`institution.state_${state.value}`),
+    label: t(`institution.state${state.value}`),
     value: state.value,
   };
 });

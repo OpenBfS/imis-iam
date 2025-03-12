@@ -19,7 +19,7 @@
     :items="props.items"
     :items-length="totalNumberOfItems"
     :items-per-page="props.itemsPerPage"
-    :items-per-page-text="$t('label.items_per_page')"
+    :items-per-page-text="$t('label.itemsPerPage')"
     :loading="applicationStore.isLoading"
     :no-data-text="props.noDataText"
     :page-text="`${offset + 1}-${
@@ -91,7 +91,7 @@
               :items="states"
               item-title="label"
               item-value="value"
-              :label="$t('institution.service_building_state')"
+              :label="$t('institution.serviceBuildingState')"
               :type="props.type"
             ></Filter>
           </template>

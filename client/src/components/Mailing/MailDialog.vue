@@ -8,7 +8,7 @@
 <template>
   <v-dialog v-model="show">
     <v-card min-width="60vw" class="align-self-center">
-      <v-card-title>{{ $t("emails.write_new_email") }}</v-card-title>
+      <v-card-title>{{ $t("emails.write_newEmail") }}</v-card-title>
       <v-divider></v-divider>
       <v-container>
         <v-row class="px-2 py-2" no-gutters>
@@ -19,7 +19,7 @@
                   <Select
                     attribute="sender"
                     class="v-col-6"
-                    :no-data-text="$t('label.no_data_text')"
+                    :no-data-text="$t('label.noDataText')"
                     :items="senderList"
                     :label="$t('emails.sender')"
                     v-model="mail.selectedSender"
@@ -33,14 +33,14 @@
                     :items="props.mailingLists"
                     item-title="name"
                     item-value="id"
-                    :no-data-text="$t('emails.no_recipients')"
+                    :no-data-text="$t('emails.noRecipients')"
                     required
                     v-model="mail.selectedList"
                   ></Select>
                   <Select
                     attribute="type"
                     class="v-col-6"
-                    :no-data-text="$t('label.no_data_text')"
+                    :no-data-text="$t('label.noDataText')"
                     return-object
                     clearable
                     :label="$t('emails.type')"
@@ -66,8 +66,8 @@
                         clearable
                         variant="filled"
                         prepend-inner-icon="mdi-calendar-blank"
-                        :hint="$t('hints.date_format')"
-                        :label="$t('emails.expiry_date')"
+                        :hint="$t('hints.dateFormat')"
+                        :label="$t('emails.expiryDate')"
                         :attribute="'expiryDate'"
                         @click="isExpiryDatePickerOpen = true"
                         @click:clear="isExpiryDatePickerOpen = false"
@@ -95,7 +95,7 @@
                         box-shadow: 0pt 0pt 8pt 4pt rgba(20, 20, 20, 0.2);
                       "
                       :show-adjacent-months="true"
-                      :title="$t('emails.expiry_date')"
+                      :title="$t('emails.expiryDate')"
                       @update:modelValue="handleExpiryDateUpdate"
                       ><template v-slot:header>
                         <div class="v-date-picker-header bg-accent">
@@ -136,7 +136,7 @@
             </v-row>
           </v-form>
         </v-row>
-        <v-label>* {{ $t("hints.required_fields") }}</v-label>
+        <v-label>* {{ $t("hints.requiredFields") }}</v-label>
         <UIAlert
           v-if="hasRequestError || hasLoadingError"
           v-bind:message="applicationStore.httpErrorMessage"
@@ -318,10 +318,10 @@ onBeforeMount(() => {
   applicationStore.setForm(form);
   initClientRules({
     expiryDate: validGermanDate(),
-    recipient: reqField(t("emails.required_recipient")),
-    subject: reqField(t("emails.required_subject")),
-    text: reqField(t("emails.required_content")),
-    type: reqField(t("emails.required_type")),
+    recipient: reqField(t("emails.requiredRecipient")),
+    subject: reqField(t("emails.requiredSubject")),
+    text: reqField(t("emails.requiredContent")),
+    type: reqField(t("emails.requiredType")),
   });
 });
 onMounted(() => {

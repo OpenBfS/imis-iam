@@ -26,7 +26,7 @@
         : props.modelValue
     "
     :name="props.name"
-    :no-data-text="props.noDataText ?? $t('label.no_data_text')"
+    :no-data-text="props.noDataText ?? $t('label.noDataText')"
     :prepend-inner-icon="props.prependInnerIcon"
     :readonly="applicationStore.form?.readonly || props.readonly"
     :return-object="props.returnObject"

@@ -13,7 +13,7 @@
         v-model="dateString"
         :clearable="!applicationStore.form?.readonly && !props.readonly"
         prepend-inner-icon="mdi-calendar-blank"
-        :hint="!props.readonly ? $t('hints.date_format') : ''"
+        :hint="!props.readonly ? $t('hints.dateFormat') : ''"
         :label="label"
         :readonly="applicationStore.form?.readonly || props.readonly"
         :rules="rules"
@@ -97,7 +97,7 @@ onMounted(() => {
 const rules = computed(() => {
   const tmpRules = validGermanDate();
   if (props.required) {
-    tmpRules.push(...reqField(t("calendar.required_date")));
+    tmpRules.push(...reqField(t("calendar.requiredDate")));
   }
   return tmpRules;
 });

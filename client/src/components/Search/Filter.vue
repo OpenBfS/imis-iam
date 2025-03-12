@@ -13,7 +13,7 @@
     :items="props.items"
     :item-title="props.itemTitle"
     :item-value="props.itemValue"
-    :no-data-text="$t('label.no_data_text')"
+    :no-data-text="$t('label.noDataText')"
     class="my-1 overflow-hidden"
     clearable
     hide-details

@@ -58,7 +58,7 @@
           class="ml-4 text-caption"
           v-if="failureMails && failureMails.length === 0"
         >
-          {{ $t("emails.no_mails_available") }}
+          {{ $t("emails.noMailsAvailable") }}
         </div>
         <!-- maintenance Mails -->
         <div class="text-h6 mt-4">
@@ -111,7 +111,7 @@
           class="ml-4 text-caption"
           v-if="maintenanceMails && maintenanceMails.length === 0"
         >
-          {{ $t("emails.no_mails_available") }}
+          {{ $t("emails.noMailsAvailable") }}
         </div>
         <!-- Rest Mails -->
         <div class="text-h6 mt-4">
@@ -164,7 +164,7 @@
           class="ml-4 text-caption"
           v-if="otherMails && otherMails.length === 0"
         >
-          {{ $t("emails.no_mails_available") }}
+          {{ $t("emails.noMailsAvailable") }}
         </div>
       </v-col>
       <MailContent
