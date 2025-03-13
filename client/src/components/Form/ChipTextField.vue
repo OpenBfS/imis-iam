@@ -131,6 +131,13 @@ onUnmounted(() => {
 watch(entries, (newEntries) => {
   onUpdateModelValue(newEntries, emit, props.attribute);
 });
+
+/**
+ * Since the text input that is no chip yet isn't saved in managedItem in the applicationStore
+ * we cannot say if the content of the form changed just by a look at managedItem. To be able
+ * to track this intermediate state of ChipTextFields we save the attribute of them in
+ * attributesOfFieldsThatChanged when there is some input.
+ */
 watch(input, (newInput) => {
   const isContained = applicationStore.attributesOfFieldsThatChanged.includes(
     props.attribute
