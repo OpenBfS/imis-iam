@@ -157,27 +157,6 @@ watch(
   }
 );
 
-applicationStore.$subscribe((mutation) => {
-  const key = mutation.events.key;
-  if (key === props.attribute) {
-    // Mutations with the same key can also occur when the rules in the application store are
-    // updated so we need to ensure that we don't get an array with rules (functions).
-    if (
-      mutation.events.newValue[0] &&
-      typeof mutation.events.newValue[0] === "function"
-    )
-      return;
-    entries.value = mutation.events.newValue;
-    input.value = "";
-  } else if (key === "attributesOfFieldsThatChanged") {
-    if (
-      !applicationStore.attributesOfFieldsThatChanged.includes(props.attribute)
-    ) {
-      input.value = "";
-    }
-  }
-});
-
 const addEntry = () => {
   if (isAdding) return;
   isAdding = true;
