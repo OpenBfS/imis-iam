@@ -119,7 +119,7 @@
     "annotations": {
       "inputType": "html5-tel"
     },
-    "validations" : { 
+    "validations" : {
       "pattern": {
         "pattern": "^\\+[1-9][0-9]{7,16}$",
         "error-message": "error.valid_mobile"
@@ -136,7 +136,7 @@
     "annotations": {
       "inputType": "html5-tel"
     },
-    "validations" : { 
+    "validations" : {
       "pattern": {
         "pattern": "^\\+[1-9][0-9]{7,16}$",
         "error-message": "error.valid_fax"
@@ -144,8 +144,8 @@
     },
     "group": "contact"
   }, {
-    "name" : "operation_mode_change_mail_addresses",
-    "displayName" : "${profile.attributes.operation_mode_change_mail_addresses}",
+    "Name" : "operationModeChangeMailAddresses",
+    "displayName" : "${profile.attributes.operationModeChangeMailAddresses}",
     "permissions" : {
       "view" : [ "admin", "user" ],
       "edit" : [ "admin", "user" ]
@@ -166,8 +166,8 @@
     "multivalued": true,
     "group": "operation_mode_change_contact"
   }, {
-    "name" : "operation_mode_change_phone_numbers",
-    "displayName" : "${profile.attributes.operation_mode_change_phone_numbers}",
+    "name" : "operationModeChangePhoneNumbers",
+    "displayName" : "${profile.attributes.operationModeChangePhoneNumbers}",
     "permissions" : {
       "view" : [ "admin", "user" ],
       "edit" : [ "admin", "user" ]
@@ -184,8 +184,8 @@
     "multivalued": true,
     "group": "operation_mode_change_contact"
   }, {
-    "name" : "operation_mode_change_sms_phone_numbers",
-    "displayName" : "${profile.attributes.operation_mode_change_sms_phone_numbers}",
+    "name" : "operationModeChangeSmsPhoneNumbers",
+    "displayName" : "${profile.attributes.operationModeChangeSmsPhoneNumbers}",
     "permissions" : {
       "view" : [ "admin", "user" ],
       "edit" : [ "admin", "user" ]
