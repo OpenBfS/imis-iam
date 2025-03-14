@@ -144,7 +144,7 @@
     },
     "group": "contact"
   }, {
-    "Name" : "operationModeChangeMailAddresses",
+    "name" : "operationModeChangeMailAddresses",
     "displayName" : "${profile.attributes.operationModeChangeMailAddresses}",
     "permissions" : {
       "view" : [ "admin", "user" ],
