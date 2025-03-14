@@ -23,7 +23,7 @@ test("Test handleValidationErrorFromServer", async () => {
     },
     {
       attribute: "email",
-      message: "error.valid_email",
+      message: "error.validEmail",
       messageParameters: ["email", "\\S+@\\S+\\.\\S+"],
     },
     {
