@@ -266,11 +266,9 @@ export function useForm(i18n) {
       delete applicationStore.clientAndServerRules[key];
       applicationStore.clientAndServerRules[key] = [];
     });
-    Object.keys(applicationStore.clientRules).forEach((key) => {
-      applicationStore.clientAndServerRules[key].push(
-        ...applicationStore.clientRules[key]
-      );
-    });
+    // First add the server rules and then the client rules because Vuetify shows only one
+    // error message at a time and if the user saved an item already they obviously passed
+    // the client rules and the server rules are more important so we decide to show them.
     Object.keys(applicationStore.serverValidationRules).forEach((key) => {
       if (!applicationStore.clientAndServerRules[key]) {
         // Necessary because it could be that the backend returns errors
@@ -280,6 +278,11 @@ export function useForm(i18n) {
       }
       applicationStore.clientAndServerRules[key].push(
         applicationStore.serverValidationRules[key]
+      );
+    });
+    Object.keys(applicationStore.clientRules).forEach((key) => {
+      applicationStore.clientAndServerRules[key].push(
+        ...applicationStore.clientRules[key]
       );
     });
   };
