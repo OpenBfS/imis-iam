@@ -43,7 +43,6 @@ services:
     ports:
       - ${PORT}:80
     environment:
-      - CLIENT_HOST
       - CLIENT_PATH
       - CLIENT_MODE
       - PROTOCOLL
