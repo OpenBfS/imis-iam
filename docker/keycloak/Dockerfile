@@ -39,10 +39,11 @@ WORKDIR ${KEYCLOAK_HOME}
 ENV SRC_DIR=/opt/src
 ADD docker/keycloak ${SRC_DIR}
 
-RUN ln -fs $SRC_DIR/keycloak.conf $KEYCLOAK_HOME/conf/keycloak.conf
 RUN mkdir -p $KEYCLOAK_HOME/data
 RUN ln -fs $SRC_DIR/data $KEYCLOAK_HOME/data/import
 
+# db option needs to be set for build step, already
+ARG KC_DB=postgres
 RUN ${KEYCLOAK_HOME}/bin/kc.sh build
 
 ENV IMIS_REALM=imis3
