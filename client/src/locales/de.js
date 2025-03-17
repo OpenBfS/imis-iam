@@ -228,6 +228,7 @@ export default {
     send: "Versenden",
     confirm: "Bestätigen",
     delete: "Löschen",
+    reloadPage: "Seite neuladen",
   },
   // Shared labels
   label: {
@@ -262,6 +263,9 @@ export default {
     columns: "Spalten",
     columnsSelection: "Spaltenauswahl",
     filters: "Filter",
+    sessionExpired: "Sitzung abgelaufen",
+    sessionExpiredExplanation:
+      "Laden Sie die Seite neu, um sich erneut anzumelden oder schließen Sie diesen Dialog, z.B. um die Daten in angefangenen Formularen anderweitig zu sichern.",
   },
   // Emails
   emails: {

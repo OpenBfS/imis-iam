@@ -32,6 +32,7 @@ export const useApplicationStore = defineStore("application", {
     showManageEventDialog: false,
     showManageUserDialog: false,
     showManageInstitutionDialog: false,
+    showSessionExpiredDialog: false,
     processType: "",
     footerLinks: {
       contact: import.meta.env.VITE_FOOTER_CONTACT,
@@ -53,6 +54,9 @@ export const useApplicationStore = defineStore("application", {
     },
     setShowManageEventDialog(data) {
       this.showManageEventDialog = data;
+    },
+    setShowSessionExpiredDialog(data) {
+      this.showSessionExpiredDialog = data;
     },
     setSavedItem(data) {
       this.savedItem = data;

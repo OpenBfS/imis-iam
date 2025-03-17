@@ -19,9 +19,9 @@ const pinia = createPinia();
 
 vuetify.locale = createVueI18nAdapter({ i18n, useI18n });
 
-createApp(App)
-  .use(pinia)
-  .use(router)
-  .use(i18n)
-  .use(vuetify)
-  .mount("#app");
+const app = createApp(App);
+
+// Necessary so window is available in Vuejs components.
+app.config.globalProperties.window = window;
+
+app.use(pinia).use(router).use(i18n).use(vuetify).mount("#app");

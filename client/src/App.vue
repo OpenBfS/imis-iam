@@ -31,6 +31,9 @@
           <v-dialog v-model="applicationStore.showManageEventDialog">
             <ManageEvent />
           </v-dialog>
+          <v-dialog v-model="applicationStore.showSessionExpiredDialog">
+            <SessionExpiredDialog />
+          </v-dialog>
         </v-main>
       </div>
       <Appfooter />

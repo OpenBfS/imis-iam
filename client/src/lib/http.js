@@ -21,6 +21,12 @@ function handleError(error) {
     return;
   }
 
+  const applicationStore = useApplicationStore();
+
+  if (error.response?.status === 401) {
+    applicationStore.setShowSessionExpiredDialog(true);
+  }
+
   let msg;
   if (error.response) {
     const errData = error.response.data;
@@ -35,7 +41,7 @@ function handleError(error) {
   } else {
     msg = "Error" + error.message;
   }
-  useApplicationStore().setHttpErrorMessage(msg);
+  applicationStore.setHttpErrorMessage(msg);
 }
 
 HTTP.interceptors.response.use(
