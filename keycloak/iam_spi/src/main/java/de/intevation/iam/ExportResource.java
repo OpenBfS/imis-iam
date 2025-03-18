@@ -20,7 +20,6 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -96,7 +95,6 @@ public class ExportResource {
      * @param search Optional search parameter (ignored if IDs are given)
      * @param ids Multiple institution-IDs can be given to export specific institutions
      * @param attributes Attributes that are exported, if empty all attributes are exported
-     * @param headers Request headers
      * @return Institutions as CSV
      */
     @GET
@@ -109,8 +107,7 @@ public class ExportResource {
             @QueryParam("encoding") String encoding,
             @QueryParam("search") String search,
             @QueryParam("id") List<Integer> ids,
-            @QueryParam("attributes") Set<String> attributes,
-            @Context HttpHeaders headers
+            @QueryParam("attributes") Set<String> attributes
     ) {
         CSVExporter<Institution> exporter = new CSVExporter<>();
         setCsvOptions(
@@ -123,7 +120,7 @@ public class ExportResource {
                 institutions.add(instProvider.getInstitutionById(id));
             }
         } else {
-            institutions = instProvider.getInstitutions(headers, search, null, null, null, null)
+            institutions = instProvider.getInstitutions(search, null, null, null, null)
                 .getList();
         }
         return doExport(exporter, institutions, attributes);

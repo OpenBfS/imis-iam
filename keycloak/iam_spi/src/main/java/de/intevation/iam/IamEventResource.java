@@ -58,12 +58,11 @@ public class IamEventResource {
 
     /**
      * Get all events.
-     * @param headers Request headers
      * @return Response containing event array.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEvents(@Context HttpHeaders headers) {
+    public Response getEvents() {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -71,8 +70,7 @@ public class IamEventResource {
         Root<Event> root = query.from(Event.class);
         query.select(root);
         List<Event> result = auth.filter(
-            em.createQuery(query).getResultList(),
-            session.getContext().getUserSession().getId()
+            em.createQuery(query).getResultList()
         );
         return Response.ok(result).build();
     }
@@ -80,14 +78,11 @@ public class IamEventResource {
     /**
      * Get an event by id.
      * @param id Event id
-     * @param headers Request headers
      * @return Event json or 404 if not found
      */
     @GET
     @Path("/{id}")
-    public Response getEventById(
-            @PathParam("id") Integer id,
-            @Context HttpHeaders headers) {
+    public Response getEventById(@PathParam("id") Integer id) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         Event event = em.find(Event.class, id);
@@ -164,14 +159,11 @@ public class IamEventResource {
     /**
      * Remove an event by id.
      * @param id Event id
-     * @param headers Request headers
      * @return 200 if done, 404 if not found, 403 if not authorized
      */
     @DELETE
     @Path("/{id}")
-    public Response deleteEvent(
-            @PathParam("id") Integer id,
-            @Context HttpHeaders headers) {
+    public Response deleteEvent(@PathParam("id") Integer id) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         Event event = em.find(Event.class, id);

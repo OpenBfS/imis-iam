@@ -162,8 +162,7 @@ public class UserResource {
             .filter(userFilter)
             .collect(Collectors.toList());
         // Filter hidden users
-        userList = auth.filter(userList,
-                session.getContext().getUserSession().getId());
+        userList = auth.filter(userList);
 
         long size = userList.size();
         if (firstResult != null || maxResults != null) {

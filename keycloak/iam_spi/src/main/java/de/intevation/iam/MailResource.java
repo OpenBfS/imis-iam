@@ -144,7 +144,6 @@ public class MailResource {
                 null,
                 RequestMethod.GET)
         ) {
-            System.out.println(session.getContext().getUserSession().getId());
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -191,7 +190,7 @@ public class MailResource {
             filter = cb.and(filter, dateFilter);
         }
 
-        if (sender != null && !sender.equals("")) {
+        if (sender != null && !sender.isEmpty()) {
             Predicate senderFilter = cb.equal(root.get(Mail_.sender), sender);
             filter = cb.and(filter, senderFilter);
         }
@@ -231,7 +230,7 @@ public class MailResource {
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(mail, languages.get(0), entityManager);
-        String userId = session.getContext().getUserSession().getId();
+        String userId = session.getContext().getUserSession().getUser().getId();
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
@@ -246,8 +245,7 @@ public class MailResource {
         RealmModel realm = session.getContext().getRealm();
         DefaultEmailSenderProvider senderProvider
             = new DefaultEmailSenderProvider(session);
-        Map<String, String> smtpConfig = new HashMap<String, String>();
-        smtpConfig.putAll(realm.getSmtpConfig());
+        Map<String, String> smtpConfig = new HashMap<>(realm.getSmtpConfig());
 
         //Update mail object
         Timestamp now = new Timestamp(System.currentTimeMillis());

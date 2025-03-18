@@ -42,7 +42,6 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
     /**
      * Constructor.
      * @param session Keycloak session
-     * @param freeMarker FreeMarker util
      */
     public IamMailTemplateProvider(KeycloakSession session) {
         super(session);
@@ -61,7 +60,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
     ) throws EmailException {
         StringBuilder usernamesBuilder = new StringBuilder();
         inactiveAccounts.forEach(acc -> {
-            if (usernamesBuilder.length() > 0) {
+            if (!usernamesBuilder.isEmpty()) {
                 usernamesBuilder.append(", ");
             }
             usernamesBuilder.append(acc.getUsername());
@@ -89,7 +88,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
             List<UserModel> expiredUsers) throws EmailException {
         StringBuilder usernamesBuilder = new StringBuilder();
         expiredUsers.forEach(acc -> {
-            if (usernamesBuilder.length() > 0) {
+            if (!usernamesBuilder.isEmpty()) {
                 usernamesBuilder.append(", ");
             }
             usernamesBuilder.append(acc.getUsername());

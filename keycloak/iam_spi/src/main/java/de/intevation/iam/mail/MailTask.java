@@ -83,7 +83,7 @@ public class MailTask implements KeycloakSessionTask {
             user.setExpiredNotificationSent(true);
             em.merge(user);
         });
-        if (users != null && users.size() > 0) {
+        if (!users.isEmpty()) {
             mailTemplateProvider.sendAccountExpiredNotification(
                 getNotificationRecipient(), users);
         }
@@ -108,7 +108,7 @@ public class MailTask implements KeycloakSessionTask {
         query.where(filter);
         List<UserAttributes> userAttributes
                 = em.createQuery(query).getResultList();
-        if (userAttributes.size() == 0) {
+        if (userAttributes.isEmpty()) {
             return;
         }
         List<UserModel> users = new ArrayList<>();

@@ -40,7 +40,6 @@ import jakarta.ws.rs.core.Response.Status;
 import org.hibernate.query.criteria.JpaExpression;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.auth.Authorizer;
@@ -164,7 +163,6 @@ public class InstitutionResource {
      * }]
      * </code>
      * </pre>
-     * @param headers Request headers
      * @param search Optional search parameter
      * @param firstResult First result to return
      * @param maxResults Maximum numbers of results to return
@@ -174,7 +172,7 @@ public class InstitutionResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ObjectList<Institution> getInstitutions(@Context HttpHeaders headers,
+    public ObjectList<Institution> getInstitutions(
             @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults,
@@ -324,7 +322,6 @@ public class InstitutionResource {
     public Response createInstitution(final Institution rep,
             @Context HttpHeaders headers
     ) {
-        String id = session.getContext().getUserSession().getId();
         if (!auth.isAuthorized(rep, RequestMethod.POST)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -332,12 +329,10 @@ public class InstitutionResource {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
 
-        RealmModel realm = session.getContext().getRealm();
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
-        UserModel requestingUser = session.users().getUserById(realm, id);
 
-        mergeTags(rep, em, requestingUser);
+        mergeTags(rep, em);
         em.persist(rep);
         return Response.ok(rep).build();
     }
@@ -382,7 +377,6 @@ public class InstitutionResource {
     public Response updateInstitution(
             final Institution rep, @Context HttpHeaders headers
     ) {
-        String id = session.getContext().getUserSession().getId();
         if (!auth.isAuthorized(rep, RequestMethod.PUT)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -396,10 +390,8 @@ public class InstitutionResource {
                || em.find(Institution.class, rep.getId()) == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        RealmModel realm = session.getContext().getRealm();
-        UserModel requestingUser = session.users().getUserById(realm, id);
 
-        mergeTags(rep, em, requestingUser);
+        mergeTags(rep, em);
         Institution merged = em.merge(rep);
         return Response.ok(merged).build();
     }
@@ -449,9 +441,10 @@ public class InstitutionResource {
 
     private void mergeTags(
         Institution rep,
-        EntityManager em,
-        UserModel requestingUser
+        EntityManager em
     ) {
+        UserModel requestingUser =
+            session.getContext().getUserSession().getUser();
         for (InstitutionTag tag: rep.getInstitutionTags()) {
             InstitutionTag persistentTag =
                 em.find(InstitutionTag.class, tag.getName());

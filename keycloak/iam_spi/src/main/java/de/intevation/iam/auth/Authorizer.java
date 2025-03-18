@@ -34,13 +34,9 @@ public abstract class Authorizer<T> {
      * The default implementation returns all elements authorized for GET.
      *
      * @param data List of objects
-     * @param userId ID of requesting user
      * @return Filtered list
      */
-    public List<T> filter(
-        List<T> data,
-        String userId
-    ) {
+    public List<T> filter(List<T> data) {
         return data.stream().filter(object -> isAuthorized(
                 object, RequestMethod.GET)).toList();
     }

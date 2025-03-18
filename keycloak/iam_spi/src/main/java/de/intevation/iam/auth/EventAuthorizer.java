@@ -42,16 +42,10 @@ public class EventAuthorizer extends Authorizer<Event> {
     }
 
     @Override
-    public List<Event> filter(
-        List<Event> data,
-        String userId
-    ) {
+    public List<Event> filter(List<Event> data) {
         return data.stream()
-            .map((event) -> {
-                event.setReadonly(
-                    !isAuthorized(event, null));
-                return event;
-            })
+            .peek((event) -> event.setReadonly(
+                !isAuthorized(event, null)))
             .collect(Collectors.toList());
     }
 }
