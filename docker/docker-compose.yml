@@ -1,22 +1,4 @@
 services:
-  mailhog:
-    build:
-      context: ./mailhog
-    image: "iam_mailhog"
-    profiles:
-      - dev
-  ldap:
-    build:
-      context: ./ldap
-    image: "iam_ldap"
-    profiles:
-      - dev
-  db:
-    build:
-      context: ./db
-    image: "iam_db"
-    profiles:
-      - dev
   keycloak:
     build:
       context: ../

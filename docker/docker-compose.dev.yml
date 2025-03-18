@@ -1,11 +1,24 @@
 services:
   mailhog:
+    build:
+      context: ./mailhog
+    image: "iam_mailhog"
     ports:
       - ${MAILHOG_PORT:-48082}:8025
+  ldap:
+    build:
+      context: ./ldap
+    image: "iam_ldap"
   db:
+    build:
+      context: ./db
+    image: "iam_db"
     ports:
       - ${DB_PORT:-2345}:5432
   keycloak:
+    extends:
+      file: docker-compose.yml
+      service: keycloak
     depends_on:
       db:
         condition: service_healthy
@@ -27,6 +40,9 @@ services:
       - KC_SPI_THEME_CACHE_THEMES=false
       - KC_SPI_THEME_CACHE_TEMPLATES=false
   client:
+    extends:
+      file: docker-compose.yml
+      service: client
     environment:
       - CLIENT_MODE=development
     volumes:

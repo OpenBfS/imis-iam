@@ -19,10 +19,10 @@ HOSTNAME=docker-host docker compose up -d
 
 ## Development Setup
 
-To start a setup specifically for development use
+To start a setup specifically for development, use the dedicated configuration:
 
 ```bash
-docker compose --profile dev -f docker-compose.yml -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml up -d
 ```
 
 In this case, an initial admin user is created during the setup:
