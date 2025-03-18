@@ -3,8 +3,6 @@ services:
     build:
       context: ./mailhog
     image: "iam_mailhog"
-    ports:
-      - ${MAILHOG_PORT}:8025
     profiles:
       - dev
   ldap:
@@ -17,8 +15,6 @@ services:
     build:
       context: ./db
     image: "iam_db"
-    ports:
-      - ${DB_PORT}:5432
     profiles:
       - dev
   keycloak:
@@ -44,7 +40,6 @@ services:
       - ${PORT}:80
     environment:
       - CLIENT_PATH
-      - CLIENT_MODE
       - PROTOCOLL
       - HOSTNAME
       - PORT
