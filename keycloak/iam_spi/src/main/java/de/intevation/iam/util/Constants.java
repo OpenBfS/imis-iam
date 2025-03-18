@@ -11,9 +11,4 @@ package de.intevation.iam.util;
 public class Constants {
     private Constants() { }
     public static final String IAM_CLIENT_ID = "iam-client";
-
-    /**
-     * Header containing userid.
-     */
-    public static final String USER_HEADER = "X-user";
 }

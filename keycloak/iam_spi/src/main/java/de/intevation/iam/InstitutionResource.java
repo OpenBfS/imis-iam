@@ -6,7 +6,6 @@
  */
 package de.intevation.iam;
 
-import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +49,6 @@ import de.intevation.iam.auth.IaMRole;
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.InstitutionTag;
 import de.intevation.iam.model.representation.ObjectList;
-import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 import org.keycloak.utils.SearchQueryUtils;
@@ -319,15 +317,15 @@ public class InstitutionResource {
      * @param rep Institution representation
      * @param headers Request headers
 
-     * @return New Instituion JSON or 400 if no institution is present
+     * @return New Institution JSON or 400 if no institution is present
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response createInstitution(final Institution rep,
             @Context HttpHeaders headers
-    ) throws IntrospectionException, ReflectiveOperationException {
-        String id = headers.getHeaderString(Constants.USER_HEADER);
-        if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
+    ) {
+        String id = session.getContext().getUserSession().getId();
+        if (!auth.isAuthorized(rep, RequestMethod.POST)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -383,9 +381,9 @@ public class InstitutionResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateInstitution(
             final Institution rep, @Context HttpHeaders headers
-    ) throws IntrospectionException, ReflectiveOperationException {
-        String id = headers.getHeaderString(Constants.USER_HEADER);
-        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
+    ) {
+        String id = session.getContext().getUserSession().getId();
+        if (!auth.isAuthorized(rep, RequestMethod.PUT)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -409,13 +407,12 @@ public class InstitutionResource {
     /**
      * Delete the institution with the given id.
      * @param id Institution id
-     * @param headers Request headers
      * @return 200 if successful or 404 if not found
      */
     @DELETE
     @Path("/{id}")
     public Response removeInstitution(
-            @PathParam("id") Integer id, @Context HttpHeaders headers) {
+            @PathParam("id") Integer id) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         Institution institution = em.find(Institution.class, id);
@@ -423,10 +420,9 @@ public class InstitutionResource {
             return Response.status(Status.NOT_FOUND).build();
         }
         if (
-            !auth.isAuthorizedById(
+            !auth.isAuthorized(
                 institution,
-                RequestMethod.DELETE,
-                headers.getHeaderString(Constants.USER_HEADER))
+                RequestMethod.DELETE)
         ) {
             return Response.status(Status.UNAUTHORIZED).build();
         }

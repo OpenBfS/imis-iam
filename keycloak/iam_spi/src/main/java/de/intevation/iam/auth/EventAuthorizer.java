@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.Event;
@@ -31,13 +30,11 @@ public class EventAuthorizer extends Authorizer<Event> {
     }
 
     @Override
-    public boolean isAuthorizedById(
+    public boolean isAuthorized(
         Event data,
-        RequestMethod requestMethod,
-        String userId
+        RequestMethod requestMethod
     ) {
-        RealmModel realm = session.getContext().getRealm();
-        UserModel requestingUser = session.users().getUserById(realm, userId);
+        UserModel requestingUser = session.getContext().getUserSession().getUser();
         if (requestingUser == null) {
             return false;
         }
@@ -52,7 +49,7 @@ public class EventAuthorizer extends Authorizer<Event> {
         return data.stream()
             .map((event) -> {
                 event.setReadonly(
-                    !isAuthorizedById(event, null, userId));
+                    !isAuthorized(event, null));
                 return event;
             })
             .collect(Collectors.toList());

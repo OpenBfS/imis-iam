@@ -22,13 +22,11 @@ public abstract class Authorizer<T> {
      * Check if user is authorized for the given data and request method.
      * @param data Data
      * @param requestMethod Request method used
-     * @param userId ID of requesting user
      * @return True if authorized, else false
      */
-    public abstract boolean isAuthorizedById(
+    public abstract boolean isAuthorized(
         T data,
-        RequestMethod requestMethod,
-        String userId
+        RequestMethod requestMethod
     );
 
     /**
@@ -43,7 +41,7 @@ public abstract class Authorizer<T> {
         List<T> data,
         String userId
     ) {
-        return data.stream().filter(object -> isAuthorizedById(
-                object, RequestMethod.GET, userId)).toList();
+        return data.stream().filter(object -> isAuthorized(
+                object, RequestMethod.GET)).toList();
     }
 }

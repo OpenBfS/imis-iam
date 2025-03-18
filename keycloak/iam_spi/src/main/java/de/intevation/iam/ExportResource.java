@@ -55,7 +55,6 @@ public class ExportResource {
      * @param search Optional search parameter (ignored if IDs are given)
      * @param ids Multiple user-IDs can be given to export specific users
      * @param attributes Attributes that are exported, if empty all attributes are exported
-     * @param headers Request headers
      * @return Resulting csv data
      */
     @GET
@@ -68,8 +67,7 @@ public class ExportResource {
             @QueryParam("encoding") String encoding,
             @QueryParam("search") String search,
             @QueryParam("id") List<String> ids,
-            @QueryParam("attributes") Set<String> attributes,
-            @Context HttpHeaders headers
+            @QueryParam("attributes") Set<String> attributes
     ) {
         CSVExporter<User> exporter = new CSVExporter<>();
         setCsvOptions(
@@ -79,10 +77,10 @@ public class ExportResource {
         List<User> users = new ArrayList<>();
         if (ids != null && !ids.isEmpty()) {
             for (String id: ids) {
-                users.add(userProvider.getUserById(id, headers));
+                users.add(userProvider.getUserById(id));
             }
         } else {
-            users = userProvider.getUsers(headers, search, null, null)
+            users = userProvider.getUsers(search, null, null)
                 .getList();
         }
         return doExport(exporter, users, attributes);

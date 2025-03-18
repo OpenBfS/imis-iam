@@ -7,7 +7,6 @@
 package de.intevation.iam.auth;
 
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.Mail;
@@ -20,16 +19,11 @@ public class MailAuthorizer extends Authorizer<Mail> {
     }
 
     @Override
-    public boolean isAuthorizedById(
+    public boolean isAuthorized(
         Mail data,
-        RequestMethod requestMethod,
-        String userId
+        RequestMethod requestMethod
     ) {
-        if (userId == null) {
-            return false;
-        }
-        RealmModel realm = session.getContext().getRealm();
-        UserModel requestingUser = session.users().getUserById(realm, userId);
+        UserModel requestingUser = session.getContext().getUserSession().getUser();
 
         switch (requestMethod) {
             case GET: return IaMRole.USER.isRoleOf(requestingUser, session);

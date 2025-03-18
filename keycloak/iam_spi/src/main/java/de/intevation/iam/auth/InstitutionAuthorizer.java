@@ -10,11 +10,12 @@ import jakarta.persistence.EntityManager;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.util.RequestMethod;
+
+import java.util.Objects;
 
 public class InstitutionAuthorizer extends Authorizer<Institution> {
 
@@ -23,16 +24,11 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
     }
 
     @Override
-    public boolean isAuthorizedById(
+    public boolean isAuthorized(
         Institution data,
-        RequestMethod requestMethod,
-        String userId
+        RequestMethod requestMethod
     ) {
-        if (userId == null) {
-            return false;
-        }
-        RealmModel realm = session.getContext().getRealm();
-        UserModel requestingUser = session.users().getUserById(realm, userId);
+        UserModel requestingUser = session.getContext().getUserSession().getUser();
 
         switch (requestMethod) {
             case GET: return IaMRole.USER.isRoleOf(requestingUser, session);
@@ -40,8 +36,8 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
             case PUT:
                 EntityManager em = session.getProvider(
                     JpaConnectionProvider.class).getEntityManager();
-                return data.getMeasFacilId() == em.find(
-                        Institution.class, data.getId()).getMeasFacilId()
+                return Objects.equals(data.getMeasFacilId(), em.find(
+                        Institution.class, data.getId()).getMeasFacilId())
                     && IaMRole.EDITOR.isRoleOf(requestingUser, session)
                     || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             case POST:

@@ -97,7 +97,6 @@ public class UserResource {
 
     /**
      * Get profile of the current users.
-     * @param headers Request header
      * @return User profile as json, 403 if not authorized
      * @throws ForbiddenException if requesting user is not authorized to
      * view the requested data.
@@ -105,7 +104,7 @@ public class UserResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("profile")
-    public User getProfile(@Context HttpHeaders headers) {
+    public User getProfile() {
         return new User(
             session.getContext().getUserSession().getUser(),
             session);
@@ -113,7 +112,6 @@ public class UserResource {
 
     /**
      * Get all users.
-     * @param headers Request headers
      * @param search Optional search parameter
      * @param firstResult First result to return
      * @param maxResults Maximum numbers of results to return
@@ -121,7 +119,7 @@ public class UserResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ObjectList<User> getUsers(@Context HttpHeaders headers,
+    public ObjectList<User> getUsers(
             @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
             @QueryParam("maxResults") Integer maxResults) {
@@ -165,7 +163,7 @@ public class UserResource {
             .collect(Collectors.toList());
         // Filter hidden users
         userList = auth.filter(userList,
-                headers.getHeaderString(Constants.USER_HEADER));
+                session.getContext().getUserSession().getId());
 
         long size = userList.size();
         if (firstResult != null || maxResults != null) {
@@ -190,7 +188,6 @@ public class UserResource {
     /**
      * Get user by id.
      * @param id User id
-     * @param headers Request headers
      * @return User
      * @throws NotFoundException if a user with given ID does not exist
      * @throws ForbiddenException if requesting user is not authorized to
@@ -198,10 +195,7 @@ public class UserResource {
      */
     @GET
     @Path("{id}")
-    public User getUserById(
-        @PathParam("id") String id,
-        @Context HttpHeaders headers
-    ) {
+    public User getUserById(@PathParam("id") String id) {
         RealmModel realm = session.getContext().getRealm();
         UserModel userModel = session.users().getUserById(realm, id);
         if (userModel == null) {
@@ -209,10 +203,9 @@ public class UserResource {
         }
 
         User user = new User(userModel, session);
-        if (!auth.isAuthorizedById(
+        if (!auth.isAuthorized(
                 user,
-                RequestMethod.GET,
-                headers.getHeaderString(Constants.USER_HEADER))) {
+                RequestMethod.GET)) {
             throw new ForbiddenException();
         }
         return user;
@@ -231,8 +224,7 @@ public class UserResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public User createUser(@Context HttpHeaders headers, final User rep) {
-        String id = headers.getHeaderString(Constants.USER_HEADER);
-        if (!auth.isAuthorizedById(rep, RequestMethod.POST, id)) {
+        if (!auth.isAuthorized(rep, RequestMethod.POST)) {
             throw new ForbiddenException();
         }
 
@@ -302,8 +294,7 @@ public class UserResource {
         @Context HttpHeaders headers,
         final User rep
     ) {
-        String id = headers.getHeaderString(Constants.USER_HEADER);
-        if (!auth.isAuthorizedById(rep, RequestMethod.PUT, id)) {
+        if (!auth.isAuthorized(rep, RequestMethod.PUT)) {
             throw new ForbiddenException();
         }
 

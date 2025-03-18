@@ -47,7 +47,6 @@ import de.intevation.iam.auth.MailAuthorizer;
 import de.intevation.iam.model.jpa.Mail;
 import de.intevation.iam.model.jpa.Mail_;
 import de.intevation.iam.model.jpa.MailType;
-import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
 
@@ -61,7 +60,6 @@ public class MailResource {
     private static final Logger LOG = Logger.getLogger("MailProvider");
 
     private static final String FROM_ADDRESS = "from";
-    private static final String USER_ID_HEADER = "X-SHIB-user";
 
     //Keycloak session
     private KeycloakSession session;
@@ -120,7 +118,6 @@ public class MailResource {
     /**
      * Get mails.
      *
-     * @param headers Request headers
      * @param types Filter by type IDs given with URL parameter "type"
      * @param count Restrict number of returned mails
      * @param archived if true only archived mails returned
@@ -132,7 +129,6 @@ public class MailResource {
     @GET
     @SuppressWarnings("checkstyle:parameternumber")
     public Response getMails(
-        @Context HttpHeaders headers,
         @QueryParam("type") List<Integer> types,
         @QueryParam("count") Integer count,
         @QueryParam("archived") boolean archived,
@@ -144,11 +140,11 @@ public class MailResource {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
-        if (!auth.isAuthorizedById(
+        if (!auth.isAuthorized(
                 null,
-                RequestMethod.GET,
-                headers.getHeaderString(Constants.USER_HEADER))
+                RequestMethod.GET)
         ) {
+            System.out.println(session.getContext().getUserSession().getId());
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -235,14 +231,13 @@ public class MailResource {
     ) {
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(mail, languages.get(0), entityManager);
-        String userId = headers.getHeaderString(USER_ID_HEADER);
+        String userId = session.getContext().getUserSession().getId();
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
-        if (!auth.isAuthorizedById(
+        if (!auth.isAuthorized(
                 mail,
-                RequestMethod.POST,
-                headers.getHeaderString(Constants.USER_HEADER))) {
+                RequestMethod.POST)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
 
@@ -285,18 +280,16 @@ public class MailResource {
      */
     @GET
     @Path("/archive/{id}")
-    public Response archiveMail(@PathParam("id") Integer mailId,
-            @Context HttpHeaders headers) {
+    public Response archiveMail(@PathParam("id") Integer mailId) {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
         Mail mail = em.find(Mail.class, mailId);
         if (mail == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (!auth.isAuthorizedById(
+        if (!auth.isAuthorized(
                 mail,
-                RequestMethod.POST,
-                headers.getHeaderString(Constants.USER_HEADER))) {
+                RequestMethod.POST)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         mail.setArchived(true);

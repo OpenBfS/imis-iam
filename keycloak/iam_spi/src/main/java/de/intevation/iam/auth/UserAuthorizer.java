@@ -25,18 +25,13 @@ public class UserAuthorizer extends Authorizer<User> {
     }
 
     @Override
-    public boolean isAuthorizedById(
+    public boolean isAuthorized(
         User data,
-        RequestMethod requestMethod,
-        String userId
+        RequestMethod requestMethod
     ) {
-        if (userId == null) {
-            return false;
-        }
-
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
-        UserModel requestingUser = session.users().getUserById(realm, userId);
+        UserModel requestingUser = session.getContext().getUserSession().getUser();
         if (requestingUser == null) {
             return false;
         }
