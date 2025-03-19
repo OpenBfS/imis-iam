@@ -8,6 +8,7 @@ services:
       - ${ADMIN_PORT}:8080
     env_file:
       - keycloak/keycloak.env
+      - shared.env
 #    volumes:
 #      - ./keycloak/data:/opt/keycloak/data/import
   client:
@@ -20,9 +21,7 @@ services:
         condition: service_healthy
     ports:
       - ${PORT}:80
+    env_file:
+      - shared.env
     environment:
-      - CLIENT_PATH
-      - PROTOCOLL
-      - HOSTNAME
-      - PORT
       - PHOTON_URL
