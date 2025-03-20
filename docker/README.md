@@ -46,14 +46,19 @@ web application "MailHog" at port `48082` on the docker host.
 
 ## Configuration
 
-### Keycloak
-
-Some aspects of the application can be configured via environment variables
-in keycloak/keycloak.env.
+Environment variables shared between containers are defined in `shared.env`.
 
 The configuration assumes a TLS endpoint is operated in front of the
 Compose stack, if used for production. The environment variable `PROTOCOLL`
 has to be set to `https` in this case.
+
+### Keycloak
+
+Some aspects of the application can be configured via environment variables
+defined in `keycloak/keycloak.env`. In case further environment variables
+need to be defined to configure other aspects of Keycloak (e.g. to set
+`KC_HTTP_MAX_QUEUED_REQUESTS` in productive setup), these can be set
+in an additional file `keycloak/optional.env`.
 
 
 ### Client application
