@@ -44,7 +44,8 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
                 if (data.getMeasFacilId() != null) {
                     return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
                 }
-            case DELETE: return IaMRole.EDITOR.isRoleOf(requestingUser, session);
+            case DELETE:
+                return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
     }
