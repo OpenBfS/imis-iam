@@ -7,6 +7,8 @@
 
 package de.intevation.iam.auth;
 
+import java.util.List;
+
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -41,6 +43,7 @@ public class UserAuthorizer extends Authorizer<User> {
             case PUT -> authorizeUpdate(
                     data, session, requestingUser, client);
             case POST -> (!data.isEnabled()
+                    && networkEquals(requestingUser, data)
                     && IaMRole.EDITOR.isRoleOf(requestingUser, session)
                     || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session))
                     // Not allowed granting roles superior to own role
@@ -90,9 +93,21 @@ public class UserAuthorizer extends Authorizer<User> {
         if (oldRole == null || !oldRole.equals(user.getRole())) {
             return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
         }
-        // Else only allow users with other roles than user to edit
-        // or allow users to edit their own profile
+
         return IaMRole.EDITOR.isRoleOf(requestingUser, session)
+            && networkEquals(requestingUser, user)
+            || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
             || user.getId().equals(requestingUser.getId());
+    }
+
+    private boolean networkEquals(UserModel requestingUser, User data) {
+        final String networkKey = "network";
+        String requestingUserNetwork =
+            requestingUser.getFirstAttribute(networkKey);
+        List<String> dataNetwork = data.getAttributes().get(networkKey);
+        return requestingUserNetwork != null
+            && dataNetwork != null
+            && !dataNetwork.isEmpty()
+            && requestingUserNetwork.equals(dataNetwork.get(0));
     }
 }
