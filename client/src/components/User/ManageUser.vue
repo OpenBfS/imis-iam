@@ -212,7 +212,7 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, provide, onBeforeMount, onMounted, onUnmounted } from "vue";
+import { computed, provide, onBeforeMount, onMounted, onUnmounted, toRaw } from "vue";
 import { useNotification } from "@/lib/use-notification.js";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http.js";
@@ -308,6 +308,8 @@ onMounted(() => {
     applicationStore.clientAndServerRules[key] =
       applicationStore.clientRules[key];
   });
+  applicationStore.managedItem.attributes.network = toRaw(profileStore.userData.attributes.network)
+  applicationStore.managedItem.role = toRaw(userStore.roles).find((role) => role.name === "user")?.name
 });
 onUnmounted(() => {
   applicationStore.removeAllResetEventListeners();
