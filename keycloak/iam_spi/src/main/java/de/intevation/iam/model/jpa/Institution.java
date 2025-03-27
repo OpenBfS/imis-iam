@@ -30,7 +30,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -62,7 +61,6 @@ public class Institution {
         joinColumns = {@JoinColumn(name = "institution_id")},
         inverseJoinColumns = {@JoinColumn(name = "tag_name")}
     )
-    @NotEmpty
     private Set<InstitutionTag> tags = new HashSet<>();
 
     @NotBlank

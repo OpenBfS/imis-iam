@@ -232,7 +232,6 @@
                   item-title="name"
                   item-value="id"
                   persistent-hint
-                  required
                   multiple
                 ></Select>
               </v-col>
