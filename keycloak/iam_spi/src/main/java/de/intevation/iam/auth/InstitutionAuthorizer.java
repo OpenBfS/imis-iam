@@ -32,21 +32,33 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
 
         switch (requestMethod) {
             case GET: return IaMRole.USER.isRoleOf(requestingUser, session);
-            // Only Role.CHIEF_EDITOR is allowed to set/edit imisId
+            // Only Role.CHIEF_EDITOR is allowed to set/edit measFacilId
             case PUT:
                 EntityManager em = session.getProvider(
                     JpaConnectionProvider.class).getEntityManager();
-                return Objects.equals(data.getMeasFacilId(), em.find(
+                return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
+                    || Objects.equals(data.getMeasFacilId(), em.find(
                         Institution.class, data.getId()).getMeasFacilId())
-                    && IaMRole.EDITOR.isRoleOf(requestingUser, session)
-                    || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+                    && networkEquals(requestingUser, data)
+                    && IaMRole.EDITOR.isRoleOf(requestingUser, session);
             case POST:
                 if (data.getMeasFacilId() != null) {
                     return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
                 }
+                return IaMRole.EDITOR.isRoleOf(requestingUser, session);
             case DELETE:
                 return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
             default: return false;
         }
+    }
+
+    private boolean networkEquals(
+        UserModel requestingUser, Institution data
+    ) {
+        String userNetwork = requestingUser.getFirstAttribute("network");
+        String measFacilId = data.getMeasFacilId();
+        return userNetwork != null
+            && measFacilId != null
+            && userNetwork.equals(measFacilId.substring(0, 2));
     }
 }
