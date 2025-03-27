@@ -202,11 +202,7 @@ public class UserResource {
         }
 
         User user = new User(userModel, session);
-        if (!auth.isAuthorized(
-                user,
-                RequestMethod.GET)) {
-            throw new ForbiddenException();
-        }
+        auth.authorize(user, RequestMethod.GET);
         return user;
     }
 
@@ -223,9 +219,7 @@ public class UserResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public User createUser(@Context HttpHeaders headers, final User rep) {
-        if (!auth.isAuthorized(rep, RequestMethod.POST)) {
-            throw new ForbiddenException();
-        }
+        auth.authorize(rep, RequestMethod.POST);
 
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
@@ -293,9 +287,7 @@ public class UserResource {
         @Context HttpHeaders headers,
         final User rep
     ) {
-        if (!auth.isAuthorized(rep, RequestMethod.PUT)) {
-            throw new ForbiddenException();
-        }
+        auth.authorize(rep, RequestMethod.PUT);
 
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);

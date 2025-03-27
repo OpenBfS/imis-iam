@@ -12,6 +12,7 @@ import java.util.List;
 import org.keycloak.models.KeycloakSession;
 
 import de.intevation.iam.util.RequestMethod;
+import jakarta.ws.rs.ForbiddenException;
 
 
 public abstract class Authorizer<T> {
@@ -28,6 +29,21 @@ public abstract class Authorizer<T> {
         T data,
         RequestMethod requestMethod
     );
+
+    /**
+     * Authorize request for given data.
+     * @param data Data
+     * @param requestMethod Request method used
+     * @throws ForbiddenException if current user is not authorized
+     */
+    public void authorize(
+        T data,
+        RequestMethod requestMethod
+    ) {
+        if (!isAuthorized(data, requestMethod)) {
+            throw new ForbiddenException();
+        }
+    }
 
     /**
      * Filter or modify the given list of objects.

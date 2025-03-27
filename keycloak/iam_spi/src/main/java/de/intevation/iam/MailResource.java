@@ -140,12 +140,7 @@ public class MailResource {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
-        if (!auth.isAuthorized(
-                null,
-                RequestMethod.GET)
-        ) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
+        auth.authorize(null, RequestMethod.GET);
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Mail> critQuery = cb.createQuery(Mail.class);
@@ -234,11 +229,7 @@ public class MailResource {
         if (userId == null) {
             return Response.status(Status.FORBIDDEN).build();
         }
-        if (!auth.isAuthorized(
-                mail,
-                RequestMethod.POST)) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
+        auth.authorize(mail, RequestMethod.POST);
 
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
@@ -285,11 +276,7 @@ public class MailResource {
         if (mail == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (!auth.isAuthorized(
-                mail,
-                RequestMethod.POST)) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
+        auth.authorize(mail, RequestMethod.POST);
         mail.setArchived(true);
         em.persist(mail);
         return Response.ok().type(MediaType.APPLICATION_JSON).build();

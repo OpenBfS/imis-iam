@@ -322,9 +322,7 @@ public class InstitutionResource {
     public Response createInstitution(final Institution rep,
             @Context HttpHeaders headers
     ) {
-        if (!auth.isAuthorized(rep, RequestMethod.POST)) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
+        auth.authorize(rep, RequestMethod.POST);
 
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
@@ -377,9 +375,7 @@ public class InstitutionResource {
     public Response updateInstitution(
             final Institution rep, @Context HttpHeaders headers
     ) {
-        if (!auth.isAuthorized(rep, RequestMethod.PUT)) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
+        auth.authorize(rep, RequestMethod.PUT);
 
         List<Locale> languages = headers.getAcceptableLanguages();
         validator.validate(rep, languages.get(0), entityManager);
@@ -411,13 +407,8 @@ public class InstitutionResource {
         if (institution == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        if (
-            !auth.isAuthorized(
-                institution,
-                RequestMethod.DELETE)
-        ) {
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
+        auth.authorize(institution, RequestMethod.DELETE);
+
         em.remove(institution);
         return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
