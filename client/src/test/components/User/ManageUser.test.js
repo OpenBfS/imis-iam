@@ -122,7 +122,7 @@ test("Re-setting fields is removing validation errors", async () => {
   // It can be found in a <div> which is a sibling of the input.
   expect(
     wrapper.get("input[name='role']").element.parentElement.children[0]
-      .textContent
+      .textContent,
   ).toBe(roles.filter((r) => r.name === user.role)[0].title);
   expect(selectContainer.textContent).toContain(errors[0].message);
   wrapper.vm.resetForm(user, editedUser);

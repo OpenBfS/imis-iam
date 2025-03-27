@@ -87,7 +87,7 @@ export const useApplicationStore = defineStore("application", {
     },
     removeChangeInField(attribute) {
       const index = this.attributesOfFieldsThatChanged.findIndex(
-        (a) => a === attribute
+        (a) => a === attribute,
       );
       if (index !== -1) {
         this.attributesOfFieldsThatChanged =
@@ -143,12 +143,12 @@ export const useApplicationStore = defineStore("application", {
       this.clientAndServerRules[attribute] = [];
       if (this.clientRules[attribute]) {
         this.clientAndServerRules[attribute].push(
-          ...this.clientRules[attribute]
+          ...this.clientRules[attribute],
         );
       }
       if (this.serverValidationRules[attribute]) {
         this.clientAndServerRules[attribute].push(
-          this.serverValidationRules[attribute]
+          this.serverValidationRules[attribute],
         );
       }
     },

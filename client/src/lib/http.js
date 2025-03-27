@@ -49,7 +49,7 @@ HTTP.interceptors.response.use(
   (error) => {
     handleError(error);
     return Promise.reject(error);
-  }
+  },
 );
 
 // Base URL for photon geocoder API

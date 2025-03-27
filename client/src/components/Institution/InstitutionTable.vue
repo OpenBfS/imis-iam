@@ -74,7 +74,6 @@ import { getExpInstitution } from "@/components/Institution/institution.js";
 import { onMounted } from "vue";
 import { createHeaders } from "@/lib/utils";
 
-
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();

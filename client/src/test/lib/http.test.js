@@ -56,7 +56,7 @@ test("Test error handling", () => {
   error.response.data[0].message = undefined;
   handleError(error);
   expect(applicationStore.httpErrorMessage).toBe(
-    JSON.stringify(error.response.data)
+    JSON.stringify(error.response.data),
   );
 
   error.response.data = [1, 2];

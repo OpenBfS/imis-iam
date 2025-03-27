@@ -123,7 +123,7 @@ const getFilters = () => {
 const areFiltersForHiddenColumnsAvailable = computed(() => {
   const filters = Object.keys(getFilters());
   return tableHeaders.value.some(
-    (header) => header.visible === false && filters.includes(header.key)
+    (header) => header.visible === false && filters.includes(header.key),
   );
 });
 

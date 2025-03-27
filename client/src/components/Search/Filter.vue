@@ -6,44 +6,44 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-<div class="table-filter">
-  <v-autocomplete
-    v-if="props.items"
-    :label="props.label"
-    :items="props.items"
-    :item-title="props.itemTitle"
-    :item-value="props.itemValue"
-    :no-data-text="$t('label.noDataText')"
-    class="my-1 overflow-hidden"
-    clearable
-    hide-details
-    min-width="120"
-    :model-value="autocompleteValue"
-    variant="outlined"
-    @update:modelValue="
-      (event) => {
-        autocompleteValue = event;
-        handleFilterInput(event);
-      }
-    "
-  ></v-autocomplete>
-  <v-text-field
-    v-else
-    class="my-1 overflow-hidden"
-    clearable
-    density="compact"
-    :model-value="textFieldValue"
-    :placeholder="props.placeholder"
-    hide-details
-    min-width="40"
-    variant="outlined"
-    @update:modelValue="
-      (event) => {
-        textFieldValue = event;
-        handleFilterInput(event);
-      }
-    "
-  ></v-text-field>
+  <div class="table-filter">
+    <v-autocomplete
+      v-if="props.items"
+      :label="props.label"
+      :items="props.items"
+      :item-title="props.itemTitle"
+      :item-value="props.itemValue"
+      :no-data-text="$t('label.noDataText')"
+      class="my-1 overflow-hidden"
+      clearable
+      hide-details
+      min-width="120"
+      :model-value="autocompleteValue"
+      variant="outlined"
+      @update:modelValue="
+        (event) => {
+          autocompleteValue = event;
+          handleFilterInput(event);
+        }
+      "
+    ></v-autocomplete>
+    <v-text-field
+      v-else
+      class="my-1 overflow-hidden"
+      clearable
+      density="compact"
+      :model-value="textFieldValue"
+      :placeholder="props.placeholder"
+      hide-details
+      min-width="40"
+      variant="outlined"
+      @update:modelValue="
+        (event) => {
+          textFieldValue = event;
+          handleFilterInput(event);
+        }
+      "
+    ></v-text-field>
   </div>
 </template>
 

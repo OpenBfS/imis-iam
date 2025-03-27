@@ -11,7 +11,7 @@
     v-if="
       getFormFieldType(
         attribute.annotations?.inputType,
-        attribute.multivalued
+        attribute.multivalued,
       ) === FORM_FIELD_TYPE_CHIPTEXTFIELD
     "
     v-bind="commonProps"
@@ -78,7 +78,7 @@ const FORM_FIELD_TYPE_CHIPTEXTFIELD = "chiptextfield";
 
 const getMetaDataAttribute = (nameOfAttribute) => {
   return profileStore.attributes.find(
-    (attribute) => attribute.name === nameOfAttribute
+    (attribute) => attribute.name === nameOfAttribute,
   );
 };
 const getFormFieldType = (inputType, multivalued) => {
@@ -87,7 +87,7 @@ const getFormFieldType = (inputType, multivalued) => {
   if (!inputType) return FORM_FIELD_TYPE_TEXTFIELD;
   if (
     ["text", "html5-email", "html5-tel", "html5-url", "html5-number"].includes(
-      inputType
+      inputType,
     )
   ) {
     if (multivalued) {

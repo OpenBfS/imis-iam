@@ -61,7 +61,7 @@
               <v-row>
                 <template
                   v-for="attribute in profileStore.attributesOfGroup(
-                    group.name
+                    group.name,
                   )"
                   :key="attribute.name"
                 >
@@ -277,10 +277,7 @@ const getUserAttributeRules = (userAttribute) => {
           length.max,
         ]);
       } else if (length.min) {
-        message = t("error.invalidLengthTooShort", [
-          displayName,
-          length.min,
-        ]);
+        message = t("error.invalidLengthTooShort", [displayName, length.min]);
       } else {
         message = t("error.invalidLengthTooLong", {
           attribute: displayName,
@@ -328,14 +325,14 @@ const userRoles = computed(() => {
   var roles = userStore.roles ?? [];
   // If available, use description field for localization
   roles.forEach(
-    (item) => (item.title = item.description ? t(item.description) : item.name)
+    (item) => (item.title = item.description ? t(item.description) : item.name),
   );
   return roles.filter(
     // Only allow 'chief_editor' to grant this role
     (item) =>
       item.name !== "chief_editor" ||
       user.value.role === "chief_editor" ||
-      profileStore.userData.role === "chief_editor"
+      profileStore.userData.role === "chief_editor",
   );
 });
 // Deep Copy for objects
@@ -365,7 +362,7 @@ const saveUser = () => {
     resetNotification,
     isServerValidationError,
     handleValidationErrorFromServer,
-    hasRequestError
+    hasRequestError,
   );
 };
 

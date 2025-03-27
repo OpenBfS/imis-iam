@@ -36,16 +36,16 @@ test("Test handleValidationErrorFromServer", async () => {
   expect(Object.keys(applicationStore.clientAndServerRules)[0]).toBe("role");
   expectTypeOf(applicationStore.clientAndServerRules["role"]).toBeFunction();
   expect(applicationStore.clientAndServerRules["role"][0]()).toBe(
-    errors[0].message
+    errors[0].message,
   );
 
   expect(Object.keys(applicationStore.clientAndServerRules)[1]).toBe("email");
   expectTypeOf(applicationStore.clientAndServerRules["email"]).toBeFunction();
   expect(applicationStore.clientAndServerRules["email"][0]()).toBe(
-    t("error.validEmail")
+    t("error.validEmail"),
   );
 
   expect(applicationStore.clientAndServerRules["email"][0]()).toBe(
-    t("error.validEmail")
+    t("error.validEmail"),
   );
 });

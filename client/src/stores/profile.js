@@ -44,13 +44,13 @@ export const useProfileStore = defineStore("profile", {
     },
     attributesWithoutGroup: (state) => {
       return state.userProfileMetadata.attributes?.filter(
-        (attribute) => !attribute.group
+        (attribute) => !attribute.group,
       );
     },
     attributesOfGroup: (state) => {
       return (groupName) =>
         state.userProfileMetadata.attributes.filter(
-          (attribute) => attribute.group === groupName
+          (attribute) => attribute.group === groupName,
         );
     },
     isChiefEditor: (state) => {

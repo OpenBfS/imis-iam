@@ -28,5 +28,4 @@
   </v-container>
 </template>
 
-<script setup>
-</script>
+<script setup></script>

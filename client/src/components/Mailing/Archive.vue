@@ -333,7 +333,7 @@ watch(
   () => selectedFilter.value,
   () => {
     getMails();
-  }
+  },
 );
 const currentYear = new Date().getFullYear();
 
@@ -367,7 +367,7 @@ watch(
       setStartAndEndDate(route.params.year);
       getMails();
     }
-  }
+  },
 );
 watch([() => endDate.value, () => startDate.value], () => {
   getMails();
@@ -382,6 +382,6 @@ watch(
     if (oldValue !== newValue) {
       triggerFilter();
     }
-  }
+  },
 );
 </script>

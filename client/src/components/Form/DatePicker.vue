@@ -134,7 +134,7 @@ const dateCloseConditional = () => {
 };
 const includedElements = () => {
   const elements = document.querySelectorAll(
-    `#date-textfield-${id.value} *, #date-picker-${id.value} *`
+    `#date-textfield-${id.value} *, #date-picker-${id.value} *`,
   );
   const includedElements = [];
   for (let i = 0; i < elements.length; i++) {
@@ -149,6 +149,6 @@ watch(
   (newDate) => {
     setDateString(newDate);
     internalDate.value = newDate;
-  }
+  },
 );
 </script>

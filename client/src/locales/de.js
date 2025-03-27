@@ -211,7 +211,7 @@ export default {
     operationModeChangeContact: "Kontaktdaten IMIS-Betriebsartenwechsel (BAW)",
     operationModeChangeMailAddresses: "BAW-E-Mail",
     operationModeChangePhoneNumbers: "BAW-Telefon",
-    operationModeChangeSmsPhoneNumbers: "BAW-SMS"
+    operationModeChangeSmsPhoneNumbers: "BAW-SMS",
   },
   // Shared button texts
   button: {

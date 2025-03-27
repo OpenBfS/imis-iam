@@ -281,7 +281,7 @@ const closeConditional = () => {
 };
 const includeExpiryDatePicker = () => {
   const elements = document.querySelectorAll(
-    ".expiryDatePicker *, #expiryDateTextfield *"
+    ".expiryDatePicker *, #expiryDateTextfield *",
   );
   const includedElements = [];
   for (let i = 0; i < elements.length; i++) {

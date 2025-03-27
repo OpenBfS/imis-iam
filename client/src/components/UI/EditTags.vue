@@ -105,7 +105,7 @@ watch(
   () => {
     resetMessages();
     resetSelection();
-  }
+  },
 );
 
 const loadInstitutionTags = () => {
@@ -123,7 +123,7 @@ const loadUserTags = async () => {
     await profileStore.loadUserProfileMetadata();
   }
   userTagsAttribute.value = profileStore.attributes.find(
-    (attribute) => attribute.name === "tags"
+    (attribute) => attribute.name === "tags",
   );
   userTags.value = userTagsAttribute.value.validations.options.options;
 };
@@ -166,7 +166,7 @@ const editTags = async (remove) => {
   for (let i = 0; i < selectedItems.length; i++) {
     const id = selectedItems[i];
     const itemToEdit = structuredClone(
-      foundItems.find((item) => item.id === id)
+      foundItems.find((item) => item.id === id),
     );
     let newTags = [];
     const oldTags = isInstitutionType()
@@ -216,7 +216,7 @@ const editTags = async (remove) => {
         true,
         isServerValidationError,
         handleValidationErrorFromServer,
-        hasRequestError
+        hasRequestError,
       );
     } else if (isUserType()) {
       result = updateUser(
@@ -224,7 +224,7 @@ const editTags = async (remove) => {
         resetNotification,
         isServerValidationError,
         handleValidationErrorFromServer,
-        hasRequestError
+        hasRequestError,
       );
     }
     if (result.response !== 200) {
@@ -234,7 +234,7 @@ const editTags = async (remove) => {
         const attribute = errorObject.messageParameters[0];
         const translatedMessage = translateError(
           errorObject.message,
-          attribute
+          attribute,
         );
         newErrorMessages.push({
           key: itemToEdit.name,

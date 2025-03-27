@@ -69,7 +69,9 @@ const savedUser = computed(() => {
 });
 
 const logout = () => {
-  window.location.assign(`${import.meta.env.BASE_URL}redirect_uri?logout=${window.location.origin}`);
+  window.location.assign(
+    `${import.meta.env.BASE_URL}redirect_uri?logout=${window.location.origin}`,
+  );
 };
 
 const editProfile = () => {

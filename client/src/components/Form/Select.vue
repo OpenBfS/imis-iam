@@ -36,7 +36,7 @@
       ...rules,
       ...(applicationStore.clientAndServerRules[props.attribute]
         ? applicationStore.clientAndServerRules[props.attribute]
-        : props.rules ?? []),
+        : (props.rules ?? [])),
     ]"
     :variant="props.variant"
     @update:model-value="
@@ -88,7 +88,7 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 const translationCategory = inject("translationCategory");
 const rules = ref(
-  createRequiredRule(props.required, props.attribute, translationCategory)
+  createRequiredRule(props.required, props.attribute, translationCategory),
 );
 
 const editable = computed(() => {

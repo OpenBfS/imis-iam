@@ -154,7 +154,7 @@ onBeforeMount(() => {
         t("error.invalidLengthTooLong", {
           attribute: t("export.fieldSeparator"),
           max: 1,
-        })
+        }),
       ),
     ],
     quoteType: [
@@ -164,7 +164,7 @@ onBeforeMount(() => {
         t("error.invalidLengthTooLong", {
           attribute: t("export.quoteType"),
           max: 1,
-        })
+        }),
       ),
     ],
   });
@@ -182,12 +182,12 @@ onMounted(() => {
   if (applicationStore.listToExport === "users") {
     csvOptions.value["search"] = createSearchQueryString(
       undefined,
-      userStore.filterBy
+      userStore.filterBy,
     );
   } else if (applicationStore.listToExport === "institutions") {
     csvOptions.value["search"] = createSearchQueryString(
       undefined,
-      institutionStore.filterBy
+      institutionStore.filterBy,
     );
   }
   applicationStore.managedItem = csvOptions.value;

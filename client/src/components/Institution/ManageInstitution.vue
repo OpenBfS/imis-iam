@@ -507,7 +507,7 @@ const saveInstitution = () => {
     showPostalAddress,
     isServerValidationError,
     handleValidationErrorFromServer,
-    hasRequestError
+    hasRequestError,
   );
 };
 const deleteInstitution = () => {

@@ -144,7 +144,7 @@ watch(entries, (newEntries) => {
  */
 watch(input, (newInput) => {
   const isContained = applicationStore.attributesOfFieldsThatChanged.includes(
-    props.attribute
+    props.attribute,
   );
   if (newInput.length > 0 && !isContained) {
     applicationStore.submitChangeInField(props.attribute);
@@ -165,7 +165,7 @@ watch(
       entries.value = newEntries;
       input.value = "";
     }
-  }
+  },
 );
 
 const addEntry = () => {
@@ -203,7 +203,7 @@ const onClickPlusButton = () => {
   addEntry();
   // Re-focus text field so user can continue to enter values
   const index = Array.from(plusButton.value.$el.form).indexOf(
-    plusButton.value.$el
+    plusButton.value.$el,
   );
   plusButton.value.$el.form[index - 1]?.focus();
 };

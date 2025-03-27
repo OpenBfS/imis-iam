@@ -35,7 +35,7 @@
       ...rules,
       ...(applicationStore.clientAndServerRules[props.attribute]
         ? applicationStore.clientAndServerRules[props.attribute]
-        : props.rules ?? []),
+        : (props.rules ?? [])),
     ]"
     :type="props.type ?? 'text'"
     :variant="props.variant ?? 'underlined'"
@@ -96,7 +96,7 @@ const emit = defineEmits(["update:modelValue"]);
 const combobox = ref(null);
 const translationCategory = inject("translationCategory");
 const rules = ref(
-  createRequiredRule(props.required, props.attribute, translationCategory)
+  createRequiredRule(props.required, props.attribute, translationCategory),
 );
 
 const validate = () => {

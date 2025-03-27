@@ -61,7 +61,7 @@ describe("Testing Archive", async () => {
   });
   test("Create correct filter query", async () => {
     expect(query).toBe(
-      `mail?archived=true&start=${currentYear}-01-01T00:00:00.000Z&end=${currentYear}-12-31T23:59:59.999Z`
+      `mail?archived=true&start=${currentYear}-01-01T00:00:00.000Z&end=${currentYear}-12-31T23:59:59.999Z`,
     );
   });
 });

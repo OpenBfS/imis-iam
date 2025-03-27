@@ -54,7 +54,7 @@ function updateInstitution(
   showPostalAddress,
   isServerValidationError,
   handleValidationErrorFromServer,
-  hasRequestError
+  hasRequestError,
 ) {
   const applicationStore = useApplicationStore();
   const institutionStore = useInstitutionStore();
