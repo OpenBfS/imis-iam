@@ -8,6 +8,7 @@ import i18n from "@/i18n";
 import { useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
+import { toRaw } from "vue";
 
 const expUser = {
   attributes: {},
@@ -17,7 +18,12 @@ const expUser = {
 };
 
 function getExpUser() {
-  return structuredClone(expUser);
+  const profileStore = useProfileStore();
+  const userStore = useUserStore();
+  const user = structuredClone(expUser);
+  user.attributes.network = toRaw(profileStore.userData.attributes.network)
+  user.role = toRaw(userStore.roles).find((role) => role.name === "user")?.name
+  return user
 }
 
 function handleDisplayName(displayName) {

@@ -294,9 +294,6 @@ const getUserAttributeRules = (userAttribute) => {
 
 onBeforeMount(() => {
   applicationStore.setForm(form);
-  if (!userStore.roles) {
-    userStore.loadRoles();
-  }
 });
 
 onMounted(() => {
@@ -308,8 +305,6 @@ onMounted(() => {
     applicationStore.clientAndServerRules[key] =
       applicationStore.clientRules[key];
   });
-  applicationStore.managedItem.attributes.network = toRaw(profileStore.userData.attributes.network)
-  applicationStore.managedItem.role = toRaw(userStore.roles).find((role) => role.name === "user")?.name
 });
 onUnmounted(() => {
   applicationStore.removeAllResetEventListeners();
