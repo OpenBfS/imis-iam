@@ -272,4 +272,14 @@
             ALTER TABLE iam_institution DROP COLUMN central_phone;
         </sql>
     </changeSet>
+    <changeSet author="tom@intevation.de" id="v0.17">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+          ALTER TABLE iam_institution_user
+            DROP CONSTRAINT iam_institution_user_institution_id_fkey;
+          ALTER TABLE iam_institution_user
+            ADD FOREIGN KEY (institution_id) REFERENCES keycloak.iam_institution;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
