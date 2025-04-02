@@ -30,15 +30,15 @@ public class EventAuthorizer extends Authorizer<Event> {
     }
 
     @Override
-    public boolean isAuthorized(
+    public void doAuthorize(
         Event data,
         RequestMethod requestMethod
-    ) {
+    ) throws AuthorizationException {
         UserModel requestingUser = session.getContext().getUserSession().getUser();
-        if (requestingUser == null) {
-            return false;
+        if (requestingUser == null
+            || !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            throw new AuthorizationException();
         }
-        return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
     }
 
     @Override

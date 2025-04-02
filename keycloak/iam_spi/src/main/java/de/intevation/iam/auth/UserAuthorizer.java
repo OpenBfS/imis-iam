@@ -27,18 +27,18 @@ public class UserAuthorizer extends Authorizer<User> {
     }
 
     @Override
-    public boolean isAuthorized(
+    public void doAuthorize(
         User data,
         RequestMethod requestMethod
-    ) {
+    ) throws AuthorizationException {
         RealmModel realm = session.getContext().getRealm();
         ClientModel client = realm.getClientByClientId(Constants.IAM_CLIENT_ID);
         UserModel requestingUser = session.getContext().getUserSession().getUser();
         if (requestingUser == null) {
-            return false;
+            throw new AuthorizationException();
         }
 
-        return switch (requestMethod) {
+        boolean allowed = switch (requestMethod) {
             case GET -> isVisible(data, session, requestingUser);
             case PUT -> authorizeUpdate(
                     data, session, requestingUser, client);
@@ -50,6 +50,9 @@ public class UserAuthorizer extends Authorizer<User> {
                     && requestingUser.hasRole(client.getRole(data.getRole()));
             default -> false;
         };
+        if (!allowed) {
+            throw new AuthorizationException();
+        }
     }
 
     private boolean isVisible(

@@ -24,31 +24,34 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
     }
 
     @Override
-    public boolean isAuthorized(
+    public void doAuthorize(
         Institution data,
         RequestMethod requestMethod
-    ) {
+    ) throws AuthorizationException {
         UserModel requestingUser = session.getContext().getUserSession().getUser();
 
-        switch (requestMethod) {
-            case GET: return IaMRole.USER.isRoleOf(requestingUser, session);
+        EntityManager em = session.getProvider(
+            JpaConnectionProvider.class).getEntityManager();
+        boolean allowed = switch (requestMethod) {
+            case GET ->
+                IaMRole.USER.isRoleOf(requestingUser, session);
             // Only Role.CHIEF_EDITOR is allowed to set/edit measFacilId
-            case PUT:
-                EntityManager em = session.getProvider(
-                    JpaConnectionProvider.class).getEntityManager();
-                return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
-                    || Objects.equals(data.getMeasFacilId(), em.find(
+            case PUT -> (
+                IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
+                || Objects.equals(data.getMeasFacilId(), em.find(
                         Institution.class, data.getId()).getMeasFacilId())
-                    && networkEquals(requestingUser, data)
-                    && IaMRole.EDITOR.isRoleOf(requestingUser, session);
-            case POST:
-                if (data.getMeasFacilId() != null) {
-                    return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
-                }
-                return IaMRole.EDITOR.isRoleOf(requestingUser, session);
-            case DELETE:
-                return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
-            default: return false;
+                && networkEquals(requestingUser, data)
+                && IaMRole.EDITOR.isRoleOf(requestingUser, session));
+            case POST -> (
+                data.getMeasFacilId() == null
+                && IaMRole.EDITOR.isRoleOf(requestingUser, session)
+                || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session));
+            case DELETE ->
+                IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+            default -> false;
+        };
+        if (!allowed) {
+            throw new AuthorizationException();
         }
     }
 

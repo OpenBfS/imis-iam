@@ -19,16 +19,19 @@ public class MailAuthorizer extends Authorizer<Mail> {
     }
 
     @Override
-    public boolean isAuthorized(
+    public void doAuthorize(
         Mail data,
         RequestMethod requestMethod
-    ) {
+    ) throws AuthorizationException {
         UserModel requestingUser = session.getContext().getUserSession().getUser();
 
-        switch (requestMethod) {
-            case GET: return IaMRole.USER.isRoleOf(requestingUser, session);
-            case POST: return IaMRole.EDITOR.isRoleOf(requestingUser, session);
-            default: return false;
+        boolean allowed = switch (requestMethod) {
+            case GET -> IaMRole.USER.isRoleOf(requestingUser, session);
+            case POST -> IaMRole.EDITOR.isRoleOf(requestingUser, session);
+            default -> false;
+        };
+        if (!allowed) {
+            throw new AuthorizationException();
         }
     }
 }
