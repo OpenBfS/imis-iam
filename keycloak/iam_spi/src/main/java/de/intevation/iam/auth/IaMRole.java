@@ -36,4 +36,19 @@ public enum IaMRole {
             && user.hasRole(session.getContext().getRealm().getClientByClientId(
                 Constants.IAM_CLIENT_ID).getRole(this.toString()));
     }
+
+    /**
+     * Check whether a given user has this role.
+     *
+     * @param user The user to check.
+     * @param session object used to fetch the RoleModel for this role.
+     * @throws AuthorizationException if user does not have this role.
+     */
+    public void require(
+        UserModel user, KeycloakSession session
+    ) throws AuthorizationException {
+        if (!this.isRoleOf(user, session)) {
+            throw new AuthorizationException();
+        }
+    }
 }

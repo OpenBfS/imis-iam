@@ -37,6 +37,7 @@
                 <Checkbox
                   attribute="active"
                   v-model="institution.active"
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
                   :label="$t('institution.active')"
                 ></Checkbox>
               </v-col>
@@ -229,6 +230,7 @@
                   :label="$t('institution.tags')"
                   :items="categories"
                   v-model="institution.tags"
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
                   item-title="name"
                   item-value="id"
                   persistent-hint
