@@ -23,7 +23,12 @@ RUN a2dissite -q 000-default
 ADD client /usr/local/iamclient
 WORKDIR /usr/local/iamclient
 
+RUN yarn install
+ARG CLIENT_PATH
+RUN yarn build --base ${CLIENT_PATH} --outDir /var/www${CLIENT_PATH}
+
 ADD docker/client/ /usr/local/iamdocker/
-RUN ln -s /usr/local/iamdocker/custom-vhosts.conf /etc/apache2/sites-enabled/
+RUN ln -s /usr/local/iamdocker/client.conf /etc/apache2/sites-enabled/
+RUN ln -s /usr/local/iamdocker/dev.conf /etc/apache2/sites-available/
 
 CMD bash /usr/local/iamdocker/start.sh
