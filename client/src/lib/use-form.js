@@ -15,7 +15,7 @@ export function useForm(i18n) {
   const valid = ref(false);
   const hasNoChange = ref(true);
   const showConfirmCancelDialog = ref(false);
-  const regExprPhone = /(\(?([\d \-)–+/(]+){6,}\)?([ .\-–/]?)([\d]+))/;
+  const regExprPhone = /^\+[1-9][0-9]{7,16}$/;
   const regExprEmail = /^\S+@\S+\.\S+$/;
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
   // Validation rules

@@ -94,7 +94,7 @@ public class Institution {
             joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
     @UniqueElements
-    private List<@Size(min = 7) String> phoneNumbers;
+    private List<@Pattern(regexp = "^\\+[1-9][0-9]{7,16}$") String> phoneNumbers;
 
     @Column(name = "central_fax")
     private String centralFax;
@@ -113,7 +113,7 @@ public class Institution {
         joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
     @UniqueElements
-    private List<String> operationModeChangePhoneNumbers;
+    private List<@Pattern(regexp = "^\\+[1-9][0-9]{7,16}$") String> operationModeChangePhoneNumbers;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -121,7 +121,7 @@ public class Institution {
         joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
     @UniqueElements
-    private List<String> operationModeChangeSmsPhoneNumbers;
+    private List<@Pattern(regexp = "^\\+[1-9][0-9]{7,16}$") String> operationModeChangeSmsPhoneNumbers;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
