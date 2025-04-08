@@ -150,11 +150,12 @@ export function useForm(i18n) {
 
   const watchChange = (originalObject, changedObject) => {
     const applicationStore = useApplicationStore();
-    applicationStore.$subscribe((mutation) => {
-      if (mutation.events?.key === "attributesOfFieldsThatChanged") {
+    watch(
+      () => applicationStore.attributesOfFieldsThatChanged,
+      () => {
         updateHasNoChange(originalObject, changedObject);
       }
-    });
+    );
     watch(changedObject, () => {
       updateHasNoChange(originalObject, changedObject);
     });
