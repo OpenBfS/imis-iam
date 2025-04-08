@@ -44,6 +44,8 @@ import org.hibernate.validator.constraints.UniqueElements;
 @MeasFacilOrNone
 public class Institution {
 
+    private static final String PHONE_PATTERN = "^\\+[1-9][0-9]{7,16}$";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -94,9 +96,10 @@ public class Institution {
             joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
     @UniqueElements
-    private List<@Pattern(regexp = "^\\+[1-9][0-9]{7,16}$") String> phoneNumbers;
+    private List<@Pattern(regexp = PHONE_PATTERN) String> phoneNumbers;
 
     @Column(name = "central_fax")
+    @Pattern(regexp = PHONE_PATTERN)
     private String centralFax;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -113,7 +116,7 @@ public class Institution {
         joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
     @UniqueElements
-    private List<@Pattern(regexp = "^\\+[1-9][0-9]{7,16}$") String> operationModeChangePhoneNumbers;
+    private List<@Pattern(regexp = PHONE_PATTERN) String> operationModeChangePhoneNumbers;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -121,7 +124,7 @@ public class Institution {
         joinColumns = @JoinColumn(name = "institution_id"))
     @Column(name = "phone")
     @UniqueElements
-    private List<@Pattern(regexp = "^\\+[1-9][0-9]{7,16}$") String> operationModeChangeSmsPhoneNumbers;
+    private List<@Pattern(regexp = PHONE_PATTERN) String> operationModeChangeSmsPhoneNumbers;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(

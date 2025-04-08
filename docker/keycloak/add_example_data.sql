@@ -56,15 +56,15 @@ INSERT INTO keycloak.iam_institution_mail(institution_id, mail) VALUES
 (((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), 'inst2@example.test');
 
 INSERT INTO keycloak.iam_institution_phone(institution_id, phone) VALUES
-(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/456789'),
-(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), '0123/456789');
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '+49123456789'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), '+49123456789');
 
 INSERT INTO keycloak.iam_institution_operation_mode_change_phone_numbers(institution_id, phone) VALUES
-(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/111111'),
-(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/101010'),
-(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), '0123/222222');
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '+49123111111'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '+49123101010'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), '+49123222222');
 
 INSERT INTO keycloak.iam_institution_operation_mode_change_sms_phone_numbers(institution_id, phone) VALUES
-(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/33333333'),
-(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '0123/44444444'),
-(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), '0123/55555555');
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '+4912333333333'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')), '+4912344444444'),
+(((SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 2')), '+4912355555555');
