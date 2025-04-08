@@ -133,8 +133,8 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
                     if (val.equals(Boolean.TRUE)) {
                         forbidden.add(attr);
                     }
-                } else if (val instanceof Collection lst) {
-                    if (lst != null && !lst.isEmpty()) {
+                } else if (val instanceof Collection<?> lst) {
+                    if (!lst.isEmpty()) {
                         forbidden.add(attr);
                     }
                 } else if (val != null) {

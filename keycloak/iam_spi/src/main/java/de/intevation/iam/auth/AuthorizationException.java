@@ -7,8 +7,11 @@
 package de.intevation.iam.auth;
 
 
-class AuthorizationException extends Exception {
+import java.io.Serial;
 
+public class AuthorizationException extends Exception {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     AuthorizationException() {

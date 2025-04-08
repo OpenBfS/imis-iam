@@ -35,8 +35,7 @@ public class EventAuthorizer extends Authorizer<Event> {
         RequestMethod requestMethod
     ) throws AuthorizationException {
         UserModel requestingUser = session.getContext().getUserSession().getUser();
-        if (requestingUser == null
-            || !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+        if (!IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
             throw new AuthorizationException();
         }
     }
