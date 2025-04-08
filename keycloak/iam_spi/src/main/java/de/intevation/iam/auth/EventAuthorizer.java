@@ -30,7 +30,7 @@ public class EventAuthorizer extends Authorizer<Event> {
     }
 
     @Override
-    public void doAuthorize(
+    void doAuthorize(
         Event data,
         RequestMethod requestMethod
     ) throws AuthorizationException {

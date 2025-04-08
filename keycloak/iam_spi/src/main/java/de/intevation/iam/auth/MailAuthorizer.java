@@ -19,7 +19,7 @@ public class MailAuthorizer extends Authorizer<Mail> {
     }
 
     @Override
-    public void doAuthorize(
+    void doAuthorize(
         Mail data,
         RequestMethod requestMethod
     ) throws AuthorizationException {

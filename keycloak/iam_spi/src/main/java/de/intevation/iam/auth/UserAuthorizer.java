@@ -27,7 +27,7 @@ public class UserAuthorizer extends Authorizer<User> {
     }
 
     @Override
-    public void doAuthorize(
+    void doAuthorize(
         User data,
         RequestMethod requestMethod
     ) throws AuthorizationException {

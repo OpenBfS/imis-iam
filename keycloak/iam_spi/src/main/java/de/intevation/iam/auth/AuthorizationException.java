@@ -9,7 +9,7 @@ package de.intevation.iam.auth;
 
 import java.io.Serial;
 
-public class AuthorizationException extends Exception {
+class AuthorizationException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 1L;

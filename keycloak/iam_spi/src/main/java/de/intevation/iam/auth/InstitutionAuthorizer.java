@@ -54,7 +54,7 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
     }
 
     @Override
-    public void doAuthorize(
+    void doAuthorize(
         Institution data,
         RequestMethod requestMethod
     ) throws AuthorizationException {

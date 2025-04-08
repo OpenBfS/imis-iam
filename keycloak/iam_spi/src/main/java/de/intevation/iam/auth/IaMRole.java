@@ -44,7 +44,7 @@ public enum IaMRole {
      * @param session object used to fetch the RoleModel for this role.
      * @throws AuthorizationException if user does not have this role.
      */
-    public void require(
+    void require(
         UserModel user, KeycloakSession session
     ) throws AuthorizationException {
         if (!this.isRoleOf(user, session)) {
