@@ -19,6 +19,7 @@ services:
     extends:
       file: docker-compose.yml
       service: keycloak
+    entrypoint: /opt/src/start.sh
     ports:
       - ${ADMIN_PORT:-48080}:8080
     depends_on:

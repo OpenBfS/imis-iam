@@ -1,5 +1,9 @@
 #!/bin/sh -e
 
+#
+# Start Keycloak with example data for development setup
+#
+
 DIR=$(dirname $0)
 
 if [ -z $KEYCLOAK_HOME ]

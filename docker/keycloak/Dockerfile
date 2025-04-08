@@ -53,4 +53,4 @@ RUN adduser --system keycloak
 RUN chown -R keycloak: ${KEYCLOAK_HOME}
 USER keycloak
 
-CMD sh $SRC_DIR/start.sh
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--optimized"]
