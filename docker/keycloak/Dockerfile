@@ -49,4 +49,8 @@ RUN ${KEYCLOAK_HOME}/bin/kc.sh build
 ENV IMIS_REALM=imis3
 HEALTHCHECK CMD curl -f http://localhost:8080/realms/$IMIS_REALM || exit 1
 
+RUN adduser --system keycloak
+RUN chown -R keycloak: ${KEYCLOAK_HOME}
+USER keycloak
+
 CMD sh $SRC_DIR/start.sh
