@@ -21,7 +21,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -53,7 +52,7 @@ import de.intevation.iam.validation.Validator;
 import org.keycloak.utils.SearchQueryUtils;
 
 /**
- * Class providing rest interfaces to create, get and delete Institutions.
+ * Class providing rest interfaces to create and get Institutions.
  * @author Alexander Woestmann <awoestmann@intevation.de>
  */
 @Produces(MediaType.APPLICATION_JSON)
@@ -390,27 +389,6 @@ public class InstitutionResource {
         mergeTags(rep, em);
         Institution merged = em.merge(rep);
         return Response.ok(merged).build();
-    }
-
-    /**
-     * Delete the institution with the given id.
-     * @param id Institution id
-     * @return 200 if successful or 404 if not found
-     */
-    @DELETE
-    @Path("/{id}")
-    public Response removeInstitution(
-            @PathParam("id") Integer id) {
-        EntityManager em = session.getProvider(
-            JpaConnectionProvider.class).getEntityManager();
-        Institution institution = em.find(Institution.class, id);
-        if (institution == null) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        auth.authorize(institution, RequestMethod.DELETE);
-
-        em.remove(institution);
-        return Response.ok().type(MediaType.APPLICATION_JSON).build();
     }
 
     /**

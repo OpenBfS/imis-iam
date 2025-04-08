@@ -103,11 +103,6 @@ export const useInstitutionStore = defineStore("institution", {
       this.institutions.push(data);
       this.totalNumberOfInstitutions++;
     },
-    removeInstitution(data) {
-      const index = this.institutions.findIndex((inst) => inst.id === data.id);
-      this.institutions.splice(index, 1);
-      this.totalNumberOfInstitutions--;
-    },
     updateFilter(key, term) {
       if (term === null || term.length === 0) {
         delete this.filterBy[key];

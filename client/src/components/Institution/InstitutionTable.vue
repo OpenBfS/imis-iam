@@ -42,25 +42,6 @@
             : $t("label.showInfo")
         }}</span>
       </v-tooltip>
-      <v-tooltip location="top">
-        <template v-slot:activator="{ props }">
-          <v-btn
-            v-if="profileStore.isAllowedToManage"
-            variant="plain"
-            icon="mdi-delete"
-            size="small"
-            v-bind="props"
-            @click="
-              applicationStore.setManagedItem({
-                ...item,
-              });
-              applicationStore.setProcessType('delet');
-              applicationStore.setShowManageInstitutionDialog(true);
-            "
-          ></v-btn>
-        </template>
-        <span>{{ $t("label.delete") }}</span>
-      </v-tooltip>
     </template>
   </DataTableServer>
 </template>

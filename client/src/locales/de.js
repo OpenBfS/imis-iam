@@ -252,7 +252,6 @@ export default {
     delete: "Löschen",
     from: "Von:",
     to: "Bis:",
-    confirmDeletion: "Bitte Bestätigen Sie das Löschen der {name} Institution",
     confirmCancelHeader: "Wirklich abbrechen?",
     confirmCancelExplanation: "Alle Änderungen werden dabei verworfen.",
     title: "Titel",

@@ -6,7 +6,7 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-card width="80vw" v-if="['add', 'edit'].indexOf(processType) !== -1">
+  <v-card width="80vw">
     <v-card-title v-if="processType === 'add'">
       <span class="text-h5">{{ $t("institution.createTitle") }}</span>
     </v-card-title>
@@ -281,33 +281,6 @@
       </v-btn>
     </v-card-actions>
   </v-card>
-  <v-card v-else width="50vw">
-    <v-card-text>
-      <span class="text-h5">{{
-        $t("label.confirmDeletion", { name: institution.name })
-      }}</span>
-      <div>
-        <UIAlert
-          v-if="hasRequestError"
-          v-bind:isSuccessful="!hasRequestError"
-          v-bind:message="applicationStore.httpErrorMessage"
-        />
-      </div>
-    </v-card-text>
-    <v-divider></v-divider>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="accent" @click="deleteInstitution()">
-        {{ $t("button.delete") }}
-      </v-btn>
-      <v-btn
-        color="accent"
-        @click="applicationStore.setShowManageInstitutionDialog(false)"
-      >
-        {{ $t("button.cancel") }}
-      </v-btn>
-    </v-card-actions>
-  </v-card>
   <ConfirmCancelDialog
     :isActive="showConfirmCancelDialog"
     :onConfirm="() => applicationStore.setShowManageInstitutionDialog(false)"
@@ -392,7 +365,6 @@ const {
   closeConfirmCancelDialog,
   handleValidationErrorFromServer,
   isServerValidationError,
-  showFormError,
 } = useForm();
 const categories = ref([]);
 const getCategories = () => {
@@ -509,19 +481,8 @@ const saveInstitution = () => {
     showPostalAddress,
     isServerValidationError,
     handleValidationErrorFromServer,
-    hasRequestError,
+    hasRequestError
   );
-};
-const deleteInstitution = () => {
-  HTTP.delete("iam/institution/" + institution.value.id)
-    .then(() => {
-      institutionStore.removeInstitution(institution.value);
-      applicationStore.searchRequest(["institutions"]);
-      applicationStore.setShowManageInstitutionDialog(false);
-    })
-    .catch((error) => {
-      showFormError(error, hasRequestError);
-    });
 };
 
 watchChange(originalInstitution, institution.value);
