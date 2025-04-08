@@ -123,8 +123,16 @@ const resetInput = () => {
 onMounted(() => {
   if (props.modelValue) {
     entries.value = props.modelValue;
-  } else if (props.attribute && applicationStore.managedItem[props.attribute]) {
-    entries.value = applicationStore.managedItem[props.attribute];
+  }
+  // Users can have attributes nested in the property "attributes"
+  else if (
+    props.attribute &&
+    (applicationStore.managedItem[props.attribute] ||
+      applicationStore.managedItem.attributes?.[props.attribute])
+  ) {
+    entries.value =
+      applicationStore.managedItem[props.attribute] ||
+      applicationStore.managedItem.attributes?.[props.attribute];
   }
   applicationStore.addResetEventListener(resetInput);
 });
@@ -159,10 +167,20 @@ watch(
   // Without structuredClone changes are not detected correctly.
   () => structuredClone(applicationStore.managedItem),
   (newValue, oldValue) => {
-    const oldEntries = oldValue[props.attribute];
-    const newEntries = newValue[props.attribute];
-    if (areArraysDifferent(oldEntries ?? [], newEntries ?? [])) {
-      entries.value = newEntries;
+    // Users can have attributes nested in the property "attributes"
+    const oldEntries =
+      oldValue[props.attribute] || oldValue.attributes?.[props.attribute];
+    const newEntries =
+      newValue[props.attribute] || newValue.attributes?.[props.attribute];
+    if (!oldEntries && !newEntries) {
+      return;
+    }
+    if (
+      (!oldEntries && newEntries) ||
+      (oldEntries && !newEntries) ||
+      areArraysDifferent(oldEntries ?? [], newEntries ?? [])
+    ) {
+      entries.value = newEntries || [];
       input.value = "";
     }
   },

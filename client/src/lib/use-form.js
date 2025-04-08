@@ -115,6 +115,13 @@ export function useForm(i18n) {
     const allKeys = [...Object.keys(a), ...Object.keys(b)];
     for (let i = 0; i < allKeys.length; i++) {
       const key = allKeys[i];
+      if (
+        (a[key] === undefined && b[key]?.length === 0) ||
+        (a[key]?.length === 0 && b[key] === undefined)
+      ) {
+        // Treat empty array as if it was undefined because in the end both mean that there is no value for an attribute.
+        continue;
+      }
       if (a[key] === null && b[key] === null) {
         continue;
       } else if (
