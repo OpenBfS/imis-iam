@@ -20,10 +20,12 @@ RUN a2enmod -q headers
 RUN a2enmod -q proxy_http
 RUN a2dissite -q 000-default
 
-ADD client /usr/local/iamclient
-WORKDIR /usr/local/iamclient
-
+ENV SRC=/usr/local/iamclient/
+ADD client/package.json client/yarn.lock $SRC
+WORKDIR $SRC
 RUN yarn install
+
+ADD client $SRC
 ARG CLIENT_PATH
 RUN yarn build --base ${CLIENT_PATH} --outDir /var/www${CLIENT_PATH}
 
