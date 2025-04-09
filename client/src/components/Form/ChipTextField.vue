@@ -21,15 +21,7 @@
     :persistent-placeholder="entries.length > 0"
     :prepend-inner-icon="props.prependInnerIcon"
     :readonly="applicationStore.form?.readonly || props.readonly"
-    :rules="
-      applicationStore.clientAndServerRules[props.attribute]
-        ? [
-            ...applicationStore.clientAndServerRules[props.attribute],
-            ...(props.rules ?? []),
-            ...internalRules,
-          ]
-        : [...(props.rules ?? []), ...internalRules]
-    "
+    :rules="allRules"
     :variant="props.variant ?? 'underlined'"
   >
     <template v-slot:append="{ isValid }">
@@ -113,6 +105,17 @@ const internalRules = ref([
     }
   },
 ]);
+
+const allRules = computed(() => {
+  return applicationStore.clientAndServerRules[props.attribute]
+    ? [
+        ...applicationStore.clientAndServerRules[props.attribute],
+        ...(props.rules ?? []),
+        ...internalRules.value,
+      ]
+    : [...(props.rules ?? []), ...internalRules.value];
+});
+
 let isAdding = false;
 const editable = computed(() => {
   return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
@@ -194,7 +197,7 @@ const addEntry = () => {
     return;
   }
   let isValid = true;
-  props.rules?.forEach((rule) => {
+  allRules.value.forEach((rule) => {
     const result = rule(input.value);
     if (typeof result !== "boolean" || !result) isValid = false;
   });
