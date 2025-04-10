@@ -69,3 +69,21 @@ the environment variable `CLIENT_MODE` can be set. Per default, it's set to
 
 Further configuration options can be found in `docker-compose.yml` and
 `../client/.env`.
+
+
+## Bootstrapping the application
+
+The application depends on the existence of a Keycloak realm with a specific
+OIDC-client and roles. As a starting point, `keycloak/data/realm.json` can be
+imported after application start using e.g.
+
+```
+docker compose exec keycloak /opt/src/import_realm.sh
+```
+
+`realm.json` also contains example configuration for SMTP server and
+LDAP user federation as well as example user data for development setups.
+It should be considered removing these from the file before building the image
+or adapting the configuration via the Keycloak admin console after import.
+
+A development setup, as documented above, imports the realm automatically.

@@ -1,5 +1,5 @@
 {
-  "realm" : "${IMIS_REALM}",
+  "realm" : "imis3",
   "enabled" : true,
   "resetPasswordAllowed" : true,
   "roles" : {

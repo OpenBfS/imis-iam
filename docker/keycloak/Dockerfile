@@ -13,7 +13,7 @@ ENV LC_ALL=en_US.UTF-8
 
 RUN apt-get update && apt-get install -y \
             libxml2-utils openjdk-21-jre-headless maven jq curl \
-            postgresql-client wait-for-it
+            postgresql-client
 
 ENV KEYCLOAK_HOME=/opt/keycloak
 
@@ -39,15 +39,11 @@ WORKDIR ${KEYCLOAK_HOME}
 ENV SRC_DIR=/opt/src
 ADD docker/keycloak ${SRC_DIR}
 
-RUN mkdir -p $KEYCLOAK_HOME/data
-RUN ln -fs $SRC_DIR/data $KEYCLOAK_HOME/data/import
-
 # db option needs to be set for build step, already
 ARG KC_DB=postgres
 RUN ${KEYCLOAK_HOME}/bin/kc.sh build
 
-ENV IMIS_REALM=imis3
-HEALTHCHECK CMD curl -f http://localhost:8080/realms/$IMIS_REALM || exit 1
+HEALTHCHECK CMD curl -f http://localhost:8080/realms/master || exit 1
 
 RUN adduser --system keycloak
 RUN chown -R keycloak: ${KEYCLOAK_HOME}
