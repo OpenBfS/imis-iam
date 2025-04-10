@@ -69,6 +69,7 @@ onMounted(() => {
     profileStore.loadProfile(),
     userStore.loadRoles(),
     institutionStore.loadInstitutions("", true),
+    applicationStore.loadNetworks(),
   ]).catch(() => {
     hasLoadingError.value = true;
   });

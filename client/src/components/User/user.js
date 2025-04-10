@@ -15,6 +15,7 @@ const expUser = {
   attributes: {},
   institutions: [],
   role: null,
+  network: null,
   enabled: false,
 };
 
@@ -22,9 +23,11 @@ function getExpUser() {
   const profileStore = useProfileStore();
   const userStore = useUserStore();
   const user = structuredClone(expUser);
-  user.attributes.network = toRaw(profileStore.userData.attributes?.network)
-  user.role = toRaw(userStore.roles)?.find((role) => role.name === "user")?.name
-  return user
+  user.network = toRaw(profileStore.userData.network);
+  user.role = toRaw(userStore.roles)?.find(
+    (role) => role.name === "user"
+  )?.name;
+  return user;
 }
 
 function handleDisplayName(displayName) {
@@ -60,8 +63,7 @@ function updateUser(
           profileStore.loadProfile();
         }
         applicationStore.setOwnAccount(false);
-        applicationStore.setShowManageUserDialog(false);
-        applicationStore.searchRequest(["users"]);
+        finishUserDialog(user);
         resolve({ status: 200 });
       })
       .catch((error) => {
@@ -73,4 +75,11 @@ function updateUser(
   });
 }
 
-export { getExpUser, handleDisplayName, updateUser };
+function finishUserDialog(newUser) {
+  const applicationStore = useApplicationStore();
+  applicationStore.searchRequest(["users"]);
+  applicationStore.setShowManageUserDialog(false);
+  applicationStore.loadNetworksIfNotContains(newUser.network);
+}
+
+export { finishUserDialog, getExpUser, handleDisplayName, updateUser };

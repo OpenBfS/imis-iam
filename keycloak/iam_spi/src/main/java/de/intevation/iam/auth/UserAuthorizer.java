@@ -7,13 +7,13 @@
 
 package de.intevation.iam.auth;
 
-import java.util.List;
-
+import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
+import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.model.representation.User;
 import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.RequestMethod;
@@ -60,12 +60,8 @@ public class UserAuthorizer extends Authorizer<User> {
             KeycloakSession session,
             UserModel requestingUser
     ) {
-        String userNetwork =
-            user.getAttributes().get(NETWORK_ATTRIBUTE_KEY) != null
-            ? user.getAttributes().get(NETWORK_ATTRIBUTE_KEY).get(0)
-            : null;
-        String requestingUserNetwork =
-            requestingUser.getFirstAttribute(NETWORK_ATTRIBUTE_KEY);
+        String userNetwork = user.getNetwork();
+        String requestingUserNetwork = getRequestingUserNetwork(requestingUser);
         return user.isEnabled()
             || IaMRole.EDITOR.isRoleOf(requestingUser, session)
             && requestingUserNetwork != null
@@ -85,6 +81,8 @@ public class UserAuthorizer extends Authorizer<User> {
         RealmModel realm = session.getContext().getRealm();
         UserModel oldUserModel
             = session.users().getUserById(realm, user.getId());
+        User oldUser = new User(oldUserModel, session);
+
         if (user.isEnabled() != oldUserModel.isEnabled()
             && !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
             return false;
@@ -97,6 +95,12 @@ public class UserAuthorizer extends Authorizer<User> {
             return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
         }
 
+        // If network shall be changed: Check if user is chief editor
+        if (!user.getNetwork().equals(oldUser.getNetwork())
+            && !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            return false;
+        }
+
         return IaMRole.EDITOR.isRoleOf(requestingUser, session)
             && networkEquals(requestingUser, user)
             || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
@@ -104,13 +108,15 @@ public class UserAuthorizer extends Authorizer<User> {
     }
 
     private boolean networkEquals(UserModel requestingUser, User data) {
-        final String networkKey = "network";
-        String requestingUserNetwork =
-            requestingUser.getFirstAttribute(networkKey);
-        List<String> dataNetwork = data.getAttributes().get(networkKey);
-        return requestingUserNetwork != null
-            && dataNetwork != null
-            && !dataNetwork.isEmpty()
-            && requestingUserNetwork.equals(dataNetwork.get(0));
+        String dataNetwork = data.getNetwork();
+        return getRequestingUserNetwork(requestingUser).equals(dataNetwork);
+    }
+
+    private String getRequestingUserNetwork(UserModel requestingUser) {
+        UserAttributes userAttributes = session
+            .getProvider(JpaConnectionProvider.class)
+            .getEntityManager()
+            .find(UserAttributes.class, requestingUser.getId());
+        return userAttributes.getNetwork();
     }
 }

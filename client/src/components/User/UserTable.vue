@@ -90,6 +90,7 @@ onMounted(async () => {
         }),
         { name: "institutions", default: true },
         { name: "role", default: false },
+        { name: "network", default: false },
         { name: "enabled", default: false },
       ]
     : [];
@@ -105,7 +106,11 @@ const getUserById = (id) => {
 };
 const user = ref(getExpUser());
 const onCopyClicked = (id) => {
+  const network = structuredClone(user.value).network;
   user.value = cloneObject(getUserById(id));
+  // Keep network of example user because other roles than chief redakteur are not allowed
+  // to set other network values.
+  user.value.network = network;
   savedUser.value = cloneObject(user.value);
   user.value.attributes.title = undefined;
   user.value.attributes.username = undefined;

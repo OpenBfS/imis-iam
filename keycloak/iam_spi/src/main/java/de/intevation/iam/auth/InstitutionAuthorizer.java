@@ -12,6 +12,7 @@ import org.keycloak.models.UserModel;
 
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.Institution_;
+import de.intevation.iam.model.jpa.UserAttributes;
 import de.intevation.iam.util.RequestMethod;
 
 import java.beans.IntrospectionException;
@@ -69,12 +70,20 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
                     IaMRole.EDITOR.require(requestingUser, session);
                     anyPrivilegedAttrChanged(data);
                     networkEquals(requestingUser, data);
+                    Institution persistent = session
+                        .getProvider(JpaConnectionProvider.class)
+                        .getEntityManager()
+                        .find(Institution.class, data.getId());
+                    if (!persistent.getNetwork().equals(data.getNetwork())) {
+                        throw new AuthorizationException("Not allowed to change network");
+                    }
                     break;
                 }
             case POST:
                 if (!IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
                     IaMRole.EDITOR.require(requestingUser, session);
                     anyPrivilegedAttrSet(data);
+                    networkEquals(requestingUser, data);
                     break;
                 }
             default:
@@ -85,12 +94,13 @@ public class InstitutionAuthorizer extends Authorizer<Institution> {
     private void networkEquals(
         UserModel requestingUser, Institution data
     ) throws AuthorizationException {
-        String userNetwork = requestingUser.getFirstAttribute("network");
-        String measFacilId = data.getMeasFacilId();
-        if (userNetwork == null
-            || measFacilId == null
-            || !userNetwork.equals(measFacilId.substring(0, 2))
-        ) {
+        UserAttributes userAttributes = session
+            .getProvider(JpaConnectionProvider.class)
+            .getEntityManager()
+            .find(UserAttributes.class, requestingUser.getId());
+        String userNetwork = userAttributes.getNetwork();
+        String institutionNetwork = data.getNetwork();
+        if (!userNetwork.equals(institutionNetwork)) {
             throw new AuthorizationException("Not authorized for network");
         }
     }

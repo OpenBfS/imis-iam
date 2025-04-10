@@ -66,6 +66,18 @@
                   "
                 ></TextField>
               </v-col>
+              <v-col>
+                <Combobox
+                  :items="applicationStore.networks"
+                  item-title="name"
+                  item-value="name"
+                  :label="$t('institution.network')"
+                  :attribute="'network'"
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
+                  required
+                  @update:modelValue="institution.network = $event"
+                ></Combobox>
+              </v-col>
             </v-row>
             <div class="group_class">
               <TextField
@@ -318,7 +330,7 @@ import { useApplicationStore } from "@/stores/application.js";
 // import { debounce } from "debounce";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
-import { updateInstitution } from "./institution.js";
+import { finishInstitutionDialog, updateInstitution } from "./institution.js";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import ChipTextField from "@/components/Form/ChipTextField.vue";
 import TextField from "@/components/Form/TextField.vue";
@@ -491,9 +503,9 @@ const createInstitution = () => {
   sanitizePayload(payload);
   HTTP.post("/iam/institution", payload)
     .then((response) => {
-      institutionStore.addInstitution(response.data);
-      applicationStore.searchRequest(["institutions"]);
-      applicationStore.setShowManageInstitutionDialog(false);
+      const newInstitution = response.data;
+      institutionStore.addInstitution(newInstitution);
+      finishInstitutionDialog(newInstitution);
     })
     .catch((error) => {
       isServerValidationError(error)

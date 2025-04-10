@@ -48,6 +48,9 @@ public class User {
     @NotBlank
     private String role;
 
+    @NotBlank
+    private String network;
+
     private boolean enabled;
 
     /**
@@ -88,6 +91,8 @@ public class User {
                 instList.forEach((inst) -> institutions.add(
                         inst.getName()));
             }
+
+            this.network = jpaModel.getNetwork();
         }
     }
 
@@ -124,6 +129,13 @@ public class User {
     }
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getNetwork() {
+        return network;
+    }
+    public void setNetwork(String network) {
+        this.network = network;
     }
 
     /**

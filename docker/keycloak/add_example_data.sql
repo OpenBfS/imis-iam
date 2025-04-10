@@ -20,6 +20,13 @@ INSERT INTO iam_institution_tag (name) VALUES
     ('Aufsichtsbehörde'),
     ('Sonstige'),
     ('Alle');
+INSERT INTO iam_network (name) VALUES
+    ('08'),
+    ('30'),
+    ('02'),
+    ('20'),
+    ('07'),
+    ('11');
 
 INSERT INTO keycloak.iam_institution(
     name,
@@ -28,15 +35,28 @@ INSERT INTO keycloak.iam_institution(
     service_building_postal_code,
     service_building_location,
     service_building_state,
-    meas_facil_id
+    meas_facil_id,
+    network
 ) VALUES
-    ('Institution 1', 'inst_1', 'Examplestreet 1', '12345', 'ExampleLocation-1', 'berlin', 'inst1'),
-    ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', 'berlin', 'inst1-1');
+    ('Institution 1', 'inst_1', 'Examplestreet 1', '12345', 'ExampleLocation-1', 'berlin', 'inst1', (SELECT * FROM iam_network ORDER BY name LIMIT 1)),
+    ('Institution 2', 'inst_2', 'Examplestreet 2', '22345', 'ExampleLocation-2', 'berlin', 'inst1-1', (SELECT * FROM iam_network ORDER BY name LIMIT 1 OFFSET 1));
 
-INSERT INTO keycloak.iam_user_attributes (id, expiry_date)
-    SELECT id, current_date + interval '12 month'
-    FROM keycloak.user_entity WHERE username IN (
-        'exampleuser', 'redakteur', 'chefredakteur');
+INSERT INTO keycloak.iam_user_attributes(id, expiry_date, network) VALUES
+(
+    (SELECT id FROM keycloak.user_entity WHERE username = 'exampleuser'),
+    (SELECT current_date + interval '12 month' FROM keycloak.user_entity WHERE username = 'exampleuser'),
+    (SELECT name FROM iam_network ORDER BY name LIMIT 1)
+),
+(
+    (SELECT id FROM keycloak.user_entity WHERE username = 'redakteur'),
+    (SELECT current_date + interval '12 month' FROM keycloak.user_entity WHERE username = 'redakteur'),
+    (SELECT name FROM iam_network ORDER BY name LIMIT 1 OFFSET 1)
+),
+(
+    (SELECT id FROM keycloak.user_entity WHERE username = 'chefredakteur'),
+    (SELECT current_date + interval '12 month' FROM keycloak.user_entity WHERE username = 'chefredakteur'),
+    (SELECT name FROM iam_network ORDER BY name LIMIT 1 OFFSET 2)
+);
 
 INSERT INTO keycloak.iam_institution_user(user_id, institution_id) VALUES
 ((SELECT id FROM keycloak.user_entity WHERE username = 'exampleuser'), (SELECT id FROM keycloak.iam_institution WHERE name = 'Institution 1')),

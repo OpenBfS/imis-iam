@@ -44,4 +44,9 @@ public class IamResource {
     public ExportResource getExportResource() {
         return new ExportResource(this.session);
     }
+
+    @Path("networks")
+    public NetworkResource getNetworkResource() {
+        return new NetworkResource(this.session);
+    }
 }

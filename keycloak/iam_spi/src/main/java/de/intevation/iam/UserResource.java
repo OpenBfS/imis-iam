@@ -257,6 +257,9 @@ public class UserResource {
         if (attributes.getId() == null) {
             attributes.setId(newUserModel.getId());
         }
+
+        setNetwork(rep.getNetwork(), attributes);
+
         attributes.setExpiredNotificationSent(false);
         attributes.setInactivityNotificationSent(false);
         attributes.setExpiryDate(
@@ -336,6 +339,9 @@ public class UserResource {
                 dbAttributes.getExpiredNotificationSent());
         attributes.setInactivityNotificationSent(
                 dbAttributes.getInactivityNotificationSent());
+
+        setNetwork(rep.getNetwork(), attributes);
+
         em.merge(attributes);
         return new User(user, session);
     }
@@ -356,5 +362,11 @@ public class UserResource {
             roleNames.add(new Role(role));
         });
         return Response.ok(roleNames).build();
+    }
+
+    private void setNetwork(String network, UserAttributes attributes) {
+        NetworkResource networkResource = new NetworkResource(session);
+        String persistentNetwork = networkResource.mergeNetworks(network);
+        attributes.setNetwork(persistentNetwork);
     }
 }

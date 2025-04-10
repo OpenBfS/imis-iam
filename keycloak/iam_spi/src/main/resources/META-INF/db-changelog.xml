@@ -282,4 +282,24 @@
             ADD FOREIGN KEY (institution_id) REFERENCES keycloak.iam_institution;
         </sql>
     </changeSet>
+    <changeSet author="christoph.klassen@intevation.de" id="v0.18">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+          CREATE TABLE iam_network (
+            name VARCHAR PRIMARY KEY
+          );
+          INSERT INTO iam_network VALUES ('19');
+          ALTER TABLE iam_institution
+            ADD COLUMN network VARCHAR REFERENCES iam_network(name);
+          UPDATE iam_institution SET network = '19';
+          ALTER TABLE iam_institution
+            ALTER COLUMN network SET NOT NULL;
+          ALTER TABLE iam_user_attributes
+            ADD COLUMN network VARCHAR REFERENCES iam_network(name);
+          UPDATE iam_user_attributes SET network = '19';
+          ALTER TABLE iam_user_attributes
+            ALTER COLUMN network SET NOT NULL;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

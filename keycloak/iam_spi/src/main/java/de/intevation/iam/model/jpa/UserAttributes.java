@@ -18,6 +18,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 import org.keycloak.models.jpa.entities.UserEntity;
 
@@ -53,6 +54,9 @@ public class UserAttributes {
         inverseJoinColumns = {@JoinColumn(name = "institution_id")}
     )
     private Set<Institution> institutions = new HashSet<>();
+
+    @NotBlank
+    private String network;
 
     public String getId() {
         return id;
@@ -104,5 +108,13 @@ public class UserAttributes {
         if (institutions != null) {
             this.institutions.addAll(institutions);
         }
+    }
+
+    public String getNetwork() {
+        return network;
+    }
+
+    public void setNetwork(String network) {
+        this.network = network;
     }
 }

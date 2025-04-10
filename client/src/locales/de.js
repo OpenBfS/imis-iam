@@ -131,6 +131,7 @@ export default {
     fax: "Fax",
     phone: "Telefon",
     measFacilName: "Messstellen-Bezeichnung",
+    network: "Netzbetreiber",
     serviceBuildingLocation: "Ort des Dienstgebäudes",
     serviceBuildingStreet: "Straße/Hausnummer des Dienstgebäudes",
     serviceBuildingPostalCode: "PLZ des Dienstgebäudes",

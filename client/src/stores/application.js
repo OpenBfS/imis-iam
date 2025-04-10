@@ -8,6 +8,7 @@ import { defineStore } from "pinia";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
 import { nextTick } from "vue";
+import { HTTP } from "@/lib/http";
 
 export const useApplicationStore = defineStore("application", {
   namespaced: true,
@@ -44,6 +45,7 @@ export const useApplicationStore = defineStore("application", {
     reportMail: import.meta.env.VITE_REPORT_MAIL,
     ownAccount: false,
     isLoading: false,
+    networks: [],
   }),
   actions: {
     setOwnAccount(data) {
@@ -162,6 +164,26 @@ export const useApplicationStore = defineStore("application", {
       this.resetEventListeners.forEach((listener) => {
         listener();
       });
+    },
+    setNetworks(newNetworks) {
+      this.networks = newNetworks;
+    },
+    loadNetworks() {
+      return new Promise((resolve, reject) => {
+        HTTP.get("iam/networks/")
+          .then((response) => {
+            this.setNetworks(response.data);
+            resolve(response);
+          })
+          .catch((error) => reject(error));
+      });
+    },
+    // Load networks if there is no network with name networkName. Only necessary if a
+    // user/institution with a new network was saved.
+    loadNetworksIfNotContains(networkName) {
+      if (!this.networks.find((network) => network.name === networkName)) {
+        this.loadNetworks();
+      }
     },
   },
 });

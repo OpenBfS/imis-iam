@@ -188,7 +188,6 @@
       "position" : [ "Leiter" ],
       "fax" : [ "+49123654" ],
       "phone" : [ "+491234123456" ],
-      "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
     "enabled" : true,
@@ -210,7 +209,6 @@
       "position" : [ "Leiter" ],
       "fax" : [ "+49123654" ],
       "phone" : [ "+491234123456" ],
-      "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
     "enabled" : true,
@@ -232,7 +230,6 @@
       "position" : [ "Leiter" ],
       "fax" : [ "+49123654" ],
       "phone" : [ "+491234123456" ],
-      "network" : [ "11" ],
       "tags" : [ "AK UN" ]
     },
     "enabled" : true,

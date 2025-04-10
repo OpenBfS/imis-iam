@@ -329,6 +329,8 @@ public class InstitutionResource {
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
 
+        NetworkResource networkResource = new NetworkResource(session);
+        networkResource.mergeNetworks(rep.getNetwork());
         mergeTags(rep, em);
         em.persist(rep);
         return Response.ok(rep).build();
@@ -386,6 +388,8 @@ public class InstitutionResource {
             return Response.status(Status.BAD_REQUEST).build();
         }
 
+        NetworkResource networkResource = new NetworkResource(session);
+        networkResource.mergeNetworks(rep.getNetwork());
         mergeTags(rep, em);
         Institution merged = em.merge(rep);
         return Response.ok(merged).build();

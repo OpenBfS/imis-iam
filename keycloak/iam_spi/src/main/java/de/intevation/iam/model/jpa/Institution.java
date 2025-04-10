@@ -139,6 +139,9 @@ public class Institution {
     @UniqueElements
     private List<@Email String> operationModeChangeMailAddresses;
 
+    @NotBlank
+    private String network;
+
     @Size(min = 5, max = 7)
     @Column(name = "meas_facil_id")
     @Pattern(regexp = NO_LEADING_TRAILING_SPACES_PATTERN)
@@ -340,5 +343,13 @@ public class Institution {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getNetwork() {
+        return network;
+    }
+
+    public void setNetwork(String network) {
+        this.network = network;
     }
 }

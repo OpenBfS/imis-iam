@@ -5,9 +5,11 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { useApplicationStore } from "@/stores/application.js";
+import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution.js";
+import { useProfileStore } from "@/stores/profile";
 import i18n from "@/i18n";
+import { toRaw } from "vue";
 
 const { t } = i18n.global;
 
@@ -32,6 +34,7 @@ const operationModeChange = {
 const expInstitution = {
   name: "",
   measFacilName: "",
+  network: null,
   ...central,
   ...operationModeChange,
   ...imis,
@@ -46,7 +49,10 @@ const expInstitution = {
 };
 
 function getExpInstitution() {
-  return structuredClone(expInstitution);
+  const institution = structuredClone(expInstitution);
+  const profileStore = useProfileStore();
+  institution.network = toRaw(profileStore.userData.network);
+  return institution;
 }
 
 function updateInstitution(
@@ -56,7 +62,6 @@ function updateInstitution(
   handleValidationErrorFromServer,
   hasRequestError,
 ) {
-  const applicationStore = useApplicationStore();
   const institutionStore = useInstitutionStore();
   if (!showPostalAddress) {
     delete institution.addressLocation;
@@ -67,8 +72,7 @@ function updateInstitution(
     institutionStore
       .updateInstitution(institution)
       .then(() => {
-        applicationStore.searchRequest(["institutions"]);
-        applicationStore.setShowManageInstitutionDialog(false);
+        finishInstitutionDialog(institution);
         resolve({ status: 200 });
       })
       .catch((error) => {
@@ -78,6 +82,13 @@ function updateInstitution(
         resolve(error);
       });
   });
+}
+
+function finishInstitutionDialog(newInstitution) {
+  const applicationStore = useApplicationStore();
+  applicationStore.searchRequest(["institutions"]);
+  applicationStore.setShowManageInstitutionDialog(false);
+  applicationStore.loadNetworksIfNotContains(newInstitution.network);
 }
 
 const states = [
@@ -104,4 +115,9 @@ const states = [
   };
 });
 
-export { getExpInstitution, updateInstitution, states };
+export {
+  finishInstitutionDialog,
+  getExpInstitution,
+  updateInstitution,
+  states,
+};

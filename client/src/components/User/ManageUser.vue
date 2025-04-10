@@ -100,22 +100,37 @@
               </template>
             </v-row>
 
-            <div class="two_group_class">
-              <Select
-                attribute="institutions"
-                :clearable="profileStore.isAllowedToManage"
-                :no-data-text="$t('label.noDataText')"
-                :label="$t('user.institutions')"
-                :items="institutionStore.institutions"
-                v-model="user.institutions"
-                item-title="name"
-                item-value="name"
-                persistent-hint
-                multiple
-                required
-              ></Select>
-            </div>
-            <div class="one_group_class">
+            <v-row>
+              <v-col>
+                <Select
+                  attribute="institutions"
+                  :clearable="profileStore.isAllowedToManage"
+                  :no-data-text="$t('label.noDataText')"
+                  :label="$t('user.institutions')"
+                  :items="institutionStore.institutions"
+                  v-model="user.institutions"
+                  item-title="name"
+                  item-value="name"
+                  persistent-hint
+                  multiple
+                  required
+                ></Select>
+              </v-col>
+              <v-col>
+                <Combobox
+                  :items="applicationStore.networks"
+                  item-title="name"
+                  item-value="name"
+                  :label="$t('user.network')"
+                  :attribute="'network'"
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
+                  :model-value="user.network"
+                  @update:model-value="user.network = $event"
+                  required
+                ></Combobox>
+              </v-col>
+            </v-row>
+            <v-row>
               <Select
                 attribute="role"
                 :clearable="profileStore.isAllowedToManage"
@@ -128,7 +143,7 @@
                 v-model="user.role"
                 persistent-hint
               ></Select>
-            </div>
+            </v-row>
           </v-form>
           <v-label>* {{ $t("hints.requiredFields") }}</v-label>
           <UIAlert
@@ -221,7 +236,11 @@ import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
 import { trimSpacesInObject, useForm } from "@/lib/use-form.js";
-import { handleDisplayName, updateUser } from "@/components/User/user.js";
+import {
+  finishUserDialog,
+  handleDisplayName,
+  updateUser,
+} from "@/components/User/user.js";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
@@ -339,9 +358,9 @@ const cloneObject = (obj) => {
 const createUser = () => {
   HTTP.post("/iam/user", trimSpacesInObject(user.value))
     .then((response) => {
-      userStore.addUser(response.data);
-      applicationStore.setOwnAccount(true);
-      applicationStore.setShowManageUserDialog(false);
+      const newUser = response.data;
+      userStore.addUser(newUser);
+      finishUserDialog(newUser);
       applicationStore.searchRequest(["users"]);
     })
     .catch((error) => {
