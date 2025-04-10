@@ -66,3 +66,6 @@ in an additional file `keycloak/optional.env`.
 To decide if the client should be started in development or production mode,
 the environment variable `CLIENT_MODE` can be set. Per default, it's set to
 `development` in `docker-compose.dev.yml`.
+
+Further configuration options can be found in `docker-compose.yml` and
+`../client/.env`.
