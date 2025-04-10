@@ -36,12 +36,12 @@ RUN cp target/iam-api-extension-jar-with-dependencies.jar $KEYCLOAK_HOME/provide
 
 WORKDIR ${KEYCLOAK_HOME}
 
-ENV SRC_DIR=/opt/src
-ADD docker/keycloak ${SRC_DIR}
-
 # db option needs to be set for build step, already
 ARG KC_DB=postgres
 RUN ${KEYCLOAK_HOME}/bin/kc.sh build
+
+ENV SRC_DIR=/opt/src
+ADD docker/keycloak ${SRC_DIR}
 
 HEALTHCHECK CMD curl -f http://localhost:8080/realms/master || exit 1
 
