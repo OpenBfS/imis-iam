@@ -311,7 +311,7 @@ import {
 } from "vue";
 import { HTTP } from "@/lib/http.js";
 import { useNotification } from "@/lib/use-notification.js";
-import { useForm } from "@/lib/use-form.js";
+import { trimSpacesInObject, useForm } from "@/lib/use-form.js";
 import { useApplicationStore } from "@/stores/application.js";
 // TODO: Geocoding feature delayed to a subsequent date
 // import { useCoordinatesStore } from "@/stores/coordinates.js";
@@ -484,7 +484,7 @@ const sanitizePayload = (payload) => {
   keysToDelete.forEach((key) => {
     delete payload[key];
   });
-  return payload;
+  return trimSpacesInObject(payload);
 };
 const createInstitution = () => {
   let payload = { ...institution.value };

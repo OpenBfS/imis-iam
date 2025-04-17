@@ -220,7 +220,7 @@ import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
-import { useForm } from "@/lib/use-form.js";
+import { trimSpacesInObject, useForm } from "@/lib/use-form.js";
 import { handleDisplayName, updateUser } from "@/components/User/user.js";
 import Checkbox from "@/components/Form/Checkbox.vue";
 import TextField from "@/components/Form/TextField.vue";
@@ -337,7 +337,7 @@ const cloneObject = (obj) => {
   return JSON.parse(JSON.stringify(obj));
 };
 const createUser = () => {
-  HTTP.post("/iam/user", user.value)
+  HTTP.post("/iam/user", trimSpacesInObject(user.value))
     .then((response) => {
       userStore.addUser(response.data);
       applicationStore.setOwnAccount(true);

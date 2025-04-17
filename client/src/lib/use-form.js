@@ -400,3 +400,21 @@ export function useForm(i18n) {
     noLeadingTrailingSpaces,
   };
 }
+
+export const trimSpacesInObject = (obj) => {
+  const keys = Object.keys(obj);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const value = obj[key];
+    if (typeof value === "string") {
+      obj[key] = value.trim();
+    } else if (typeof value === "object") {
+      if (value.length) {
+        obj[key] = value.map((v) => v.trim());
+      } else {
+        trimSpacesInObject(obj[key]);
+      }
+    }
+  }
+  return obj;
+};

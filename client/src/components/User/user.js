@@ -5,6 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import i18n from "@/i18n";
+import { trimSpacesInObject } from "@/lib/use-form";
 import { useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
@@ -52,7 +53,7 @@ function updateUser(
   if (resetNotification) resetNotification();
   return new Promise((resolve) => {
     userStore
-      .updateUser(user)
+      .updateUser(trimSpacesInObject(user))
       .then(() => {
         // Update current user Profile and thus the data in App bar.
         if (profileStore.userData.id === user.id) {
