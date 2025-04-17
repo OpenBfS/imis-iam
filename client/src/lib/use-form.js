@@ -17,6 +17,8 @@ export function useForm(i18n) {
   const showConfirmCancelDialog = ref(false);
   const regExprPhone = /^\+[1-9][0-9]{7,16}$/;
   const regExprEmail = /^\S+@\S+\.\S+$/;
+  const regExprPostalCode = /^\d{5}$/;
+  const noLeadingTrailingSpaces = /\S.*\S/;
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
   // Validation rules
   const validMail = (validMsg) => {
@@ -30,7 +32,7 @@ export function useForm(i18n) {
     ];
   };
   const validPostalcode = (validMsg) => {
-    return [(v) => /^\d{5}$/.test(v) || v == "" || validMsg];
+    return [(v) => regExprPostalCode.test(v) || v == "" || validMsg];
   };
   const dateStringToDate = (dateString) => {
     const parts = dateString.split(".");
@@ -395,5 +397,6 @@ export function useForm(i18n) {
     areArraysDifferent,
     showFormError,
     createRequiredRule,
+    noLeadingTrailingSpaces,
   };
 }

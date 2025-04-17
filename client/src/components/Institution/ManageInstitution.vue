@@ -359,6 +359,8 @@ const {
   validPhone,
   validPostalcode,
   resetForm,
+  validRegex,
+  noLeadingTrailingSpaces,
   watchChange,
   onCancel,
   showConfirmCancelDialog,
@@ -397,8 +399,30 @@ const measIdAndNameOrNothing = () => {
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
-    measFacilName: [...measIdAndNameOrNothing()],
-    serviceBuildingPostalCode: validPostalcode(t("error.validPostalcode")),
+    name: validRegex(
+      noLeadingTrailingSpaces,
+      t("error.noLeadingTrailingSpaces")
+    ),
+    measFacilName: [
+      ...measIdAndNameOrNothing(),
+      ...validRegex(
+        noLeadingTrailingSpaces,
+        t("error.noLeadingTrailingSpaces")
+      ),
+    ],
+    serviceBuildingPostalCode: [...validPostalcode(t("error.validPostalcode"))],
+    serviceBuildingStreet: [
+      ...validRegex(
+        noLeadingTrailingSpaces,
+        t("error.noLeadingTrailingSpaces")
+      ),
+    ],
+    serviceBuildingLocation: [
+      ...validRegex(
+        noLeadingTrailingSpaces,
+        t("error.noLeadingTrailingSpaces")
+      ),
+    ],
     addressPostalCode: validPostalcode(t("error.validPostalcode")),
     centralPhone: validPhone(t("error.validPhone")),
     centralFax: validPhone(t("error.validFax")),
@@ -412,6 +436,10 @@ onBeforeMount(() => {
           maxLength: 7,
         }),
       ...measIdAndNameOrNothing(),
+      ...validRegex(
+        noLeadingTrailingSpaces,
+        t("error.noLeadingTrailingSpaces")
+      ),
     ],
   });
 });

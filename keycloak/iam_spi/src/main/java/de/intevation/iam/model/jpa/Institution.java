@@ -45,6 +45,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 public class Institution {
 
     private static final String PHONE_PATTERN = "^\\+[1-9][0-9]{7,16}$";
+    private static final String NO_LEADING_TRAILING_SPACES_PATTERN = "^\\S.*\\S$";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,9 +53,11 @@ public class Institution {
 
     @NotBlank
     @Column(name = "name", nullable = false)
+    @Pattern(regexp = NO_LEADING_TRAILING_SPACES_PATTERN)
     private String name;
 
     @Column(name = "meas_facil_name")
+    @Pattern(regexp = NO_LEADING_TRAILING_SPACES_PATTERN)
     private String measFacilName;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -67,15 +70,17 @@ public class Institution {
 
     @NotBlank
     @Column(name = "service_building_street", nullable = false)
+    @Pattern(regexp = NO_LEADING_TRAILING_SPACES_PATTERN)
     private String serviceBuildingStreet;
 
-    @Pattern(regexp = "[0-9]*")
+    @Pattern(regexp = "^[0-9]*$")
     @Size(min = 5, max = 5)
     @Column(name = "service_building_postal_code", nullable = false)
     private String serviceBuildingPostalCode;
 
     @NotBlank
     @Column(name = "service_building_location", nullable = false)
+    @Pattern(regexp = NO_LEADING_TRAILING_SPACES_PATTERN)
     private String serviceBuildingLocation;
 
     @Column(name = "service_building_state")
@@ -136,6 +141,7 @@ public class Institution {
 
     @Size(min = 5, max = 7)
     @Column(name = "meas_facil_id")
+    @Pattern(regexp = NO_LEADING_TRAILING_SPACES_PATTERN)
     private String measFacilId;
 
     @Column(name = "x_coordinate")

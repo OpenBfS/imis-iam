@@ -33,7 +33,7 @@
         "max" : 255
       },
       "pattern": {
-        "pattern": "\\S+@\\S+\\.\\S+",
+        "pattern": "^\\S+@\\S+\\.\\S+$",
         "error-message": "error.validEmail"
       }
     },
@@ -46,7 +46,15 @@
       "view" : [ "user", "admin" ]
     },
     "annotations" : { },
-    "validations" : { },
+    "validations" : {
+      "length" : {
+        "min" : 2
+      },
+      "pattern": {
+        "pattern": "^\\S.*\\S$",
+        "error-message": "error.noLeadingTrailingSpaces"
+      }
+    },
     "group": "name"
   }, {
     "name" : "firstName",
@@ -63,8 +71,12 @@
     },
     "validations" : {
       "length" : {
-        "min": 3,
+        "min" : 2,
         "max" : 255
+      },
+      "pattern": {
+        "pattern": "^\\S.*\\S$",
+        "error-message": "error.noLeadingTrailingSpaces"
       },
       "person-name-prohibited-characters" : { }
     },
@@ -84,7 +96,12 @@
     },
     "validations" : {
       "length" : {
+        "min" : 2,
         "max" : 255
+      },
+      "pattern": {
+        "pattern": "^\\S.*\\S$",
+        "error-message": "error.noLeadingTrailingSpaces"
       },
       "person-name-prohibited-characters" : { }
     },

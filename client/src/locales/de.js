@@ -93,6 +93,8 @@ export default {
     validDate: "Datum muss gültig sein",
     allOrNothing: "{0} und {1} oder keines angeben",
     onlyUniqueValues: "Bitte geben Sie keine doppelten Werte ein.",
+    noLeadingTrailingSpaces:
+      "Bitte verwenden Sie ein gültiges Format ohne Leerzeichen am Anfang/Ende.",
   },
   export: {
     semicolon: "Semikolon",
