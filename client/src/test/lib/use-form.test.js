@@ -7,8 +7,9 @@
 import { setActivePinia, createPinia } from "pinia";
 import { useApplicationStore } from "@/stores/application";
 import { test, expect, expectTypeOf } from "vitest";
-import { useForm } from "@/lib/use-form";
+import { trimSpacesInObject, useForm } from "@/lib/use-form";
 import i18n from "@/i18n";
+import { getExpInstitution } from "@/components/Institution/institution";
 
 const { handleValidationErrorFromServer } = useForm(i18n);
 setActivePinia(createPinia());
@@ -48,4 +49,13 @@ test("Test handleValidationErrorFromServer", async () => {
   expect(applicationStore.clientAndServerRules["email"][0]()).toBe(
     t("error.validEmail"),
   );
+});
+
+test("Test function trimSpacesInObject", () => {
+  const inst = getExpInstitution();
+  inst["serviceBuildingPostalCode"] = " 12345";
+  inst["serviceBuildingStreet"] = "Example Street 1 ";
+  trimSpacesInObject(inst);
+  expect(inst["serviceBuildingPostalCode"]).toBe("12345");
+  expect(inst["serviceBuildingStreet"]).toBe("Example Street 1");
 });
