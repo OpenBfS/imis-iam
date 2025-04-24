@@ -128,6 +128,10 @@ public class UserResource {
         Map<String, String> attributes = search == null
                 ? Collections.emptyMap()
                 : SearchQueryUtils.getFields(search);
+
+        // Match sub-strings
+        attributes.put(UserModel.EXACT, Boolean.FALSE.toString());
+
         String generalSearch = attributes.get("search");
         if (generalSearch != null) {
             attributes.put(UserModel.SEARCH, generalSearch);
