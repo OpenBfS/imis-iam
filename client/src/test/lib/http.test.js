@@ -23,14 +23,14 @@ test("Test axios request options", () => {
     throw Error();
   });
 
-  // If the options for the following request are invalid the catch is not reached
-  // and the test is failing. That is what we want to happen.
   axiosClient
     .get(`/`, {
       paramsSerializer,
     })
     .catch((e) => {
-      console.log("Error", e);
+      // An AxiousError means that the options passed to get() are not alright. If it's not an AxiosError
+      // it is the error thrown by us which we can ignore.
+      expect(e.name).not.toBe("AxiosError")
     });
 });
 
