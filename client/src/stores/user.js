@@ -40,24 +40,25 @@ export const useUserStore = defineStore("user", {
         }
       });
     },
-    loadUsers(searchString) {
+    loadUsers(searchString, loadAll = false) {
       return new Promise((resolve, reject) => {
-        const params = {
-          search: createSearchQueryString(searchString, this.filterBy),
-          firstResult: this.offset,
-          maxResults: this.itemsPerPage,
-          sortBy: this.sortBy?.key,
-          order: this.sortBy?.order,
-        };
+        const params = loadAll
+          ? {}
+          : {
+              search: createSearchQueryString(searchString, this.filterBy),
+              firstResult: this.offset,
+              maxResults: this.itemsPerPage,
+              sortBy: this.sortBy?.key,
+              order: this.sortBy?.order,
+            };
         HTTP.get("/iam/user", {
           params,
         })
           .then((response) => {
             this.totalNumberOfUsers = response.data.size;
-            if (searchString) {
-              this.setFoundUsers(response.data.list);
-            } else {
+            if (loadAll) {
               this.setUsers(response.data.list);
+            } else {
               this.setFoundUsers(response.data.list);
             }
             resolve(response);

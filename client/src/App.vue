@@ -50,24 +50,26 @@
 <script setup>
 import { onMounted } from "vue";
 import { useApplicationStore } from "@/stores/application.js";
+import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useNotification } from "./lib/use-notification.js";
 import { useUserStore } from "./stores/user.js";
 
 const applicationStore = useApplicationStore();
+const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
 
 const { hasLoadingError } = useNotification();
 
 onMounted(() => {
-  profileStore.loadUserProfileMetadata().catch(() => {
-    hasLoadingError.value = true;
-  });
-  profileStore.loadProfile().catch(() => {
-    hasLoadingError.value = true;
-  });
-  userStore.loadRoles().catch(() => {
+  // Load all values which can be selected in the "Manage" dialogs
+  Promise.all([
+    profileStore.loadUserProfileMetadata(),
+    profileStore.loadProfile(),
+    userStore.loadRoles(),
+    institutionStore.loadInstitutions("", true),
+  ]).catch(() => {
     hasLoadingError.value = true;
   });
 });

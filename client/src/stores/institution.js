@@ -64,24 +64,25 @@ export const useInstitutionStore = defineStore("institution", {
         }
       });
     },
-    loadInstitutions(searchString) {
+    loadInstitutions(searchString, loadAll = false) {
       return new Promise((resolve, reject) => {
-        const params = {
-          search: createSearchQueryString(searchString, this.filterBy),
-          firstResult: this.offset,
-          maxResults: this.itemsPerPage,
-          sortBy: this.sortBy?.key,
-          order: this.sortBy?.order,
-        };
+        const params = loadAll
+          ? {}
+          : {
+              search: createSearchQueryString(searchString, this.filterBy),
+              firstResult: this.offset,
+              maxResults: this.itemsPerPage,
+              sortBy: this.sortBy?.key,
+              order: this.sortBy?.order,
+            };
         HTTP.get("/iam/institution", {
           params,
         })
           .then((response) => {
             this.totalNumberOfInstitutions = response.data.size;
-            if (searchString) {
-              this.setFoundInstitutions(response.data.list);
-            } else {
+            if (loadAll) {
               this.setInstitutionList(response.data.list);
+            } else {
               this.setFoundInstitutions(response.data.list);
             }
             resolve(response);
