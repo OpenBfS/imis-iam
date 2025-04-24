@@ -11,6 +11,7 @@
     @keydown.delete="onDelete"
     @keydown.tab="onTab"
     v-model="input"
+    ref="textfield"
     :clearable="props.clearable && editable"
     :density="props.density ?? 'compact'"
     :disabled="props.disabled"
@@ -90,6 +91,7 @@ const emit = defineEmits(["update:modelValue"]);
 
 const input = ref("");
 const plusButton = ref(null);
+const textfield = ref(null);
 const entries = ref([]);
 const indexOfDuplicate = ref(-1);
 
@@ -223,10 +225,7 @@ const onDelete = () => {
 const onClickPlusButton = () => {
   addEntry();
   // Re-focus text field so user can continue to enter values
-  const index = Array.from(plusButton.value.$el.form).indexOf(
-    plusButton.value.$el,
-  );
-  plusButton.value.$el.form[index - 1]?.focus();
+  textfield.value.$el.querySelector("input")?.focus()
 };
 
 const onTab = () => {
