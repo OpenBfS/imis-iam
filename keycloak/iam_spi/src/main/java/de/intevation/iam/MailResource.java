@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -235,7 +236,7 @@ public class MailResource {
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         DefaultEmailSenderProvider senderProvider
-            = new DefaultEmailSenderProvider(session);
+            = new DefaultEmailSenderProvider(session, new ConcurrentHashMap<>());
         Map<String, String> smtpConfig = new HashMap<>(realm.getSmtpConfig());
 
         //Update mail object

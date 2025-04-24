@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.keycloak.email.DefaultEmailSenderProvider;
 import org.keycloak.email.EmailException;
@@ -45,7 +46,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
      */
     public IamMailTemplateProvider(KeycloakSession session) {
         super(session);
-        sender = new DefaultEmailSenderProvider(session);
+        sender = new DefaultEmailSenderProvider(session, new ConcurrentHashMap<>());
     }
 
     /**
