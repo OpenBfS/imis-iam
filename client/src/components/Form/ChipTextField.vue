@@ -44,6 +44,7 @@
       :color="index === indexOfDuplicate ? 'error' : 'default'"
       size="small"
       :key="entry"
+      data-test="chip"
     >
       {{ entry }}
     </v-chip>
@@ -225,7 +226,7 @@ const onDelete = () => {
 const onClickPlusButton = () => {
   addEntry();
   // Re-focus text field so user can continue to enter values
-  textfield.value.$el.querySelector("input")?.focus()
+  textfield.value.$el.querySelector("input")?.focus();
 };
 
 const onTab = () => {
