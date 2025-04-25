@@ -21,7 +21,9 @@
           <v-btn
             variant="plain"
             :icon="`${
-              profileStore.isAllowedToManage
+              profileStore.isAllowedToManage &&
+              (item.network === profileStore.userData.network ||
+                profileStore.userData.role === 'chief_editor')
                 ? 'mdi-pencil'
                 : 'mdi-information-outline'
             }`"
@@ -31,7 +33,9 @@
           ></v-btn>
         </template>
         <span>{{
-          profileStore.isAllowedToManage
+          profileStore.isAllowedToManage &&
+          (item.network === profileStore.userData.network ||
+            profileStore.userData.role === "chief_editor")
             ? $t("label.edit")
             : $t("label.showInfo")
         }}</span>

@@ -409,7 +409,9 @@ const isReadOnly = computed(() => {
   if (applicationStore.ownAccount) {
     return false;
   }
-  return !profileStore.isAllowedToManage;
+  return !profileStore.isAllowedToManage ||
+  (profileStore.userData.role !== 'chief_editor' &&
+    user.value.network !== profileStore.userData.network) ;
 });
 
 // Necessary so tests are able to access exactly these instances used in this component.
