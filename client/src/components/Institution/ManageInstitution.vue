@@ -22,7 +22,11 @@
           <v-form
             v-model="valid"
             ref="form"
-            :readonly="!profileStore.isAllowedToManage"
+            :readonly="
+              !profileStore.isAllowedToManage ||
+              (profileStore.userData.role !== 'chief_editor' &&
+                institution.network !== profileStore.userData.network)
+            "
           >
             <v-row>
               <v-col>
@@ -413,26 +417,26 @@ onBeforeMount(() => {
   applicationStore.initClientRules({
     name: validRegex(
       noLeadingTrailingSpaces,
-      t("error.noLeadingTrailingSpaces")
+      t("error.noLeadingTrailingSpaces"),
     ),
     measFacilName: [
       ...measIdAndNameOrNothing(),
       ...validRegex(
         noLeadingTrailingSpaces,
-        t("error.noLeadingTrailingSpaces")
+        t("error.noLeadingTrailingSpaces"),
       ),
     ],
     serviceBuildingPostalCode: [...validPostalcode(t("error.validPostalcode"))],
     serviceBuildingStreet: [
       ...validRegex(
         noLeadingTrailingSpaces,
-        t("error.noLeadingTrailingSpaces")
+        t("error.noLeadingTrailingSpaces"),
       ),
     ],
     serviceBuildingLocation: [
       ...validRegex(
         noLeadingTrailingSpaces,
-        t("error.noLeadingTrailingSpaces")
+        t("error.noLeadingTrailingSpaces"),
       ),
     ],
     addressPostalCode: validPostalcode(t("error.validPostalcode")),
@@ -450,7 +454,7 @@ onBeforeMount(() => {
       ...measIdAndNameOrNothing(),
       ...validRegex(
         noLeadingTrailingSpaces,
-        t("error.noLeadingTrailingSpaces")
+        t("error.noLeadingTrailingSpaces"),
       ),
     ],
   });
@@ -521,7 +525,7 @@ const saveInstitution = () => {
     showPostalAddress,
     isServerValidationError,
     handleValidationErrorFromServer,
-    hasRequestError
+    hasRequestError,
   );
 };
 
