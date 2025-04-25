@@ -91,6 +91,12 @@
                     :clearValidationError="clearValidationError"
                     :setUserAttribute="setUserAttribute"
                     :user="user"
+                    :disabled="
+                      !(
+                        profileStore.userData.role === 'chief_editor' ||
+                        attribute.name !== 'tags'
+                      )
+                    "
                   />
                   <p
                     :id="`${attribute.name}-validation-error`"
@@ -133,8 +139,7 @@
             <v-row>
               <Select
                 attribute="role"
-                :clearable="profileStore.isAllowedToManage"
-                :readonly="!profileStore.isAllowedToManage"
+                :disabled="profileStore.userData.role !== 'chief_editor'"
                 :label="$t('user.role')"
                 :items="userRoles"
                 item-value="name"
@@ -344,9 +349,9 @@ const userRoles = computed(() => {
     (item) => (item.title = item.description ? t(item.description) : item.name),
   );
   return roles.filter(
-    // Only allow 'chief_editor' to grant this role
+    // Only allow 'chief_editor' to grant roles other than 'user'
     (item) =>
-      item.name !== "chief_editor" ||
+      item.name === "user" ||
       user.value.role === "chief_editor" ||
       profileStore.userData.role === "chief_editor",
   );

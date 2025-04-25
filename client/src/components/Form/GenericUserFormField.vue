@@ -15,6 +15,7 @@
       ) === FORM_FIELD_TYPE_CHIPTEXTFIELD
     "
     v-bind="commonProps"
+    :disabled="disabled"
   ></ChipTextField>
   <TextField
     v-else-if="
@@ -23,6 +24,7 @@
     "
     v-bind="commonProps"
     :type="getTextFieldType(attribute.name)"
+    :disabled="disabled"
   ></TextField>
   <Select
     v-else-if="
@@ -35,6 +37,7 @@
     :items="attribute.validations.options.options"
     :clearable="attribute.annotations.inputType === 'multiselect'"
     :multiple="attribute.annotations.inputType === 'multiselect'"
+    :disabled="disabled"
   ></Select>
 </template>
 
@@ -42,6 +45,7 @@
 import { computed } from "vue";
 import { useProfileStore } from "@/stores/profile.js";
 import { handleDisplayName } from "@/components/User/user.js";
+import TextField from "@/components/Form/TextField.vue";
 
 const profileStore = useProfileStore();
 
@@ -50,6 +54,10 @@ const props = defineProps({
   clearValidationError: Function,
   setUserAttribute: Function,
   user: Object,
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Creating these variables so we don't have to write "props." everywhere.

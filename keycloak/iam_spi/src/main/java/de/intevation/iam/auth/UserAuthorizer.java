@@ -7,6 +7,13 @@
 
 package de.intevation.iam.auth;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
@@ -20,7 +27,21 @@ import de.intevation.iam.util.RequestMethod;
 
 public class UserAuthorizer extends Authorizer<User> {
 
+    private static final String ENABLED_ATTRIBUTE_KEY = "enabled";
+    private static final String ROLE_ATTRIBUTE_KEY = "role";
     private static final String NETWORK_ATTRIBUTE_KEY = "network";
+    private static final String TAGS_ATTRIBUTE_KEY = "tags";
+
+    /**
+     * Attributes that require IaMRole.CHIEF_EDITOR to be set.
+     */
+    private static final List<String> PRIVILEGED_ATTR =
+        List.of(
+            ENABLED_ATTRIBUTE_KEY,
+            ROLE_ATTRIBUTE_KEY,
+            NETWORK_ATTRIBUTE_KEY,
+            TAGS_ATTRIBUTE_KEY
+        );
 
     public UserAuthorizer(KeycloakSession session) {
         this.session = session;
@@ -38,73 +59,138 @@ public class UserAuthorizer extends Authorizer<User> {
             throw new AuthorizationException();
         }
 
-        boolean allowed = switch (requestMethod) {
-            case GET -> isVisible(data, session, requestingUser);
-            case PUT -> authorizeUpdate(
-                    data, session, requestingUser, client);
-            case POST -> (!data.isEnabled()
-                    && networkEquals(requestingUser, data)
-                    && IaMRole.EDITOR.isRoleOf(requestingUser, session)
-                    || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session))
-                    // Not allowed granting roles superior to own role
-                    && requestingUser.hasRole(client.getRole(data.getRole()));
-            default -> false;
-        };
-        if (!allowed) {
-            throw new AuthorizationException();
+        switch (requestMethod) {
+            case GET:
+                checkVisible(data, session, requestingUser);
+                break;
+            case PUT:
+                authorizeUpdate(data, session, requestingUser);
+                break;
+            case POST:
+                authorizeCreate(data, session, requestingUser, client);
+                break;
+            default:
+                throw new AuthorizationException();
         }
     }
 
-    private boolean isVisible(
+    private void checkVisible(
             User user,
             KeycloakSession session,
             UserModel requestingUser
-    ) {
+    ) throws AuthorizationException {
         String userNetwork = user.getNetwork();
         String requestingUserNetwork = getRequestingUserNetwork(requestingUser);
-        return user.isEnabled()
+        if (user.isEnabled()
             || IaMRole.EDITOR.isRoleOf(requestingUser, session)
             && requestingUserNetwork != null
             && requestingUserNetwork.equals(userNetwork)
-            || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
+            || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            return;
+        }
+        throw new AuthorizationException("User is not visible");
     }
 
-    private boolean authorizeUpdate(
+    private void checkPrivilegedAttributes(
+        User user,
+        UserModel requestingUser,
+        UserModel oldUserModel,
+        KeycloakSession session
+    ) throws AuthorizationException {
+        if (!IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            List<String> forbidden = new ArrayList<>();
+
+            for (String attr : PRIVILEGED_ATTR) {
+                Object newValue, oldValue = null;
+                try {
+                    Method getter = (new PropertyDescriptor(attr, User.class))
+                        .getReadMethod();
+                    newValue = getter.invoke(user);
+                    if (oldUserModel == null) {
+                        // Allow boolean values set to false on user creation
+                        if (getter.getReturnType().equals(Boolean.TYPE)
+                                && newValue.equals(Boolean.FALSE)) {
+                            continue;
+                        }
+                    } else {
+                        oldValue = getter.invoke(
+                                new User(oldUserModel, session));
+                    }
+                } catch (IntrospectionException ignored) {
+                    // Assume User Profile attribute if it's not a property
+                    newValue = user.getAttributes().get(attr);
+                    if (oldUserModel != null) {
+                        oldValue = oldUserModel.getAttributes().get(attr);
+                    }
+                } catch (ReflectiveOperationException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Checks for user creation
+                if (oldUserModel == null) {
+                    if (attr.equals(ROLE_ATTRIBUTE_KEY)
+                        // Allow to create user role
+                        && newValue.equals(IaMRole.USER.toString())) {
+                        continue;
+                    }
+                    if (attr.equals(NETWORK_ATTRIBUTE_KEY)
+                        // Allow to create user in same network
+                        && newValue.equals(getRequestingUserNetwork(requestingUser))) {
+                        continue;
+                    }
+                }
+                if (!Objects.equals(newValue, oldValue)) {
+                    forbidden.add(attr);
+                }
+            }
+
+            if (!forbidden.isEmpty()) {
+                throw new AuthorizationException(
+                    "Not allowed to set " + forbidden);
+            }
+        }
+    }
+
+    private void authorizeCreate(
         User user,
         KeycloakSession session,
         UserModel requestingUser,
         ClientModel client
-    ) {
-        if (!isVisible(user, session, requestingUser)) {
-            return false;
+    ) throws AuthorizationException {
+        checkPrivilegedAttributes(user, requestingUser, null, session);
+
+        if (IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
+                || networkEquals(requestingUser, user)
+                && IaMRole.EDITOR.isRoleOf(requestingUser, session)
+                // Not allowed granting roles superior to own role
+                && requestingUser.hasRole(client.getRole(user.getRole()))) {
+            return;
         }
+
+        throw new AuthorizationException();
+    }
+
+    private void authorizeUpdate(
+        User user,
+        KeycloakSession session,
+        UserModel requestingUser
+    ) throws AuthorizationException {
+        checkVisible(user, session, requestingUser);
+
         RealmModel realm = session.getContext().getRealm();
         UserModel oldUserModel
             = session.users().getUserById(realm, user.getId());
-        User oldUser = new User(oldUserModel, session);
 
-        if (user.isEnabled() != oldUserModel.isEnabled()
-            && !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
-            return false;
-        }
-        //If role shall be changed:
-        //Check if user is chief editor
-        String oldRole = oldUserModel.getClientRoleMappingsStream(client)
-            .map(role -> role.getName()).findFirst().orElse(null);
-        if (oldRole == null || !oldRole.equals(user.getRole())) {
-            return IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session);
-        }
+        checkPrivilegedAttributes(user, requestingUser, oldUserModel, session);
 
-        // If network shall be changed: Check if user is chief editor
-        if (!user.getNetwork().equals(oldUser.getNetwork())
-            && !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
-            return false;
-        }
-
-        return IaMRole.EDITOR.isRoleOf(requestingUser, session)
+        if (IaMRole.EDITOR.isRoleOf(requestingUser, session)
             && networkEquals(requestingUser, user)
             || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
-            || user.getId().equals(requestingUser.getId());
+            || user.getId().equals(requestingUser.getId())) {
+            return;
+        }
+
+        throw new AuthorizationException();
     }
 
     private boolean networkEquals(UserModel requestingUser, User data) {
