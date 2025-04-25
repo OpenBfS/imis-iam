@@ -125,9 +125,9 @@ public class UserResource {
             @QueryParam("maxResults") Integer maxResults) {
         RealmModel realm = session.getContext().getRealm();
 
-        Map<String, String> attributes = search == null
+        Map<String, String> attributes = new HashMap<>(search == null
                 ? Collections.emptyMap()
-                : SearchQueryUtils.getFields(search);
+                : SearchQueryUtils.getFields(search));
 
         // Match sub-strings
         attributes.put(UserModel.EXACT, Boolean.FALSE.toString());
