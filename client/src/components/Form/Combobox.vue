@@ -25,7 +25,7 @@
         ? applicationStore.managedItem[props.attribute]
         : props.modelValue
     "
-    :name="props.name"
+    :name="props.name || props.attribute"
     :no-data-text="props.noDataText ?? $t('label.noDataText')"
     :prepend-inner-icon="props.prependInnerIcon"
     :readonly="applicationStore.form?.readonly || props.readonly"

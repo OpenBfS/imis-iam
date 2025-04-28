@@ -17,7 +17,7 @@
         ? applicationStore.managedItem[props.attribute]
         : props.modelValue
     "
-    :name="props.name"
+    :name="props.name || props.attribute"
     :prepend-inner-icon="props.prependInnerIcon"
     :readonly="applicationStore.form?.readonly || props.readonly"
     ref="textField"
