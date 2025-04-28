@@ -6,11 +6,13 @@
  */
 
 import i18n from "@/i18n";
+import { useUserStore } from "@/stores/user.js";
 
 const { t } = i18n.global;
 
 // Creates headers that can be inserted into a Vuetify table.
 const createHeaders = (columns, type) => {
+  const userStore = useUserStore();
   const newHeaders = [];
   columns.forEach((column) => {
     const headerName = column.name;
@@ -33,7 +35,14 @@ const createHeaders = (columns, type) => {
         headerName === "role" &&
         structuredClone(item)?.[headerName]
       ) {
-        return t(`role_iam_${structuredClone(item)[headerName]}`);
+        const roleName = structuredClone(item)[headerName];
+        const roles = userStore.roles;
+        const role = roles.find((r) => r.name === roleName);
+        if (role) {
+          return t(role.description);
+        } else {
+          return structuredClone(item)?.[headerName];
+        }
       }
       const value =
         type === "users"
