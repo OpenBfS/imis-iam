@@ -157,10 +157,6 @@ public class UserAuthorizer extends Authorizer<User> {
     ) throws AuthorizationException {
         if (!IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
             IaMRole.EDITOR.require(requestingUser, session);
-            // Not allowed granting roles superior to own role
-            if (!requestingUser.hasRole(client.getRole(user.getRole()))) {
-                throw new AuthorizationException();
-            }
             checkPrivilegedAttributes(user, requestingUser, null, session);
         }
     }
