@@ -17,7 +17,7 @@
     :disabled="props.disabled"
     :hint="props.hint"
     :label="`${props.label}${props.required ? ' *' : ''}`"
-    :name="props.name"
+    :name="props.name || props.attribute"
     :persistent-hint="true"
     :persistent-placeholder="entries.length > 0"
     :prepend-inner-icon="props.prependInnerIcon"
@@ -28,6 +28,7 @@
     <template v-slot:append="{ isValid }">
       <v-btn
         ref="plusButton"
+        data-test="plusButton"
         @click="onClickPlusButton"
         size="x-small"
         icon="mdi-plus"

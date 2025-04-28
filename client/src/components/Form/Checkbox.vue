@@ -16,7 +16,7 @@
         ? applicationStore.managedItem[props.attribute]
         : props.modelValue
     "
-    :name="props.name"
+    :name="props.name || props.attribute"
     :persistent-hint="props.persistentHint"
     :readonly="applicationStore.form?.readonly || props.readonly"
     :rules="

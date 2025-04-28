@@ -21,7 +21,7 @@
         ? applicationStore.managedItem[props.attribute]
         : props.modelValue
     "
-    :name="props.name"
+    :name="props.name || props.attribute"
     :persistent-hint="props.persistentHint"
     :prepend-inner-icon="props.prependInnerIcon"
     :readonly="applicationStore.form?.readonly || props.readonly"

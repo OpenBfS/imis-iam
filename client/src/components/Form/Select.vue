@@ -26,7 +26,7 @@
         : props.modelValue
     "
     :multiple="props.multiple"
-    :name="props.name"
+    :name="props.name || props.attribute"
     :no-data-text="props.noDataText"
     :persistent-hint="props.persistentHint"
     :prepend-inner-icon="props.prependInnerIcon"
