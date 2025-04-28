@@ -97,57 +97,55 @@ public class UserAuthorizer extends Authorizer<User> {
         UserModel oldUserModel,
         KeycloakSession session
     ) throws AuthorizationException {
-        if (!IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
-            List<String> forbidden = new ArrayList<>();
+        List<String> forbidden = new ArrayList<>();
 
-            for (String attr : PRIVILEGED_ATTR) {
-                Object newValue, oldValue = null;
-                try {
-                    Method getter = (new PropertyDescriptor(attr, User.class))
-                        .getReadMethod();
-                    newValue = getter.invoke(user);
-                    if (oldUserModel == null) {
-                        // Allow boolean values set to false on user creation
-                        if (getter.getReturnType().equals(Boolean.TYPE)
-                                && newValue.equals(Boolean.FALSE)) {
-                            continue;
-                        }
-                    } else {
-                        oldValue = getter.invoke(
-                                new User(oldUserModel, session));
-                    }
-                } catch (IntrospectionException ignored) {
-                    // Assume User Profile attribute if it's not a property
-                    newValue = user.getAttributes().get(attr);
-                    if (oldUserModel != null) {
-                        oldValue = oldUserModel.getAttributes().get(attr);
-                    }
-                } catch (ReflectiveOperationException e) {
-                    throw new RuntimeException(e);
-                }
-
-                // Checks for user creation
+        for (String attr : PRIVILEGED_ATTR) {
+            Object newValue, oldValue = null;
+            try {
+                Method getter = (new PropertyDescriptor(attr, User.class))
+                    .getReadMethod();
+                newValue = getter.invoke(user);
                 if (oldUserModel == null) {
-                    if (attr.equals(ROLE_ATTRIBUTE_KEY)
-                        // Allow to create user role
-                        && newValue.equals(IaMRole.USER.toString())) {
+                    // Allow boolean values set to false on user creation
+                    if (getter.getReturnType().equals(Boolean.TYPE)
+                        && newValue.equals(Boolean.FALSE)) {
                         continue;
                     }
-                    if (attr.equals(NETWORK_ATTRIBUTE_KEY)
-                        // Allow to create user in same network
-                        && newValue.equals(getRequestingUserNetwork(requestingUser))) {
-                        continue;
-                    }
+                } else {
+                    oldValue = getter.invoke(
+                        new User(oldUserModel, session));
                 }
-                if (!Objects.equals(newValue, oldValue)) {
-                    forbidden.add(attr);
+            } catch (IntrospectionException ignored) {
+                // Assume User Profile attribute if it's not a property
+                newValue = user.getAttributes().get(attr);
+                if (oldUserModel != null) {
+                    oldValue = oldUserModel.getAttributes().get(attr);
                 }
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
             }
 
-            if (!forbidden.isEmpty()) {
-                throw new AuthorizationException(
-                    "Not allowed to set " + forbidden);
+            // Checks for user creation
+            if (oldUserModel == null) {
+                if (attr.equals(ROLE_ATTRIBUTE_KEY)
+                    // Allow to create user role
+                    && newValue.equals(IaMRole.USER.toString())) {
+                    continue;
+                }
+                if (attr.equals(NETWORK_ATTRIBUTE_KEY)
+                    // Allow to create user in same network
+                    && newValue.equals(getRequestingUserNetwork(requestingUser))) {
+                    continue;
+                }
             }
+            if (!Objects.equals(newValue, oldValue)) {
+                forbidden.add(attr);
+            }
+        }
+
+        if (!forbidden.isEmpty()) {
+            throw new AuthorizationException(
+                "Not allowed to set " + forbidden);
         }
     }
 
@@ -157,17 +155,14 @@ public class UserAuthorizer extends Authorizer<User> {
         UserModel requestingUser,
         ClientModel client
     ) throws AuthorizationException {
-        checkPrivilegedAttributes(user, requestingUser, null, session);
-
-        if (IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
-                || networkEquals(requestingUser, user)
-                && IaMRole.EDITOR.isRoleOf(requestingUser, session)
-                // Not allowed granting roles superior to own role
-                && requestingUser.hasRole(client.getRole(user.getRole()))) {
-            return;
+        if (!IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            IaMRole.EDITOR.require(requestingUser, session);
+            // Not allowed granting roles superior to own role
+            if (!requestingUser.hasRole(client.getRole(user.getRole()))) {
+                throw new AuthorizationException();
+            }
+            checkPrivilegedAttributes(user, requestingUser, null, session);
         }
-
-        throw new AuthorizationException();
     }
 
     private void authorizeUpdate(
@@ -177,20 +172,20 @@ public class UserAuthorizer extends Authorizer<User> {
     ) throws AuthorizationException {
         checkVisible(user, session, requestingUser);
 
-        RealmModel realm = session.getContext().getRealm();
-        UserModel oldUserModel
-            = session.users().getUserById(realm, user.getId());
-
-        checkPrivilegedAttributes(user, requestingUser, oldUserModel, session);
-
-        if (IaMRole.EDITOR.isRoleOf(requestingUser, session)
-            && networkEquals(requestingUser, user)
-            || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
-            || user.getId().equals(requestingUser.getId())) {
-            return;
+        if (!IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            if (!(IaMRole.EDITOR.isRoleOf(requestingUser, session)
+                    && networkEquals(requestingUser, user))
+                && !user.getId().equals(requestingUser.getId())
+            ) {
+                throw new AuthorizationException();
+            }
+            RealmModel realm = session.getContext().getRealm();
+            UserModel oldUserModel
+                = session.users().getUserById(realm, user.getId());
+            checkPrivilegedAttributes(
+                user, requestingUser, oldUserModel, session);
         }
 
-        throw new AuthorizationException();
     }
 
     private boolean networkEquals(UserModel requestingUser, User data) {
