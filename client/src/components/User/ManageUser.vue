@@ -343,17 +343,16 @@ const processType = computed(() => {
   return applicationStore.processType;
 });
 const userRoles = computed(() => {
-  var roles = userStore.roles ?? [];
-  roles.forEach((item) => {
-    item.props = {};
+  return userStore.roles?.map((item) => {
+    const newItem = structuredClone(item)
+    newItem.props = {};
     // Only allow 'chief_editor' to grant roles other than 'user'
-    item.props.disabled =
+    newItem.props.disabled =
       item.name !== "user" && profileStore.userData.role !== "chief_editor";
     // If available, use description field for localization
-    item.title = item.description ? t(item.description) : item.name;
-    return item;
-  });
-  return roles;
+    newItem.title = item.description ? t(item.description) : item.name;
+    return newItem;
+  }) ?? [];
 });
 // Deep Copy for objects
 const cloneObject = (obj) => {
