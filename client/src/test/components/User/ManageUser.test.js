@@ -22,6 +22,7 @@ import {
   setupSharedTestEnvironment,
 } from "@/test/sharedTests";
 
+const { t } = i18n.global;
 const { handleValidationErrorFromServer } = useForm(i18n);
 
 setActivePinia(createPinia());
@@ -160,7 +161,7 @@ describe("Test ManageUser", () => {
     // It can be found in a <div> which is a sibling of the input.
     expect(
       wrapper.get("input[name='role']").element.parentElement.textContent
-    ).toContain(roles.filter((r) => r.name === user.role)[0].title);
+    ).toContain(t(roles.filter((r) => r.name === user.role)[0].description));
     expect(selectContainer.textContent).toContain(errors[0].message);
     const editedUser = structuredClone(user);
     editedUser.role = null;
