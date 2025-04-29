@@ -18,6 +18,7 @@ import { useForm } from "@/lib/use-form";
 import i18n from "@/i18n";
 import {
   networks,
+  roles,
   runSharedTests,
   setupSharedTestEnvironment,
 } from "@/test/sharedTests";
@@ -83,11 +84,6 @@ const userProfileMetadata = {
     },
   ],
 };
-const roles = [
-  { name: "chief_editor", description: "roleIamChiefEditor" },
-  { name: "editor", description: "roleIamEditor" },
-  { name: "user", description: "roleIamUser" },
-];
 
 let wrapper;
 

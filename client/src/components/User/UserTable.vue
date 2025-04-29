@@ -69,6 +69,8 @@ import DataTableServer from "@/components/DataTableServer.vue";
 import { createHeaders } from "@/lib/utils";
 
 const props = defineProps({
+  // columns only used to insert different columns for testing
+  columns: Array,
   users: Array,
 });
 
@@ -81,23 +83,25 @@ onMounted(async () => {
   if (!profileStore.attributes) {
     await profileStore.loadUserProfileMetadata();
   }
-  const columns = profileStore.attributes
-    ? [
-        ...profileStore.attributes.map((attr) => {
-          const rawAttr = toRaw(attr);
-          return {
-            name: rawAttr.name,
-            default:
-              attr.annotations?.defaultField &&
-              Boolean(attr.annotations?.defaultField) === true,
-          };
-        }),
-        { name: "institutions", default: true },
-        { name: "role", default: false },
-        { name: "network", default: false },
-        { name: "enabled", default: false },
-      ]
-    : [];
+  const columns = props.columns
+    ? props.columns
+    : profileStore.attributes
+      ? [
+          ...profileStore.attributes.map((attr) => {
+            const rawAttr = toRaw(attr);
+            return {
+              name: rawAttr.name,
+              default:
+                attr.annotations?.defaultField &&
+                Boolean(attr.annotations?.defaultField) === true,
+            };
+          }),
+          { name: "institutions", default: true },
+          { name: "role", default: false },
+          { name: "network", default: false },
+          { name: "enabled", default: false },
+        ]
+      : [];
   userStore.tableHeaders = createHeaders(columns, "users");
 });
 

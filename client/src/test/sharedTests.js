@@ -13,6 +13,11 @@ import { useProfileStore } from "@/stores/profile";
 
 const { t } = i18n.global;
 
+const roles = [
+  { name: "chief_editor", description: "roleIamChiefEditor" },
+  { name: "editor", description: "roleIamEditor" },
+  { name: "user", description: "roleIamUser" },
+];
 const networks = ["01", "02"];
 
 const setupSharedTestEnvironment = async (item) => {
@@ -108,4 +113,4 @@ const runSharedTests = async (wrapper) => {
   await reset();
 };
 
-export { networks, runSharedTests, setupSharedTestEnvironment };
+export { networks, roles, runSharedTests, setupSharedTestEnvironment };
