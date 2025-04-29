@@ -34,7 +34,7 @@ const institution = {
 
 describe("Test ManageInstitution", () => {
   test("Reset button is en- and disabled correctly", async () => {
-    setupSharedTestEnvironment(institution);
+    setupSharedTestEnvironment(institution, "chief_editor");
     const applicationStore = useApplicationStore();
     applicationStore.setNetworks(networks);
     const wrapper = mount(ManageInstitution, {

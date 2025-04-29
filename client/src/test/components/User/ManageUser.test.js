@@ -87,8 +87,8 @@ const userProfileMetadata = {
 
 let wrapper;
 
-const setupTestEnvironment = async () => {
-  setupSharedTestEnvironment(user);
+const setupTestEnvironment = async (roleOfLoggedInUser) => {
+  setupSharedTestEnvironment(user, roleOfLoggedInUser);
   const profileStore = useProfileStore();
   const userStore = useUserStore();
   userStore.setRoles(roles);
@@ -101,7 +101,7 @@ const setupTestEnvironment = async () => {
 
 describe("Test ManageUser", () => {
   beforeAll(async () => {
-    await setupTestEnvironment();
+    await setupTestEnvironment("chief_editor");
   });
 
   async function testFieldInput(wrapper, name) {
@@ -167,7 +167,13 @@ describe("Test ManageUser", () => {
   });
 
   test("Reset button is en- and disabled correctly", async () => {
-    await setupTestEnvironment();
+    await setupTestEnvironment("chief_editor");
     runSharedTests(wrapper);
+  });
+
+  // Reason for this test is to prevent what had to be fixed in 663e4dcaa03da9cafdeaca76f0554432ae923f51.
+  test("Role should be translated even if user of application is no chief editor", async () => {
+    await setupTestEnvironment("editor");
+    expect(wrapper.text()).toContain(t("roleIamChiefEditor"));
   });
 });

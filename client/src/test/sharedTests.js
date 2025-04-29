@@ -20,14 +20,14 @@ const roles = [
 ];
 const networks = ["01", "02"];
 
-const setupSharedTestEnvironment = async (item) => {
+const setupSharedTestEnvironment = async (item, roleOfLoggedInUser) => {
   setActivePinia(createPinia());
   const applicationStore = useApplicationStore();
   applicationStore.processType = "edit";
   applicationStore.managedItem = structuredClone(item);
   applicationStore.savedItem = structuredClone(item);
   const profileStore = useProfileStore();
-  profileStore.setUserData({ role: "chief_editor" });
+  profileStore.setUserData({ role: roleOfLoggedInUser });
 };
 
 // These tests can be run for the components ManageUser and ManageInstitution
