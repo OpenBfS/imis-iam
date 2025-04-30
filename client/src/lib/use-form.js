@@ -206,7 +206,7 @@ export function useForm(i18n) {
    *    (starts with "error-").
    */
   const translateError = (message, parameters) => {
-    let translatedMessage;
+    let translatedMessage = message;
     // Keycloak error is not translated
     if (message.startsWith("error-")) {
       // Need to convert the key from Keycloak because the translation keys use camelCase.
@@ -226,15 +226,6 @@ export function useForm(i18n) {
       translatedMessage = t(translationKey, parameters);
     } else if (message.startsWith("error.")) {
       translatedMessage = t(message, parameters[0]);
-    } else {
-      const triedTranslation = t(`error.${message}`);
-      // If t() returns the translation key the translation was not successful
-      if (triedTranslation !== `error.${message}`) {
-        translatedMessage = triedTranslation;
-      } else {
-        // Fallback
-        translatedMessage = message;
-      }
     }
     return translatedMessage;
   };
