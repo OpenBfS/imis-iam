@@ -15,10 +15,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.keycloak.email.DefaultEmailAuthenticator;
 import org.keycloak.email.DefaultEmailSenderProvider;
+import org.keycloak.email.EmailAuthenticator;
 import org.keycloak.email.EmailException;
+import org.keycloak.email.PasswordAuthEmailAuthenticator;
+import org.keycloak.email.TokenAuthEmailAuthenticator;
 import org.keycloak.email.freemarker.FreeMarkerEmailTemplateProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
@@ -38,6 +41,13 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
 
     private static final String DEFAULT_LOCALE = "de";
 
+
+    private static final Map<EmailAuthenticator.AuthenticatorType, EmailAuthenticator> EMAIL_AUTHENTICATORS = Map.of(
+            EmailAuthenticator.AuthenticatorType.NONE, new DefaultEmailAuthenticator(),
+            EmailAuthenticator.AuthenticatorType.BASIC, new PasswordAuthEmailAuthenticator(),
+            EmailAuthenticator.AuthenticatorType.TOKEN, new TokenAuthEmailAuthenticator()
+    );
+
     DefaultEmailSenderProvider sender;
 
     /**
@@ -46,7 +56,7 @@ public class IamMailTemplateProvider extends FreeMarkerEmailTemplateProvider {
      */
     public IamMailTemplateProvider(KeycloakSession session) {
         super(session);
-        sender = new DefaultEmailSenderProvider(session, new ConcurrentHashMap<>());
+        sender = new DefaultEmailSenderProvider(session, EMAIL_AUTHENTICATORS);
     }
 
     /**

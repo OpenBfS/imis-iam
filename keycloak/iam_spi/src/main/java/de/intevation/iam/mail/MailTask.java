@@ -138,6 +138,7 @@ public class MailTask implements KeycloakSessionTask {
         mailTemplateProvider
                 = new IamMailTemplateProviderFactory().create(session);
         realm = session.realms().getRealmByName(IMIS_REALM);
+        session.getContext().setRealm(realm);
         mailTemplateProvider.setRealm(realm);
         try {
             checkForExpiredAcccounts(session);

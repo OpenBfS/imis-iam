@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,8 +36,12 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.keycloak.connections.jpa.JpaConnectionProvider;
+import org.keycloak.email.DefaultEmailAuthenticator;
+import org.keycloak.email.PasswordAuthEmailAuthenticator;
 import org.keycloak.email.DefaultEmailSenderProvider;
+import org.keycloak.email.EmailAuthenticator;
 import org.keycloak.email.EmailException;
+import org.keycloak.email.TokenAuthEmailAuthenticator;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -61,6 +64,12 @@ public class MailResource {
     private static final Logger LOG = Logger.getLogger("MailProvider");
 
     private static final String FROM_ADDRESS = "from";
+
+    private static final Map<EmailAuthenticator.AuthenticatorType, EmailAuthenticator> EMAIL_AUTHENTICATORS = Map.of(
+        EmailAuthenticator.AuthenticatorType.NONE, new DefaultEmailAuthenticator(),
+        EmailAuthenticator.AuthenticatorType.BASIC, new PasswordAuthEmailAuthenticator(),
+        EmailAuthenticator.AuthenticatorType.TOKEN, new TokenAuthEmailAuthenticator()
+    );
 
     //Keycloak session
     private KeycloakSession session;
@@ -236,7 +245,7 @@ public class MailResource {
             JpaConnectionProvider.class).getEntityManager();
         RealmModel realm = session.getContext().getRealm();
         DefaultEmailSenderProvider senderProvider
-            = new DefaultEmailSenderProvider(session, new ConcurrentHashMap<>());
+            = new DefaultEmailSenderProvider(session, EMAIL_AUTHENTICATORS);
         Map<String, String> smtpConfig = new HashMap<>(realm.getSmtpConfig());
 
         //Update mail object
