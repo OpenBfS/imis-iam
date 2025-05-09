@@ -5,13 +5,13 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { createRouter, createWebHashHistory } from "vue-router";
-import Home from "@/components/Main.vue";
+import Search from "@/components/Search/Search.vue";
 
 const routes = [
   {
     path: "/",
-    name: "home",
-    component: Home,
+    name: "search",
+    component: Search,
   },
 
   {
