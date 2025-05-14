@@ -39,6 +39,27 @@
     },
     "group": "contact"
   }, {
+    "name" : "secondaryEmail",
+    "displayName" : "${profile.attributes.secondaryEmail}",
+    "permissions" : {
+      "view" : [ "admin", "user" ],
+      "edit" : [ "admin", "user" ]
+    },
+    "annotations": {
+      "inputType": "html5-email"
+    },
+    "validations" : {
+      "email" : { },
+      "length" : {
+        "max" : 255
+      },
+      "pattern": {
+        "pattern": "^\\S+@\\S+\\.\\S+$",
+        "error-message": "error.validEmail"
+      }
+    },
+    "group": "contact"
+  }, {
     "name" : "title",
     "displayName" : "${profile.attributes.title}",
     "permissions" : {
