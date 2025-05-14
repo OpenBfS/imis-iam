@@ -7,24 +7,25 @@
  -->
 <template>
   <div id="imis-footer" class="text-caption">
+<!--    
     <a disabled size="small" variant="text"
       >&copy;{{ $t("label.copyright") }}
     </a>
+  -->    
     <a size="small" :href="links.contact" variant="text">{{
-      $t("label.contact")
-    }}</a>
+      $t("label.contact") }}
+    </a>
+<!--    
     <a size="small" :href="links.privacy" variant="text">
-      {{ $t("label.dataPrivacy") }}</a
-    >
+      {{ $t("label.dataPrivacy") }}
+    </a>
     <a size="small" :href="links.accessibility" variant="text">
-      {{ $t("label.accessibility") }}</a
-    >
+      {{ $t("label.accessibility") }}
+    </a>
     <a size="small" :href="links.help" variant="text">
       {{ $t("label.help") }}
     </a>
-    <a size="small" :href="links.socialMedia" variant="text">
-      {{ $t("label.socialMedia") }}
-    </a>
+-->    
   </div>
 </template>
 <style scoped>

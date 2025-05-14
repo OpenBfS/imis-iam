@@ -40,7 +40,6 @@ export const useApplicationStore = defineStore("application", {
       help: import.meta.env.VITE_FOOTER_HELP,
       accessibility: import.meta.env.VITE_FOOTER_ACCESSIBILITY,
       privacy: import.meta.env.VITE_FOOTER_PRIVACY,
-      socialMedia: import.meta.env.VITE_FOOTER_SOCIALMEDIA,
     },
     reportMail: import.meta.env.VITE_REPORT_MAIL,
     ownAccount: false,

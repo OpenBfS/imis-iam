@@ -171,7 +171,6 @@
         <div id="footer-privacy"><a href="${properties.imisFooterPrivacy}">${msg("imisFooterPrivacy")}</a></div>
         <div id="footer-Accessibility"><a href="${properties.imisFooterAccessibility}">${msg("imisFooterAccessibility")}</a></div>
         <div id="footer-help"><a href="${properties.imisFooterHelp}">${msg("imisFooterHelp")}</a></div>
-        <div id="footer-socialMedia"><a href="${properties.imisFooterSocialMedia}">${msg("imisFooterSocialMedia")}</a></div>
     </div>
 </div>
 </body>

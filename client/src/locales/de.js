@@ -18,7 +18,7 @@ export default {
   roleIamChiefEditor: "Chefredakteur",
   // Appbar component
   appbar: {
-    title: "IAM123",
+    title: "IMIS Adressbuch",
     buttonProfile: "Profil",
     buttonLogout: "Abmelden",
     textLogin: "Angemeldet als:",
@@ -239,13 +239,12 @@ export default {
     showInfo: "Info zeigen",
     search: "Suche",
     noDataText: "Keine Daten vorhanden",
-    reportProblem: "Problem melden",
+    reportProblem: "Hilfe",
     accessibility: "Barrierefreiheit",
     help: "Hilfe",
     contact: "Impressum",
     dataPrivacy: "Datenschutz",
     copyright: "Copyrightholder",
-    socialMedia: "Social Media",
     export: "Exportieren",
     actions: "Aktionen",
     attributes: "Attribute",
@@ -268,7 +267,7 @@ export default {
     filters: "Filter",
     sessionExpired: "Sitzung abgelaufen",
     sessionExpiredExplanation:
-      "Laden Sie die Seite neu, um sich erneut anzumelden oder schließen Sie diesen Dialog, z.B. um die Daten in angefangenen Formularen anderweitig zu sichern.",
+      "Bitte laden Sie die Seite neu, um sich erneut anzumelden oder schließen Sie diesen Dialog, z.B. um die Daten in angefangenen Formularen anderweitig zu sichern.",
   },
   // Emails
   emails: {
