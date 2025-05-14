@@ -59,7 +59,9 @@
             <li> ${msg("imisInfo2")}</li>
             <li> ${msg("imisInfo3")}</li>
         </ul>
+<#--
         <a href="${properties.imisInfoUrl!}"> ${msg("imisInfoUrlMsg")}</a>
+-->
     </div>
     <div class="${properties.kcFormCardClass!}">
         <header class="${properties.kcFormHeaderClass!}">
@@ -166,11 +168,15 @@
 
     </div>
     <div id="imis-footer">
+<#--    
         <div id="footer-copyright">${msg("imisFooterCopyright")}</div>
+-->
         <div id="footer-contact"><a href="${properties.imisFooterContact}">${msg("imisFooterContact")}</a></div>
+<#--
         <div id="footer-privacy"><a href="${properties.imisFooterPrivacy}">${msg("imisFooterPrivacy")}</a></div>
         <div id="footer-Accessibility"><a href="${properties.imisFooterAccessibility}">${msg("imisFooterAccessibility")}</a></div>
         <div id="footer-help"><a href="${properties.imisFooterHelp}">${msg("imisFooterHelp")}</a></div>
+-->
     </div>
 </div>
 </body>
