@@ -62,7 +62,7 @@
             </form>
         </#if>
         </div>
-
+<#--
         <#if realm.password && social.providers??>
             <div id="kc-social-providers" class="${properties.kcFormSocialAccountSectionClass!}">
                 <hr/>
@@ -83,7 +83,7 @@
                 </ul>
             </div>
         </#if>
-
+-->
     </div>
 
     <#elseif section = "info" >
