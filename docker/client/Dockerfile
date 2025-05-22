@@ -8,7 +8,7 @@ RUN mkdir -p /usr/share/man/man1/ && apt-get -qq update && apt-get -qq install \
     curl unzip git npm apache2 libapache2-mod-auth-openidc && \
     apt-get -qq clean && rm -rf /var/lib/apt/lists/*
 
-EXPOSE 80
+EXPOSE 443
 
 RUN npm install --global yarn
 
