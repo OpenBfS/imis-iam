@@ -3,7 +3,7 @@ services:
     build:
       context: ../
       dockerfile: ./docker/keycloak/Dockerfile
-    image: "iam_keycloak"
+    image: ${REGISTRY_HOST}imis3/imis-keycloak:${KC_VERSION}
     env_file:
       - keycloak/keycloak.env
       - shared.env
@@ -17,7 +17,7 @@ services:
       dockerfile: ./docker/client/Dockerfile
       args:
         CLIENT_PATH: ${CLIENT_PATH}
-    image: "iam_client"
+    image: ${REGISTRY_HOST}imis3/imis-addressbook:${ABOOK_VERSION}
     depends_on:
       keycloak:
         condition: service_healthy
