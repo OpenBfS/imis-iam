@@ -7,7 +7,7 @@
 export default {
   // For re-use
   userTerm: "IMIS-Nutzer",
-  measFacilIdTerm: "Messstellen-ID",
+  measFacilIdTerm: "Institutions-ID",
   tagTerm: "Kategorie",
   institutions: "Institutionen",
   true: "Ja",
@@ -127,10 +127,10 @@ export default {
     editTitle: "Institution {name}",
     addInstitution: "Institution Hinzufügen",
     noInstitutionsAvailable: "Es sind keine Institutionen vorhanden",
-    name: "Name",
+    name: "Institutionsname",
     fax: "Fax",
     phone: "Telefon",
-    measFacilName: "Messstellen-Bezeichnung",
+    measFacilName: "Kurzbezeichnung",
     network: "Redaktionsbereich",
     serviceBuildingLocation: "Ort des Dienstgebäudes",
     serviceBuildingStreet: "Straße/Hausnummer des Dienstgebäudes",
