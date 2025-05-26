@@ -18,11 +18,11 @@
         @update:modelValue="emit('onSelectedTab', $event)"
       >
         <v-tab value="users"
-          >{{ $t("main.users") }} ({{ userStore.foundUsers.length }})</v-tab
+          >{{ $t("main.users") }} ({{ userStore.totalNumberOfUsers }})</v-tab
         >
         <v-tab value="institutions"
           >{{ $t("institutions") }} ({{
-            institutionStore.foundInstitutions.length
+            institutionStore.totalNumberOfInstitutions
           }})</v-tab
         >
       </v-tabs>
