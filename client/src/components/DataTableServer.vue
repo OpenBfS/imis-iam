@@ -22,11 +22,7 @@
     :items-per-page-text="$t('label.itemsPerPage')"
     :loading="applicationStore.isLoading"
     :no-data-text="props.noDataText"
-    :page-text="`${offset + 1}-${
-      offset + props.itemsPerPage > props.items.length
-        ? offset + props.items.length
-        : offset + props.itemsPerPage
-    } ${$t('label.of')} ${props.totalNumberOfItems}`"
+    :page-text="`${offset + 1}-${getNumberForEndOfRange()} ${$t('label.of')} ${props.totalNumberOfItems}`"
     show-select
     v-model="selected"
     @update:options="updateTable"
@@ -218,4 +214,13 @@ const updateTable = (event) => {
 onMounted(() => {
   getInstitutionTags();
 });
+
+const getNumberForEndOfRange = () => {
+  // -1 means user selected to show all items in the table. Without this case the UI would display
+  // 1--1 of... instead of 1-1...
+  if (props.itemsPerPage === -1) return 1;
+  return props.offset + props.itemsPerPage > props.items.length
+    ? props.offset + props.items.length
+    : props.offset + props.itemsPerPage;
+};
 </script>
