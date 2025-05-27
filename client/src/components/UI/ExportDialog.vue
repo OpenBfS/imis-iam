@@ -126,11 +126,11 @@ const quoteTypes = [
 const rowDelimiters = [
   {
     name: t("export.windows"),
-    value: "\n\r",
+    value: "\r\n",
   },
   {
     name: t("export.linux"),
-    value: "\r",
+    value: "\n",
   },
 ];
 const encoding = ["iso-8859-15", "utf-16", "utf-8", "ascii"];
