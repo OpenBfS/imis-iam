@@ -15,12 +15,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.Locale;
 
+import de.intevation.iam.model.jpa.Institution_;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -110,7 +113,7 @@ public class InstitutionResource {
                 if (field.getType().isAssignableFrom(List.class)
                     || field.getType().isAssignableFrom(Set.class)) {
                     Join<Institution, ?> join = root.join(entry.getKey());
-                    if (Objects.equals(entry.getKey(), "tags")) {
+                    if (Objects.equals(entry.getKey(), Institution_.TAGS)) {
                         predicates.add(cb.like(
                                 cb.lower(join.get("name")),
                                 value));
@@ -223,10 +226,33 @@ public class InstitutionResource {
             query.where(cb.and(getFilterQuery(root, cb, attributes)));
         }
 
-        if (order == SortOrder.asc) {
-            query.orderBy(cb.asc(root.get(sortByAttribute)));
+        Expression<?> orderByExpr;
+
+        // Allow to sort for multi value entries
+        Field field;
+        try {
+            field = Institution.class.getDeclaredField(sortByAttribute);
+        } catch (NoSuchFieldException e) {
+            throw new BadRequestException("sort by field not found");
+        }
+        if (field.getType().isAssignableFrom(List.class)
+                || field.getType().isAssignableFrom(Set.class)) {
+            Join<Institution, ?> join = root.join(sortByAttribute);
+            if (Objects.equals(sortByAttribute, Institution_.TAGS)) {
+                Expression<String> path = join.get("name");
+                orderByExpr = cb.least(path);
+            } else {
+                orderByExpr = cb.least(((JpaExpression) join).cast(String.class));
+            }
         } else {
-            query.orderBy(cb.desc(root.get(sortByAttribute)));
+            orderByExpr = root.get(sortByAttribute);
+        }
+
+        query.groupBy(root.get(Institution_.ID));
+        if (order == SortOrder.asc) {
+            query.orderBy(cb.asc(orderByExpr));
+        } else {
+            query.orderBy(cb.desc(orderByExpr));
         }
 
         List<Institution> result = em.createQuery(query)
@@ -236,7 +262,7 @@ public class InstitutionResource {
         if (size == 0) {
             size = result.size();
         }
-        return new ObjectList<Institution>(size, result);
+        return new ObjectList<>(size, result);
     }
 
     /**
