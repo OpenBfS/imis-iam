@@ -8,7 +8,6 @@ import { defineStore } from "pinia";
 import { createSearchQueryString, HTTP } from "../lib/http.js";
 
 export const useUserStore = defineStore("user", {
-  namespaced: true,
   state: () => ({
     users: [],
     roles: null,

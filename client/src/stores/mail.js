@@ -8,7 +8,6 @@ import { defineStore } from "pinia";
 import { HTTP } from "../lib/http.js";
 
 export const useMailStore = defineStore("mail", {
-  namespaced: true,
   state: () => ({
     mailTypes: [],
   }),

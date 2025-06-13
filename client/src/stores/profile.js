@@ -8,7 +8,6 @@ import { defineStore } from "pinia";
 import { HTTP } from "../lib/http.js";
 
 export const useProfileStore = defineStore("profile", {
-  namespaced: true,
   state: () => ({
     userData: {},
     userProfileMetadata: {},

@@ -9,7 +9,6 @@ import { Promise } from "core-js";
 import { createSearchQueryString, HTTP } from "../lib/http.js";
 
 export const useInstitutionStore = defineStore("institution", {
-  namespaced: true,
   state: () => ({
     //List of institutions
     institutions: [],

@@ -11,7 +11,6 @@ import { nextTick } from "vue";
 import { HTTP } from "@/lib/http";
 
 export const useApplicationStore = defineStore("application", {
-  namespaced: true,
   state: () => ({
     httpErrorMessage: "",
     showExportDialog: false,
