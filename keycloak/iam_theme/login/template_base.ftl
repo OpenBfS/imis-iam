@@ -58,6 +58,7 @@
             <li> ${msg("imisInfo1")}</li>
             <li> ${msg("imisInfo2")}</li>
             <li> ${msg("imisInfo3")}</li>
+            <li> ${msg("imisInfo4")}</li>
         </ul>
 <#--
         <a href="${properties.imisInfoUrl!}"> ${msg("imisInfoUrlMsg")}</a>
