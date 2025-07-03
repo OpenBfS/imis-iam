@@ -81,7 +81,8 @@ public class UserAuthorizer extends Authorizer<User> {
     ) throws AuthorizationException {
         String userNetwork = user.getNetwork();
         String requestingUserNetwork = getRequestingUserNetwork(requestingUser);
-        if (user.isEnabled()
+        if (
+            (user.isEnabled() && !user.isHiddenInAddressbook())
             || IaMRole.EDITOR.isRoleOf(requestingUser, session)
             && requestingUserNetwork != null
             && requestingUserNetwork.equals(userNetwork)

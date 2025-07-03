@@ -53,6 +53,8 @@ public class User {
 
     private boolean enabled;
 
+    private boolean hiddenInAddressbook = false;
+
     /**
      * Empty constructor used by JSON de-/serialization.
      */
@@ -93,6 +95,7 @@ public class User {
             }
 
             this.network = jpaModel.getNetwork();
+            this.hiddenInAddressbook = jpaModel.getHiddenInAddressbook();
         }
     }
 
@@ -101,6 +104,13 @@ public class User {
     }
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isHiddenInAddressbook() {
+        return hiddenInAddressbook;
+    }
+    public void setHiddenInAddressbook(boolean hidden) {
+        this.hiddenInAddressbook = hidden;
     }
 
     public String getId() {
@@ -163,6 +173,7 @@ public class User {
             newInstitutions.addAll(insts);
             jpaUser.setInstitutions(newInstitutions);
         }
+        jpaUser.setHiddenInAddressbook(hiddenInAddressbook);
         return jpaUser;
     }
 }
