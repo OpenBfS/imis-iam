@@ -21,6 +21,7 @@ export default {
     title: "IMIS Adressbuch",
     buttonProfile: "Profil",
     buttonLogout: "Abmelden",
+    buttonChangePassword: "Passwort ändern",
     textLogin: "Angemeldet als:",
   },
   // Applications component

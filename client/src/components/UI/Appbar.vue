@@ -46,6 +46,9 @@
         <v-list-item link @click="editProfile">
           {{ $t("appbar.buttonProfile") }}
         </v-list-item>
+        <v-list-item link @click="changePassword">
+          {{ $t("appbar.buttonChangePassword") }}</v-list-item
+        >
         <v-list-item link @click="logout">
           {{ $t("appbar.buttonLogout") }}</v-list-item
         >
@@ -71,6 +74,12 @@ const savedUser = computed(() => {
 const logout = () => {
   window.location.assign(
     `${import.meta.env.BASE_URL}redirect_uri?logout=${window.location.origin}`,
+  );
+};
+
+const changePassword = () => {
+  window.location.assign(
+    `/realms/imis3/protocol/openid-connect/auth?client_id=iam-client&redirect_uri=${window.location.origin}&response_type=code&kc_action=UPDATE_PASSWORD`,
   );
 };
 
