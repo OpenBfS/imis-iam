@@ -122,11 +122,11 @@ export default {
   },
   // Institutions component
   institution: {
-    export: "Institutionen-Liste exportieren",
-    title: "Institutionen",
+    export: "Exportieren",
+    institutionTitle: "@:institutions",
     createTitle: "Neue Institution erstellen",
     editTitle: "Institution {name}",
-    addInstitution: "Institution Hinzufügen",
+    addInstitution: "Institution hinzufügen",
     noInstitutionsAvailable: "Es sind keine Institutionen vorhanden",
     name: "Institutionsname",
     fax: "Fax",
@@ -184,12 +184,12 @@ export default {
   },
   // Users component
   user: {
-    export: "@:userTerm-Liste exportieren",
+    export: "Exportieren",
     userTitle: "@:userTerm",
     createTitle: "Neuen @:userTerm erstellen",
     editTitle: "@:userTerm {name}",
     institutions: "@:institutions",
-    addUser: "@:userTerm Hinzufügen",
+    addUser: "@:userTerm hinzufügen",
     editMyProfile: "Mein Profil bearbeiten",
     contact: "Kontakt",
     phone: "Telefon",
