@@ -18,7 +18,7 @@ export default {
   roleIamChiefEditor: "Chefredakteur",
   // Appbar component
   appbar: {
-    title: "IMIS Adressbuch",
+    title: "IMIS-Adressbuch",
     buttonProfile: "Profil",
     buttonLogout: "Abmelden",
     buttonChangePassword: "Passwort ändern",
