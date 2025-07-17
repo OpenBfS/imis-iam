@@ -10,6 +10,7 @@
     @keydown.enter="addEntry"
     @keydown.delete="onDelete"
     @keydown.tab="onTab"
+    @blur="addEntry"
     v-model="input"
     ref="textfield"
     :clearable="props.clearable && editable"
