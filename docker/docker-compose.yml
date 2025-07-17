@@ -17,6 +17,7 @@ services:
       dockerfile: ./docker/client/Dockerfile
       args:
         CLIENT_PATH: ${CLIENT_PATH}
+        SESSION_INACTIVITY_TIMEOUT: ${SESSION_INACTIVITY_TIMEOUT}
     image: ${REGISTRY_HOST}imis3/imis-addressbook:${ABOOK_VERSION}
     depends_on:
       keycloak:

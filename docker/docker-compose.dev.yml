@@ -49,6 +49,7 @@ services:
       service: client
     environment:
       - CLIENT_MODE=development
+      - SESSION_INACTIVITY_TIMEOUT=${SESSION_INACTIVITY_TIMEOUT}
     volumes:
       - ./client:/usr/local/iamdocker
       - ../client:/usr/local/iamclient
