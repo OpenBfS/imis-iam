@@ -253,7 +253,8 @@
       "options" : {
         "options" : [ "Leiter", "Vertreter", "Radiologischer Ansprechpartner", "Mitarbeiter", "IT-Ansprechperson", "Störplatz" ]
       }
-    }
+    },
+    "multivalued": true
   }, {
     "name" : "tags",
     "displayName" : "${profile.attributes.tags}",
