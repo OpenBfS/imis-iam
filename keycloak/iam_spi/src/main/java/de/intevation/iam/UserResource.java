@@ -140,7 +140,7 @@ public class UserResource {
 
         Map<String, String> customAttributes = new HashMap<>();
 
-        for (String customAttribute : new String[]{"institutions", "role"}) {
+        for (String customAttribute : new String[]{"institutions", "role", "network"}) {
            String value = attributes.get(customAttribute);
            if (value != null) {
                customAttributes.put(customAttribute, value);
@@ -155,9 +155,11 @@ public class UserResource {
         if (!customAttributes.isEmpty()) {
             String institution = customAttributes.get("institutions");
             String role = customAttributes.get("role");
+            String network = customAttributes.get("network");
             userFilter = u -> (institution == null
                 || u.getInstitutions().contains(institution))
-                && (role == null || u.getRole().equals(role));
+                && (role == null || u.getRole().equals(role))
+                && (network == null || u.getNetwork().contains(network));
         }
 
         List<User> userList = userModels.map(userEntity -> new User(
