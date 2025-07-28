@@ -1,277 +1,415 @@
 {
-  "attributes" : [ {
-    "name": "username",
-    "displayName": "${profile.attributes.username}",
-    "permissions": {
-      "view": ["admin", "user"],
-      "edit": ["admin", "user"]
+  "attributes": [
+    {
+      "name": "username",
+      "displayName": "${profile.attributes.username}",
+      "validations": {
+        "length": {
+          "min": 3,
+          "max": 255
+        },
+        "username-prohibited-characters": {},
+        "up-username-not-idn-homograph": {}
+      },
+      "required": {
+        "roles": [
+          "admin",
+          "user"
+        ]
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "multivalued": false
     },
-    "required" : {
-      "roles" : [ "admin", "user" ]
+    {
+      "name": "email",
+      "displayName": "${profile.attributes.email}",
+      "validations": {
+        "email": {},
+        "length": {
+          "max": 255
+        },
+        "pattern": {
+          "pattern": "^\\S+@\\S+\\.\\S+$",
+          "error-message": "error.validEmail"
+        }
+      },
+      "annotations": {
+        "inputType": "html5-email"
+      },
+      "required": {
+        "roles": [
+          "user"
+        ]
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "contact",
+      "multivalued": false
     },
-    "validations": {
-      "length": { "min": 3, "max": 255 },
-      "username-prohibited-characters": {},
-      "up-username-not-idn-homograph": {}
+    {
+      "name": "secondaryEmail",
+      "displayName": "${profile.attributes.secondaryEmail}",
+      "validations": {
+        "email": {},
+        "length": {
+          "max": 255
+        },
+        "pattern": {
+          "pattern": "^\\S+@\\S+\\.\\S+$",
+          "error-message": "error.validEmail"
+        }
+      },
+      "annotations": {
+        "inputType": "html5-email"
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "contact",
+      "multivalued": false
+    },
+    {
+      "name": "title",
+      "displayName": "${profile.attributes.title}",
+      "validations": {
+        "length": {
+          "min": 2
+        },
+        "pattern": {
+          "pattern": "^\\S.*\\S$",
+          "error-message": "error.noLeadingTrailingSpaces"
+        }
+      },
+      "annotations": {},
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "name",
+      "multivalued": false
+    },
+    {
+      "name": "firstName",
+      "displayName": "${profile.attributes.firstName}",
+      "validations": {
+        "length": {
+          "min": 2,
+          "max": 255
+        },
+        "pattern": {
+          "pattern": "^\\S.*\\S$",
+          "error-message": "error.noLeadingTrailingSpaces"
+        },
+        "person-name-prohibited-characters": {}
+      },
+      "annotations": {
+        "defaultField": "true"
+      },
+      "required": {
+        "roles": [
+          "user"
+        ]
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "name",
+      "multivalued": false
+    },
+    {
+      "name": "lastName",
+      "displayName": "${profile.attributes.lastName}",
+      "validations": {
+        "length": {
+          "min": 2,
+          "max": 255
+        },
+        "pattern": {
+          "pattern": "^\\S.*\\S$",
+          "error-message": "error.noLeadingTrailingSpaces"
+        },
+        "person-name-prohibited-characters": {}
+      },
+      "annotations": {
+        "defaultField": "true"
+      },
+      "required": {
+        "roles": [
+          "user"
+        ]
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "name",
+      "multivalued": false
+    },
+    {
+      "name": "phone",
+      "displayName": "${profile.attributes.phone}",
+      "validations": {
+        "pattern": {
+          "pattern": "^\\+[1-9][0-9]{7,16}$",
+          "error-message": "error.validPhone"
+        }
+      },
+      "annotations": {
+        "inputType": "html5-tel"
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "contact",
+      "multivalued": false
+    },
+    {
+      "name": "mobile",
+      "displayName": "${profile.attributes.mobile}",
+      "validations": {
+        "pattern": {
+          "pattern": "^\\+[1-9][0-9]{7,16}$",
+          "error-message": "error.validMobile"
+        }
+      },
+      "annotations": {
+        "inputType": "html5-tel"
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "contact",
+      "multivalued": false
+    },
+    {
+      "name": "fax",
+      "displayName": "${profile.attributes.fax}",
+      "validations": {
+        "pattern": {
+          "pattern": "^\\+[1-9][0-9]{7,16}$",
+          "error-message": "error.validFax"
+        }
+      },
+      "annotations": {
+        "inputType": "html5-tel"
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "contact",
+      "multivalued": false
+    },
+    {
+      "name": "operationModeChangeMailAddresses",
+      "displayName": "${profile.attributes.operationModeChangeMailAddresses}",
+      "validations": {
+        "email": {},
+        "length": {
+          "max": 255
+        },
+        "pattern": {
+          "pattern": "\\S+@\\S+\\.\\S+",
+          "error-message": "error.validEmail"
+        }
+      },
+      "annotations": {
+        "inputType": "html5-email"
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "operationModeChangeContact",
+      "multivalued": true
+    },
+    {
+      "name": "operationModeChangePhoneNumbers",
+      "displayName": "${profile.attributes.operationModeChangePhoneNumbers}",
+      "validations": {
+        "pattern": {
+          "pattern": "^\\+[1-9][0-9]{7,16}$",
+          "error-message": "error.validPhone"
+        }
+      },
+      "annotations": {
+        "inputType": "html5-tel"
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "operationModeChangeContact",
+      "multivalued": true
+    },
+    {
+      "name": "operationModeChangeSmsPhoneNumbers",
+      "displayName": "${profile.attributes.operationModeChangeSmsPhoneNumbers}",
+      "validations": {
+        "pattern": {
+          "pattern": "^\\+[1-9][0-9]{7,16}$",
+          "error-message": "error.validPhone"
+        }
+      },
+      "annotations": {
+        "inputType": "html5-tel"
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "group": "operationModeChangeContact",
+      "multivalued": true
+    },
+    {
+      "name": "position",
+      "displayName": "${profile.attributes.position}",
+      "validations": {
+        "options": {
+          "options": [
+            "Leitung/Vertretung",
+            "Fachliche Ansprechperson",
+            "Mitarbeitende"
+          ]
+        }
+      },
+      "annotations": {
+        "inputType": "multiselect"
+      },
+      "required": {
+        "roles": [
+          "admin",
+          "user"
+        ]
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "multivalued": true
+    },
+    {
+      "name": "tags",
+      "displayName": "${profile.attributes.tags}",
+      "validations": {
+        "options": {
+          "options": [
+            "AK UN",
+            "IBG",
+            "IBG nachrichtlich",
+            "IMIS-Information",
+            "Kleine Lagen",
+            "Landesadministration IMIS-DokPool",
+            "Messanleitung",
+            "REI-Nutzer",
+            "REI/REA informell",
+            "Schulungsangebote"
+          ]
+        }
+      },
+      "annotations": {
+        "inputType": "multiselect"
+      },
+      "permissions": {
+        "view": [
+          "admin",
+          "user"
+        ],
+        "edit": [
+          "admin",
+          "user"
+        ]
+      },
+      "multivalued": true
     }
-  }, {
-    "name" : "email",
-    "displayName" : "${profile.attributes.email}",
-    "permissions" : {
-      "view" : [ "admin", "user" ],
-      "edit" : [ "admin", "user" ]
-    },
-    "annotations": {
-      "inputType": "html5-email"
-    },
-    "required" : {
-      "roles" : [ "user" ]
-    },
-    "validations" : {
-      "email" : { },
-      "length" : {
-        "max" : 255
-      },
-      "pattern": {
-        "pattern": "^\\S+@\\S+\\.\\S+$",
-        "error-message": "error.validEmail"
-      }
-    },
-    "group": "contact"
-  }, {
-    "name" : "secondaryEmail",
-    "displayName" : "${profile.attributes.secondaryEmail}",
-    "permissions" : {
-      "view" : [ "admin", "user" ],
-      "edit" : [ "admin", "user" ]
-    },
-    "annotations": {
-      "inputType": "html5-email"
-    },
-    "validations" : {
-      "email" : { },
-      "length" : {
-        "max" : 255
-      },
-      "pattern": {
-        "pattern": "^\\S+@\\S+\\.\\S+$",
-        "error-message": "error.validEmail"
-      }
-    },
-    "group": "contact"
-  }, {
-    "name" : "title",
-    "displayName" : "${profile.attributes.title}",
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
-    },
-    "annotations" : { },
-    "validations" : {
-      "length" : {
-        "min" : 2
-      },
-      "pattern": {
-        "pattern": "^\\S.*\\S$",
-        "error-message": "error.noLeadingTrailingSpaces"
-      }
-    },
-    "group": "name"
-  }, {
-    "name" : "firstName",
-    "displayName" : "${profile.attributes.firstName}",
-    "required" : {
-      "roles" : [ "user" ]
-    },
-    "permissions" : {
-      "view" : [ "admin", "user" ],
-      "edit" : [ "admin", "user" ]
-    },
-    "annotations": {
-      "defaultField": "true"
-    },
-    "validations" : {
-      "length" : {
-        "min" : 2,
-        "max" : 255
-      },
-      "pattern": {
-        "pattern": "^\\S.*\\S$",
-        "error-message": "error.noLeadingTrailingSpaces"
-      },
-      "person-name-prohibited-characters" : { }
-    },
-    "group": "name"
-  }, {
-    "name" : "lastName",
-    "displayName" : "${profile.attributes.lastName}",
-    "required" : {
-      "roles" : [ "user" ]
-    },
-    "permissions" : {
-      "view" : [ "admin", "user" ],
-      "edit" : [ "admin", "user" ]
-    },
-    "annotations": {
-      "defaultField": "true"
-    },
-    "validations" : {
-      "length" : {
-        "min" : 2,
-        "max" : 255
-      },
-      "pattern": {
-        "pattern": "^\\S.*\\S$",
-        "error-message": "error.noLeadingTrailingSpaces"
-      },
-      "person-name-prohibited-characters" : { }
-    },
-    "group": "name"
-  }, {
-    "name" : "phone",
-    "displayName" : "${profile.attributes.phone}",
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
-    },
-    "annotations": {
-      "inputType": "html5-tel"
-    },
-    "validations" : {
-      "pattern": {
-        "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.validPhone"
-      }
-    },
-    "group": "contact"
-  }, {
-    "name" : "mobile",
-    "displayName" : "${profile.attributes.mobile}",
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
-    },
-    "annotations": {
-      "inputType": "html5-tel"
-    },
-    "validations" : {
-      "pattern": {
-        "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.validMobile"
-      }
-},
-    "group": "contact"
-  }, {
-    "name" : "fax",
-    "displayName" : "${profile.attributes.fax}",
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
-    },
-    "annotations": {
-      "inputType": "html5-tel"
-    },
-    "validations" : {
-      "pattern": {
-        "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.validFax"
-      }
-    },
-    "group": "contact"
-  }, {
-    "name" : "operationModeChangeMailAddresses",
-    "displayName" : "${profile.attributes.operationModeChangeMailAddresses}",
-    "permissions" : {
-      "view" : [ "admin", "user" ],
-      "edit" : [ "admin", "user" ]
-    },
-    "annotations": {
-      "inputType": "html5-email"
-    },
-    "validations" : {
-      "email" : { },
-      "length" : {
-        "max" : 255
-      },
-      "pattern": {
-        "pattern": "\\S+@\\S+\\.\\S+",
-        "error-message": "error.validEmail"
-      }
-    },
-    "multivalued": true,
-    "group": "operationModeChangeContact"
-  }, {
-    "name" : "operationModeChangePhoneNumbers",
-    "displayName" : "${profile.attributes.operationModeChangePhoneNumbers}",
-    "permissions" : {
-      "view" : [ "admin", "user" ],
-      "edit" : [ "admin", "user" ]
-    },
-    "annotations": {
-      "inputType": "html5-tel"
-    },
-    "validations" : {
-      "pattern": {
-        "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.validPhone"
-      }
-    },
-    "multivalued": true,
-    "group": "operationModeChangeContact"
-  }, {
-    "name" : "operationModeChangeSmsPhoneNumbers",
-    "displayName" : "${profile.attributes.operationModeChangeSmsPhoneNumbers}",
-    "permissions" : {
-      "view" : [ "admin", "user" ],
-      "edit" : [ "admin", "user" ]
-    },
-    "annotations": {
-      "inputType": "html5-tel"
-    },
-    "validations" : {
-      "pattern": {
-        "pattern": "^\\+[1-9][0-9]{7,16}$",
-        "error-message": "error.validPhone"
-      }
-    },
-    "multivalued": true,
-    "group": "operationModeChangeContact"
-  }, {
-    "name" : "position",
-    "displayName" : "${profile.attributes.position}",
-    "required" : {
-      "roles" : [ "admin", "user" ]
-    },
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
-    },
-    "annotations" : {
-      "inputType" : "multiselect"
-    },
-    "validations" : {
-      "options" : {
-        "options" : [ "Leiter", "Vertreter", "Radiologischer Ansprechpartner", "Mitarbeiter", "IT-Ansprechperson", "Störplatz" ]
-      }
-    },
-    "multivalued": true
-  }, {
-    "name" : "tags",
-    "displayName" : "${profile.attributes.tags}",
-    "permissions" : {
-      "edit" : [ "admin", "user" ],
-      "view" : [ "user", "admin" ]
-    },
-    "annotations" : {
-      "inputType" : "multiselect"
-    },
-    "validations" : {
-      "options" : {
-        "options" : [ "AK UN", "BMU Stab A", "BMU Stab S", "BfS Stab L", "BfS Stab M", "IBG", "IBG n", "IMIS informell", "IMIS-Betriebsartenwechsel", "In-Situ", "Kleine Lagen", "Lagezentrum BfS", "Landesadmin", "Messanleitung", "Messstellen Leitung", "NGA", "Plaus", "REI-Nutzer", "REI/REA informell", "SSK", "Schulungsangebote"]
-      }
-    },
-    "multivalued": true
-  } ],
+  ],
   "groups": [
     {
       "name": "name",
