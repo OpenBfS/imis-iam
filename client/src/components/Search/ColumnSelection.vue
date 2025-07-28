@@ -21,13 +21,13 @@
           class="ms-4"
           color="accent"
           icon="mdi-view-column"
+          id="column-selection"
           v-bind="props"
         ></v-btn>
         <v-badge
           inline
           class="position-absolute left-0 top-0"
           color="light-green"
-          id="column-selection"
           :model-value="areFiltersForHiddenColumnsAvailable"
         >
           <template v-slot:badge>
