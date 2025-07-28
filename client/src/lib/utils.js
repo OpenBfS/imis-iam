@@ -30,7 +30,11 @@ const createHeaders = (columns, type) => {
     };
     // This function decides how the values inside an item are displayed in the v-data-server-table.
     header.value = (item) => {
-      if (
+      if (type === "institutions" && headerName === "serviceBuildingState") {
+        const state = structuredClone(item)[headerName]
+        const capitalizedState = state[0].toUpperCase() + state.slice(1)
+        return t(`institution.state${capitalizedState}`)
+      } else if (
         type === "users" &&
         headerName === "role" &&
         structuredClone(item)?.[headerName]
