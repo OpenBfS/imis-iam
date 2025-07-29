@@ -107,7 +107,13 @@ public class InstitutionResource {
                 continue;
             }
 
-            String value = "%" + entry.getValue().toLowerCase() + "%";
+            String value;
+            // Use exact search for tags
+            if (entry.getKey().equals("tags")) {
+                value = entry.getValue().toLowerCase();
+            } else {
+                value = "%" + entry.getValue().toLowerCase() + "%";
+            }
             try {
                 Field field = Institution.class.getDeclaredField(entry.getKey());
                 if (field.getType().isAssignableFrom(List.class)
