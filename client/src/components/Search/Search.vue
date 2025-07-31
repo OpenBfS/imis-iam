@@ -67,7 +67,7 @@
           color="accent"
           class="ms-4"
           v-bind="props"
-          icon="mdi-import"
+          icon="mdi-download"
           @click="
             applicationStore.setlistToExport(selectedTab);
             applicationStore.setShowExportDialog(true);
