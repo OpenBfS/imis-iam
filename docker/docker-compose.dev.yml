@@ -47,6 +47,9 @@ services:
     extends:
       file: docker-compose.yml
       service: client
+    entrypoint:
+      - bash
+      - /usr/local/iamdocker/start.sh
     environment:
       - CLIENT_MODE=development
       - SESSION_INACTIVITY_TIMEOUT=${SESSION_INACTIVITY_TIMEOUT}

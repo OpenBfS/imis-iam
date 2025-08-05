@@ -1,11 +1,13 @@
-FROM debian:bookworm
+ARG DEBIAN_CODENAME=bookworm
+ARG HTTPD_VERSION=2.4
+FROM httpd:${HTTPD_VERSION}-${DEBIAN_CODENAME}
 LABEL maintainer=tom@intevation.de
 
 #
 # Install required packages
 #
-RUN mkdir -p /usr/share/man/man1/ && apt-get -qq update && apt-get -qq install \
-    curl unzip git npm apache2 libapache2-mod-auth-openidc && \
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y npm libapache2-mod-auth-openidc curl && \
     apt-get -qq clean && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 443
@@ -15,11 +17,6 @@ RUN npm install --global yarn
 #
 # httpd setup
 #
-RUN a2enmod -q ssl
-RUN a2enmod -q headers
-RUN a2enmod -q proxy_http
-RUN a2dissite -q 000-default
-
 ENV SRC=/usr/local/iamclient/
 ADD client/package.json client/yarn.lock $SRC
 WORKDIR $SRC
@@ -30,7 +27,8 @@ ARG CLIENT_PATH
 RUN yarn build --base ${CLIENT_PATH} --outDir /var/www${CLIENT_PATH}
 
 ADD docker/client/ /usr/local/iamdocker/
-RUN ln -s /usr/local/iamdocker/client.conf /etc/apache2/sites-enabled/
-RUN ln -s /usr/local/iamdocker/dev.conf /etc/apache2/sites-available/
+RUN sed -i "$ a Include /usr/local/iamdocker/client.conf" /usr/local/apache2/conf/httpd.conf
 
-CMD bash /usr/local/iamdocker/start.sh
+HEALTHCHECK CMD curl --fail ${PROTOCOLL}://${HOSTSERVERNAME}${CLIENT_PATH} || exit 1
+
+CMD ["httpd-foreground"]
