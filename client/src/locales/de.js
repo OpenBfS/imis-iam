@@ -265,6 +265,7 @@ export default {
     of: "von",
     columns: "Spalten",
     columnsSelection: "Spaltenauswahl",
+    deselectAll: "Alle (de)selektieren",
     filters: "Filter",
     sessionExpired: "Sitzung abgelaufen",
     sessionExpiredExplanation:

@@ -45,6 +45,13 @@
         ></v-list-item>
         <v-list-item>
           <v-checkbox
+            ref="allCheckbox"
+            @change="onAllCheckboxChanged"
+            :indeterminate="!allColumnsSelected && !noColumnsSelected"
+            :modelValue="allColumnsSelected"
+            :label="$t('label.deselectAll')"
+          ></v-checkbox>
+          <v-checkbox
             v-for="item in tableHeaders"
             @update:modelValue="
               () => {
@@ -85,12 +92,14 @@
 import { computed, nextTick, ref } from "vue";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
+import { deselectAllColumns, selectAllColumns } from "@/lib/utils";
 
 const props = defineProps(["type"]);
 
 const institutionStore = useInstitutionStore();
 const userStore = useUserStore();
 
+const allCheckbox = ref(null);
 const areTableSettingsOpen = ref(false);
 
 const tableHeaders = computed(() => {
@@ -100,6 +109,38 @@ const tableHeaders = computed(() => {
     return institutionStore.tableHeaders;
   }
 });
+
+const selectedTableHeaders = computed(() => {
+  return props.type === "users"
+    ? userStore.selectedTableColumns
+    : institutionStore.selectedTableColumns;
+});
+
+const allColumnsSelected = computed(() => {
+  return selectedTableHeaders.value.length === tableHeaders.value.length;
+});
+
+const noColumnsSelected = computed(() => {
+  return selectedTableHeaders.value.length === 0;
+});
+
+const onAllCheckboxChanged = (event) => {
+  if (allCheckbox.value.$props.indeterminate) {
+    selectAll();
+  } else if (allCheckbox.value.$props.modelValue) {
+    deselectAll();
+  } else {
+    selectAll();
+  }
+};
+
+const selectAll = () => {
+  selectAllColumns(props.type);
+};
+
+const deselectAll = () => {
+  deselectAllColumns(props.type)
+};
 
 const getFilterValue = (key) => {
   return getFilters()?.[key];

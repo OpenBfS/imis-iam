@@ -6,6 +6,7 @@
  */
 
 import i18n from "@/i18n";
+import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user.js";
 
 const { t } = i18n.global;
@@ -59,6 +60,31 @@ const createHeaders = (columns, type) => {
   return newHeaders;
 };
 
+const initSelectedColumns = (type) => {
+  const store = type === "users" ? useUserStore() : useInstitutionStore();
+  store.selectedTableColumns = store.tableHeaders
+    .filter((header) => header.visible === true)
+    .map((header) => {
+      return header.key;
+    });
+};
+
+const deselectAllColumns = (type) => {
+  const store = type === "users" ? useUserStore() : useInstitutionStore();
+  store.selectedTableColumns = [];
+  store.tableHeaders.forEach((header) => {
+    header.visible = false;
+  });
+};
+
+const selectAllColumns = (type) => {
+  const store = type === "users" ? useUserStore() : useInstitutionStore();
+  store.selectedTableColumns = store.tableHeaders.map((header) => {
+    header.visible = true;
+    return header.key;
+  });
+};
+
 // Format and translate values where necessary.
 function createLabelForTableCell(value) {
   if (value === undefined) return;
@@ -73,4 +99,9 @@ function createLabelForTableCell(value) {
   return value;
 }
 
-export { createHeaders };
+export {
+  createHeaders,
+  initSelectedColumns,
+  deselectAllColumns,
+  selectAllColumns,
+};

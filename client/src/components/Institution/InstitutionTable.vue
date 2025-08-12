@@ -57,7 +57,7 @@ import { useProfileStore } from "@/stores/profile.js";
 import DataTableServer from "@/components/DataTableServer.vue";
 import { getExpInstitution } from "@/components/Institution/institution.js";
 import { onMounted } from "vue";
-import { createHeaders } from "@/lib/utils";
+import { createHeaders, initSelectedColumns } from "@/lib/utils";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -83,5 +83,6 @@ onMounted(() => {
     };
   });
   institutionStore.tableHeaders = createHeaders(columns, "institutions");
+  initSelectedColumns("institutions");
 });
 </script>
