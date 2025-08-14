@@ -21,6 +21,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.ws.rs.BadRequestException;
@@ -243,7 +244,7 @@ public class InstitutionResource {
         }
         if (field.getType().isAssignableFrom(List.class)
                 || field.getType().isAssignableFrom(Set.class)) {
-            Join<Institution, ?> join = root.join(sortByAttribute);
+            Join<Institution, ?> join = root.join(sortByAttribute, JoinType.LEFT);
             if (Objects.equals(sortByAttribute, Institution_.TAGS)) {
                 Expression<String> path = join.get("name");
                 orderByExpr = cb.least(path);
