@@ -26,5 +26,5 @@ services:
       - ${PORT}:${PORT}
     env_file:
       - shared.env
-    environment:
-      - PHOTON_URL=https://osm.bfs.de/photon
+#    environment:
+#     - PHOTON_URL=http://example.com/
