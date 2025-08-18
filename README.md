@@ -1,7 +1,7 @@
 # Identity management for IMIS applications
 
-This application serves as central identity management for the IMIS
-("Integriertes Mess- und Informationssystem") applications of the
+This application serves as central identity and access management for the IMIS
+("Integrated Measuring and Information System for the Surveillance of Environmental Radioactivity") applications of the
 German Federal Office for Radiation Protection.
 
 
