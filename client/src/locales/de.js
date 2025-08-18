@@ -159,7 +159,7 @@ export default {
     xCoordinate: "X-Koordinate",
     yCoordinate: "Y-Koordinate",
     serviceBuildingState: "Bundesland",
-    stateBadenWuerttemberg: "Baden Würtemberg",
+    stateBadenWuerttemberg: "Baden-Württemberg",
     stateBavaria: "Bayern",
     stateBerlin: "Berlin",
     stateBrandenburg: "Brandenburg",
@@ -265,7 +265,7 @@ export default {
     of: "von",
     columns: "Spalten",
     columnsSelection: "Spaltenauswahl",
-    deselectAll: "Alle (ab)abwählen",
+    deselectAll: "Alle (ab)wählen",
     filters: "Filter",
     sessionExpired: "Sitzung abgelaufen",
     sessionExpiredExplanation:
