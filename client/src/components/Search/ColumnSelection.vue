@@ -160,6 +160,8 @@ const getColumnCheckboxLabel = (key) => {
     }
   } else if (["active", "enabled"].includes(key)) {
     return t(`${value}`);
+  } else if (key === "serviceBuildingState") {
+    return t(`institution.state${value}`);
   } else {
     return value;
   }
