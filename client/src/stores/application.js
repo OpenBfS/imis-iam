@@ -33,6 +33,7 @@ export const useApplicationStore = defineStore("application", {
     showManageUserDialog: false,
     showManageInstitutionDialog: false,
     showSessionExpiredDialog: false,
+    showInfoDialog: false,
     processType: "",
     footerLinks: {
       contact: import.meta.env.VITE_FOOTER_CONTACT,

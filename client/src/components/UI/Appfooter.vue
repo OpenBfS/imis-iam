@@ -6,8 +6,8 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <div id="imis-footer" class="text-caption">
-    <!--    
+  <div id="imis-footer" class="text-caption py-1">
+    <!--
     <a disabled size="small" variant="text"
       >&copy;{{ $t("label.copyright") }}
     </a>
@@ -15,7 +15,10 @@
     <a size="small" :href="links.contact" variant="text"
       >{{ $t("label.contact") }}
     </a>
-    <!--    
+    <v-btn @click="openInfoDialog" size="x-small" class="mx-2">
+      {{ $t("label.info") }}
+    </v-btn>
+    <!--
     <a size="small" :href="links.privacy" variant="text">
       {{ $t("label.dataPrivacy") }}
     </a>
@@ -63,11 +66,15 @@ export default {
     const links = computed(() => {
       return applicationStore.footerLinks;
     });
+    const openInfoDialog = () => {
+      applicationStore.showInfoDialog = true;
+    };
     onMounted(() => {
       links.value;
     });
     return {
       links,
+      openInfoDialog,
     };
   },
 };

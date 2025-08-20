@@ -244,6 +244,7 @@ export default {
     accessibility: "Barrierefreiheit",
     help: "Hilfe",
     contact: "Impressum",
+    info: "Info",
     dataPrivacy: "Datenschutz",
     copyright: "Copyrightholder",
     export: "Exportieren",

@@ -34,6 +34,9 @@
           <v-dialog v-model="applicationStore.showSessionExpiredDialog">
             <SessionExpiredDialog />
           </v-dialog>
+          <v-dialog v-model="applicationStore.showInfoDialog">
+            <InfoDialog />
+          </v-dialog>
         </v-main>
       </div>
       <Appfooter />
