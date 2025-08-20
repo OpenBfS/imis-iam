@@ -93,6 +93,9 @@ import { computed, nextTick, ref } from "vue";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
 import { deselectAllColumns, selectAllColumns } from "@/lib/utils";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps(["type"]);
 
@@ -150,6 +153,13 @@ const getColumnCheckboxLabel = (key) => {
   const value = getFilterValue(key);
   if (value === undefined) {
     return "";
+  } else if (key === "role") {
+    const role = userStore.roles.find((r) => r.name === value);
+    if (role) {
+      return t(role.description);
+    }
+  } else if (["active", "enabled"].includes(key)) {
+    return t(`${value}`);
   } else {
     return value;
   }
