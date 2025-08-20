@@ -28,6 +28,7 @@ import de.intevation.iam.util.RequestMethod;
 public class UserAuthorizer extends Authorizer<User> {
 
     private static final String ENABLED_ATTRIBUTE_KEY = "enabled";
+    private static final String HIDDEN_IN_ADDRESSBOOK_KEY = "hiddenInAddressbook";
     private static final String ROLE_ATTRIBUTE_KEY = "role";
     private static final String NETWORK_ATTRIBUTE_KEY = "network";
     private static final String TAGS_ATTRIBUTE_KEY = "tags";
@@ -38,6 +39,7 @@ public class UserAuthorizer extends Authorizer<User> {
     private static final List<String> PRIVILEGED_ATTR =
         List.of(
             ENABLED_ATTRIBUTE_KEY,
+            HIDDEN_IN_ADDRESSBOOK_KEY,
             ROLE_ATTRIBUTE_KEY,
             NETWORK_ATTRIBUTE_KEY,
             TAGS_ATTRIBUTE_KEY

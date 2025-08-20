@@ -17,6 +17,7 @@ const expUser = {
   role: null,
   network: null,
   enabled: false,
+  hiddenInAddressbook: false,
 };
 
 function getExpUser() {

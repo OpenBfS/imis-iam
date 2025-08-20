@@ -46,11 +46,16 @@
           <template v-if="header.key === 'active' || header.key === 'enabled'">
             <Filter
               :filterKey="header.key"
-              :items="[
-                { title: t('true'), value: 'true' },
-                { title: t('false'), value: 'false' },
-              ]"
+              :items="booleanFilterItems"
               :label="$t('user.enabled')"
+              :type="props.type"
+            ></Filter>
+          </template>
+          <template v-if="header.key === 'hiddenInAddressbook'">
+            <Filter
+              :filterKey="header.key"
+              :items="booleanFilterItems"
+              :label="$t('user.hiddenInAddressbook')"
               :type="props.type"
             ></Filter>
           </template>
@@ -151,6 +156,11 @@ const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
+
+const booleanFilterItems = [
+  { title: t("true"), value: "true" },
+  { title: t("false"), value: "false" },
+];
 
 const actionHeader = {
   title: t("label.actions"),

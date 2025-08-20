@@ -42,11 +42,19 @@
                   "
                 ></TextField>
               </v-col>
-              <v-col>
+              <v-col cols="2">
                 <Checkbox
                   attribute="enabled"
                   :label="$t('user.enabled')"
                   v-model="user.enabled"
+                  :disabled="profileStore.userData.role !== 'chief_editor'"
+                ></Checkbox>
+              </v-col>
+              <v-col>
+                <Checkbox
+                  attribute="hiddenInAddressbook"
+                  :label="$t('user.hiddenInAddressbook')"
+                  v-model="user.hiddenInAddressbook"
                   :disabled="profileStore.userData.role !== 'chief_editor'"
                 ></Checkbox>
               </v-col>

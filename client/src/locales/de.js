@@ -206,6 +206,7 @@ export default {
     name: "Name",
     username: "IMIS-Kennung",
     enabled: "Aktiviert",
+    hiddenInAddressbook: "Versteckt",
     position: "Position",
     misc: "Weiteres",
     tags: "E-Mail-Verteiler",
