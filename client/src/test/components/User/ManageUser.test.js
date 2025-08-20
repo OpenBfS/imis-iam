@@ -117,7 +117,7 @@ describe("Test ManageUser", () => {
 
   test("First name is displayed in respective input", async () => {
     expect(wrapper.get("input[name='firstName']").element.value).toBe(
-      firstName
+      firstName,
     );
   });
 
@@ -156,7 +156,7 @@ describe("Test ManageUser", () => {
     // input element (which is "").
     // It can be found in a <div> which is a sibling of the input.
     expect(
-      wrapper.get("input[name='role']").element.parentElement.textContent
+      wrapper.get("input[name='role']").element.parentElement.textContent,
     ).toContain(t(roles.filter((r) => r.name === user.role)[0].description));
     expect(selectContainer.textContent).toContain(errors[0].message);
     const editedUser = structuredClone(user);

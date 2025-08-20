@@ -301,7 +301,8 @@ export default {
   },
   search: {
     editTags: "E-Mail-Verteiler bearbeiten",
-    editTags_institutions: "@:tagTerm{'n'} der ausgewählten Institutionen bearbeiten",
+    editTags_institutions:
+      "@:tagTerm{'n'} der ausgewählten Institutionen bearbeiten",
     editTags_users: "E-Mail-Verteiler der ausgewählten Nutzer bearbeiten",
     didntRemove:
       "Der Tag '{tag}' wurde nicht entfernt, da {type} mindestens einen Tag besitzen müssen.",

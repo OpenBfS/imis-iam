@@ -142,7 +142,7 @@ const selectAll = () => {
 };
 
 const deselectAll = () => {
-  deselectAllColumns(props.type)
+  deselectAllColumns(props.type);
 };
 
 const getFilterValue = (key) => {

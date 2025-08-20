@@ -93,7 +93,7 @@ export function useForm(i18n) {
   const resetForm = async (
     originalObject,
     changedObject,
-    resetNotificationCallback
+    resetNotificationCallback,
   ) => {
     const applicationStore = useApplicationStore();
     if (resetNotificationCallback) resetNotificationCallback();
@@ -163,7 +163,7 @@ export function useForm(i18n) {
       () => applicationStore.attributesOfFieldsThatChanged,
       () => {
         updateHasNoChange(originalObject, changedObject);
-      }
+      },
     );
     watch(changedObject, () => {
       updateHasNoChange(originalObject, changedObject);
@@ -217,7 +217,7 @@ export function useForm(i18n) {
           const charAfterDash = translationKey.charAt(index + 1);
           translationKey = translationKey.replace(
             `-${charAfterDash}`,
-            charAfterDash.toUpperCase()
+            charAfterDash.toUpperCase(),
           );
         }
         index = translationKey.indexOf("-");
@@ -248,7 +248,7 @@ export function useForm(i18n) {
       const message = errorObject.message;
       const translatedMessage = translateError(
         message,
-        errorObject.messageParameters
+        errorObject.messageParameters,
       );
       // Create rules that can be used by the validation mechanism of Vuetify.
       applicationStore.serverValidationRules[attribute] = () => {
@@ -278,12 +278,12 @@ export function useForm(i18n) {
         applicationStore.clientAndServerRules[key] = [];
       }
       applicationStore.clientAndServerRules[key].push(
-        applicationStore.serverValidationRules[key]
+        applicationStore.serverValidationRules[key],
       );
     });
     Object.keys(applicationStore.clientRules).forEach((key) => {
       applicationStore.clientAndServerRules[key].push(
-        ...applicationStore.clientRules[key]
+        ...applicationStore.clientRules[key],
       );
     });
   };
@@ -294,12 +294,12 @@ export function useForm(i18n) {
     applicationStore.clientAndServerRules[attribute] = [];
     if (applicationStore.clientRules[attribute]) {
       applicationStore.clientAndServerRules[attribute].push(
-        ...applicationStore.clientRules[attribute]
+        ...applicationStore.clientRules[attribute],
       );
     }
     if (applicationStore.serverValidationRules[attribute]) {
       applicationStore.clientAndServerRules[attribute].push(
-        applicationStore.serverValidationRules[attribute]
+        applicationStore.serverValidationRules[attribute],
       );
     }
   };

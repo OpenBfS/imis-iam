@@ -46,7 +46,7 @@ const runSharedTests = async (wrapper) => {
   // When we search one that contains "phone" in the label we know that we can add a valid phone number.
   const allChipTextFields = wrapper.findAllComponents(ChipTextField);
   const chipTextField = allChipTextFields.find((field) =>
-    field.text().includes(t("institution.phone"))
+    field.text().includes(t("institution.phone")),
   );
   const plusButton = chipTextField.find('[data-test="plusButton"]');
 

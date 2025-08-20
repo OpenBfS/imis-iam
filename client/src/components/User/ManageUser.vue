@@ -343,16 +343,18 @@ const processType = computed(() => {
   return applicationStore.processType;
 });
 const userRoles = computed(() => {
-  return userStore.roles?.map((item) => {
-    const newItem = structuredClone(item)
-    newItem.props = {};
-    // Only allow 'chief_editor' to grant roles other than 'user'
-    newItem.props.disabled =
-      item.name !== "user" && profileStore.userData.role !== "chief_editor";
-    // If available, use description field for localization
-    newItem.title = item.description ? t(item.description) : item.name;
-    return newItem;
-  }) ?? [];
+  return (
+    userStore.roles?.map((item) => {
+      const newItem = structuredClone(item);
+      newItem.props = {};
+      // Only allow 'chief_editor' to grant roles other than 'user'
+      newItem.props.disabled =
+        item.name !== "user" && profileStore.userData.role !== "chief_editor";
+      // If available, use description field for localization
+      newItem.title = item.description ? t(item.description) : item.name;
+      return newItem;
+    }) ?? []
+  );
 });
 // Deep Copy for objects
 const cloneObject = (obj) => {
@@ -407,9 +409,11 @@ const isReadOnly = computed(() => {
   if (applicationStore.ownAccount) {
     return false;
   }
-  return !profileStore.isAllowedToManage ||
-  (profileStore.userData.role !== 'chief_editor' &&
-    user.value.network !== profileStore.userData.network) ;
+  return (
+    !profileStore.isAllowedToManage ||
+    (profileStore.userData.role !== "chief_editor" &&
+      user.value.network !== profileStore.userData.network)
+  );
 });
 
 // Necessary so tests are able to access exactly these instances used in this component.

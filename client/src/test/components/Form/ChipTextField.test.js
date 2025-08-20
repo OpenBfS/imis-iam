@@ -71,7 +71,7 @@ test("Test ChipTextField", async () => {
   // automatically calls rules when the input is changed.
   expect(propRuleSpy.mock.calls.length).toBeGreaterThan(callCountPropRule + 1);
   expect(clientRuleSpy.mock.calls.length).toBeGreaterThan(
-    callCountClientRule + 1
+    callCountClientRule + 1,
   );
 
   await inputField.setValue("b");

@@ -30,7 +30,7 @@ test("Test axios request options", () => {
     .catch((e) => {
       // An AxiousError means that the options passed to get() are not alright. If it's not an AxiosError
       // it is the error thrown by us which we can ignore.
-      expect(e.name).not.toBe("AxiosError")
+      expect(e.name).not.toBe("AxiosError");
     });
 });
 

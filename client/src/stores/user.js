@@ -46,7 +46,8 @@ export const useUserStore = defineStore("user", {
           : {
               search: createSearchQueryString(searchString, this.filterBy),
               firstResult: this.offset,
-              maxResults: this.itemsPerPage !== -1 ? this.itemsPerPage : undefined,
+              maxResults:
+                this.itemsPerPage !== -1 ? this.itemsPerPage : undefined,
               sortBy: this.sortBy?.key,
               order: this.sortBy?.order,
             };

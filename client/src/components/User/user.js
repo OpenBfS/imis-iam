@@ -25,7 +25,7 @@ function getExpUser() {
   const user = structuredClone(expUser);
   user.network = toRaw(profileStore.userData.network);
   user.role = toRaw(userStore.roles)?.find(
-    (role) => role.name === "user"
+    (role) => role.name === "user",
   )?.name;
   return user;
 }
