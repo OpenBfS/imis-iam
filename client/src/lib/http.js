@@ -63,6 +63,16 @@ const paramsSerializer = {
   },
 };
 
+// Escape characters that would be interpreted falsely in an URL
+// Explanation: https://stackoverflow.com/questions/10772066/escaping-special-character-in-a-url/20873310#20873310
+const escapeSpecialCharacters = (text) => {
+  const regex = /[":/?#\]@!$&'()*+,;=]{1}/g;
+  const result = text.replaceAll(regex, (match) => {
+    return `\\${match}`;
+  });
+  return result;
+};
+
 /**
  * Creates a query parameter like this:
  * "search=search:searchTerm firstName:Jane lastName:Doe"
@@ -79,9 +89,13 @@ function createSearchQueryString(searchTerm, filters) {
     searchQueryString = searchQueryString.concat(" ");
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
-    searchQueryString = searchQueryString.concat(`${key}:"${filters[key]}"`);
-    if (i < keys.length - 1) {
-      searchQueryString = searchQueryString.concat(" ");
+    if (filters[key]) {
+      searchQueryString = searchQueryString.concat(
+        `${key}:"${escapeSpecialCharacters(filters[key])}"`
+      );
+      if (i < keys.length - 1) {
+        searchQueryString = searchQueryString.concat(" ");
+      }
     }
   }
   return searchQueryString;
@@ -89,6 +103,7 @@ function createSearchQueryString(searchTerm, filters) {
 
 export {
   createSearchQueryString,
+  escapeSpecialCharacters,
   handleError,
   HTTP,
   PhotonHTTP,

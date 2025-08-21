@@ -6,7 +6,7 @@
  */
 import { setActivePinia, createPinia } from "pinia";
 import { useApplicationStore } from "@/stores/application";
-import { handleError } from "@/lib/http";
+import { createSearchQueryString, handleError } from "@/lib/http";
 import { test, expect } from "vitest";
 import axios from "axios";
 import { paramsSerializer } from "@/lib/http";
@@ -75,4 +75,18 @@ test("Test error handling", () => {
   error.request = undefined;
   handleError(error);
   expect(applicationStore.httpErrorMessage).toBe("Error" + message);
+});
+
+test("Encode params in URL", () => {
+  const filters = {
+    institutions: `Anführungs " zeichen`,
+    maxResults: "25",
+    sortBy: undefined,
+    order: undefined,
+  }
+  const params = {
+    search: createSearchQueryString("", filters),
+  }
+  const serializedQueryString = paramsSerializer.serialize(params)
+  expect(serializedQueryString).toBe("search=institutions%3A%22Anf%C3%BChrungs%20%5C%22%20zeichen%22%20maxResults%3A%2225%22%20");
 });
