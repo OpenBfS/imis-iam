@@ -51,7 +51,7 @@
               :type="props.type"
             ></Filter>
           </template>
-          <template v-if="header.key === 'hiddenInAddressbook'">
+          <template v-else-if="header.key === 'hiddenInAddressbook'">
             <Filter
               :filterKey="header.key"
               :items="booleanFilterItems"
