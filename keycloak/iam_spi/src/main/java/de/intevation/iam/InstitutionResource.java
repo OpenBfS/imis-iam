@@ -441,7 +441,7 @@ public class InstitutionResource {
         CriteriaQuery<InstitutionTag> query
             = cb.createQuery(InstitutionTag.class);
         Root<InstitutionTag> root = query.from(InstitutionTag.class);
-        query.select(root);
+        query.select(root).orderBy(cb.asc(root.get("name")));
         return em.createQuery(query).getResultList();
     }
 

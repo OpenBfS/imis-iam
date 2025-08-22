@@ -62,7 +62,7 @@
           <template v-else-if="header.key === 'institutions'">
             <Filter
               :filterKey="header.key"
-              :items="institutionStore.institutions"
+              :items="institutionStore.institutions?.sort()"
               item-title="name"
               item-value="name"
               :label="$t('user.institutions')"

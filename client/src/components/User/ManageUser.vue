@@ -120,7 +120,7 @@
                   :clearable="profileStore.isAllowedToManage"
                   :no-data-text="$t('label.noDataText')"
                   :label="$t('user.institutions')"
-                  :items="institutionStore.institutions"
+                  :items="institutionStore.institutions?.sort()"
                   v-model="user.institutions"
                   item-title="name"
                   item-value="name"
