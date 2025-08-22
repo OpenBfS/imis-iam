@@ -53,7 +53,7 @@ export const useProfileStore = defineStore("profile", {
         );
     },
     isChiefEditor: (state) => {
-      return state.userData.roles === "chief_editor";
+      return state.userData.role === "chief_editor";
     },
   },
   actions: {

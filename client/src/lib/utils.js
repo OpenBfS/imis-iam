@@ -7,16 +7,22 @@
 
 import i18n from "@/i18n";
 import { useInstitutionStore } from "@/stores/institution";
+import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user.js";
 
 const { t } = i18n.global;
 
 // Creates headers that can be inserted into a Vuetify table.
 const createHeaders = (columns, type) => {
+  const profileStore = useProfileStore();
   const userStore = useUserStore();
   const newHeaders = [];
-  columns.forEach((column) => {
+  for(let i = 0; i < columns.length; i++) {
+    const column = columns[i];
     const headerName = column.name;
+    if (headerName === "hiddenInAddressbook" && !profileStore.isChiefEditor) {
+      continue;
+    }
     const translationPrefix = type === "users" ? "user" : "institution";
     const translationKey =
       headerName === "name"
@@ -56,7 +62,7 @@ const createHeaders = (columns, type) => {
       return createLabelForTableCell(structuredClone(value), t);
     };
     newHeaders.push(header);
-  });
+  }
   return newHeaders;
 };
 

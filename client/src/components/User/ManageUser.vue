@@ -50,12 +50,11 @@
                   :disabled="profileStore.userData.role !== 'chief_editor'"
                 ></Checkbox>
               </v-col>
-              <v-col>
+              <v-col v-if="profileStore.userData.role === 'chief_editor'">
                 <Checkbox
                   attribute="hiddenInAddressbook"
                   :label="$t('user.hiddenInAddressbook')"
                   v-model="user.hiddenInAddressbook"
-                  :disabled="profileStore.userData.role !== 'chief_editor'"
                 ></Checkbox>
               </v-col>
             </v-row>
