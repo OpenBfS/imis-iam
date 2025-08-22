@@ -185,7 +185,7 @@
     "email" : "example@chefredakteur.com",
     "attributes" : {
       "mobile" : [ "+49654321" ],
-      "position" : [ "Leiter" ],
+      "position" : [ "Leitung/Vertretung" ],
       "fax" : [ "+49123654" ],
       "phone" : [ "+491234123456" ],
       "tags" : [ "AK UN" ]
@@ -206,7 +206,7 @@
     "email" : "example@user.com",
     "attributes" : {
       "mobile" : [ "+49654321" ],
-      "position" : [ "Leiter" ],
+      "position" : [ "Mitarbeitende" ],
       "fax" : [ "+49123654" ],
       "phone" : [ "+491234123456" ],
       "tags" : [ "AK UN" ]
@@ -227,7 +227,7 @@
     "email" : "example@redakteur.com",
     "attributes" : {
       "mobile" : [ "+49654321" ],
-      "position" : [ "Leiter" ],
+      "position" : [ "Leitung/Vertretung" ],
       "fax" : [ "+49123654" ],
       "phone" : [ "+491234123456" ],
       "tags" : [ "AK UN" ]
