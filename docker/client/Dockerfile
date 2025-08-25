@@ -24,7 +24,8 @@ RUN yarn install
 
 ADD client $SRC
 ARG CLIENT_PATH
-RUN yarn build --base ${CLIENT_PATH} --outDir /var/www${CLIENT_PATH}
+ARG REPORT_MAIL="IMIS-Hotline <imisnotifications@example.test>"
+RUN VITE_REPORT_MAIL="${REPORT_MAIL}" yarn build --base ${CLIENT_PATH} --outDir /var/www${CLIENT_PATH}
 
 ADD docker/client/ /usr/local/iamdocker/
 RUN sed -i "$ a Include /usr/local/iamdocker/client.conf" /usr/local/apache2/conf/httpd.conf

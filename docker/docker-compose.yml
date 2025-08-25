@@ -18,6 +18,7 @@ services:
       args:
         CLIENT_PATH: ${CLIENT_PATH}
         SESSION_INACTIVITY_TIMEOUT: ${SESSION_INACTIVITY_TIMEOUT}
+        REPORT_MAIL: ${REPORT_MAIL}
     image: ${REGISTRY_HOST}imis3/imis-addressbook:${ABOOK_VERSION}
     depends_on:
       keycloak:
