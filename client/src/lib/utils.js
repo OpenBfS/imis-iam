@@ -39,6 +39,7 @@ const createHeaders = (columns, type) => {
     header.value = (item) => {
       if (type === "institutions" && headerName === "serviceBuildingState") {
         const state = structuredClone(item)[headerName];
+        if (!state) return "";
         const capitalizedState = state[0].toUpperCase() + state.slice(1);
         return t(`institution.state${capitalizedState}`);
       } else if (
