@@ -79,7 +79,7 @@ public class ExportResource {
                 users.add(userProvider.getUserById(id));
             }
         } else {
-            users = userProvider.getUsers(search, null, null)
+            users = userProvider.getUsers(search, null, null, null, null)
                 .getList();
         }
         return doExport(exporter, users, attributes);

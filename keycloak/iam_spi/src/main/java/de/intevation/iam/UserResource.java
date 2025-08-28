@@ -18,6 +18,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.intevation.iam.util.SearchQueryUtils;
+import de.intevation.iam.util.SortUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.BadRequestException;
@@ -56,10 +58,14 @@ import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
-import org.keycloak.utils.SearchQueryUtils;
 
 
 public class UserResource {
+
+    public enum SortOrder {
+        asc,
+        desc
+    }
 
     private KeycloakSession session;
 
@@ -111,10 +117,88 @@ public class UserResource {
     }
 
     /**
+     * Converts a List<List<User>> to a List<User>, keeping only users
+     * that are present in every inner list.
+     *
+     * @param listOfLists The input List<List<User>>.
+     * @return A new List<User> containing only the users common to all inner lists.
+     */
+    public static List<User> getCommonUsers(List<List<User>> listOfLists) {
+        if (listOfLists == null || listOfLists.isEmpty()) {
+            return List.of();
+        }
+
+        // Create mutable copy
+        List<List<User>> mutableList = new ArrayList<>();
+        for (List<User> users : listOfLists) {
+            mutableList.add(new ArrayList<>(users));
+        }
+
+        Map<String, User> allUsers = new HashMap<>();
+        for (List<User> users : mutableList) {
+            for (int i = 0; i < users.size(); i++) {
+                User user = users.get(i);
+                if (!allUsers.containsKey(user.getId())) {
+                    allUsers.put(user.getId(), user);
+                } else {
+                    users.set(i, allUsers.get(user.getId()));
+                }
+            }
+        }
+
+        long numberOfLists = mutableList.size();
+
+        return mutableList.stream()
+                .flatMap(List::stream)
+                .collect(Collectors.groupingBy(user -> user, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() == numberOfLists)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Transforms a Map of String keys and List<String> values into a List of
+     * Maps, where each inner Map represents a "row" of data.
+     *
+     * @param map The input map where keys are column names and values are lists
+     * of data for each column.
+     * @return A list of maps, where each map contains one item for each key from
+     * the input map, representing a single row. If the input map is null
+     * or empty, an empty list is returned.
+     */
+    private static List<Map<String, String>> splitMap(Map<String, List<String>> map) {
+        if (map == null || map.isEmpty()) {
+            List<Map<String, String>> list = new ArrayList<>();
+            list.add(new HashMap<>());
+            return list;
+        }
+
+        int minSize = Integer.MAX_VALUE;
+        for (List<String> list : map.values()) {
+            if (list.size() < minSize) {
+                minSize = list.size();
+            }
+        }
+        List<Map<String, String>> ret = new ArrayList<>();
+        for (int index = 0; index < minSize; index++) {
+            Map<String, String> row = new HashMap<>();
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                row.put(entry.getKey(), entry.getValue().get(index));
+            }
+            ret.add(row);
+        }
+        return ret;
+    }
+
+    /**
      * Get all users.
      * @param search Optional search parameter
      * @param firstResult First result to return
      * @param maxResults Maximum numbers of results to return
+     * @param sortBy Attribute to sort for
+     * @param order Sort order: ascending and descending
      * @return List of user json objects
      */
     @GET
@@ -122,56 +206,79 @@ public class UserResource {
     public ObjectList<User> getUsers(
             @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
-            @QueryParam("maxResults") Integer maxResults) {
+            @QueryParam("maxResults") Integer maxResults,
+            @QueryParam("sortBy") String sortBy,
+            @QueryParam("order") SortOrder order) {
         RealmModel realm = session.getContext().getRealm();
 
-        Map<String, String> attributes = new HashMap<>(search == null
+        String sortByAttribute = "id";
+        if (sortBy != null) {
+            sortByAttribute = sortBy;
+        }
+
+        if (order == null) {
+            order = SortOrder.asc;
+        }
+
+        Map<String, List<String>> multiAttributes = new HashMap<>(search == null
                 ? Collections.emptyMap()
                 : SearchQueryUtils.getFields(search));
 
-        // Match sub-strings
-        attributes.put(UserModel.EXACT, Boolean.FALSE.toString());
+        List<List<User>> collectedUserList = new ArrayList<>();
+        for (Map<String, String> attributes : splitMap(multiAttributes)) {
 
-        String generalSearch = attributes.get("search");
-        if (generalSearch != null) {
-            attributes.put(UserModel.SEARCH, generalSearch);
-            attributes.remove("search");
+            // Match sub-strings
+            attributes.put(UserModel.EXACT, Boolean.FALSE.toString());
+
+            String generalSearch = attributes.get("search");
+            if (generalSearch != null) {
+                attributes.put(UserModel.SEARCH, generalSearch);
+                attributes.remove("search");
+            }
+
+            Map<String, String> customAttributes = new HashMap<>();
+
+            for (String customAttribute : new String[]{"institutions", "role", "network", "hiddenInAddressbook"}) {
+                String value = attributes.get(customAttribute);
+                if (value != null) {
+                    customAttributes.put(customAttribute, value);
+                    attributes.remove(customAttribute);
+                }
+            }
+
+            Stream<UserModel> userModels = session.users()
+                    .searchForUserStream(realm, attributes);
+
+            Predicate<User> userFilter = u -> true;
+            if (!customAttributes.isEmpty()) {
+                String institution = customAttributes.get("institutions");
+                String role = customAttributes.get("role");
+                String network = customAttributes.get("network");
+                String isHiddenString = customAttributes.get("hiddenInAddressbook");
+                Boolean isHidden = isHiddenString != null ? Boolean.valueOf(isHiddenString) : null;
+                userFilter = u -> (institution == null
+                        || u.getInstitutions().contains(institution))
+                        && (role == null || u.getRole().equals(role))
+                        && (network == null || u.getNetwork().contains(network))
+                        && (isHidden == null || u.isHiddenInAddressbook() == isHidden);
+            }
+
+            List<User> userList = userModels.map(userEntity -> new User(
+                            session.users()
+                                    .getUserById(realm, userEntity.getId()), session))
+                    .filter(userFilter)
+                    .collect(Collectors.toList());
+            // Filter hidden users
+            userList = auth.filter(userList);
+            collectedUserList.add(userList);
         }
 
-        Map<String, String> customAttributes = new HashMap<>();
+        List<User> userList = getCommonUsers(collectedUserList);
 
-        for (String customAttribute : new String[]{"institutions", "role", "network", "hiddenInAddressbook"}) {
-           String value = attributes.get(customAttribute);
-           if (value != null) {
-               customAttributes.put(customAttribute, value);
-               attributes.remove(customAttribute);
-           }
+        if (order != SortOrder.asc
+                || !sortByAttribute.equals("id")) {
+            SortUtil.sortByField(userList, sortByAttribute, order == SortOrder.asc);
         }
-
-        Stream<UserModel> userModels = session.users()
-                .searchForUserStream(realm, attributes);
-
-        Predicate<User> userFilter = u -> true;
-        if (!customAttributes.isEmpty()) {
-            String institution = customAttributes.get("institutions");
-            String role = customAttributes.get("role");
-            String network = customAttributes.get("network");
-            String isHiddenString = customAttributes.get("hiddenInAddressbook");
-            Boolean isHidden = isHiddenString != null ? Boolean.valueOf(isHiddenString) : null;
-            userFilter = u -> (institution == null
-                || u.getInstitutions().contains(institution))
-                && (role == null || u.getRole().equals(role))
-                && (network == null || u.getNetwork().contains(network))
-                && (isHidden == null || u.isHiddenInAddressbook() == isHidden);
-        }
-
-        List<User> userList = userModels.map(userEntity -> new User(
-            session.users()
-            .getUserById(realm, userEntity.getId()), session))
-            .filter(userFilter)
-            .collect(Collectors.toList());
-        // Filter hidden users
-        userList = auth.filter(userList);
 
         long size = userList.size();
         if (firstResult != null || maxResults != null) {
