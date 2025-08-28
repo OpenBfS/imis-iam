@@ -1,3 +1,34 @@
+FROM ubuntu:24.04 as builder
+
+# Use UTF-8
+RUN echo \
+    "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8" | \
+    debconf-set-selections && \
+    echo "locales locales/default_environment_locale select en_US.UTF-8" | \
+    debconf-set-selections
+RUN apt-get update -y && apt-get install -y locales
+ENV LC_ALL=en_US.UTF-8
+
+RUN apt-get update && apt-get install -y \
+            openjdk-21-jre-headless maven
+
+ENV KEYCLOAK_HOME=/opt/keycloak
+
+ENV SPI_SRC=/opt/iam_spi
+WORKDIR ${SPI_SRC}
+ADD keycloak/iam_spi/pom.xml ${SPI_SRC}/
+
+
+ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
+
+# Build SPI
+# Download dependencies before adding sources to leverage build cache
+RUN mvn -q dependency:go-offline
+ADD keycloak/iam_spi ${SPI_SRC}
+RUN mvn -q package
+RUN mkdir $KEYCLOAK_HOME/providers && \
+    cp target/iam-api-extension-jar-with-dependencies.jar $KEYCLOAK_HOME/providers/
+
 FROM ubuntu:24.04
 
 LABEL maintainer=awoestmann@intevation.de
@@ -12,7 +43,7 @@ RUN apt-get update -y && apt-get install -y locales
 ENV LC_ALL=en_US.UTF-8
 
 RUN apt-get update && apt-get install -y \
-            libxml2-utils openjdk-21-jre-headless maven jq curl \
+            libxml2-utils openjdk-21-jre-headless jq curl \
             postgresql-client
 
 ENV KEYCLOAK_HOME=/opt/keycloak
@@ -25,14 +56,7 @@ RUN KEYCLOAK_VERSION=$(xmllint --xpath "//*[local-name()='keycloak.version']/tex
     curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
     | tar zx && mv keycloak-${KEYCLOAK_VERSION} ${KEYCLOAK_HOME}
 
-ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
-
-# Deploy SPI
-# Download dependencies before adding sources to leverage build cache
-RUN mvn -q dependency:go-offline
-ADD keycloak/iam_spi ${SPI_SRC}
-RUN mvn -q package
-RUN cp target/iam-api-extension-jar-with-dependencies.jar $KEYCLOAK_HOME/providers/
+COPY --from=builder ${KEYCLOAK_HOME}/ ${KEYCLOAK_HOME}/
 
 WORKDIR ${KEYCLOAK_HOME}
 
