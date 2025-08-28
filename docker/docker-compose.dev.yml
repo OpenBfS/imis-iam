@@ -44,6 +44,8 @@ services:
       - KC_SPI_THEME_CACHE_THEMES=false
       - KC_SPI_THEME_CACHE_TEMPLATES=false
   client:
+    build:
+      dockerfile: ./docker/client/Dockerfile.dev
     extends:
       file: docker-compose.yml
       service: client
