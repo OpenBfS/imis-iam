@@ -127,7 +127,7 @@ const noColumnsSelected = computed(() => {
   return selectedTableHeaders.value.length === 0;
 });
 
-const onAllCheckboxChanged = (event) => {
+const onAllCheckboxChanged = () => {
   if (allCheckbox.value.$props.indeterminate) {
     selectAll();
   } else if (allCheckbox.value.$props.modelValue) {

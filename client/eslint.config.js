@@ -30,6 +30,7 @@ export default [
       "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     },
     languageOptions: {
+      ecmaVersion: 2024,
       sourceType: "module",
       globals: {
         ...globals.browser,
