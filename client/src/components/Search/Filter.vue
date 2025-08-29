@@ -19,6 +19,7 @@
       hide-details
       min-width="120"
       :model-value="autocompleteValue"
+      :multiple="type === 'users'"
       variant="outlined"
       @update:modelValue="
         (event) => {
