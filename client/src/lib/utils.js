@@ -32,7 +32,7 @@ const createHeaders = (columns, type) => {
     const header = {
       title: t(translationKey),
       key: headerName,
-      sortable: type !== "users",
+      sortable: true,
       visible: column.default,
     };
     // This function decides how the values inside an item are displayed in the v-data-server-table.
