@@ -53,6 +53,7 @@ services:
     environment:
       - CLIENT_MODE=development
       - SESSION_INACTIVITY_TIMEOUT=${SESSION_INACTIVITY_TIMEOUT}
+      - SESSION_COOKIE_NAME=${SESSION_COOKIE_NAME}
     volumes:
       - ./client:/usr/local/iamdocker
       - ../client:/usr/local/iamclient
