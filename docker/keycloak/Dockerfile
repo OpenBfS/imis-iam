@@ -19,17 +19,16 @@ WORKDIR ${SPI_SRC}
 ADD keycloak/iam_spi/pom.xml ${SPI_SRC}/
 
 
-ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
-
 # Build SPI
 # Download dependencies before adding sources to leverage build cache
 RUN mvn -q dependency:go-offline
 ADD keycloak/iam_spi ${SPI_SRC}
 RUN mvn -q package
-RUN mkdir $KEYCLOAK_HOME/providers && \
+RUN mkdir -p $KEYCLOAK_HOME/providers && \
     cp target/iam-api-extension-jar-with-dependencies.jar $KEYCLOAK_HOME/providers/
 
-FROM ubuntu:24.04
+#----------------------------------------
+FROM ubuntu:24.04 as main
 
 LABEL maintainer=awoestmann@intevation.de
 
@@ -48,11 +47,9 @@ RUN apt-get update && apt-get install -y \
 
 ENV KEYCLOAK_HOME=/opt/keycloak
 
-ENV SPI_SRC=/opt/iam_spi
-WORKDIR ${SPI_SRC}
-ADD keycloak/iam_spi/pom.xml ${SPI_SRC}/
+ADD keycloak/iam_spi/pom.xml /opt/spi_pom.xml
 
-RUN KEYCLOAK_VERSION=$(xmllint --xpath "//*[local-name()='keycloak.version']/text()" $SPI_SRC/pom.xml); \
+RUN KEYCLOAK_VERSION=$(xmllint --xpath "//*[local-name()='keycloak.version']/text()" /opt/spi_pom.xml); \
     curl -sL https://github.com/keycloak/keycloak/releases/download/${KEYCLOAK_VERSION}/keycloak-${KEYCLOAK_VERSION}.tar.gz \
     | tar zx && mv keycloak-${KEYCLOAK_VERSION} ${KEYCLOAK_HOME}
 
@@ -68,6 +65,8 @@ ENV SRC_DIR=/opt/src
 ADD docker/keycloak ${SRC_DIR}
 
 HEALTHCHECK CMD curl -f http://localhost:8080/realms/master || exit 1
+
+ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
 
 RUN adduser --system keycloak
 RUN chown -R keycloak: ${KEYCLOAK_HOME}
