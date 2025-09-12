@@ -78,9 +78,16 @@ const logout = () => {
 };
 
 const changePassword = () => {
-  window.location.assign(
-    `/realms/imis3/protocol/openid-connect/auth?client_id=iam-client&redirect_uri=${window.location.origin}&response_type=code&kc_action=UPDATE_PASSWORD`,
-  );
+  let prefixXhr = new XMLHttpRequest();
+  prefixXhr.responseType = 'json';
+  prefixXhr.open('GET', '/backend/realms/imis3/');
+  prefixXhr.onload = function() {
+    let urlPrefix = prefixXhr.response['token-service'];
+    window.location.assign(
+      `${urlPrefix}/auth?client_id=iam-client&redirect_uri=${window.location.origin}${window.location.pathname}&response_type=code&kc_action=UPDATE_PASSWORD`
+    );
+  };
+  prefixXhr.send();
 };
 
 const editProfile = () => {
