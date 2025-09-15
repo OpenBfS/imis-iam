@@ -107,7 +107,8 @@ public class UserResource {
     public User getProfile() {
         return new User(
             session.getContext().getUserSession().getUser(),
-            session);
+            session,
+            true);
     }
 
     /**

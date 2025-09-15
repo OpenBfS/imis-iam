@@ -427,7 +427,9 @@
       "name": "operationModeChangeContact",
       "displayHeader": "",
       "displayDescription": "",
-      "annotations": {}
+      "annotations": {
+        "private": true
+      }
     }
   ]
 }

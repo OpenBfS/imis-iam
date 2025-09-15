@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -23,6 +24,10 @@ import jakarta.validation.constraints.NotEmpty;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
+import org.keycloak.representations.userprofile.config.UPAttribute;
+import org.keycloak.representations.userprofile.config.UPConfig;
+import org.keycloak.representations.userprofile.config.UPGroup;
+import org.keycloak.userprofile.UserProfileProvider;
 
 import de.intevation.iam.model.jpa.Institution;
 import de.intevation.iam.model.jpa.Institution_;
@@ -37,6 +42,8 @@ import de.intevation.iam.util.Constants;
  * iam attributes, groups and roles tables.
  */
 public class User {
+
+    private static final String PRIVATE_KEY = "private";
 
     private String id;
 
@@ -67,12 +74,42 @@ public class User {
      * @return Generated user
      */
     public User(UserModel userModel, KeycloakSession session) {
+        this(userModel, session, false);
+    }
+
+    /**
+     * Generate user from given usermodel.
+     * @param userModel Keycloak usermodel
+     * @param session KeycloakSession
+     * @param priv true to include private profile attributes
+     * @return Generated user
+     */
+    public User(UserModel userModel, KeycloakSession session, boolean priv) {
         this.id = userModel.getId();
         this.enabled = userModel.isEnabled();
 
         // Contains custom attributes defined via User Profile config,
         // but only if actually a value is set.
-        this.attributes = userModel.getAttributes();
+        if (priv) {
+            this.attributes = userModel.getAttributes();
+        } else {
+            /* Exclude attributes with annotation "private" set to true or
+               which are part of a group with such annotation */
+            UPConfig upConfig =
+                session.getProvider(UserProfileProvider.class).getConfiguration();
+            List<String> privateGroups = upConfig.getGroups().stream()
+                .filter(g -> g.getAnnotations() != null
+                    && g.getAnnotations().containsKey(PRIVATE_KEY))
+                .map(UPGroup::getName).toList();
+            List<String> privateAttrs = upConfig.getAttributes().stream()
+                .filter(a -> a.getAnnotations() != null
+                    && a.getAnnotations().containsKey(PRIVATE_KEY)
+                    || privateGroups.contains(a.getGroup()))
+                .map(UPAttribute::getName).toList();
+            this.attributes = userModel.getAttributes().entrySet()
+                .stream().filter(e -> !privateAttrs.contains(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
 
         EntityManager em = session.getProvider(
             JpaConnectionProvider.class).getEntityManager();
