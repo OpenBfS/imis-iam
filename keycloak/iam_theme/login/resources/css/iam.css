@@ -2,8 +2,8 @@
 
 /* Custom properties */
 :root {
-    --imis-primary-color:#5b8445;
-    --imis-secondary-color:#caddc1;
+    --imis-primary-color: blue;
+    --imis-secondary-color: black;
     --background: white;
     --imis-card-background-color: white;
     --imis-border: 1px solid #dedede;
