@@ -3,6 +3,8 @@ services:
     build:
       context: ../
       dockerfile: ./docker/keycloak/Dockerfile
+      args:
+        IAM_THEME_SRC: ${IAM_THEME_SRC}
     image: ${REGISTRY_HOST}imis3/imis-keycloak:${KC_VERSION}
     env_file:
       - keycloak/keycloak.env

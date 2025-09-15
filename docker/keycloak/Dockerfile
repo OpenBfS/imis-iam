@@ -66,7 +66,8 @@ ADD docker/keycloak ${SRC_DIR}
 
 HEALTHCHECK CMD curl -f http://localhost:8080/realms/master || exit 1
 
-ADD keycloak/iam_theme ${KEYCLOAK_HOME}/themes/iam_theme
+ARG IAM_THEME_SRC
+ADD ${IAM_THEME_SRC} ${KEYCLOAK_HOME}/themes/iam_theme
 
 RUN adduser --system keycloak
 RUN chown -R keycloak: ${KEYCLOAK_HOME}
