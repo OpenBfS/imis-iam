@@ -63,8 +63,8 @@ const paramsSerializer = {
   },
 };
 
-const escapeQuotes = (text) => {
-  const regex = /["]{1}/g;
+const escapeSpecialCharacters = (text) => {
+  const regex = /["\\]{1}/g;
   const result = text.replaceAll(regex, (match) => {
     return `\\${match}`;
   });
@@ -89,7 +89,7 @@ function createSearchQueryString(searchTerm, filters) {
     const key = keys[i];
     if (filters[key]) {
       searchQueryString = searchQueryString.concat(
-        `${key}:"${escapeQuotes(filters[key])}"`
+        `${key}:"${escapeSpecialCharacters(filters[key])}"`
       );
       if (i < keys.length - 1) {
         searchQueryString = searchQueryString.concat(" ");
@@ -101,7 +101,7 @@ function createSearchQueryString(searchTerm, filters) {
 
 export {
   createSearchQueryString,
-  escapeQuotes,
+  escapeSpecialCharacters,
   handleError,
   HTTP,
   PhotonHTTP,
