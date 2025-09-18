@@ -9,6 +9,7 @@ import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
 import { nextTick } from "vue";
 import { HTTP } from "@/lib/http";
+import { useProfileStore } from "./profile";
 
 export const useApplicationStore = defineStore("application", {
   state: () => ({
@@ -28,6 +29,7 @@ export const useApplicationStore = defineStore("application", {
     attributesOfFieldsThatChanged: [],
     resetEventListeners: [],
     form: undefined,
+    // Original unedited item so we can reset it when necessary
     savedItem: {},
     showManageEventDialog: false,
     showManageUserDialog: false,
@@ -183,6 +185,17 @@ export const useApplicationStore = defineStore("application", {
       if (!this.networks.find((network) => network.name === networkName)) {
         this.loadNetworks();
       }
+    },
+    openUserEditForm(user) {
+      const profileStore = useProfileStore();
+      const ownUsername = profileStore.userData.attributes.username[0];
+      const isOwnAccount = ownUsername === user.attributes.username[0]
+      const u = isOwnAccount ? profileStore.userData : user;
+      this.setOwnAccount(isOwnAccount);
+      this.setManagedItem(u);
+      this.setSavedItem(structuredClone(u));
+      this.setProcessType("edit");
+      this.setShowManageUserDialog(true);
     },
   },
 });

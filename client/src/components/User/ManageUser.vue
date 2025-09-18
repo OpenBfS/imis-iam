@@ -59,7 +59,7 @@
               </v-col>
             </v-row>
             <template
-              v-for="group in profileStore.attributeGroups"
+              v-for="group in filteredAttributeGroups"
               :key="group.name"
             >
               <v-row>
@@ -69,6 +69,7 @@
                 <template
                   v-for="attribute in profileStore.attributesOfGroup(
                     group.name,
+                    toRaw(user)
                   )"
                   :key="attribute.name"
                 >
@@ -239,7 +240,14 @@ form > div {
 }
 </style>
 <script setup>
-import { computed, provide, onBeforeMount, onMounted, onUnmounted } from "vue";
+import {
+  computed,
+  provide,
+  onBeforeMount,
+  onMounted,
+  onUnmounted,
+  toRaw,
+} from "vue";
 import { useNotification } from "@/lib/use-notification.js";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http.js";
@@ -362,6 +370,15 @@ const userRoles = computed(() => {
       return newItem;
     }) ?? []
   );
+});
+const filteredAttributeGroups = computed(() => {
+  return profileStore.attributeGroups.filter((group) => {
+    return (
+      !group.annotations?.private ||
+      profileStore.userData.attributes.username[0] ===
+        user.value.attributes.username[0]
+    );
+  });
 });
 // Deep Copy for objects
 const cloneObject = (obj) => {

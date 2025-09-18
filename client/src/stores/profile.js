@@ -41,16 +41,36 @@ export const useProfileStore = defineStore("profile", {
     attributeGroups: (state) => {
       return state.userProfileMetadata.groups;
     },
+    getGroupByAttributeName: (state) => {
+      return (attributeName) => {
+        const attribute = state.getAttribute(attributeName);
+        return state.attributeGroups.find(
+          (group) => group.name === attribute.group
+        );
+      };
+    },
     attributesWithoutGroup: (state) => {
       return state.userProfileMetadata.attributes?.filter(
         (attribute) => !attribute.group,
       );
     },
+    // Returns all attributes of a group but filters out attributes that are not allowed to be
+    // seen by the current user.
     attributesOfGroup: (state) => {
-      return (groupName) =>
-        state.userProfileMetadata.attributes.filter(
-          (attribute) => attribute.group === groupName,
+      return (groupName, userToEdit) => {
+        const profileUsername = state.userData.attributes.username[0];
+        return state.userProfileMetadata.attributes.filter(
+          (attribute) =>
+            attribute.group === groupName &&
+            (!attribute.annotations?.private ||
+              profileUsername === userToEdit.attributes.username[0])
         );
+      };
+    },
+    isAttributePrivate: (state) => {
+      return (name) => {
+        return state.getAttribute(name)?.annotations?.private === true;
+      }
     },
     isChiefEditor: (state) => {
       return state.userData.role === "chief_editor";

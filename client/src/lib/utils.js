@@ -17,11 +17,25 @@ const createHeaders = (columns, type) => {
   const profileStore = useProfileStore();
   const userStore = useUserStore();
   const newHeaders = [];
-  for(let i = 0; i < columns.length; i++) {
+  for (let i = 0; i < columns.length; i++) {
     const column = columns[i];
     const headerName = column.name;
     if (headerName === "hiddenInAddressbook" && !profileStore.isChiefEditor) {
       continue;
+    } else if (type === "users") {
+      // Don't show columns with private attributes because the user can only see their own private
+      // attributes and thus, these columns are useless.
+      const attribute = profileStore.getAttribute(headerName);
+      const group = attribute
+        ? profileStore.getGroupByAttributeName(headerName)
+        : undefined;
+      if (
+        attribute &&
+        (profileStore.isAttributePrivate(headerName) ||
+          group?.annotations.private === true)
+      ) {
+        continue;
+      }
     }
     const translationPrefix = type === "users" ? "user" : "institution";
     const translationKey =
@@ -55,6 +69,7 @@ const createHeaders = (columns, type) => {
         } else {
           return structuredClone(item)?.[headerName];
         }
+        // Don't show attributes that are marked as private when they belong to other users
       }
       const value =
         type === "users"

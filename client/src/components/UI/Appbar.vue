@@ -91,11 +91,6 @@ const changePassword = () => {
 };
 
 const editProfile = () => {
-  const user = cloneObject(savedUser.value);
-  applicationStore.setOwnAccount(true);
-  applicationStore.setManagedItem(user);
-  applicationStore.setSavedItem(savedUser.value);
-  applicationStore.setProcessType("edit");
-  applicationStore.setShowManageUserDialog(true);
+  applicationStore.openUserEditForm(cloneObject(savedUser.value));
 };
 </script>

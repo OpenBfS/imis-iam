@@ -136,11 +136,6 @@ const onCopyClicked = (id) => {
 };
 const onEditClicked = (id) => {
   user.value = cloneObject(getUserById(id));
-  // Save original user data for "reset" button
-  savedUser.value = cloneObject(user.value);
-  applicationStore.setManagedItem(user.value);
-  applicationStore.setSavedItem(savedUser.value);
-  applicationStore.setProcessType("edit");
-  applicationStore.setShowManageUserDialog(true);
+  applicationStore.openUserEditForm(user.value);
 };
 </script>
