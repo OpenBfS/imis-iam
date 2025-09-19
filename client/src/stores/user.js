@@ -39,7 +39,7 @@ export const useUserStore = defineStore("user", {
         }
       });
     },
-    loadUsers(searchString, loadAll = false) {
+    loadUsers(searchString, loadAll = false, abortController = undefined) {
       return new Promise((resolve, reject) => {
         const params = loadAll
           ? {}
@@ -53,6 +53,7 @@ export const useUserStore = defineStore("user", {
             };
         HTTP.get("/iam/user", {
           params,
+          signal: abortController?.signal,
         })
           .then((response) => {
             this.totalNumberOfUsers = response.data.size;
@@ -63,7 +64,14 @@ export const useUserStore = defineStore("user", {
             }
             resolve(response);
           })
-          .catch((error) => reject(error));
+          .catch((error) => {
+            // We cancel search requests for users and institutions if a new request is made on purpose.
+            // This error is very likely not a problem.
+            if (error.code === "ERR_CANCELED") {
+              resolve();
+            }
+            reject(error);
+          });
       });
     },
     loadRoles() {
