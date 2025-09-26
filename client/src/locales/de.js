@@ -68,7 +68,7 @@ export default {
     invalidValue: "'{0}' hat einen ungültigen Wert.",
     invalidNumber: "'{0}' ist eine ungültige Zahl.",
     invalidUriScheme: "'{0}' ist ein ungültiges URL-Schema.",
-    userAttributeReadOnly: "Das Feld {0} is schreibgeschützt.",
+    userAttributeReadOnly: "Das Feld {0} ist schreibgeschützt.",
     invalidDate: "'{0}' ist ein ungültiges Datum.",
     invalidLength: "'{0}' muss eine Länge zwischen {1} und {2} haben.",
     invalidUri: "'{0}' ist eine ungültige URL.",
