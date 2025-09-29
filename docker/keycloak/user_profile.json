@@ -281,11 +281,9 @@
       },
       "permissions": {
         "view": [
-          "admin",
           "user"
         ],
         "edit": [
-          "admin",
           "user"
         ]
       },
@@ -306,11 +304,9 @@
       },
       "permissions": {
         "view": [
-          "admin",
           "user"
         ],
         "edit": [
-          "admin",
           "user"
         ]
       },
@@ -331,11 +327,9 @@
       },
       "permissions": {
         "view": [
-          "admin",
           "user"
         ],
         "edit": [
-          "admin",
           "user"
         ]
       },
@@ -426,10 +420,7 @@
     {
       "name": "operationModeChangeContact",
       "displayHeader": "",
-      "displayDescription": "",
-      "annotations": {
-        "private": true
-      }
+      "displayDescription": ""
     }
   ]
 }

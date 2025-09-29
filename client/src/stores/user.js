@@ -80,7 +80,7 @@ export const useUserStore = defineStore("user", {
       return new Promise((resolve, reject) => {
         HTTP.put("iam/user", user)
           .then((response) => {
-            //Update the stored entity using repsonse data
+            //Update the stored entity using response data
             this.updateUserEntity(response.data);
             resolve(response);
           })

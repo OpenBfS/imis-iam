@@ -6,6 +6,7 @@
  */
 package de.intevation.iam;
 
+import static org.keycloak.userprofile.UserProfileContext.ACCOUNT;
 import static org.keycloak.userprofile.UserProfileContext.USER_API;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.representations.userprofile.config.UPConfig;
+import org.keycloak.userprofile.UserProfileContext;
 import org.keycloak.userprofile.UserProfileProvider;
 import org.keycloak.userprofile.ValidationException;
 
@@ -60,6 +62,8 @@ import org.keycloak.utils.SearchQueryUtils;
 
 
 public class UserResource {
+
+    private static final String PROFILE_PATH = "profile";
 
     private KeycloakSession session;
 
@@ -103,12 +107,22 @@ public class UserResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("profile")
+    @Path(PROFILE_PATH)
     public User getProfile() {
         return new User(
             session.getContext().getUserSession().getUser(),
             session,
-            true);
+            ACCOUNT);
+    }
+
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(PROFILE_PATH)
+    public User updateProfile(
+        @Context HttpHeaders headers,
+        final User user
+    ) {
+        return doUpdateUser(headers, user, ACCOUNT);
     }
 
     /**
@@ -149,9 +163,6 @@ public class UserResource {
            }
         }
 
-        Stream<UserModel> userModels = session.users()
-                .searchForUserStream(realm, attributes);
-
         Predicate<User> userFilter = u -> true;
         if (!customAttributes.isEmpty()) {
             String institution = customAttributes.get("institutions");
@@ -166,9 +177,9 @@ public class UserResource {
                 && (isHidden == null || u.isHiddenInAddressbook() == isHidden);
         }
 
-        List<User> userList = userModels.map(userEntity -> new User(
-            session.users()
-            .getUserById(realm, userEntity.getId()), session))
+        List<User> userList = session.users()
+            .searchForUserStream(realm, attributes)
+            .map(userEntity -> new User(userEntity, session, USER_API))
             .filter(userFilter)
             .collect(Collectors.toList());
         // Filter hidden users
@@ -211,7 +222,7 @@ public class UserResource {
             throw new NotFoundException();
         }
 
-        User user = new User(userModel, session);
+        User user = new User(userModel, session, USER_API);
         auth.authorize(user, RequestMethod.GET);
         return user;
     }
@@ -278,7 +289,7 @@ public class UserResource {
         //Force flush and update to ensure attributes are persisted
         em.flush();
         em.refresh(attributes);
-        return new User(newUserModel, session);
+        return new User(newUserModel, session, USER_API);
     }
 
     /**
@@ -300,6 +311,14 @@ public class UserResource {
         @Context HttpHeaders headers,
         final User rep
     ) {
+        return doUpdateUser(headers, rep, USER_API);
+    }
+
+    private User doUpdateUser(
+        HttpHeaders headers,
+        final User rep,
+        UserProfileContext ctx
+    ) {
         auth.authorize(rep, RequestMethod.PUT);
 
         List<Locale> languages = headers.getAcceptableLanguages();
@@ -313,7 +332,7 @@ public class UserResource {
         //Update user
         try {
             this.userProfileProvider
-                .create(USER_API, rep.getAttributes(), user).update();
+                .create(ctx, rep.getAttributes(), user).update();
         } catch (ValidationException ve) {
             if (session.getTransactionManager().isActive()) {
                 session.getTransactionManager().setRollbackOnly();
@@ -353,7 +372,7 @@ public class UserResource {
         setNetwork(rep.getNetwork(), attributes);
 
         em.merge(attributes);
-        return new User(user, session);
+        return new User(user, session, ctx);
     }
 
     /**
