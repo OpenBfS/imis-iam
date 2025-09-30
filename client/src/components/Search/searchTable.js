@@ -113,7 +113,6 @@ const getFilters = (type) => {
 };
 
 const getFilterValue = (type, key) => {
-  console.log("test", type, key)
   return getFilters(type)?.[key];
 };
 
