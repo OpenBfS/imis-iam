@@ -75,6 +75,7 @@
             <button
               v-if="columns[index].sortable"
               @click="toggleSort(columns[index])"
+              class="d-flex align-baseline ga-1"
             >
               <span>{{ columns[index].title }}</span>
               <v-icon
