@@ -186,7 +186,7 @@ const editTags = async (remove) => {
         }
         newErrorMessages.push({
           key: key,
-          value: t("search.didnt_remove", {
+          value: t("search.didntRemove", {
             tag: oldTags[0],
             type: translatedType,
           }),
