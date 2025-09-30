@@ -12,8 +12,8 @@
       class="mx-auto"
       :title="
         props.type === 'institutions'
-          ? $t('search.editTags_institutions')
-          : $t('search.editTags_users')
+          ? $t('search.editTagsInstitutions')
+          : $t('search.editTagsUsers')
       "
     >
       <v-card-text>
