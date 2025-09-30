@@ -19,7 +19,10 @@
       hide-details
       min-width="120"
       :model-value="autocompleteValue"
-      :multiple="type === 'users'"
+      :multiple="
+        type === 'users' &&
+        !['enabled', 'hiddenInAddressbook', 'role'].includes(filterKey)
+      "
       variant="outlined"
       @update:modelValue="
         (event) => {
