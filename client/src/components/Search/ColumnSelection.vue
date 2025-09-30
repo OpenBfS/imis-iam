@@ -92,7 +92,7 @@
 import { computed, nextTick, ref } from "vue";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
-import { deselectAllColumns, selectAllColumns } from "@/lib/utils";
+import { deselectAllColumns, selectAllColumns } from "@/components/Search/searchTable.js";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

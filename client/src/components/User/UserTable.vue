@@ -66,7 +66,7 @@ import { useUserStore } from "@/stores/user.js";
 import { onMounted, ref, toRaw } from "vue";
 import { getExpUser } from "@/components/User/user.js";
 import DataTableServer from "@/components/DataTableServer.vue";
-import { createHeaders, initSelectedColumns } from "@/lib/utils";
+import { createHeaders, initSelectedColumns } from "@/components/Search/searchTable.js";
 
 const props = defineProps({
   // columns only used to insert different columns for testing
