@@ -62,18 +62,29 @@
               hide-details
             />
           </template>
-          <button
-            v-else-if="columns[index].sortable"
-            @click="toggleSort(columns[index])"
-          >
-            <span>{{ columns[index].title }}</span>
-            <v-icon
-              :icon="getSortIcon(columns[index])"
-              class="v-data-table-header__sort-icon"
-            />
-          </button>
-          <div v-else>
-            <span>{{ columns[index].title }}</span>
+          <div v-else class="d-flex align-baseline ga-1">
+            <v-chip
+              v-if="getFilterValue(props.type, columns[index].key)"
+              class="me-2 px-1"
+              color="light-green"
+              size="x-small"
+              variant="flat"
+            >
+              <v-icon color="white" icon="mdi-filter"></v-icon>
+            </v-chip>
+            <button
+              v-if="columns[index].sortable"
+              @click="toggleSort(columns[index])"
+            >
+              <span>{{ columns[index].title }}</span>
+              <v-icon
+                :icon="getSortIcon(columns[index])"
+                class="v-data-table-header__sort-icon"
+              />
+            </button>
+            <div v-else>
+              <span>{{ columns[index].title }}</span>
+            </div>
           </div>
         </th>
       </tr>
@@ -193,6 +204,7 @@ import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { states } from "./Institution/institution";
 import Filter from "./Search/Filter.vue";
+import { getFilterValue } from "./Search/searchTable";
 
 const { t } = useI18n();
 const { hasLoadingError } = useNotification();

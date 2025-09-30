@@ -92,7 +92,12 @@
 import { computed, nextTick, ref } from "vue";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
-import { deselectAllColumns, selectAllColumns } from "@/components/Search/searchTable.js";
+import {
+  deselectAllColumns,
+  selectAllColumns,
+  getFilters,
+  getFilterValue,
+} from "@/components/Search/searchTable.js";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -145,12 +150,8 @@ const deselectAll = () => {
   deselectAllColumns(props.type);
 };
 
-const getFilterValue = (key) => {
-  return getFilters()?.[key];
-};
-
 const getColumnCheckboxLabel = (key) => {
-  const value = getFilterValue(key);
+  const value = getFilterValue(props.type, key);
   if (value === undefined) {
     return "";
   } else if (key === "role") {
@@ -167,16 +168,10 @@ const getColumnCheckboxLabel = (key) => {
   }
 };
 
-const getFilters = () => {
-  return props.type === "users"
-    ? userStore.filterBy
-    : institutionStore.filterBy;
-};
-
 const areFiltersForHiddenColumnsAvailable = computed(() => {
-  const filters = Object.keys(getFilters());
+  const filters = Object.keys(getFilters(props.type));
   return tableHeaders.value.some(
-    (header) => header.visible === false && filters.includes(header.key),
+    (header) => header.visible === false && filters.includes(header.key)
   );
 });
 
