@@ -169,9 +169,9 @@ const editTags = async (remove) => {
       foundItems.find((item) => item.id === id),
     );
     let newTags = [];
-    const oldTags = isInstitutionType()
-      ? itemToEdit.tags
-      : itemToEdit.attributes.tags;
+    const oldTags =
+      (isInstitutionType() ? itemToEdit.tags : itemToEdit.attributes.tags) ??
+      [];
     if (remove) {
       newTags = oldTags.filter((tag) => !selectedTags.value.includes(tag));
       if (newTags.length === 0 && areTagsRequired) {
