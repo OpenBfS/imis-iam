@@ -14,7 +14,7 @@
       :item-title="props.itemTitle"
       :item-value="props.itemValue"
       :no-data-text="$t('label.noDataText')"
-      class="my-1 overflow-hidden"
+      class="my-1"
       clearable
       hide-details
       min-width="120"
@@ -33,7 +33,7 @@
     ></v-autocomplete>
     <v-text-field
       v-else
-      class="my-1 overflow-hidden"
+      class="my-1"
       clearable
       density="compact"
       :model-value="textFieldValue"

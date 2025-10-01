@@ -57,7 +57,7 @@ import { useProfileStore } from "@/stores/profile.js";
 import DataTableServer from "@/components/DataTableServer.vue";
 import { getExpInstitution } from "@/components/Institution/institution.js";
 import { onMounted } from "vue";
-import { createHeaders, initSelectedColumns } from "@/lib/utils";
+import { createHeaders, initSelectedColumns } from "@/components/Search/searchTable.js";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();

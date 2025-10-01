@@ -44,6 +44,8 @@ services:
       - KC_SPI_THEME_CACHE_THEMES=false
       - KC_SPI_THEME_CACHE_TEMPLATES=false
   client:
+    build:
+      dockerfile: ./docker/client/Dockerfile.dev
     extends:
       file: docker-compose.yml
       service: client
@@ -53,6 +55,7 @@ services:
     environment:
       - CLIENT_MODE=development
       - SESSION_INACTIVITY_TIMEOUT=${SESSION_INACTIVITY_TIMEOUT}
+      - SESSION_COOKIE_NAME=${SESSION_COOKIE_NAME}
     volumes:
       - ./client:/usr/local/iamdocker
       - ../client:/usr/local/iamclient

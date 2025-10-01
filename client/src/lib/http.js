@@ -63,10 +63,8 @@ const paramsSerializer = {
   },
 };
 
-// Escape characters that would be interpreted falsely in an URL
-// Explanation: https://stackoverflow.com/questions/10772066/escaping-special-character-in-a-url/20873310#20873310
 const escapeSpecialCharacters = (text) => {
-  const regex = /[":/?#\]@!$&'()*+,;=]{1}/g;
+  const regex = /["\\]{1}/g;
   const result = text.replaceAll(regex, (match) => {
     return `\\${match}`;
   });

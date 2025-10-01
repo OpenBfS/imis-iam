@@ -17,7 +17,7 @@ const createHeaders = (columns, type) => {
   const profileStore = useProfileStore();
   const userStore = useUserStore();
   const newHeaders = [];
-  for(let i = 0; i < columns.length; i++) {
+  for (let i = 0; i < columns.length; i++) {
     const column = columns[i];
     const headerName = column.name;
     if (headerName === "hiddenInAddressbook" && !profileStore.isChiefEditor) {
@@ -106,9 +106,21 @@ function createLabelForTableCell(value) {
   return value;
 }
 
+const getFilters = (type) => {
+  const institutionStore = useInstitutionStore();
+  const userStore = useUserStore();
+  return type === "users" ? userStore.filterBy : institutionStore.filterBy;
+};
+
+const getFilterValue = (type, key) => {
+  return getFilters(type)?.[key];
+};
+
 export {
   createHeaders,
   initSelectedColumns,
   deselectAllColumns,
   selectAllColumns,
+  getFilters,
+  getFilterValue,
 };

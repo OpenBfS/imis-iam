@@ -12,8 +12,8 @@
       class="mx-auto"
       :title="
         props.type === 'institutions'
-          ? $t('search.editTags_institutions')
-          : $t('search.editTags_users')
+          ? $t('search.editTagsInstitutions')
+          : $t('search.editTagsUsers')
       "
     >
       <v-card-text>
@@ -169,9 +169,9 @@ const editTags = async (remove) => {
       foundItems.find((item) => item.id === id),
     );
     let newTags = [];
-    const oldTags = isInstitutionType()
-      ? itemToEdit.tags
-      : itemToEdit.attributes.tags;
+    const oldTags =
+      (isInstitutionType() ? itemToEdit.tags : itemToEdit.attributes.tags) ??
+      [];
     if (remove) {
       newTags = oldTags.filter((tag) => !selectedTags.value.includes(tag));
       if (newTags.length === 0 && areTagsRequired) {
@@ -186,7 +186,7 @@ const editTags = async (remove) => {
         }
         newErrorMessages.push({
           key: key,
-          value: t("search.didnt_remove", {
+          value: t("search.didntRemove", {
             tag: oldTags[0],
             type: translatedType,
           }),
