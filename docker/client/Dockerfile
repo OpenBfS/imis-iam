@@ -46,6 +46,9 @@ COPY --from=builder /var/www${CLIENT_PATH} /var/www${CLIENT_PATH}
 ADD docker/client/ /usr/local/iamdocker/
 RUN sed -i "$ a Include /usr/local/iamdocker/client.conf" /usr/local/apache2/conf/httpd.conf
 
+
+ENV CA_BUNDLE_PATH="/etc/ssl/certs/ca-certificates.crt"
+
 HEALTHCHECK CMD curl --fail ${PROTOCOLL}://${HOSTSERVERNAME}${CLIENT_PATH} || exit 1
 
 CMD ["httpd-foreground"]
