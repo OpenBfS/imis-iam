@@ -1,0 +1,26 @@
+Identity management for IMIS applications
+Copyright (C) 2022 by Bundesamt fuer Strahlenschutz
+Software engineering by Intevation GmbH
+
+This product includes software components licensed under the Apache License, Version 2.0.
+A copy of the license is available at https://www.apache.org/licenses/LICENSE-2.0 and in LICENSES/Apache-2.0.
+
+Pursuant to Section 4(d) of the Apache License, the following attribution notices are reproduced:
+
+Component: keycloak/iam_spi/src/main/java/de/intevation/iam/util/SearchQueryUtils.java
+Upstream copyright: 2021 Red Hat, Inc. and/or its affiliates
+Source: https://github.com/keycloak/keycloak/blob/26.3.4/services/src/main/java/org/keycloak/utils/SearchQueryUtils.java
+License: Apache License, Version 2.0
+
+Verbatim excerpts from the upstream NOTICE:
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Modifications by Bundesamt fuer Strahlenschutz: Search for multiple fields (date: 2025-08-28)
+
+End of notices for this component
+
+Note: This NOTICE file supplements the license files and does not create additional terms.
