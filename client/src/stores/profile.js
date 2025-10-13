@@ -57,7 +57,7 @@ export const useProfileStore = defineStore("profile", {
     // seen by the current user.
     filteredAttributesOfGroup: (state) => {
       return (groupName, userToEdit) => {
-        const profileUsername = state.userData.attributes.username[0];
+        const profileUsername = state.getOwnUsername;
         return state
           .attributesOfGroup(groupName)
           .filter(
@@ -79,6 +79,9 @@ export const useProfileStore = defineStore("profile", {
     isChiefEditor: (state) => {
       return state.userData.role === "chief_editor";
     },
+    getOwnUsername: (state) => {
+      return state.userData.attributes.username[0]
+    }
   },
   actions: {
     setUserData(data) {

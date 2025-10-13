@@ -6,6 +6,7 @@
  */
 import { defineStore } from "pinia";
 import { createSearchQueryString, HTTP } from "../lib/http.js";
+import { useProfileStore } from "./profile.js";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
@@ -85,8 +86,13 @@ export const useUserStore = defineStore("user", {
       });
     },
     updateUser(user) {
+      const profileStore = useProfileStore();
       return new Promise((resolve, reject) => {
-        HTTP.put("iam/user", user)
+        const endpoint =
+          user.attributes.username[0] === profileStore.getOwnUsername
+            ? "/iam/user/profile"
+            : "iam/user";
+        HTTP.put(endpoint, user)
           .then((response) => {
             //Update the stored entity using response data
             this.updateUserEntity(response.data);

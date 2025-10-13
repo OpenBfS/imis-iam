@@ -203,7 +203,7 @@ export const useApplicationStore = defineStore("application", {
     },
     openUserEditForm(user) {
       const profileStore = useProfileStore();
-      const ownUsername = profileStore.userData.attributes.username[0];
+      const ownUsername = profileStore.getOwnUsername;
       const isOwnAccount = ownUsername === user.attributes.username[0]
       const u = isOwnAccount ? profileStore.userData : user;
       const keys = Object.keys(u.attributes);

@@ -376,7 +376,7 @@ const filteredAttributeGroups = computed(() => {
     profileStore.attributeGroups?.filter((group) => {
       // Filter out groups which don't contain any attributes that the user can see.
       return (
-        profileStore.userData.attributes.username[0] ===
+        profileStore.getOwnUsername ===
           user.value.attributes.username[0] ||
         profileStore.filteredAttributesOfGroup(group.name, toRaw(user))
           ?.length > 0
