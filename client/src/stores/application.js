@@ -206,6 +206,15 @@ export const useApplicationStore = defineStore("application", {
       const ownUsername = profileStore.userData.attributes.username[0];
       const isOwnAccount = ownUsername === user.attributes.username[0]
       const u = isOwnAccount ? profileStore.userData : user;
+      const keys = Object.keys(u.attributes);
+      keys.forEach((key) => {
+        if (
+          Array.isArray(u.attributes[key]) &&
+          u.attributes[key].length === 0
+        ) {
+          delete u.attributes[key];
+        }
+      });
       this.setOwnAccount(isOwnAccount);
       this.setManagedItem(u);
       this.setSavedItem(structuredClone(u));
