@@ -31,14 +31,71 @@
       ><slot :name="slot" v-bind="scope"
     /></template>
 
-    <template v-slot:thead>
+    <template
+      v-slot:headers="{
+        headers,
+        columns,
+        toggleSort,
+        getSortIcon,
+        isSorted,
+        someSelected,
+        allSelected,
+        selectAll,
+      }"
+    >
+      <tr>
+        <th
+          :style="header.width ? `width: ${header.width}px` : ''"
+          :class="getTableHeaderClass(header.key, isSorted(columns[index]))"
+          v-for="(header, index) in headers[0]"
+          :key="header"
+        >
+          <template v-if="header.key === 'data-table-select'">
+            <v-checkbox
+              @click="
+                () => {
+                  selectAll(!allSelected);
+                }
+              "
+              :model-value="allSelected"
+              :indeterminate="someSelected && !allSelected"
+              hide-details
+            />
+          </template>
+          <div v-else class="d-flex align-baseline ga-1">
+            <v-chip
+              v-if="getFilterValue(props.type, columns[index].key)"
+              class="me-2 px-1"
+              color="light-green"
+              size="x-small"
+              variant="flat"
+            >
+              <v-icon color="white" icon="mdi-filter"></v-icon>
+            </v-chip>
+            <button
+              v-if="columns[index].sortable"
+              @click="toggleSort(columns[index])"
+              class="d-flex align-baseline ga-1"
+            >
+              <span>{{ columns[index].title }}</span>
+              <v-icon
+                :icon="getSortIcon(columns[index])"
+                class="v-data-table-header__sort-icon"
+              />
+            </button>
+            <div v-else>
+              <span>{{ columns[index].title }}</span>
+            </div>
+          </div>
+        </th>
+      </tr>
       <tr>
         <td
-          class="pe-2 position-sticky"
+          class="px-2 position-sticky"
           style="top: 30pt; z-index: 3; background-color: white"
         ></td>
         <td
-          class="pe-2 position-sticky"
+          class="ps-0 pe-2 position-sticky"
           style="top: 30pt; z-index: 3; background-color: white"
           v-for="header in allHeaders"
           :key="header"
@@ -148,6 +205,7 @@ import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { states } from "./Institution/institution";
 import Filter from "./Search/Filter.vue";
+import { getFilterValue } from "./Search/searchTable";
 
 const { t } = useI18n();
 const { hasLoadingError } = useNotification();
@@ -232,5 +290,14 @@ const getNumberForEndOfRange = () => {
   return props.offset + props.itemsPerPage > props.items.length
     ? props.offset + props.items.length
     : props.offset + props.itemsPerPage;
+};
+
+const getTableHeaderClass = (key, isSorted) => {
+  const sortedClass = "v-data-table__th--sorted";
+  if (key === "data-table-select") {
+    return "v-data-table__td v-data-table-column--no-padding v-data-table-column--align-start v-data-table__td--select-row";
+  } else {
+    return `pe-2 position-sticky ${isSorted ? sortedClass : ""}`;
+  }
 };
 </script>

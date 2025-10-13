@@ -17,8 +17,6 @@
               :label="$t('export.fieldSeparator')"
               :items="fieldSeparators"
               attribute="fieldSeparator"
-              item-title="name"
-              item-value="value"
               required
               @update:modelValue="csvOptions.fieldSeparator = $event"
             ></Combobox>
@@ -26,8 +24,6 @@
               :label="$t('export.rowDelimiter')"
               :items="rowDelimiters"
               attribute="rowDelimiter"
-              item-title="name"
-              item-value="value"
               persistent-hint
               required
               @update:modelValue="csvOptions.rowDelimiter = $event"
@@ -35,8 +31,6 @@
             <Combobox
               :label="$t('export.encoding')"
               :items="encoding"
-              item-title="name"
-              item-value="value"
               attribute="encoding"
               persistent-hint
               required
@@ -47,8 +41,6 @@
               :no-data-text="$t('label.noDataText')"
               :label="$t('export.quoteType')"
               :items="quoteTypes"
-              item-title="name"
-              item-value="value"
               persistent-hint
               required
               @update:modelValue="csvOptions.quoteType = $event"
@@ -97,39 +89,39 @@ const { hasRequestError } = useNotification();
 // Use array of objects to enable translation of the itemes in <v-select> element
 const fieldSeparators = [
   {
-    name: t("export.semicolon"),
+    title: t("export.semicolon"),
     value: ";",
   },
   {
-    name: t("export.comma"),
+    title: t("export.comma"),
     value: ",",
   },
   {
-    name: t("export.space"),
+    title: t("export.space"),
     value: " ",
   },
   {
-    name: t("export.period"),
+    title: t("export.period"),
     value: ".",
   },
 ];
 const quoteTypes = [
   {
-    name: t("export.doublequote"),
+    title: t("export.doublequote"),
     value: '"',
   },
   {
-    name: t("export.singlequote"),
+    title: t("export.singlequote"),
     value: "'",
   },
 ];
 const rowDelimiters = [
   {
-    name: t("export.windows"),
+    title: t("export.windows"),
     value: "\r\n",
   },
   {
-    name: t("export.linux"),
+    title: t("export.linux"),
     value: "\n",
   },
 ];

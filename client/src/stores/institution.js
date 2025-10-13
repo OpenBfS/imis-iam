@@ -63,7 +63,11 @@ export const useInstitutionStore = defineStore("institution", {
         }
       });
     },
-    loadInstitutions(searchString, loadAll = false) {
+    loadInstitutions(
+      searchString,
+      loadAll = false,
+      abortController = undefined
+    ) {
       return new Promise((resolve, reject) => {
         const params = loadAll
           ? {}
@@ -77,6 +81,7 @@ export const useInstitutionStore = defineStore("institution", {
             };
         HTTP.get("/iam/institution", {
           params,
+          signal: abortController?.signal,
         })
           .then((response) => {
             this.totalNumberOfInstitutions = response.data.size;
@@ -87,7 +92,14 @@ export const useInstitutionStore = defineStore("institution", {
             }
             resolve(response);
           })
-          .catch((error) => reject(error));
+          .catch((error) => {
+            // We cancel search requests for users and institutions if a new request is made on purpose.
+            // This error is very likely not a problem.
+            if (error.code === "ERR_CANCELED") {
+              resolve();
+            }
+            reject(error);
+          });
       });
     },
     updateInstitution(institution) {

@@ -10,16 +10,31 @@ services:
       context: ./ldap
     image: "iam_ldap"
   db:
-    build:
-      context: ./db
-    image: "iam_db"
+    image: postgres:16
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: keycloak
+    volumes:
+      # create the schema 'keycloak'
+      - ./db/initdb.d:/docker-entrypoint-initdb.d/
     ports:
       - ${DB_PORT:-2345}:5432
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U keycloak || exit 1"
+        ]
+      timeout: 5s
+      start_period: 120s
+      interval: 5s
+      retries: 5
   keycloak:
     extends:
       file: docker-compose.yml
       service: keycloak
-    entrypoint: /opt/src/start.sh
+    entrypoint: /opt/src/start-dev.sh
     ports:
       - ${ADMIN_PORT:-48080}:8080
     depends_on:
@@ -44,6 +59,8 @@ services:
       - KC_SPI_THEME_CACHE_THEMES=false
       - KC_SPI_THEME_CACHE_TEMPLATES=false
   client:
+    build:
+      dockerfile: ./docker/client/Dockerfile.dev
     extends:
       file: docker-compose.yml
       service: client
@@ -54,6 +71,8 @@ services:
       - CLIENT_MODE=development
       - SESSION_INACTIVITY_TIMEOUT=${SESSION_INACTIVITY_TIMEOUT}
       - SESSION_COOKIE_NAME=${SESSION_COOKIE_NAME}
+      #usually not required for dev:
+      #- CA_BUNDLE_PATH=${CA_BUNDLE_PATH}
     volumes:
       - ./client:/usr/local/iamdocker
       - ../client:/usr/local/iamclient

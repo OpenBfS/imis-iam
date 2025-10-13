@@ -46,6 +46,12 @@ web application "MailHog" at port `48082` on the docker host.
 
 ## Configuration
 
+For production builds copy `dev.env` to `.env` and adapt the options
+to your needs. Furthermore, you may want to copy `../keycloak/iam_theme` to
+a new folder and change greeters and notifation mails. Set `IAM_THEME_SRC`
+to point to this new folder (the path is relative to the top-level
+directory of this repository).
+
 Environment variables shared between containers are defined in `shared.env`.
 
 The configuration assumes a TLS endpoint is operated in front of the

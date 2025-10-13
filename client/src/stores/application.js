@@ -47,6 +47,7 @@ export const useApplicationStore = defineStore("application", {
     ownAccount: false,
     isLoading: false,
     networks: [],
+    abortControllers: {},
   }),
   actions: {
     setOwnAccount(data) {
@@ -110,10 +111,24 @@ export const useApplicationStore = defineStore("application", {
       return new Promise((resolve, reject) => {
         const promises = [];
         if (listOfTypes.includes("users")) {
-          promises.push(userStore.loadUsers());
+          this.abortControllers.users?.abort();
+          const userController = new AbortController();
+          this.abortControllers.users = userController;
+          promises.push(
+            userStore.loadUsers(undefined, undefined, userController)
+          );
         }
         if (listOfTypes.includes("institutions")) {
-          promises.push(institutionStore.loadInstitutions());
+          this.abortControllers.institutions?.abort();
+          const institutionController = new AbortController();
+          this.abortControllers.institutions = institutionController;
+          promises.push(
+            institutionStore.loadInstitutions(
+              undefined,
+              undefined,
+              institutionController
+            )
+          );
         }
         Promise.all(promises)
           .then(() => resolve())
