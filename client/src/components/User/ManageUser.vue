@@ -67,7 +67,7 @@
               </v-row>
               <v-row>
                 <template
-                  v-for="attribute in profileStore.attributesOfGroup(
+                  v-for="attribute in profileStore.filteredAttributesOfGroup(
                     group.name,
                     toRaw(user)
                   )"
@@ -372,13 +372,17 @@ const userRoles = computed(() => {
   );
 });
 const filteredAttributeGroups = computed(() => {
-  return profileStore.attributeGroups.filter((group) => {
-    return (
-      !group.annotations?.private ||
-      profileStore.userData.attributes.username[0] ===
-        user.value.attributes.username[0]
-    );
-  });
+  return (
+    profileStore.attributeGroups?.filter((group) => {
+      // Filter out groups which don't contain any attributes that the user can see.
+      return (
+        profileStore.userData.attributes.username[0] ===
+          user.value.attributes.username[0] ||
+        profileStore.filteredAttributesOfGroup(group.name, toRaw(user))
+          ?.length > 0
+      );
+    }) ?? []
+  );
 });
 // Deep Copy for objects
 const cloneObject = (obj) => {

@@ -26,14 +26,7 @@ const createHeaders = (columns, type) => {
       // Don't show columns with private attributes because the user can only see their own private
       // attributes and thus, these columns are useless.
       const attribute = profileStore.getAttribute(headerName);
-      const group = attribute
-        ? profileStore.getGroupByAttributeName(headerName)
-        : undefined;
-      if (
-        attribute &&
-        (profileStore.isAttributePrivate(headerName) ||
-          group?.annotations.private === true)
-      ) {
+      if (attribute && !profileStore.canAttributeBeShown(headerName)) {
         continue;
       }
     }
