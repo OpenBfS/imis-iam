@@ -77,14 +77,18 @@
               @click="toggleSort(columns[index])"
               class="d-flex align-baseline ga-1"
             >
-              <span>{{ columns[index].title }}</span>
+              <span class="text-accent" style="font-size: 11pt">{{
+                columns[index].title
+              }}</span>
               <v-icon
                 :icon="getSortIcon(columns[index])"
                 class="v-data-table-header__sort-icon"
               />
             </button>
             <div v-else>
-              <span>{{ columns[index].title }}</span>
+              <span class="text-accent" style="font-size: 11pt">
+                {{ columns[index].title }}
+              </span>
             </div>
           </div>
         </th>
