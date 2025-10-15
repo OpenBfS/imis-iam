@@ -84,7 +84,9 @@
               />
             </button>
             <div v-else>
-              <span>{{ columns[index].title }}</span>
+              <span class="text-accent" style="font-size: 11pt">
+                {{ columns[index].title }}
+              </span>
             </div>
           </div>
         </th>

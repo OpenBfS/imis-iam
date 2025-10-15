@@ -14,6 +14,8 @@
       :item-title="props.itemTitle"
       :item-value="props.itemValue"
       :no-data-text="$t('label.noDataText')"
+      base-color="accent"
+      bg-color="accent-lighten-5"
       class="my-1"
       clearable
       hide-details
@@ -29,8 +31,11 @@
     ></v-autocomplete>
     <v-text-field
       v-else
+      base-color="accent"
+      bg-color="accent-lighten-5"
       class="my-1"
       clearable
+      color="accent"
       density="compact"
       :model-value="textFieldValue"
       :placeholder="props.placeholder"
