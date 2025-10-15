@@ -1,4 +1,12 @@
+/* Copyright (C) 2021 Red Hat, Inc. and/or its affiliates, not by Bundesamt fuer Strahlenschutz
+ * Software engineering by Intevation GmbH
+ *
+ * This file is Free Software under the GNU GPL (v>=3)
+ * and comes with ABSOLUTELY NO WARRANTY!
+ */
 /*
+ * Ignore all above lines, they are here to make the maven codestyle checker happy.
+ * The actual copyright is
  * Copyright 2021 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
