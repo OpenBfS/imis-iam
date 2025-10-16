@@ -11,11 +11,12 @@ import static org.keycloak.userprofile.UserProfileContext.USER_API;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.intevation.iam.util.SearchQueryUtils;
@@ -117,79 +118,37 @@ public class UserResource {
     }
 
     /**
-     * Converts a List<List<User>> to a List<User>, keeping only users
-     * that are present in every inner list.
-     *
-     * @param listOfLists The input List<List<User>>.
-     * @return A new List<User> containing only the users common to all inner lists.
+     * For each multiselect attribute (more than one value in the input map),
+     * return complete search attributes for each value.
      */
-    public static List<User> getCommonUsers(List<List<User>> listOfLists) {
-        if (listOfLists == null || listOfLists.isEmpty()) {
-            return List.of();
-        }
-
-        // Create mutable copy
-        List<List<User>> mutableList = new ArrayList<>();
-        for (List<User> users : listOfLists) {
-            mutableList.add(new ArrayList<>(users));
-        }
-
-        Map<String, User> allUsers = new HashMap<>();
-        for (List<User> users : mutableList) {
-            for (int i = 0; i < users.size(); i++) {
-                User user = users.get(i);
-                if (!allUsers.containsKey(user.getId())) {
-                    allUsers.put(user.getId(), user);
-                } else {
-                    users.set(i, allUsers.get(user.getId()));
+    private static Map<String, List<Map<String, String>>> explodeAttrs(
+        Map<String, List<String>> map
+    ) {
+        Map<String, String> scalarAttrs = new HashMap<>();
+        map.forEach((k, v) -> {
+                if (v.size() == 1) {
+                    scalarAttrs.put(k, v.get(0));
                 }
-            }
+            });
+        if (scalarAttrs.size() == map.size()) {
+            // No multiselect attributes are searched for more than one value
+            return Map.of("", List.of(scalarAttrs));
         }
 
-        long numberOfLists = mutableList.size();
-
-        return mutableList.stream()
-                .flatMap(List::stream)
-                .collect(Collectors.groupingBy(user -> user, Collectors.counting()))
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() == numberOfLists)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Transforms a Map of String keys and List<String> values into a List of
-     * Maps, where each inner Map represents a "row" of data.
-     *
-     * @param map The input map where keys are column names and values are lists
-     * of data for each column.
-     * @return A list of maps, where each map contains one item for each key from
-     * the input map, representing a single row. If the input map is null
-     * or empty, an empty list is returned.
-     */
-    private static List<Map<String, String>> splitMap(Map<String, List<String>> map) {
-        if (map == null || map.isEmpty()) {
-            List<Map<String, String>> list = new ArrayList<>();
-            list.add(new HashMap<>());
-            return list;
-        }
-
-        int minSize = Integer.MAX_VALUE;
-        for (List<String> list : map.values()) {
-            if (list.size() < minSize) {
-                minSize = list.size();
-            }
-        }
-        List<Map<String, String>> ret = new ArrayList<>();
-        for (int index = 0; index < minSize; index++) {
-            Map<String, String> row = new HashMap<>();
-            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-                row.put(entry.getKey(), entry.getValue().get(index));
-            }
-            ret.add(row);
-        }
-        return ret;
+        Map<String, List<Map<String, String>>> exploded = new HashMap<>();
+        map.entrySet().stream()
+            .filter(e -> e.getValue().size() > 1)
+            .forEach(e -> e.getValue().forEach(v -> {
+                        String k = e.getKey();
+                        Map<String, String> attrs = new HashMap<>(scalarAttrs);
+                        attrs.put(k, v);
+                        if (exploded.containsKey(k)) {
+                            exploded.get(k).add(attrs);
+                        } else {
+                            exploded.put(k, new ArrayList<>(List.of(attrs)));
+                        }
+                    }));
+        return exploded;
     }
 
     /**
@@ -224,56 +183,83 @@ public class UserResource {
                 ? Collections.emptyMap()
                 : SearchQueryUtils.getFields(search));
 
-        List<List<User>> collectedUserList = new ArrayList<>();
-        for (Map<String, String> attributes : splitMap(multiAttributes)) {
+        /* Keycloak's searchForUserStream currently cannot search for multiple
+           values of a multiselect attribute. Thus, repeat the search for
+           each value of each multiselect attribute, union the results for
+           the values of each attribute and build the intersection of the
+           results for the multiselect attributes.
+           The union of the results per multiselect attribute is required to
+           match a requirement set by users of the application. */
+        Map<String, List<Map<String, String>>> exploded
+            = explodeAttrs(multiAttributes);
+        boolean intersectionInitialized = false;
+        Set<User> intersection = new HashSet<>();
+        for (String multiAttr : exploded.keySet()) {
+            Set<User> collectedUsers = new HashSet<>();
+            for (Map<String, String> attributes : exploded.get(multiAttr)) {
+                // Match sub-strings
+                attributes.put(UserModel.EXACT, Boolean.FALSE.toString());
 
-            // Match sub-strings
-            attributes.put(UserModel.EXACT, Boolean.FALSE.toString());
-
-            String generalSearch = attributes.get("search");
-            if (generalSearch != null) {
-                attributes.put(UserModel.SEARCH, generalSearch);
-                attributes.remove("search");
-            }
-
-            Map<String, String> customAttributes = new HashMap<>();
-
-            for (String customAttribute : new String[]{"institutions", "role", "network", "hiddenInAddressbook"}) {
-                String value = attributes.get(customAttribute);
-                if (value != null) {
-                    customAttributes.put(customAttribute, value);
-                    attributes.remove(customAttribute);
+                String generalSearch = attributes.get("search");
+                if (generalSearch != null) {
+                    attributes.put(UserModel.SEARCH, generalSearch);
+                    attributes.remove("search");
                 }
-            }
 
-            Stream<UserModel> userModels = session.users()
+                Map<String, String> customAttributes = new HashMap<>();
+                for (String customAttribute : new String[]{
+                        "institutions", "role", "network",
+                        "hiddenInAddressbook"}
+                ) {
+                    String value = attributes.get(customAttribute);
+                    if (value != null) {
+                        customAttributes.put(customAttribute, value);
+                        attributes.remove(customAttribute);
+                    }
+                }
+
+                Stream<UserModel> userModels = session.users()
                     .searchForUserStream(realm, attributes);
 
-            Predicate<User> userFilter = u -> true;
-            if (!customAttributes.isEmpty()) {
-                String institution = customAttributes.get("institutions");
-                String role = customAttributes.get("role");
-                String network = customAttributes.get("network");
-                String isHiddenString = customAttributes.get("hiddenInAddressbook");
-                Boolean isHidden = isHiddenString != null ? Boolean.valueOf(isHiddenString) : null;
-                userFilter = u -> (institution == null
+                Predicate<User> userFilter = u -> true;
+                if (!customAttributes.isEmpty()) {
+                    String institution = customAttributes.get(
+                        "institutions");
+                    String role = customAttributes.get("role");
+                    String network = customAttributes.get("network");
+                    String isHiddenString = customAttributes.get(
+                        "hiddenInAddressbook");
+                    Boolean isHidden = isHiddenString != null
+                        ? Boolean.valueOf(isHiddenString) : null;
+                    userFilter = u -> (institution == null
                         || u.getInstitutions().contains(institution))
                         && (role == null || u.getRole().equals(role))
-                        && (network == null || u.getNetwork().contains(network))
-                        && (isHidden == null || u.isHiddenInAddressbook() == isHidden);
+                        && (network == null
+                            || u.getNetwork().contains(network))
+                        && (isHidden == null
+                            || u.isHiddenInAddressbook() == isHidden);
+                }
+
+                List<User> matching = userModels
+                    .map(userEntity -> new User(userEntity, session))
+                    .filter(userFilter)
+                    .toList();
+                // Filter users not authorized for GET
+                matching = auth.filter(matching);
+
+                // Union of matching users for current multiAttr
+                collectedUsers.addAll(matching);
             }
 
-            List<User> userList = userModels.map(userEntity -> new User(
-                            session.users()
-                                    .getUserById(realm, userEntity.getId()), session))
-                    .filter(userFilter)
-                    .collect(Collectors.toList());
-            // Filter hidden users
-            userList = auth.filter(userList);
-            collectedUserList.add(userList);
+            // Intersection of results for all multiselect attributes
+            if (!intersectionInitialized) {
+                intersection.addAll(collectedUsers);
+                intersectionInitialized = true;
+            } else {
+                intersection.retainAll(collectedUsers);
+            }
         }
-
-        List<User> userList = getCommonUsers(collectedUserList);
+        List<User> userList = new ArrayList<>(intersection);
 
         if (order != SortOrder.asc
                 || !sortByAttribute.equals("id")) {
