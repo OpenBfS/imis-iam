@@ -251,6 +251,7 @@
                   item-value="id"
                   persistent-hint
                   multiple
+                  required
                 ></Select>
               </v-col>
             </v-row>
