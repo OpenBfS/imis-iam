@@ -7,6 +7,7 @@
 package de.intevation.iam;
 
 import static org.keycloak.userprofile.UserProfileContext.USER_API;
+import static org.keycloak.validate.validators.OptionsValidator.KEY_OPTIONS;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.intevation.iam.util.SearchQueryUtils;
@@ -45,6 +47,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.representations.userprofile.config.UPAttribute;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.keycloak.userprofile.UserProfileProvider;
 import org.keycloak.userprofile.ValidationException;
@@ -179,6 +182,12 @@ public class UserResource {
             order = SortOrder.asc;
         }
 
+        final Set<String> selectListAttrs = this.userProfileProvider
+            .getConfiguration().getAttributes().stream()
+            .filter(a -> a.getValidations().containsKey(KEY_OPTIONS))
+            .map(UPAttribute::getName)
+            .collect(Collectors.toUnmodifiableSet());
+
         Map<String, List<String>> multiAttributes = new HashMap<>(search == null
                 ? Collections.emptyMap()
                 : SearchQueryUtils.getFields(search));
@@ -221,7 +230,18 @@ public class UserResource {
                 Stream<UserModel> userModels = session.users()
                     .searchForUserStream(realm, attributes);
 
-                Predicate<User> userFilter = u -> true;
+                /* searchForUserStream lets us choose between exact and
+                   sub-string search only for all attributes at once.
+                   Since sub-string search is not appropriate for values
+                   from select lists, apply further filtering: */
+                Predicate<User> selectedAttrsFilter = u -> u
+                    .getAttributes().entrySet().stream()
+                    .filter(e -> selectListAttrs.contains(e.getKey())
+                        && attributes.containsKey(e.getKey()))
+                    .allMatch(e -> e.getValue().contains(
+                            attributes.get(e.getKey())));
+
+                Predicate<User> customAttributesFilter = u -> true;
                 if (!customAttributes.isEmpty()) {
                     String institution = customAttributes.get(
                         "institutions");
@@ -231,7 +251,7 @@ public class UserResource {
                         "hiddenInAddressbook");
                     Boolean isHidden = isHiddenString != null
                         ? Boolean.valueOf(isHiddenString) : null;
-                    userFilter = u -> (institution == null
+                    customAttributesFilter = u -> (institution == null
                         || u.getInstitutions().contains(institution))
                         && (role == null || u.getRole().equals(role))
                         && (network == null
@@ -242,7 +262,8 @@ public class UserResource {
 
                 List<User> matching = userModels
                     .map(userEntity -> new User(userEntity, session))
-                    .filter(userFilter)
+                    .filter(selectedAttrsFilter)
+                    .filter(customAttributesFilter)
                     .toList();
                 // Filter users not authorized for GET
                 matching = auth.filter(matching);
