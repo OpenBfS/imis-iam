@@ -24,12 +24,12 @@
     "vue": "^3.5.22",
     "vue-i18n": "^11.1.12",
     "vue-router": "^4.6.3",
-    "vuetify": "^3.10.5"
+    "vuetify": "^3.10.7"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue/test-utils": "^2.4.6",
-    "eslint": "^9.37.0",
+    "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-notice": "^1.0.0",
     "eslint-plugin-prettier": "^5.5.4",
