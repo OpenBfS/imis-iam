@@ -79,6 +79,7 @@
                       :clearValidationError="clearValidationError"
                       :setUserAttribute="setUserAttribute"
                       :user="user"
+                      :disabled="isDisabled(attribute)"
                     />
                   </v-col>
                 </template>
@@ -99,12 +100,7 @@
                     :clearValidationError="clearValidationError"
                     :setUserAttribute="setUserAttribute"
                     :user="user"
-                    :disabled="
-                      !(
-                        profileStore.userData.role === 'chief_editor' ||
-                        attribute.name !== 'tags'
-                      )
-                    "
+                    :disabled="isDisabled(attribute)"
                   />
                   <p
                     :id="`${attribute.name}-validation-error`"
@@ -329,6 +325,14 @@ const getUserAttributeRules = (userAttribute) => {
     // Rules for select components
   }
   return tmpRules;
+};
+
+const isDisabled = (attribute) => {
+  return !(
+    profileStore.userData.role === "chief_editor" ||
+    profileStore.userData.role === "editor" ||
+    attribute.name !== "tags"
+  );
 };
 
 onBeforeMount(() => {
