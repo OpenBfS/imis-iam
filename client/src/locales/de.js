@@ -176,6 +176,9 @@ export default {
     stateSaxonyAnhalt: "Sachsen-Anhalt",
     stateSchleswigHolstein: "Schleswig-Holstein",
     stateThuringia: "Thüringen",
+    institutionAlreadyExists: "Institution existiert bereits",
+    institutionWithSameAddressMessage:
+      "Unter dieser Adresse existiert bereits eine Institution - sind Sie sicher, dass Sie eine weitere unter dieser Adresse anlegen möchten?",
   },
   // Main component
   main: {
@@ -230,7 +233,9 @@ export default {
     reset: "Zurücksetzen",
     save: "Speichern",
     yes: "Ja",
+    yesProceed: "Ja, fortfahren",
     no: "Nein",
+    noCancelEntry: "Nein, Eintrag abbrechen",
     newEmail: "Neue E-Mail",
     send: "Versenden",
     confirm: "Bestätigen",

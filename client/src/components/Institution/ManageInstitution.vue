@@ -96,6 +96,7 @@
                 :label="$t('institution.serviceBuildingPostalCode')"
                 :attribute="'serviceBuildingPostalCode'"
                 required
+                @blur="checkForDuplicateAddress"
                 @update:modelValue="
                   institution.serviceBuildingPostalCode = $event
                 "
@@ -104,6 +105,7 @@
                 :label="$t('institution.serviceBuildingStreet')"
                 :attribute="'serviceBuildingStreet'"
                 required
+                @blur="checkForDuplicateAddress"
                 @update:modelValue="institution.serviceBuildingStreet = $event"
               ></TextField>
             </div>
@@ -263,6 +265,7 @@
         v-if="hasLoadingError || hasRequestError"
         v-bind:message="applicationStore.httpErrorMessage"
       />
+      <UIAlert v-else-if="duplicateAddressFound" message="aaaah" />
     </v-container>
     <v-divider></v-divider>
     <v-card-actions>
@@ -299,6 +302,20 @@
     </v-card-actions>
   </v-card>
   <ConfirmCancelDialog
+    :isActive="isDuplicateAddressDialogOpen"
+    :message="$t('institution.institutionWithSameAddressMessage')"
+    :title="$t('institution.institutionAlreadyExists')"
+    :confirmButtonText="$t('button.yesProceed')"
+    :cancelButtonText="$t('button.noCancelEntry')"
+    :onConfirm="
+      () => {
+        dismissedDuplicateAddressDialog = true;
+        isDuplicateAddressDialogOpen = false;
+      }
+    "
+    :onCancel="() => applicationStore.setShowManageInstitutionDialog(false)"
+  ></ConfirmCancelDialog>
+  <ConfirmCancelDialog
     :isActive="showConfirmCancelDialog"
     :onConfirm="() => applicationStore.setShowManageInstitutionDialog(false)"
     :onCancel="() => closeConfirmCancelDialog()"
@@ -326,7 +343,7 @@ import {
   provide,
   ref,
 } from "vue";
-import { HTTP } from "@/lib/http.js";
+import { createSearchQueryString, HTTP } from "@/lib/http.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { trimSpacesInObject, useForm } from "@/lib/use-form.js";
 import { useApplicationStore } from "@/stores/application.js";
@@ -343,6 +360,7 @@ import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
 import { useI18n } from "vue-i18n";
 import { states } from "./institution";
+import UIAlert from "../UI/UIAlert.vue";
 
 const { t } = useI18n();
 
@@ -362,6 +380,8 @@ const measFacilNameField = ref(null);
 const institution = ref(applicationStore.managedItem);
 const originalInstitution = { ...institution.value };
 const processType = ref(applicationStore.processType);
+const isDuplicateAddressDialogOpen = ref(false);
+const dismissedDuplicateAddressDialog = ref(false);
 
 // TODO: Geocoding feature delayed to a subsequent date
 // const coordinates = ref(coordinatesStore.coordinates);
@@ -418,26 +438,26 @@ onBeforeMount(() => {
   applicationStore.initClientRules({
     name: validRegex(
       noLeadingTrailingSpaces,
-      t("error.noLeadingTrailingSpaces"),
+      t("error.noLeadingTrailingSpaces")
     ),
     measFacilName: [
       ...measIdAndNameOrNothing(),
       ...validRegex(
         noLeadingTrailingSpaces,
-        t("error.noLeadingTrailingSpaces"),
+        t("error.noLeadingTrailingSpaces")
       ),
     ],
     serviceBuildingPostalCode: [...validPostalcode(t("error.validPostalcode"))],
     serviceBuildingStreet: [
       ...validRegex(
         noLeadingTrailingSpaces,
-        t("error.noLeadingTrailingSpaces"),
+        t("error.noLeadingTrailingSpaces")
       ),
     ],
     serviceBuildingLocation: [
       ...validRegex(
         noLeadingTrailingSpaces,
-        t("error.noLeadingTrailingSpaces"),
+        t("error.noLeadingTrailingSpaces")
       ),
     ],
     addressPostalCode: validPostalcode(t("error.validPostalcode")),
@@ -455,7 +475,7 @@ onBeforeMount(() => {
       ...measIdAndNameOrNothing(),
       ...validRegex(
         noLeadingTrailingSpaces,
-        t("error.noLeadingTrailingSpaces"),
+        t("error.noLeadingTrailingSpaces")
       ),
     ],
   });
@@ -526,7 +546,7 @@ const saveInstitution = () => {
     showPostalAddress,
     isServerValidationError,
     handleValidationErrorFromServer,
-    hasRequestError,
+    hasRequestError
   );
 };
 
@@ -542,6 +562,39 @@ function hasPostalAddress() {
 const isPostalAddressToBeDeleted = computed(() => {
   return hasPostalAddress() && !showPostalAddress.value;
 });
+
+const checkForDuplicateAddress = () => {
+  if (
+    !institution.value.serviceBuildingPostalCode ||
+    !institution.value.serviceBuildingStreet ||
+    dismissedDuplicateAddressDialog.value
+  )
+    return;
+  const params = {
+    firstResult: 0,
+    search: createSearchQueryString(undefined, {
+      serviceBuildingPostalCode: institution.value.serviceBuildingPostalCode,
+      serviceBuildingStreet: institution.value.serviceBuildingStreet,
+    }),
+  };
+  HTTP.get("/iam/institution", {
+    params,
+  }).then((response) => {
+    if (response.status === 200) {
+      const foundInstitutions = response.data.list;
+      const instWithDuplAddress = foundInstitutions.find((i) => {
+        return (
+          i.serviceBuildingPostalCode ===
+            institution.value.serviceBuildingPostalCode &&
+          i.serviceBuildingStreet === institution.value.serviceBuildingStreet
+        );
+      });
+      if (instWithDuplAddress) {
+        isDuplicateAddressDialogOpen.value = true;
+      }
+    }
+  });
+};
 
 // TODO: Geocoding feature delayed to a subsequent date
 /*
