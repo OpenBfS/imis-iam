@@ -18,6 +18,7 @@
       bg-color="accent-lighten-5"
       class="my-1"
       clearable
+      hide-details
       min-width="120"
       :model-value="autocompleteValue"
       variant="outlined"
@@ -38,8 +39,8 @@
       density="compact"
       :model-value="textFieldValue"
       :placeholder="props.placeholder"
+      hide-details
       min-width="40"
-      :rules="rules"
       variant="outlined"
       @update:modelValue="
         (event) => {
@@ -67,9 +68,6 @@ import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
 import debounce from "debounce";
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -87,8 +85,6 @@ const props = defineProps([
 
 const textFieldValue = ref("");
 const autocompleteValue = ref(null);
-
-const rules = [(v) => !v || !v.includes("\\") || t("error.noBackslash")];
 
 onMounted(() => {
   // Restore value when the column containing this filter component was hidden and shown again.
@@ -110,7 +106,6 @@ const triggerSearch = debounce(() => {
 }, 500);
 
 const handleFilterInput = (value) => {
-  if (value?.includes("\\")) return;
   const term = value !== null ? value : "";
   if (props.type === "users") {
     userStore.updateFilter(props.filterKey, term);

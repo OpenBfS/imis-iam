@@ -96,7 +96,6 @@ export default {
     onlyUniqueValues: "Bitte geben Sie keine doppelten Werte ein.",
     noLeadingTrailingSpaces:
       "Bitte verwenden Sie ein gültiges Format ohne Leerzeichen am Anfang/Ende.",
-    noBackslash: "Bitte verwenden Sie kein Backslash.",
   },
   export: {
     semicolon: "Semikolon",
