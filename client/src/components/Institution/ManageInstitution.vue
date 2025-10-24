@@ -436,10 +436,13 @@ const measIdAndNameOrNothing = () => {
 onBeforeMount(() => {
   applicationStore.setForm(form);
   applicationStore.initClientRules({
-    name: validRegex(
-      noLeadingTrailingSpaces,
-      t("error.noLeadingTrailingSpaces")
-    ),
+    name: [
+      ...validRegex(
+        noLeadingTrailingSpaces,
+        t("error.noLeadingTrailingSpaces")
+      ),
+      (v) => !v || !v.includes("\\") || t("error.noBackslash"),
+    ],
     measFacilName: [
       ...measIdAndNameOrNothing(),
       ...validRegex(
