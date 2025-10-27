@@ -42,6 +42,12 @@ Maven Checkstyle plugin. Some design related checks where removed.
   <module name="RegexpHeader">
     <property name="headerFile" value="java.header"/>
   </module>
+  <!-- src/main/java/de/intevation/iam/util/SearchQueryUtils.java
+       has different license header -->
+  <module name="SuppressionSingleFilter">
+    <property name="checks" value="RegexpHeader"/>
+    <property name="files" value="SearchQueryUtils.java"/>
+  </module>
 
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>

@@ -88,9 +88,21 @@ function createSearchQueryString(searchTerm, filters) {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     if (filters[key]) {
-      searchQueryString = searchQueryString.concat(
-        `${key}:"${escapeSpecialCharacters(filters[key])}"`
-      );
+      const filterValue = filters[key];
+      if (Array.isArray(filterValue)) {
+        filterValue.forEach((v, index) => {
+          searchQueryString = searchQueryString.concat(
+            `${key}:"${escapeSpecialCharacters(v)}"`
+          );
+          if (index < filterValue.length - 1) {
+            searchQueryString = searchQueryString.concat(" ");
+          }
+        });
+      } else {
+        searchQueryString = searchQueryString.concat(
+          `${key}:"${escapeSpecialCharacters(filterValue)}"`
+        );
+      }
       if (i < keys.length - 1) {
         searchQueryString = searchQueryString.concat(" ");
       }

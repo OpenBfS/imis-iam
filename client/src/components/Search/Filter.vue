@@ -21,11 +21,19 @@
       hide-details
       min-width="120"
       :model-value="autocompleteValue"
+      :multiple="
+        type === 'users' &&
+        !['enabled', 'hiddenInAddressbook', 'role'].includes(filterKey)
+      "
       variant="outlined"
+      @update:focused="
+        (event) => {
+          if (!event) handleFilterInput();
+        }
+      "
       @update:modelValue="
         (event) => {
           autocompleteValue = event;
-          handleFilterInput(event);
         }
       "
     ></v-autocomplete>
@@ -105,7 +113,8 @@ const triggerSearch = debounce(() => {
   applicationStore.searchRequest([props.type]);
 }, 500);
 
-const handleFilterInput = (value) => {
+const handleFilterInput = () => {
+  const value = autocompleteValue.value;
   const term = value !== null ? value : "";
   if (props.type === "users") {
     userStore.updateFilter(props.filterKey, term);
