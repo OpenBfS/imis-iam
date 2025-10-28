@@ -18,11 +18,6 @@ custom [JPA entities](https://www.keycloak.org/docs/latest/server_development/in
 The same extension also provides [REST interfaces](https://www.keycloak.org/docs/latest/server_development/index.html#_extensions_rest)
 for the management of these specific aspects.
 
-The REST interfaces provided by the extension generally exclude User Profile
-attributes with an annotation "private" set to true, or which are part of
-a group with such annotation. These attributes are only disclosed at
-`user/profile` for the logged in user.
-
 ### Client
 A client based on [Vue.js](https://vuejs.org) and [Vuetify](https://vuetifyjs.com)
 provides a GUI for REST interfaces provided by the backend (`client/`).
