@@ -397,8 +397,7 @@
           "user"
         ],
         "edit": [
-          "admin",
-          "user"
+          "admin"
         ]
       },
       "multivalued": true

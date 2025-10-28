@@ -31,7 +31,6 @@ public class UserAuthorizer extends Authorizer<User> {
     private static final String HIDDEN_IN_ADDRESSBOOK_KEY = "hiddenInAddressbook";
     private static final String ROLE_ATTRIBUTE_KEY = "role";
     private static final String NETWORK_ATTRIBUTE_KEY = "network";
-    private static final String TAGS_ATTRIBUTE_KEY = "tags";
 
     /**
      * Attributes that require IaMRole.CHIEF_EDITOR to be set.
@@ -41,8 +40,7 @@ public class UserAuthorizer extends Authorizer<User> {
             ENABLED_ATTRIBUTE_KEY,
             HIDDEN_IN_ADDRESSBOOK_KEY,
             ROLE_ATTRIBUTE_KEY,
-            NETWORK_ATTRIBUTE_KEY,
-            TAGS_ATTRIBUTE_KEY
+            NETWORK_ATTRIBUTE_KEY
         );
 
     public UserAuthorizer(KeycloakSession session) {
