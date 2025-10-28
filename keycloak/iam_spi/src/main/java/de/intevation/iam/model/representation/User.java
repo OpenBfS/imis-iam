@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import jakarta.persistence.EntityManager;
@@ -193,5 +194,28 @@ public class User {
         }
         jpaUser.setHiddenInAddressbook(hiddenInAddressbook);
         return jpaUser;
+    }
+
+    /**
+     * Indicates whether an object is considered equal to this instance.
+     *
+     * {@code obj} is considered equal if it is this instance or has
+     * the same ID.
+     * @param obj the object to be compared with this instance
+     * @return true if {@code obj} is considered equal to this instance
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return obj == this
+            || obj instanceof User other
+            && other.getId() != null
+            && other.getId().equals(this.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id == null
+            ? super.hashCode()
+            : Objects.hash(this.id);
     }
 }

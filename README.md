@@ -26,3 +26,11 @@ a group with such annotation. These attributes are only disclosed at
 ### Client
 A client based on [Vue.js](https://vuejs.org) and [Vuetify](https://vuetifyjs.com)
 provides a GUI for REST interfaces provided by the backend (`client/`).
+
+## License
+
+This software is licensed unter GPL version 3.0 or later.
+It includes one file licensed unter Apache 2.0:
+`keycloak/iam_spi/src/main/java/de/intevation/iam/util/SearchQueryUtils.java`
+
+A copy of both license texts is included in directory [`LICENSES`](./LICENSES/)

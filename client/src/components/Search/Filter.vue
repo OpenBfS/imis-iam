@@ -14,23 +14,36 @@
       :item-title="props.itemTitle"
       :item-value="props.itemValue"
       :no-data-text="$t('label.noDataText')"
+      base-color="accent"
+      bg-color="accent-lighten-5"
       class="my-1"
       clearable
       hide-details
       min-width="120"
       :model-value="autocompleteValue"
+      :multiple="
+        type === 'users' &&
+        !['enabled', 'hiddenInAddressbook', 'role'].includes(filterKey)
+      "
       variant="outlined"
+      @update:focused="
+        (event) => {
+          if (!event) handleFilterInput();
+        }
+      "
       @update:modelValue="
         (event) => {
           autocompleteValue = event;
-          handleFilterInput(event);
         }
       "
     ></v-autocomplete>
     <v-text-field
       v-else
+      base-color="accent"
+      bg-color="accent-lighten-5"
       class="my-1"
       clearable
+      color="accent"
       density="compact"
       :model-value="textFieldValue"
       :placeholder="props.placeholder"
@@ -100,7 +113,8 @@ const triggerSearch = debounce(() => {
   applicationStore.searchRequest([props.type]);
 }, 500);
 
-const handleFilterInput = (value) => {
+const handleFilterInput = () => {
+  const value = autocompleteValue.value;
   const term = value !== null ? value : "";
   if (props.type === "users") {
     userStore.updateFilter(props.filterKey, term);

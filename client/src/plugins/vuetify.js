@@ -21,6 +21,7 @@ const iamLight = {
     secondary: "#caddc1",
     "secondary-darken-1": "#018786",
     accent: "#5b8445",
+    "accent-lighten-5": "hsla(99, 31%, 94%, 1.00)",
     anchor: "#8c9eff",
     error: "#B00020",
     info: "#2196F3",

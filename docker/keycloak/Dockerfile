@@ -1,4 +1,4 @@
-FROM ubuntu:24.04 as builder
+FROM ubuntu:24.04 AS builder
 
 # Use UTF-8
 RUN echo \
@@ -28,7 +28,7 @@ RUN mkdir -p $KEYCLOAK_HOME/providers && \
     cp target/iam-api-extension-jar-with-dependencies.jar $KEYCLOAK_HOME/providers/
 
 #----------------------------------------
-FROM ubuntu:24.04 as main
+FROM ubuntu:24.04 AS main
 
 LABEL maintainer=awoestmann@intevation.de
 

@@ -8,17 +8,22 @@ package de.intevation.iam;
 
 import static org.keycloak.userprofile.UserProfileContext.ACCOUNT;
 import static org.keycloak.userprofile.UserProfileContext.USER_API;
+import static org.keycloak.validate.validators.OptionsValidator.KEY_OPTIONS;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.intevation.iam.util.SearchQueryUtils;
+import de.intevation.iam.util.SortUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.BadRequestException;
@@ -43,6 +48,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.representations.userprofile.config.UPAttribute;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.keycloak.userprofile.UserProfileContext;
 import org.keycloak.userprofile.UserProfileProvider;
@@ -58,12 +64,16 @@ import de.intevation.iam.util.Constants;
 import de.intevation.iam.util.DateUtils;
 import de.intevation.iam.util.RequestMethod;
 import de.intevation.iam.validation.Validator;
-import org.keycloak.utils.SearchQueryUtils;
 
 
 public class UserResource {
 
     private static final String PROFILE_PATH = "profile";
+
+    public enum SortOrder {
+        asc,
+        desc
+    }
 
     private KeycloakSession session;
 
@@ -126,10 +136,46 @@ public class UserResource {
     }
 
     /**
+     * For each multiselect attribute (more than one value in the input map),
+     * return complete search attributes for each value.
+     */
+    private static Map<String, List<Map<String, String>>> explodeAttrs(
+        Map<String, List<String>> map
+    ) {
+        Map<String, String> scalarAttrs = new HashMap<>();
+        map.forEach((k, v) -> {
+                if (v.size() == 1) {
+                    scalarAttrs.put(k, v.get(0));
+                }
+            });
+        if (scalarAttrs.size() == map.size()) {
+            // No multiselect attributes are searched for more than one value
+            return Map.of("", List.of(scalarAttrs));
+        }
+
+        Map<String, List<Map<String, String>>> exploded = new HashMap<>();
+        map.entrySet().stream()
+            .filter(e -> e.getValue().size() > 1)
+            .forEach(e -> e.getValue().forEach(v -> {
+                        String k = e.getKey();
+                        Map<String, String> attrs = new HashMap<>(scalarAttrs);
+                        attrs.put(k, v);
+                        if (exploded.containsKey(k)) {
+                            exploded.get(k).add(attrs);
+                        } else {
+                            exploded.put(k, new ArrayList<>(List.of(attrs)));
+                        }
+                    }));
+        return exploded;
+    }
+
+    /**
      * Get all users.
      * @param search Optional search parameter
      * @param firstResult First result to return
      * @param maxResults Maximum numbers of results to return
+     * @param sortBy Attribute to sort for
+     * @param order Sort order: ascending and descending
      * @return List of user json objects
      */
     @GET
@@ -137,53 +183,124 @@ public class UserResource {
     public ObjectList<User> getUsers(
             @QueryParam("search") String search,
             @QueryParam("firstResult") Integer firstResult,
-            @QueryParam("maxResults") Integer maxResults) {
+            @QueryParam("maxResults") Integer maxResults,
+            @QueryParam("sortBy") String sortBy,
+            @QueryParam("order") SortOrder order) {
         RealmModel realm = session.getContext().getRealm();
 
-        Map<String, String> attributes = new HashMap<>(search == null
+        String sortByAttribute = "id";
+        if (sortBy != null) {
+            sortByAttribute = sortBy;
+        }
+
+        if (order == null) {
+            order = SortOrder.asc;
+        }
+
+        final Set<String> selectListAttrs = this.userProfileProvider
+            .getConfiguration().getAttributes().stream()
+            .filter(a -> a.getValidations().containsKey(KEY_OPTIONS))
+            .map(UPAttribute::getName)
+            .collect(Collectors.toUnmodifiableSet());
+
+        Map<String, List<String>> multiAttributes = new HashMap<>(search == null
                 ? Collections.emptyMap()
                 : SearchQueryUtils.getFields(search));
 
-        // Match sub-strings
-        attributes.put(UserModel.EXACT, Boolean.FALSE.toString());
+        /* Keycloak's searchForUserStream currently cannot search for multiple
+           values of a multiselect attribute. Thus, repeat the search for
+           each value of each multiselect attribute, union the results for
+           the values of each attribute and build the intersection of the
+           results for the multiselect attributes.
+           The union of the results per multiselect attribute is required to
+           match a requirement set by users of the application. */
+        Map<String, List<Map<String, String>>> exploded
+            = explodeAttrs(multiAttributes);
+        boolean intersectionInitialized = false;
+        Set<User> intersection = new HashSet<>();
+        for (String multiAttr : exploded.keySet()) {
+            Set<User> collectedUsers = new HashSet<>();
+            for (Map<String, String> attributes : exploded.get(multiAttr)) {
+                // Match sub-strings
+                attributes.put(UserModel.EXACT, Boolean.FALSE.toString());
 
-        String generalSearch = attributes.get("search");
-        if (generalSearch != null) {
-            attributes.put(UserModel.SEARCH, generalSearch);
-            attributes.remove("search");
+                String generalSearch = attributes.get("search");
+                if (generalSearch != null) {
+                    attributes.put(UserModel.SEARCH, generalSearch);
+                    attributes.remove("search");
+                }
+
+                Map<String, String> customAttributes = new HashMap<>();
+                for (String customAttribute : new String[]{
+                        "institutions", "role", "network",
+                        "hiddenInAddressbook"}
+                ) {
+                    String value = attributes.get(customAttribute);
+                    if (value != null) {
+                        customAttributes.put(customAttribute, value);
+                        attributes.remove(customAttribute);
+                    }
+                }
+
+                Stream<UserModel> userModels = session.users()
+                    .searchForUserStream(realm, attributes);
+
+                /* searchForUserStream lets us choose between exact and
+                   sub-string search only for all attributes at once.
+                   Since sub-string search is not appropriate for values
+                   from select lists, apply further filtering: */
+                Predicate<User> selectedAttrsFilter = u -> u
+                    .getAttributes().entrySet().stream()
+                    .filter(e -> selectListAttrs.contains(e.getKey())
+                        && attributes.containsKey(e.getKey()))
+                    .allMatch(e -> e.getValue().contains(
+                            attributes.get(e.getKey())));
+
+                Predicate<User> customAttributesFilter = u -> true;
+                if (!customAttributes.isEmpty()) {
+                    String institution = customAttributes.get(
+                        "institutions");
+                    String role = customAttributes.get("role");
+                    String network = customAttributes.get("network");
+                    String isHiddenString = customAttributes.get(
+                        "hiddenInAddressbook");
+                    Boolean isHidden = isHiddenString != null
+                        ? Boolean.valueOf(isHiddenString) : null;
+                    customAttributesFilter = u -> (institution == null
+                        || u.getInstitutions().contains(institution))
+                        && (role == null || u.getRole().equals(role))
+                        && (network == null
+                            || u.getNetwork().contains(network))
+                        && (isHidden == null
+                            || u.isHiddenInAddressbook() == isHidden);
+                }
+
+                List<User> matching = userModels
+                    .map(userEntity -> new User(userEntity, session, USER_API))
+                    .filter(selectedAttrsFilter)
+                    .filter(customAttributesFilter)
+                    .toList();
+                // Filter users not authorized for GET
+                matching = auth.filter(matching);
+
+                // Union of matching users for current multiAttr
+                collectedUsers.addAll(matching);
+            }
+
+            // Intersection of results for all multiselect attributes
+            if (!intersectionInitialized) {
+                intersection.addAll(collectedUsers);
+                intersectionInitialized = true;
+            } else {
+                intersection.retainAll(collectedUsers);
+            }
         }
+        List<User> userList = new ArrayList<>(intersection);
 
-        Map<String, String> customAttributes = new HashMap<>();
-
-        for (String customAttribute : new String[]{"institutions", "role", "network", "hiddenInAddressbook"}) {
-           String value = attributes.get(customAttribute);
-           if (value != null) {
-               customAttributes.put(customAttribute, value);
-               attributes.remove(customAttribute);
-           }
+        if (order != SortOrder.asc
+                || !sortByAttribute.equals("id")) {
+            SortUtil.sortByField(userList, sortByAttribute, order == SortOrder.asc);
         }
-
-        Predicate<User> userFilter = u -> true;
-        if (!customAttributes.isEmpty()) {
-            String institution = customAttributes.get("institutions");
-            String role = customAttributes.get("role");
-            String network = customAttributes.get("network");
-            String isHiddenString = customAttributes.get("hiddenInAddressbook");
-            Boolean isHidden = isHiddenString != null ? Boolean.valueOf(isHiddenString) : null;
-            userFilter = u -> (institution == null
-                || u.getInstitutions().contains(institution))
-                && (role == null || u.getRole().equals(role))
-                && (network == null || u.getNetwork().contains(network))
-                && (isHidden == null || u.isHiddenInAddressbook() == isHidden);
-        }
-
-        List<User> userList = session.users()
-            .searchForUserStream(realm, attributes)
-            .map(userEntity -> new User(userEntity, session, USER_API))
-            .filter(userFilter)
-            .collect(Collectors.toList());
-        // Filter hidden users
-        userList = auth.filter(userList);
 
         long size = userList.size();
         if (firstResult != null || maxResults != null) {

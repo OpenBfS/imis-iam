@@ -7,76 +7,66 @@
  -->
 <template>
   <div class="d-flex justify-end my-1">
-    <v-tooltip location="top">
-      <template v-slot:activator="{ props }">
-        <v-btn
-          color="accent"
-          class="ms-4"
-          v-bind="props"
-          icon="mdi-tag-edit"
-          :disabled="
-            (selectedTab === 'users' && userStore.selectedUsers.length === 0) ||
-            (selectedTab === 'institutions' &&
-              institutionStore.selectedInstitutions.length === 0)
-          "
-          @click="toggleEditTags"
-        >
-        </v-btn>
-      </template>
-      <span>{{ $t("search.editTags") }}</span>
-    </v-tooltip>
-    <v-tooltip v-if="selectedTab === 'users'" location="top">
-      <template v-slot:activator="{ props }">
-        <v-btn
-          v-if="profileStore.isAllowedToManage"
-          color="accent"
-          class="ms-4"
-          v-bind="props"
-          icon="mdi-account-plus"
-          @click="
-            applicationStore.setManagedItem(getExpUser());
-            applicationStore.setProcessType('add');
-            applicationStore.setShowManageUserDialog(true);
-          "
-        >
-        </v-btn>
-      </template>
-      <span>{{ $t("user.addUser") }}</span>
-    </v-tooltip>
-    <v-tooltip v-if="selectedTab === 'institutions'" location="top">
-      <template v-slot:activator="{ props }">
-        <v-btn
-          color="accent"
-          v-if="isAllowedToAdd"
-          class="ms-4"
-          v-bind="props"
-          @click="
-            applicationStore.setManagedItem(getExpInstitution());
-            applicationStore.setProcessType('add');
-            applicationStore.setShowManageInstitutionDialog(true);
-          "
-          icon="mdi-office-building-plus"
-        >
-        </v-btn>
-      </template>
-      <span>{{ $t("institution.addInstitution") }}</span>
-    </v-tooltip>
-    <v-tooltip location="top">
-      <template v-slot:activator="{ props }">
-        <v-btn
-          color="accent"
-          class="ms-4"
-          v-bind="props"
-          icon="mdi-download"
-          @click="
-            applicationStore.setlistToExport(selectedTab);
-            applicationStore.setShowExportDialog(true);
-          "
-        >
-        </v-btn>
-      </template>
-      <span>{{ $t("user.export") }}</span>
-    </v-tooltip>
+    <UITooltip :tooltipText="$t('search.editTags')">
+      <v-btn
+        color="accent"
+        class="ms-4"
+        icon="mdi-tag-edit"
+        :disabled="
+          (selectedTab === 'users' && userStore.selectedUsers.length === 0) ||
+          (selectedTab === 'institutions' &&
+            institutionStore.selectedInstitutions.length === 0)
+        "
+        @click="toggleEditTags"
+      >
+      </v-btn>
+    </UITooltip>
+    <UITooltip v-if="selectedTab === 'users'" :tooltipText="$t('user.addUser')">
+      <v-btn
+        v-if="profileStore.isAllowedToManage"
+        color="accent"
+        class="ms-4"
+        v-bind="props"
+        icon="mdi-account-plus"
+        @click="
+          applicationStore.setManagedItem(getExpUser());
+          applicationStore.setProcessType('add');
+          applicationStore.setShowManageUserDialog(true);
+        "
+      >
+      </v-btn>
+    </UITooltip>
+    <UITooltip
+      v-if="selectedTab === 'institutions'"
+      :tooltipText="$t('institution.addInstitution')"
+    >
+      <v-btn
+        color="accent"
+        v-if="isAllowedToAdd"
+        class="ms-4"
+        v-bind="props"
+        @click="
+          applicationStore.setManagedItem(getExpInstitution());
+          applicationStore.setProcessType('add');
+          applicationStore.setShowManageInstitutionDialog(true);
+        "
+        icon="mdi-office-building-plus"
+      >
+      </v-btn>
+    </UITooltip>
+    <UITooltip :tooltipText="$t('user.export')">
+      <v-btn
+        color="accent"
+        class="ms-4"
+        v-bind="props"
+        icon="mdi-download"
+        @click="
+          applicationStore.setlistToExport(selectedTab);
+          applicationStore.setShowExportDialog(true);
+        "
+      >
+      </v-btn>
+    </UITooltip>
     <ColumnSelection :type="selectedTab"></ColumnSelection>
   </div>
   <Results @onSelectedTab="onSelectedTab" />
@@ -101,6 +91,7 @@ import { useProfileStore } from "@/stores/profile.js";
 import { getExpInstitution } from "@/components/Institution/institution.js";
 import { getExpUser } from "@/components/User/user.js";
 import EditTags from "@/components/UI/EditTags.vue";
+import UITooltip from "@/components/UI/UITooltip.vue";
 
 const { hasLoadingError, hasRequestError } = useNotification();
 

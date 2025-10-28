@@ -10,17 +10,19 @@
     <v-card
       width="50vw"
       class="mx-auto"
-      :title="$t('label.confirmCancelHeader')"
+      :title="props.title ?? $t('label.confirmCancelHeader')"
     >
-      <v-card-text> {{ $t("label.confirmCancelExplanation") }} </v-card-text>
+      <v-card-text>
+        {{ props.message ?? $t("label.confirmCancelExplanation") }}
+      </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="accent" @click="props.onConfirm()">
-          {{ $t("button.yes") }}
+          {{ props.confirmButtonText ?? $t("button.yes") }}
         </v-btn>
         <v-btn color="accent" @click="props.onCancel()">
-          {{ $t("button.no") }}
+          {{ props.cancelButtonText ?? $t("button.no") }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -28,5 +30,13 @@
 </template>
 
 <script setup>
-const props = defineProps(["onConfirm", "onCancel", "isActive"]);
+const props = defineProps([
+  "onConfirm",
+  "onCancel",
+  "isActive",
+  "title",
+  "message",
+  "confirmButtonText",
+  "cancelButtonText",
+]);
 </script>

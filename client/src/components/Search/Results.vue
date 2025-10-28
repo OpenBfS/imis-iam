@@ -13,8 +13,9 @@
     <div>
       <v-tabs
         density="compact"
+        fixed-tabs
+        selected-class="font-weight-bold bg-accent"
         v-model="tab"
-        grow
         @update:modelValue="emit('onSelectedTab', $event)"
       >
         <v-tab value="users"

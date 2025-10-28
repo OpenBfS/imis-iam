@@ -29,6 +29,7 @@
     ]"
     :type="props.type ?? 'text'"
     :variant="props.variant ?? 'underlined'"
+    @blur="emit('blur')"
     @update:model-value="
       (event) => onUpdateModelValue(event, emit, props.attribute)
     "
@@ -65,7 +66,7 @@ const props = defineProps({
   updateCallBack: Function,
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["blur", "update:modelValue"]);
 const translationCategory = inject("translationCategory");
 const textField = ref(null);
 const rules = ref(
