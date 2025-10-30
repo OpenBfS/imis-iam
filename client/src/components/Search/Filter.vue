@@ -26,6 +26,7 @@
         !['enabled', 'hiddenInAddressbook', 'role'].includes(filterKey)
       "
       variant="outlined"
+      @click:clear="handleFilterInput"
       @update:menu="
         (event) => {
           if (!event) handleFilterInput();
