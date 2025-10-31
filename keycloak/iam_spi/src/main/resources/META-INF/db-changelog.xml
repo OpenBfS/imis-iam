@@ -310,4 +310,12 @@
              ADD COLUMN hidden_in_addressbook boolean DEFAULT false;
         </sql>
     </changeSet>
+    <changeSet author="swagner@intevation.de" id="v0.20">
+        <sql dbms="all"
+             splitStatements="true"
+		     stripComments="true">
+	       CREATE OR REPLACE VIEW keycloak.v_user_entity (id, email, email_constraint, email_verified, enabled, federation_link, first_name, last_name, realm_id, username, create_time, service_account_client_link, not_before) AS
+             SELECT id, email, email_constraint, email_verified, enabled, federation_link, first_name, last_name, realm_id, username, to_timestamp(created_timestamp/1000.0), service_account_client_link, not_before FROM keycloak.user_entity;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
