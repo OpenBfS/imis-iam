@@ -1,0 +1,190 @@
+#!/usr/bin/python3
+"""
+Tests for '/iam/institution'
+
+FIXME: API should not allow to create new tags
+"""
+
+import pytest
+from lib import api_get, api_post, api_put, get_auth, generate_test_username, delete_institution_from_db
+
+
+class TestInstitutionAPI:
+    """Test suite for /iam/institution endpoints"""
+
+    def test_list_institutions(self):
+        """Test GET /iam/institution - List institutions"""
+        response = api_get("/institution", params={"maxResults": 10})
+        response.raise_for_status()
+
+        data = response.json()
+        assert data['size'] >= 2
+        assert len(data['list']) >= 2
+        assert data['list'][0]['measFacilName'] == 'inst_1'
+        assert data['list'][1]['measFacilName'] == 'inst_2'
+
+    def test_list_institutions_with_pagination(self):
+        """Test GET /iam/institution - Pagination"""
+        response = api_get("/institution", params={
+            "firstResult": 0,
+            "maxResults": 1
+        })
+        response.raise_for_status()
+        data = response.json()
+        assert data['size'] >= 2  # 'size' is the total number of search results
+        assert len(data["list"]) == 1
+        assert data['list'][0]['measFacilName'] == 'inst_1'
+
+        # Query again for Institution 2
+        response = api_get("/institution", params={
+            "firstResult": 1,
+            "maxResults": 1
+        })
+        response.raise_for_status()
+        data = response.json()
+        assert data['size'] >= 2
+        assert len(data["list"]) == 1
+        assert data['list'][0]['measFacilName'] == 'inst_2'
+
+    def test_get_institution_by_id(self):
+        """Test GET /iam/institution/{id} - Get institution by ID"""
+        # First get a list to find an institution ID
+        list_response = api_get("/institution", params={"maxResults": 1})
+        list_response.raise_for_status()
+
+        institutions = list_response.json()["list"]
+        if not institutions:
+            pytest.skip("No institutions available for testing")
+
+        institution_id = institutions[0]["id"]
+
+        # Now get the specific institution
+        response = api_get(f"/institution/{institution_id}")
+        response.raise_for_status()
+
+        institution = response.json()
+        assert institution["id"] == institution_id
+        assert "name" in institution
+        assert "network" in institution
+
+    def test_get_institution_tags(self):
+        """Test GET /iam/institution/tag - Get all tags"""
+        response = api_get("/institution/tag")
+        response.raise_for_status()
+
+        data = response.json()
+        assert len(data) == 11, data  # See example data in docker/keycloak/add_example_data.sql
+        for tag in data:
+            assert list(tag.keys()) == ['name']
+
+    def test_institution_lifecycle_create_update_get(self):
+        """
+        Test complete institution lifecycle:
+        1. Create a new institution
+        2. Get the institution and verify attributes
+        3. Update the institution
+        4. Verify updated attributes
+        Note: Institutions are not deleted to maintain referential integrity
+        """
+        # Generate test data
+        suffix = generate_test_username(prefix='')[1:]
+        test_name = f"Test Institution {suffix}"
+        test_meas_facil_name = f"test_{suffix}"
+        test_meas_facil_id = f"99{suffix[:5]}"
+
+        # Create a new institution
+        institution_data = {
+            "name": test_name,
+            "measFacilName": test_meas_facil_name,
+            "measFacilId": test_meas_facil_id,
+            "serviceBuildingStreet": "Test Street 123",
+            "serviceBuildingPostalCode": "12345",
+            "serviceBuildingLocation": "Test City",
+            "serviceBuildingState": "Test State",
+            "network": "08",
+            "active": True,
+            "tags": ["Bundesministerium"]
+        }
+
+        create_response = api_post("/institution", data=institution_data)
+        try:
+            create_response.raise_for_status()
+        except Exception:
+            print(create_response.text)
+            raise
+
+        # Get the created institution ID
+        created_institution = create_response.json()
+        created_institution_id = created_institution.get("id")
+
+        # Get the institution and verify the attributes
+        get_response = api_get(f"/institution/{created_institution_id}")
+        get_response.raise_for_status()
+        retrieved_institution = get_response.json()
+        assert retrieved_institution["id"] == created_institution_id
+        assert {key: value for key, value in retrieved_institution.items()
+                 if key != 'id' and value != []} == institution_data
+
+        # Update the institution
+        updated_name = f"{test_name} - Updated"
+        update_data = {
+            "id": created_institution_id,
+            "name": updated_name,
+            "measFacilName": test_meas_facil_name,
+            "measFacilId": test_meas_facil_id,
+            "serviceBuildingStreet": "Updated Street 456",
+            "serviceBuildingPostalCode": "54321",
+            "serviceBuildingLocation": "Updated City",
+            "serviceBuildingState": "Updated State",
+            "network": "19",
+            "active": False,
+            "tags": ["Landesmessstelle"]
+        }
+
+        update_response = api_put("/institution", data=update_data)
+        update_response.raise_for_status()
+
+        # Verify the updates
+        verify_response = api_get(f"/institution/{created_institution_id}")
+        verify_response.raise_for_status()
+
+        updated_institution = verify_response.json()
+        assert {key: value for key, value in updated_institution.items()
+                if value != []} == update_data
+
+        # Cleanup: Delete institution from database
+        delete_institution_from_db(created_institution_id)
+
+    def test_create_institution_with_missing_fields(self):
+        """Test POST /iam/institution - Creating institution with missing required fields"""
+        incomplete_data = {
+            "name": "Incomplete Institution"
+            # Missing other required fields
+        }
+
+        response = api_post("/institution", data=incomplete_data)
+        assert response.status_code == 400
+
+    def test_update_nonexistent_institution(self):
+        """Test PUT /iam/institution - Updating non-existent institution"""
+        fake_id = 999999
+
+        update_data = {
+            "id": fake_id,
+            "name": "This won't work",
+            "serviceBuildingStreet": "Test",
+            "serviceBuildingPostalCode": "12345",
+            "serviceBuildingLocation": "Test",
+            "network": "08",
+            "active": True
+        }
+
+        response = api_put("/institution", data=update_data)
+
+        assert response.status_code == 400
+
+    def test_get_nonexistent_institution(self):
+        """Test GET /iam/institution/{id} - Get non-existent institution"""
+        response = api_get("/institution/999999")
+
+        assert response.status_code == 404
