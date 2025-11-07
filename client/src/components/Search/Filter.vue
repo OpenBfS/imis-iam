@@ -26,10 +26,15 @@
         !['enabled', 'hiddenInAddressbook', 'role'].includes(filterKey)
       "
       variant="outlined"
+      @click:clear="handleFilterInput"
+      @update:menu="
+        (event) => {
+          if (!event) handleFilterInput();
+        }
+      "
       @update:modelValue="
         (event) => {
           autocompleteValue = event;
-          handleFilterInput(event);
         }
       "
     ></v-autocomplete>
@@ -49,7 +54,7 @@
       @update:modelValue="
         (event) => {
           textFieldValue = event;
-          handleFilterInput(event);
+          handleFilterInput();
         }
       "
     ></v-text-field>
@@ -109,7 +114,8 @@ const triggerSearch = debounce(() => {
   applicationStore.searchRequest([props.type]);
 }, 500);
 
-const handleFilterInput = (value) => {
+const handleFilterInput = () => {
+  const value = props.items ? autocompleteValue.value : textFieldValue.value;
   const term = value !== null ? value : "";
   if (props.type === "users") {
     userStore.updateFilter(props.filterKey, term);
