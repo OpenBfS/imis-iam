@@ -194,7 +194,6 @@ export default {
     editTitle: "@:userTerm {name}",
     institutions: "@:institutions",
     addUser: "@:userTerm hinzufügen",
-    editMyProfile: "Mein Profil bearbeiten",
     contact: "Kontakt",
     phone: "Telefon",
     fax: "Fax",
