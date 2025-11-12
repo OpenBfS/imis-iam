@@ -21,13 +21,24 @@ def get_db_connection():
     )
 
 
-def delete_institution_from_db(institution_id: int) -> bool:
+def delete_institution_from_db(institution_id: str = None, institution_facil_name: str = None) -> bool:
     """
     Delete an institution directly from the database.
+
+    Either the numeric ID or the meas_facil_name must be given.
     """
+    if not institution_id and not institution_facil_name:
+        raise ValueError("Either the numeric ID or the meas_facil_name must be given.")
+
+    conn = cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        if not institution_id:
+            cursor.execute("SELECT id from iam_institution WHERE meas_facil_name = %s",
+                           (institution_facil_name, ))
+            institution_id = cursor.fetchone()
 
         # Delete in correct order to respect foreign key constraints
         cursor.execute(
@@ -68,55 +79,56 @@ def delete_institution_from_db(institution_id: int) -> bool:
         conn.close()
     except Exception as e:
         print(f"Error deleting institution {institution_id} from database: {str(e)}")
-        conn.rollback()
-        cursor.close()
+        conn and conn.rollback()
+        cursor and cursor.close()
         conn.close()
         raise
 
 
-def delete_user_from_db(user_id: str) -> bool:
+def delete_user_from_db(user_uuid: str) -> bool:
     """
     Delete a user directly from the database.
 
     Args:
-        user_id: The Keycloak user ID (UUID string) to delete
+        user_uuid: The Keycloak user ID (UUID string) to delete
     """
+    conn = cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
         # Delete in correct order to respect foreign key constraints
         cursor.execute(
-            "DELETE FROM iam_institution_user WHERE user_id = %s",
-            (user_id,)
+            "DELETE FROM iam_institution_user WHERE user_uuid = %s",
+            (user_uuid,)
         )
         cursor.execute(
-            "DELETE FROM iam_mail WHERE user_id = %s",
-            (user_id,)
+            "DELETE FROM iam_mail WHERE user_uuid = %s",
+            (user_uuid,)
         )
         cursor.execute(
             "DELETE FROM iam_user_attributes WHERE id = %s",
-            (user_id,)
+            (user_uuid,)
         )
         cursor.execute(
-            "DELETE FROM user_role_mapping WHERE user_id = %s",
-            (user_id,)
+            "DELETE FROM user_role_mapping WHERE user_uuid = %s",
+            (user_uuid,)
         )
         cursor.execute(
-            "DELETE FROM user_attribute WHERE user_id = %s",
-            (user_id,)
+            "DELETE FROM user_attribute WHERE user_uuid = %s",
+            (user_uuid,)
         )
         cursor.execute(
             "DELETE FROM user_entity WHERE id = %s",
-            (user_id,)
+            (user_uuid,)
         )
 
         conn.commit()
         cursor.close()
         conn.close()
     except Exception as e:
-        print(f"Error deleting user {user_id} from database: {str(e)}")
-        conn.rollback()
-        cursor.close()
-        conn.close()
+        print(f"Error deleting user {user_uuid} from database: {str(e)}")
+        conn and conn.rollback()
+        cursor and cursor.close()
+        conn and conn.close()
         raise

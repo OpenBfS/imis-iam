@@ -12,7 +12,7 @@ import requests
 # redakteur: Can see and edit users in the same organization
 # exampleuser: Can only edit own details and view other users in the same organization
 TEST_USERS = {
-    "chefredakteur": "secret!",
+    "chefredakteur": "secret",
     "redakteur": "secret",
     "exampleuser": "secret",
 }

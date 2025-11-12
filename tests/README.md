@@ -9,8 +9,10 @@ This testing suite provides automated tests for all iam_spi REST API endpoints i
 - Institution management
 - Mail/messaging
 - Event management
+- Network management
 - CSV export functionality
 - Role-based permission testing
+- Frontend UI testing
 
 ## Prerequisites
 
@@ -18,37 +20,15 @@ This testing suite provides automated tests for all iam_spi REST API endpoints i
 - pip
 - A running instance of this software in development mode (see docker/README.md)
 
-## Installation
-
-### Dependencies
+## Dependencies
 
 ```bash
 cd tests
 pip install -r requirements.txt
 ```
 
-This will install:
-- `requests` - HTTP library
-- `pytest` - Testing framework
-
-### Environment
-
-Set environment variables or create a `.env` file:
-
-```bash
-export KEYCLOAK_URL="http://localhost:48080"
-export REALM="imis3"
-export CLIENT_ID="iam-client"
-export CLIENT_SECRET="exampleclientsecret"
-```
-
-Or create a `tests/.env` file:
-```ini
-KEYCLOAK_URL=http://localhost:48080
-REALM=imis3
-CLIENT_ID=iam-client
-CLIENT_SECRET=exampleclientsecret
-```
+- Firefox browser installed
+- GeckoDriver (automatically managed by webdriver-manager)
 
 ## Running Tests
 
@@ -60,47 +40,19 @@ docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.ym
 docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml up -d
 cd tests
 ./run_tests.py
+# or
+pytest
 ```
 
 ### Run Specific Test Suites
 
 ```bash
 ./run_tests.py user              # Run user API tests only
+./run_tests.py backend           # Run all backend API tests
+./run_tests.py frontend          # Run frontend tests only
 ./run_tests.py institution       # Run institution tests
 ./run_tests.py mail event        # Run mail and event tests
 ./run_tests.py --verbose         # Run with verbose output
-```
-
-### Run with pytest Directly
-
-```bash
-# Run all tests
-pytest
-
-# Run specific test file
-pytest test_user_api.py
-
-# Run tests matching pattern
-pytest -k "test_list"
-
-# Run with verbose output
-pytest -v
-
-# Run with coverage
-pytest --cov=lib --cov-report=html
-```
-
-### Run Specific Tests
-
-```bash
-# Run a specific test class
-pytest test_user_api.py::TestUserAPI
-
-# Run a specific test method
-pytest test_user_api.py::TestUserAPI::test_list_users
-
-# Run tests matching keyword
-pytest -k "role_permission"
 ```
 
 ## Configuration Options
@@ -114,6 +66,21 @@ pytest -k "role_permission"
 | `CLIENT_ID` | OAuth2 client ID | `iam-client` |
 | `CLIENT_SECRET` | OAuth2 client secret | `exampleclientsecret` |
 | `REQUEST_TIMEOUT` | API request timeout (seconds) | `30` |
+| `DB_HOST` | Database hostname | `localhost` |
+| `DB_PORT` | Database port | `2345` |
+| `DB_USER` | Database username | `keycloak` |
+| `DB_PASSWORD` | Database password | `secret` |
+| `DB_NAME` | Database name | `keycloak` |
+| `SELENIUM_HEADLESS` | Run Selenium Headless | `true` |
+
+## Manually use helper function to delete a user/institution from the database
+
+```bash
+python3 -i lib/db_helpers.py
+delete_user_from_db('6b19e3e3-c11e-4308-8f27-8f090d3b5fd5')
+delete_institution_from_db(4)
+delete_institution_from_db(institution_facil_name='test_5owza6aa')
+```
 
 ## CI/CD Integration
 

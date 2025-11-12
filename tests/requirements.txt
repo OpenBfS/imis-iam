@@ -1,3 +1,6 @@
 requests
 pytest
 psycopg2-binary
+pytest-selenium
+selenium
+webdriver-manager

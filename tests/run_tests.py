@@ -13,11 +13,13 @@ from textwrap import dedent
 
 # Test suites mapping
 TEST_SUITES = {
-    'user': 'test_user_api.py',
-    'institution': 'test_institution_api.py',
-    'mail': 'test_mail_api.py',
-    'event': 'test_event_api.py',
-    'export': 'test_export_api.py',
+    'user': 'backend/test_user_api.py',
+    'institution': 'backend/test_institution_api.py',
+    'mail': 'backend/test_mail_api.py',
+    'event': 'backend/test_event_api.py',
+    'export': 'backend/test_export_api.py',
+    'network': 'backend/test_network_api.py',
+    'frontend': 'frontend/test_frontend.py',
 }
 
 
@@ -33,11 +35,16 @@ def main():
                 mail          Mail API tests
                 event         Event API tests
                 export        Export API tests
+                network       Network API tests
+                frontend      Frontend tests
+                backend       All backend API tests
                 all           All test suites (default)
 
             Examples:
                 %(prog)s                    Run all tests
                 %(prog)s user               Run user API tests only
+                %(prog)s backend            Run all backend API tests
+                %(prog)s frontend           Run frontend tests only
                 %(prog)s --verbose          Run all tests with verbose output
                 %(prog)s user institution   Run user and institution tests
         """)
@@ -47,7 +54,7 @@ def main():
         'suites',
         nargs='*',
         default=['all'],
-        choices=list(TEST_SUITES.keys()) + ['all'],
+        choices=list(TEST_SUITES.keys()) + ['all', 'backend'],
         help='Test suite(s) to run (default: all)'
     )
 
@@ -75,9 +82,17 @@ def main():
 
     # Add test files
     if 'all' in args.suites:
-        # Run all test files
-        test_files = [f"test_{suite}_api.py" for suite in TEST_SUITES.keys()]
-        pytest_args.extend([f for f in test_files if os.path.exists(f)])
+        # Run all test files (backend and frontend)
+        pytest_args.extend(['backend/', 'frontend/'])
+    elif 'backend' in args.suites:
+        # Run all backend tests
+        pytest_args.append('backend/')
+        # If other specific suites are also requested, add them
+        for suite in args.suites:
+            if suite != 'backend' and suite in TEST_SUITES:
+                test_file = TEST_SUITES[suite]
+                if os.path.exists(test_file):
+                    pytest_args.append(test_file)
     else:
         # Run specific suites
         for suite in args.suites:
