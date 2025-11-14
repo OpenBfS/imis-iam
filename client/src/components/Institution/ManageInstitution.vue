@@ -265,7 +265,6 @@
         v-if="hasLoadingError || hasRequestError"
         v-bind:message="applicationStore.httpErrorMessage"
       />
-      <UIAlert v-else-if="duplicateAddressFound" message="aaaah" />
     </v-container>
     <v-divider></v-divider>
     <v-card-actions>
