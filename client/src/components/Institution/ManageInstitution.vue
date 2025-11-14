@@ -587,6 +587,7 @@ const checkForDuplicateAddress = () => {
       const foundInstitutions = response.data.list;
       const instWithDuplAddress = foundInstitutions.find((i) => {
         return (
+          (!institution.value.id || institution.value.id !== i.id) &&
           i.serviceBuildingPostalCode ===
             institution.value.serviceBuildingPostalCode &&
           i.serviceBuildingStreet === institution.value.serviceBuildingStreet
