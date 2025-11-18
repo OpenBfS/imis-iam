@@ -12,7 +12,9 @@ This testing suite provides automated tests for all iam_spi REST API endpoints i
 - Network management
 - CSV export functionality
 - Role-based permission testing
-- Frontend UI testing
+- Integration testing
+
+Client (UI) tests are located in `client/src/tests`.
 
 ## Prerequisites
 
@@ -95,11 +97,6 @@ test:
     - pip install -r requirements.txt
   script:
     - ./run_tests.py
-  artifacts:
-    reports:
-      junit: tests/report.xml
-    paths:
-      - tests/htmlcov/
 ```
 
 ### GitHub Actions Example

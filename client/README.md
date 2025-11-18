@@ -47,6 +47,12 @@ Lints and fixes files:
 yarn lint
 ```
 
+### Run the tests
+```
+yarn test
+```
+See also `client/src/tests/README.md` and `tests/README.md`.
+
 ### Vuejs Custom Configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 

@@ -16,3 +16,14 @@ const ResizeObserverMock = vi.fn(() => ({
 }));
 
 vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+// Mock visualViewport for Vuetify components
+const visualViewportMock = {
+  width: 1024,
+  height: 768,
+  scale: 1,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+};
+
+vi.stubGlobal("visualViewport", visualViewportMock);
