@@ -103,3 +103,4 @@ test("Role is translated", async () => {
   expect(wrapper.text()).toContain(t("roleIamUser"));
   expect(wrapper.text()).toContain(t("roleIamEditor"));
 });
+
