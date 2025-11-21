@@ -69,8 +69,6 @@ import DataTableServer from "@/components/DataTableServer.vue";
 import { createHeaders, initSelectedColumns } from "@/components/Search/searchTable.js";
 
 const props = defineProps({
-  // columns only used to insert different columns for testing
-  columns: Array,
   users: Array,
 });
 

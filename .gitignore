@@ -14,3 +14,6 @@ __pycache__
 *.pyc
 venv/
 tests/frontend/screenshots/
+
+# Vitest
+__screenshots__

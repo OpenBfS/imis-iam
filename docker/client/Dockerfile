@@ -24,7 +24,6 @@ ADD client/package.json client/yarn.lock $SRC
 WORKDIR $SRC
 RUN yarn install
 
-
 ADD client $SRC
 ARG CLIENT_PATH
 ARG REPORT_MAIL="IMIS-Hotline <imisnotifications@example.test>"
