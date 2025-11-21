@@ -246,7 +246,7 @@
                   attribute="tags"
                   :no-data-text="$t('label.noDataText')"
                   :label="$t('institution.tags')"
-                  :items="categories"
+                  :items="institutionStore.institutionTags"
                   v-model="institution.tags"
                   :disabled="profileStore.userData.role !== 'chief_editor'"
                   item-title="name"
@@ -404,16 +404,6 @@ const {
   handleValidationErrorFromServer,
   isServerValidationError,
 } = useForm();
-const categories = ref([]);
-const getCategories = () => {
-  HTTP.get("iam/institution/tag")
-    .then((response) => {
-      categories.value = response.data;
-    })
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
 
 const measIdAndNameOrNothing = () => {
   return [
@@ -485,7 +475,9 @@ onBeforeMount(() => {
 onMounted(() => {
   // TODO: Geocoding feature delayed to a subsequent date
   // coordinatesStore.coordinates.length = 0;
-  getCategories();
+  institutionStore.loadInstitutionTags().catch(() => {
+    hasLoadingError.value = true;
+  });
 
   if (hasPostalAddress()) {
     showPostalAddress.value = true;

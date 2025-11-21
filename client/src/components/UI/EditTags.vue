@@ -21,7 +21,11 @@
           <Select
             :no-data-text="$t('label.noDataText')"
             :label="$t('institution.tags')"
-            :items="props.type === 'institutions' ? institutionTags : userTags"
+            :items="
+              props.type === 'institutions'
+                ? institutionStore.institutionTags
+                : userTags
+            "
             v-model="selectedTags"
             item-title="name"
             item-value="id"
@@ -57,7 +61,6 @@
 
 <script setup>
 import { onBeforeMount, onUpdated, ref, watch } from "vue";
-import { HTTP } from "@/lib/http.js";
 import { useForm } from "@/lib/use-form.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { updateInstitution } from "@/components/Institution/institution.js";
@@ -86,7 +89,6 @@ const {
   handleValidationErrorFromServer,
   isServerValidationError,
 } = useForm();
-const institutionTags = ref([]);
 const selectedTags = ref([]);
 const userTagsAttribute = ref(null);
 const userTags = ref([]);
@@ -108,16 +110,6 @@ watch(
   },
 );
 
-const loadInstitutionTags = () => {
-  HTTP.get("iam/institution/tag")
-    .then((response) => {
-      institutionTags.value = response.data;
-    })
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
-
 const loadUserTags = async () => {
   if (!profileStore.attributes) {
     await profileStore.loadUserProfileMetadata();
@@ -135,7 +127,9 @@ onBeforeMount(() => {
 onUpdated(() => {
   resetMessages();
   if (isInstitutionType()) {
-    loadInstitutionTags();
+    institutionStore.loadInstitutionTags().catch(() => {
+      hasLoadingError.value = true;
+    });
   } else if (isUserType()) {
     loadUserTags();
   }
