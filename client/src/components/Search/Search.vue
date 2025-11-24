@@ -26,7 +26,6 @@
         v-if="profileStore.isAllowedToManage"
         color="accent"
         class="ms-4"
-        v-bind="props"
         icon="mdi-account-plus"
         @click="
           applicationStore.setManagedItem(getExpUser());
@@ -44,7 +43,6 @@
         color="accent"
         v-if="isAllowedToAdd"
         class="ms-4"
-        v-bind="props"
         @click="
           applicationStore.setManagedItem(getExpInstitution());
           applicationStore.setProcessType('add');
@@ -58,7 +56,6 @@
       <v-btn
         color="accent"
         class="ms-4"
-        v-bind="props"
         icon="mdi-download"
         @click="
           applicationStore.setlistToExport(selectedTab);
