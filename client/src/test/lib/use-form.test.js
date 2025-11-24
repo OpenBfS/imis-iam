@@ -11,7 +11,7 @@ import { trimSpacesInObject, useForm } from "@/lib/use-form";
 import i18n from "@/i18n";
 import { getExpInstitution } from "@/components/Institution/institution";
 
-const { handleValidationErrorFromServer } = useForm(i18n);
+const { areArraysDifferent, handleValidationErrorFromServer } = useForm(i18n);
 setActivePinia(createPinia());
 const applicationStore = useApplicationStore();
 const { t } = i18n.global;
@@ -58,4 +58,19 @@ test("Test function trimSpacesInObject", () => {
   trimSpacesInObject(inst);
   expect(inst["serviceBuildingPostalCode"]).toBe("12345");
   expect(inst["serviceBuildingStreet"]).toBe("Example Street 1");
+});
+
+test("Test function areArraysDifferent", () => {
+  expect(areArraysDifferent(["a", "b", "c"], ["a", "c", "b"])).toBeTruthy();
+  expect(areArraysDifferent(["a", "b", "c"], ["a", "b", "d"])).toBeTruthy();
+  expect(areArraysDifferent([1, 2, 3], [1, 3, 2])).toBeTruthy();
+  expect(areArraysDifferent([1, 2, 3], [1, 2])).toBeTruthy();
+  expect(
+    areArraysDifferent(["a", "b", "c"], ["a", "c", "b"], false)
+  ).toBeFalsy();
+  expect(
+    areArraysDifferent(["a", "b", "c"], ["a", "b", "d"], false)
+  ).toBeTruthy();
+  expect(areArraysDifferent([1, 2, 3], [1, 3, 2], false)).toBeFalsy();
+  expect(areArraysDifferent([1, 2, 3], [1, 2], false)).toBeTruthy();
 });

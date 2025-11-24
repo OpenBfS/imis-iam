@@ -21,10 +21,7 @@
       hide-details
       min-width="120"
       :model-value="autocompleteValue"
-      :multiple="
-        type === 'users' &&
-        !['enabled', 'hiddenInAddressbook', 'role'].includes(filterKey)
-      "
+      :multiple="multiple"
       variant="outlined"
       @click:clear="handleFilterInput"
       @update:menu="
@@ -72,11 +69,12 @@
 </style>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, toRaw } from "vue";
 import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
 import debounce from "debounce";
+import { useForm } from "@/lib/use-form";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -92,8 +90,17 @@ const props = defineProps([
   "type",
 ]);
 
+const { areArraysDifferent } = useForm();
+
 const textFieldValue = ref("");
 const autocompleteValue = ref(null);
+
+const multiple = computed(() => {
+  return (
+    props.type === "users" &&
+    !["enabled", "hiddenInAddressbook", "role"].includes(props.filterKey)
+  );
+});
 
 onMounted(() => {
   // Restore value when the column containing this filter component was hidden and shown again.
@@ -115,12 +122,26 @@ const triggerSearch = debounce(() => {
 }, 500);
 
 const handleFilterInput = () => {
-  const value = props.items ? autocompleteValue.value : textFieldValue.value;
+  const value = toRaw(
+    props.items ? autocompleteValue.value : textFieldValue.value
+  );
   const term = value !== null ? value : "";
-  if (props.type === "users") {
-    userStore.updateFilter(props.filterKey, term);
-  } else if (props.type === "institutions") {
-    institutionStore.updateFilter(props.filterKey, term);
+  const store = props.type === "users" ? userStore : institutionStore;
+  const oldTerm = toRaw(store.filterBy[props.filterKey]);
+  store.updateFilter(props.filterKey, term);
+  // Only send request when value did change
+  if (
+    multiple.value &&
+    ((oldTerm == undefined && term == undefined) ||
+      (oldTerm != undefined && oldTerm.length === 0 && term == undefined) ||
+      (term != undefined && term.length === 0 && oldTerm == undefined) ||
+      (oldTerm != undefined &&
+        term != undefined &&
+        !areArraysDifferent(oldTerm, term, false)))
+  ) {
+    return;
+  } else if (!multiple.value && oldTerm === term) {
+    return;
   }
   triggerSearch();
 };
