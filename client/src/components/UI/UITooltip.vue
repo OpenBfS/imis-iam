@@ -7,8 +7,8 @@
  -->
 <template>
   <v-tooltip :location="props.location ?? 'top'">
-    <template v-slot:activator="{ props }">
-      <span v-bind="props">
+    <template v-slot:activator="{ props: activatorProps }">
+      <span v-bind="activatorProps">
         <slot></slot>
       </span>
     </template>
