@@ -5,6 +5,7 @@ Database helper functions for database access
 
 import os
 import psycopg2
+from typing import Optional
 
 
 def get_db_connection():
@@ -91,25 +92,36 @@ def delete_institution_from_db(institution_id: str = None, institution_name: str
         raise
 
 
-def delete_user_from_db(user_uuid: str) -> bool:
+def delete_user_from_db(user_uuid: Optional[str] = None, username: Optional[str] = None) -> bool:
     """
     Delete a user directly from the database.
 
     Args:
         user_uuid: The Keycloak user ID (UUID string) to delete
     """
+    if not user_uuid and not username:
+        raise ValueError("Either the UUID or the username must be given.")
+
     conn = cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        if not user_uuid and username:
+            cursor.execute("SELECT id from user_entity WHERE username = %s",
+                           (institution_facil_name, ))
+            institution_id = cursor.fetchone()
+        if not user_uuid:
+            raise ValueError("Could not find the user to delete.")
+
+
         # Delete in correct order to respect foreign key constraints
         cursor.execute(
-            "DELETE FROM iam_institution_user WHERE user_uuid = %s",
+            "DELETE FROM iam_institution_user WHERE user_id = %s",
             (user_uuid,)
         )
         cursor.execute(
-            "DELETE FROM iam_mail WHERE user_uuid = %s",
+            "DELETE FROM iam_mail WHERE user_id = %s",
             (user_uuid,)
         )
         cursor.execute(
@@ -117,11 +129,11 @@ def delete_user_from_db(user_uuid: str) -> bool:
             (user_uuid,)
         )
         cursor.execute(
-            "DELETE FROM user_role_mapping WHERE user_uuid = %s",
+            "DELETE FROM user_role_mapping WHERE user_id = %s",
             (user_uuid,)
         )
         cursor.execute(
-            "DELETE FROM user_attribute WHERE user_uuid = %s",
+            "DELETE FROM user_attribute WHERE user_id = %s",
             (user_uuid,)
         )
         cursor.execute(
