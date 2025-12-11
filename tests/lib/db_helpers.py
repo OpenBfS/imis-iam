@@ -21,13 +21,13 @@ def get_db_connection():
     )
 
 
-def delete_institution_from_db(institution_id: str = None, institution_facil_name: str = None) -> bool:
+def delete_institution_from_db(institution_id: str = None, institution_name: str = None, institution_facil_name: str = None) -> bool:
     """
     Delete an institution directly from the database.
 
     Either the numeric ID or the meas_facil_name must be given.
     """
-    if not institution_id and not institution_facil_name:
+    if not institution_id and not institution_name and not institution_facil_name:
         raise ValueError("Either the numeric ID or the meas_facil_name must be given.")
 
     conn = cursor = None
@@ -35,10 +35,16 @@ def delete_institution_from_db(institution_id: str = None, institution_facil_nam
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        if not institution_id:
+        if not institution_id and institution_name:
+            cursor.execute("SELECT id from iam_institution WHERE name = %s",
+                           (institution_name, ))
+            institution_id = cursor.fetchone()
+        elif not institution_id and institution_facil_name:
             cursor.execute("SELECT id from iam_institution WHERE meas_facil_name = %s",
                            (institution_facil_name, ))
             institution_id = cursor.fetchone()
+        if not institution_id:
+            raise ValueError("Could not find the institution to delete.")
 
         # Delete in correct order to respect foreign key constraints
         cursor.execute(
