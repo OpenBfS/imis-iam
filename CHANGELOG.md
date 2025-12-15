@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.5 - 15.12.2025
+
+### Changed 
+
+- Hide 'BAW-Kontaktdaten', only owner can see his contact-details [#6146] (cklassen, tgottfried)
+- Update to KC version 26.4.6 [#6277] (swagner)
+
+
+### Added
+
+- Make timestamp readable in the DB. [#6163] (swagner)
+
 ## 1.0.4 - 27.10.2025
 
 ### Changed
