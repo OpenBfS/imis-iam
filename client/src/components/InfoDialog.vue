@@ -8,7 +8,7 @@
 <template>
   <v-card min-width="460px">
     <v-container class="pa-1 mt-4 mx-2">
-      <div>Software-Version 1.0.4</div>
+      <div>Software-Version 1.0.5</div>
     </v-container>
     <v-divider></v-divider>
     <v-card-actions>
