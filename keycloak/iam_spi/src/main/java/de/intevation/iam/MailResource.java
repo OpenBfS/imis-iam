@@ -128,7 +128,7 @@ public class MailResource {
     /**
      * Get mails.
      *
-     * @param types Filter by type IDs given with URL parameter "type"
+     * @param type Filter by type IDs given with URL parameter "type"
      * @param count Restrict number of returned mails
      * @param archived if true only archived mails returned
      * @param start Return only mails send after given timestamp

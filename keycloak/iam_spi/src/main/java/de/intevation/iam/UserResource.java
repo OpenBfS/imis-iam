@@ -100,7 +100,7 @@ public class UserResource {
 
     /**
      * Get user profile metadata.
-     * @return User profile metdata as json
+     * @return User profile metdata as JSON
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -110,7 +110,7 @@ public class UserResource {
     }
 
     /**
-     * Get profile of the current users.
+     * Get profile of the current user.
      * @return User profile as json, 403 if not authorized
      * @throws ForbiddenException if requesting user is not authorized to
      * view the requested data.

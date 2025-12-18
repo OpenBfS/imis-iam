@@ -2,7 +2,7 @@
 
 ## 1.0.5 - 15.12.2025
 
-### Changed 
+### Changed
 
 - Hide 'BAW-Kontaktdaten', only owner can see his contact-details [#6146] (cklassen, tgottfried)
 - Update to KC version 26.4.6 [#6277] (swagner)
@@ -31,7 +31,7 @@
 ### Fixed
 
 - Fix wrong result upon running filter operations in quick succession. [#6225] (cklassen)
-- Fix problem with bulk (un)assigment of mailing lists. [#6229] (cklassen)
+- Fix problem with bulk (un)assignment of mailing lists. [#6229] (cklassen)
 - Fix handling of special characters in institution names and other attributes. [#6140] (cklassen)
 - Add warning for duplicate institution addresses [#5650] (cklassen)
 - Fix imprecise search in mailing lists. [#6232] (tgottfried)
@@ -45,15 +45,15 @@
 
 ### Added
 
-- Add toggle button to (de)select all columns. [#6198] (cklassen) 
+- Add toggle button to (de)select all columns. [#6198] (cklassen)
 - Add version info. [#6187] (cklassen)
 
 ### Fixed
 
-- Fix search results for institution categories. [#6081] (pschwabauer) 
+- Fix search results for institution categories. [#6081] (pschwabauer)
 - Improve handling of stop signal in client container. [#6017] (swagner)
 - Fix sorting of empty entries in multi-value fields. [#6071] (pschwabauer)
-- Fix export with default colums setting. [#6197] (cklassen) 
+- Fix export with default columns setting. [#6197] (cklassen)
 - Fix display error for institutions with empty serviceBuildingState. [#6214] (cklassen)
 - Fix sorting of institutions. [#6207] (cklassen)
 
@@ -67,12 +67,12 @@
 
 ### Added
 
-- Add password change option to app bar. [#6141] (swagner) 
+- Add password change option to app bar. [#6141] (swagner)
 - Introduce attribute to hide users in addressbook. [#6144] (ffuhlbrueck, pschwabauer)
 
 ### Fixed
 
-- Fix loss of data entry in multi-value form fields (ChipTextFields) upon save. [#6130] (swagner) 
+- Fix loss of data entry in multi-value form fields (ChipTextFields) upon save. [#6130] (swagner)
 - Fix filter for attribute "network". [#6122] (pschwabauer)
 - Fix translation of federal states. [#6158] (cklassen)
 
@@ -81,7 +81,7 @@
 
 ### Changed
 
-- Customize theme and text. (mfabry) 
+- Customize theme and text. (mfabry)
 
 ### Added
 
