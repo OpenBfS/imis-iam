@@ -19,7 +19,8 @@ TEST_SUITES = {
     'event': 'backend/test_event_api.py',
     'export': 'backend/test_export_api.py',
     'network': 'backend/test_network_api.py',
-    'frontend': 'frontend/test_frontend.py',
+    'user_int': 'integration/test_user.py',
+    'institution_int': 'integration/test_institution.py',
 }
 
 
@@ -36,15 +37,17 @@ def main():
                 event         Event API tests
                 export        Export API tests
                 network       Network API tests
-                frontend      Frontend tests
                 backend       All backend API tests
+                integration   All integration tests
+                user_int      Integration test on users
+                institution_int Integration test on institutions
                 all           All test suites (default)
 
             Examples:
                 %(prog)s                    Run all tests
                 %(prog)s user               Run user API tests only
                 %(prog)s backend            Run all backend API tests
-                %(prog)s frontend           Run frontend tests only
+                %(prog)s integration        Run all integration tests
                 %(prog)s --verbose          Run all tests with verbose output
                 %(prog)s user institution   Run user and institution tests
         """)
@@ -54,7 +57,7 @@ def main():
         'suites',
         nargs='*',
         default=['all'],
-        choices=list(TEST_SUITES.keys()) + ['all', 'backend'],
+        choices=list(TEST_SUITES.keys()) + ['all', 'backend', 'integration'],
         help='Test suite(s) to run (default: all)'
     )
 
@@ -82,14 +85,18 @@ def main():
 
     # Add test files
     if 'all' in args.suites:
-        # Run all test files (backend and frontend)
-        pytest_args.extend(['backend/', 'frontend/'])
-    elif 'backend' in args.suites:
+        # Run all test files (backend, integration)
+        pytest_args.extend(['backend/', 'integration/'])
+    elif 'backend' in args.suites or 'integration' in args.suites:
         # Run all backend tests
-        pytest_args.append('backend/')
+        if 'backend' in args.suites:
+            pytest_args.append('backend/')
+        # Run all integration tests
+        if 'integration' in args.suites:
+            pytest_args.append('integration/')
         # If other specific suites are also requested, add them
         for suite in args.suites:
-            if suite != 'backend' and suite in TEST_SUITES:
+            if suite not in ['backend', 'integration'] and suite in TEST_SUITES:
                 test_file = TEST_SUITES[suite]
                 if os.path.exists(test_file):
                     pytest_args.append(test_file)

@@ -3,10 +3,15 @@
 Selenium helper functions for frontend testing.
 """
 
+import pytest
 import os
 from selenium import webdriver
 from selenium.webdriver import FirefoxService, FirefoxOptions
+from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from .auth import TEST_USERS
 
 
 def get_firefox_driver(headless: bool = None):
@@ -62,3 +67,72 @@ def get_application_url():
     keycloak_url = get_keycloak_url()
     realm = get_realm()
     return f"{keycloak_url}/adressbuch/"
+
+
+class SeleniumTestSuite:
+    """Base Test suite for Integration tests"""
+
+    @pytest.fixture(scope="function")
+    def driver(self):
+        """
+        Fixture that provides a Firefox WebDriver instance.
+        Automatically closes the browser after each test.
+        """
+        driver = get_firefox_driver()
+        driver.set_page_load_timeout(os.getenv('REQUEST_TIMEOUT', '30'))
+        yield driver
+        driver.quit()
+
+    @pytest.fixture(scope="function")
+    def authenticated_driver_factory(self):
+        """
+        Factory fixture that provides authenticated Firefox WebDriver instances.
+        Returns a function that can login as different users.
+        """
+        drivers = []
+
+        def _create_authenticated_driver(username="exampleuser"):
+            """
+            Create and return an authenticated driver for the specified user.
+
+            Args:
+                username: Username to login with (default: "exampleuser")
+
+            Returns:
+                Authenticated WebDriver instance
+            """
+            driver = get_firefox_driver()
+            drivers.append(driver)
+
+            # Login as specified user
+            driver.get(get_application_url())
+            wait = WebDriverWait(driver, 10)
+
+            username_field = wait.until(
+                EC.presence_of_element_located((By.ID, "username"))
+            )
+            username_field.send_keys(username)
+
+            password_field = driver.find_element(By.ID, "password")
+            password_field.send_keys(TEST_USERS[username])
+
+            login_button = driver.find_element(By.ID, "kc-login")
+            login_button.click()
+
+            # Wait for application to load
+            wait.until(
+                lambda d: "/adressbuch" in d.current_url and "/realms" not in d.current_url
+            )
+            toolbar_title = wait.until(
+                EC.presence_of_element_located((By.CLASS_NAME, "v-toolbar-title__placeholder"))
+            )
+            assert "IMIS-Adressbuch" in toolbar_title.text
+
+            print(f"Authenticated as {username}")
+            return driver
+
+        yield _create_authenticated_driver
+
+        # Cleanup all drivers created by this factory
+        for driver in drivers:
+            driver.quit()

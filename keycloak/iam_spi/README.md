@@ -284,7 +284,7 @@ Custom tables created by JPA entities:
 
 ## Tests
 
-Arquilian and other native test tools do not allow to write tests for a Keycloak extension itself.
+Arquilian, Jupiter and other native test tools do not allow to write tests for a Keycloak extension itself.
 That's why we use Python unittests in a IMIS Development setup for unit testing the HTTP API of the Keycloak extension.
 
 See `../../tests/README.md` for more details.
