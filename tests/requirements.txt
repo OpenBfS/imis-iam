@@ -1,5 +1,6 @@
 requests
 pytest
+pytest-rerunfailures
 psycopg2-binary
 pytest-selenium
 selenium

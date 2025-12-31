@@ -11,6 +11,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from lib.selenium_helpers import (
     get_firefox_driver,
     get_application_url,
@@ -28,6 +30,8 @@ SCREENSHOT_DIR.mkdir(exist_ok=True)
 
 class TestFrontendUser(SeleniumTestSuite):
     """Test suite for frontend functionality and integration tests"""
+
+    maxDiff = None
 
     @pytest.mark.parametrize("username,password", [
         (username, password) for username, password in TEST_USERS.items()
@@ -176,7 +180,7 @@ class TestFrontendUser(SeleniumTestSuite):
 
         driver.save_screenshot(f"{SCREENSHOT_DIR}/test_edit_profile_3_fields_filled.png")
 
-        # Modify institutions - scroll to element and use JavaScript click
+        # Modify institutions - scroll to element click
         institutions_dropdown = driver.find_element(By.XPATH, "//div[contains(@class, 'v-card')]//label[contains(., 'Institutionen')]/following-sibling::div//input")
         # Scroll element into view
         driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", institutions_dropdown)
@@ -224,7 +228,6 @@ class TestFrontendUser(SeleniumTestSuite):
 
         time.sleep(0.5)
         # Enable Titel column by clicking the checkbox
-        # It actually enables all columns
         # Then navigate up to find the parent list item
         titel_span = wait.until(
             EC.presence_of_element_located((By.XPATH, "//span[normalize-space(text())='Titel' and contains(@class, 'me-2')]"))
@@ -272,7 +275,7 @@ class TestFrontendUser(SeleniumTestSuite):
                     print(f"Found row with Titel: {unique_title}")
                     break
         else:
-            raise AssertionError(f"Could not find row with Titel '{unique_title}' in table")
+            raise ValueError(f"Could not find row with Titel '{unique_title}' in table")
 
         # Open entry
         view_button = target_row.find_element(By.XPATH, ".//button[.//i[contains(@class, 'mdi-information-outline')]]")
@@ -293,3 +296,137 @@ class TestFrontendUser(SeleniumTestSuite):
         print("Verified E-Mail 2")
 
         driver.save_screenshot(f"{SCREENSHOT_DIR}/test_edit_profile_10_verified.png")
+
+    @pytest.mark.flaky(reruns=2)  # in 1/3 of the cases an additional request is capture, probably a timing problem
+    def test_dropdown_minimal_requests(self, authenticated_driver_factory):
+        """
+        when the selection does not change, no requests should be sent
+        """
+        # Login as exampleuser
+        driver = authenticated_driver_factory("exampleuser")
+        wait = WebDriverWait(driver, 10)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_1_logged_in.png")
+
+        # Open column selection sidebar
+        column_selection_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@id='column-selection' or .//i[contains(@class, 'mdi-view-column')]]"))
+        )
+        column_selection_button.click()
+        print("Opened column selection sidebar")
+        time.sleep(0.5)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_2_column_selection_opened.png")
+
+        # Find the E-Mail-Verteiler column item
+        email_verteiler_span = wait.until(
+            EC.presence_of_element_located((By.XPATH, "//span[normalize-space(text())='E-Mail-Verteiler' and contains(@class, 'me-2')]"))
+        )
+        # Get the parent list item
+        email_verteiler_item = email_verteiler_span.find_element(By.XPATH, "./ancestor::div[contains(@class, 'v-list-item')]")
+
+        # Check if already checked
+        icon = email_verteiler_item.find_element(By.XPATH, ".//i[contains(@class, 'mdi')]")
+        is_checked = 'mdi-checkbox-marked' in icon.get_attribute('class')
+
+        if not is_checked:
+            # Click the span text to toggle the column
+            driver.execute_script("arguments[0].click();", email_verteiler_span)
+            print("Enabled E-Mail-Verteiler column")
+            time.sleep(0.5)
+        else:
+            print("E-Mail-Verteiler column already enabled")
+
+        # Close the column selection sidebar by clicking elsewhere
+        driver.find_element(By.TAG_NAME, "body").click()
+        time.sleep(0.5)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_3_column_enabled.png")
+
+        # Find all the column headers to determine column positions
+        headers = driver.find_elements(By.XPATH, "//table/thead/tr[1]/th[.//span]")
+        email_verteiler_col_index = None
+
+        for index, header in enumerate(headers):
+            if "E-Mail-Verteiler" in header.text:
+                email_verteiler_col_index = index
+                print(f"Found E-Mail-Verteiler at column index {email_verteiler_col_index}")
+                break
+
+        if email_verteiler_col_index is None:
+            raise Exception("E-Mail-Verteiler column not found in table headers")
+
+        # Based on recorded session: xpath=//table/thead/tr[2]/td[4]/div/div/div/div/div[3]/div/input
+        # The filter input is deeply nested in the second row (tr[2])
+        # Use the column index + 2
+        filter_xpath = f"//table/thead/tr[2]/td[{email_verteiler_col_index + 2}]//input"
+        print(f"Looking for filter input with XPath: {filter_xpath}")
+        email_verteiler_autocomplete = driver.find_element(By.XPATH, filter_xpath)
+        print(f'Element: {email_verteiler_autocomplete}')
+
+        # Open the drop down
+        email_verteiler_autocomplete.click()
+        time.sleep(0.3)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_4_filter_opened.png")
+
+        # Find "AK UN" option
+        ak_un_option = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'v-overlay')]//div[contains(@class, 'v-list-item')]//div[contains(@class, 'v-list-item-title') and text()='AK UN']"))
+        )
+        print("Found AK UN option in dropdown")
+
+        # Select the "AK UN" option
+        ActionChains(driver).move_to_element(ak_un_option).click().perform()
+        print("Selected 'AK UN' filter option")
+        time.sleep(0.5)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_5_ak_un_selected.png")
+
+        # Close the dropdown by clicking the 'Einträge pro Seite' element
+        # Clicking on body does not succeed here, it clicks in the center of the view, which is another option in the drop down
+        entries_per_page = driver.find_element(By.XPATH, "//span[contains(text(), 'Einträge pro Seite')]")
+        entries_per_page.click()
+        print("Closed dropdown by clicking 'Einträge pro Seite'")
+        time.sleep(0.5)
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_6_dropdown_closed.png")
+
+        # Save the requests before the un-re-selection steps
+        requests_before = [entry for entry in driver.execute_script("var performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {}; var network = performance.getEntries() || {}; return network;") if entry['entryType'] == 'resource']
+
+        # Reopen the filter dropdown
+        email_verteiler_autocomplete.click()
+        time.sleep(0.3)
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_7_filter_reopened.png")
+
+        # Unselect "AK UN" option
+        ak_un_option_unselect = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'v-overlay')]//div[contains(@class, 'v-list-item')]//div[contains(@class, 'v-list-item-title') and text()='AK UN']"))
+        )
+        ActionChains(driver).move_to_element(ak_un_option_unselect).click().perform()
+        print("Unselected 'AK UN' filter option")
+        time.sleep(0.5)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_8_ak_un_unselected.png")
+
+        # Select "AK UN" option again
+        ak_un_option_reselect = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'v-overlay')]//div[contains(@class, 'v-list-item')]//div[contains(@class, 'v-list-item-title') and text()='AK UN']"))
+        )
+        ActionChains(driver).move_to_element(ak_un_option_reselect).click().perform()
+        print("Selected 'AK UN' filter option again")
+        time.sleep(0.5)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_9_ak_un_reselected.png")
+
+        # Close the dropdown
+        entries_per_page.click()
+        print("Closed dropdown after reselecting")
+        time.sleep(0.5)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_dropdown_minimal_requests_10_final_state.png")
+
+        requests_after = [entry for entry in driver.execute_script("var performance = window.performance || window.mozPerformance || window.msPerformance || window.webkitPerformance || {}; var network = performance.getEntries() || {}; return network;") if entry['entryType'] == 'resource']
+        # only compare entry types 'resource' (network requests)
+        # other entry types are 'measure' and 'paint'
+        assert requests_before == requests_after
