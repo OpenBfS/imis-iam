@@ -49,6 +49,7 @@ def main():
                 %(prog)s backend            Run all backend API tests
                 %(prog)s integration        Run all integration tests
                 %(prog)s --verbose          Run all tests with verbose output
+                %(prog)s -vv                Run all tests with very verbose output
                 %(prog)s user institution   Run user and institution tests
         """)
     )
@@ -63,8 +64,9 @@ def main():
 
     parser.add_argument(
         '-v', '--verbose',
-        action='store_true',
-        help='Verbose output'
+        action='count',
+        default=0,
+        help='Verbose output (-v for verbose, -vv for very verbose)'
     )
 
     parser.add_argument(
@@ -79,7 +81,12 @@ def main():
     os.chdir(tests_dir)
 
     # Build pytest arguments
-    pytest_args = ['--color=yes', '-v']
+    pytest_args = ['--color=yes']
+
+    # Add verbosity flags
+    if args.verbose:
+        pytest_args.append('-' + 'v' * args.verbose)
+
     if args.keyword:
         pytest_args.extend(['-k', args.keyword])
 
