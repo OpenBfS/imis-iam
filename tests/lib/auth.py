@@ -121,7 +121,13 @@ class KeycloakAuth:
     def delete_user_via_admin_api(self, user_id: str) -> bool:
         """
         Delete a user using Keycloak Admin account.
+
+        This does not work and returns a 409 Conflict
+        User account cannot be deleted via keycloak because of intentionally
+        missing DELETE CASCADEs on foreign keys.
+        Use db_helpers.delete_user_from_db instead.
         """
+        raise NotImplementedError("This is not working. Use 'db_helpers.delete_user_from_db'.")
         # Get admin token
         admin_token = self.get_access_token("admin", "secret",
                                             realm="master",
@@ -143,7 +149,6 @@ class KeycloakAuth:
         elif response.status_code == 404:
             # User already deleted
             return True
-        # FIXME: 409 Conflict
         else:
             raise ValueError(f"Failed to delete user {user_id}: HTTP {response.status_code}")
             return False

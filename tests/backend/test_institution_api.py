@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 """
 Tests for '/iam/institution'
-
-FIXME: API should not allow to create new tags
 """
 
 import pytest

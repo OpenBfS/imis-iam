@@ -26,7 +26,7 @@ def delete_institution_from_db(institution_id: str = None, institution_name: str
     """
     Delete an institution directly from the database.
 
-    Either the numeric ID or the meas_facil_name must be given.
+    Either the numeric ID, name or the meas_facil_name must be given.
     """
     if not institution_id and not institution_name and not institution_facil_name:
         raise ValueError("Either the numeric ID or the meas_facil_name must be given.")

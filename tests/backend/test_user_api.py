@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 """
-Tests for '/iam/user
-
-TODO:
-In an update request, if position is an invalid value, the API ignores the whole request without error
+Tests for '/iam/user'
 """
 
 import pytest
@@ -911,3 +908,42 @@ class TestUserAPIRolePermissions:
         finally:
             if created_user_id:
                 delete_user_from_db(created_user_id)
+
+    def test_create_user_with_invalid_position(self):
+        """
+        Test that creating a user with an invalid position value fails with validation error.
+
+        Valid position values are:
+        - "Leitung/Vertretung"
+        - "Fachliche Ansprechperson"
+        - "Mitarbeitende"
+        """
+        auth = get_auth()
+        auth.switch_user_context("chefredakteur")
+
+        test_user = {
+            "attributes": {
+                "username": [generate_test_username()],
+                "firstName": ["Test"],
+                "lastName": ["User"],
+                "email": ["invalid.position@example.com"],
+                "position": ["Invalid Position Value"]  # Invalid value
+            },
+            "institutions": ["Test Institution"],
+            "network": "BfS",
+            "role": "user",
+            "enabled": True,
+            "hiddenInAddressbook": False,
+            "retired": False
+        }
+
+        # Attempt to create user with invalid position
+        response = api_post("/user", test_user)
+
+        # Should receive a validation error (400 Bad Request)
+        assert response.status_code == 400
+
+        # Verify error response contains validation information
+        error_data = response.json()
+        assert "error" in error_data or "message" in error_data, \
+            "Response should contain error information"
