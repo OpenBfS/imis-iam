@@ -57,7 +57,7 @@ def main():
     parser.add_argument(
         'suites',
         nargs='*',
-        default=['all'],
+        default='all',
         choices=list(TEST_SUITES.keys()) + ['all', 'backend', 'integration'],
         help='Test suite(s) to run (default: all)'
     )
