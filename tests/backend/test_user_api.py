@@ -370,3 +370,75 @@ class TestUserAPIRolePermissions:
 
         finally:
             auth.clear_user_context()
+
+    def test_baw_fields_update_and_visibility(self):
+        """
+        Test BAW (Operation Mode Change) fields update and visibility:
+        1. Login as chefredakteur and update own profile with BAW fields
+        2. Query own user data and verify BAW fields are present in profile
+        3. But not in when querying user data
+        4. Login as exampleuser and verify BAW fields of chefredakteur are not visible
+        """
+        baw_emails = ["baw.chef@example.com"]
+        baw_phones = ["+49123456789"]
+        baw_sms = ["+49987654321"]
+        auth = get_auth()
+
+        try:
+            # Login as chefredakteur and get own profile data
+            auth.switch_user_context("chefredakteur")
+            profile_response = api_get("/user/profile")
+            profile_response.raise_for_status()
+            profile = profile_response.json()
+
+            # Update profile with BAW fields
+            profile["attributes"]["operationModeChangeMailAddresses"] = baw_emails
+            profile["attributes"]["operationModeChangePhoneNumbers"] = baw_phones
+            profile["attributes"]["operationModeChangeSmsPhoneNumbers"] = baw_sms
+
+            update_response = api_put("/user/profile", data=profile)
+            update_response.raise_for_status()
+
+            # Query own profile and verify BAW fields are present
+            profile_check_response = api_get("/user/profile")
+            profile_check_response.raise_for_status()
+            updated_profile = profile_check_response.json()
+
+            assert updated_profile["attributes"]["operationModeChangeMailAddresses"] == baw_emails
+            assert updated_profile["attributes"]["operationModeChangePhoneNumbers"] == baw_phones
+            assert updated_profile["attributes"]["operationModeChangeSmsPhoneNumbers"] == baw_sms
+
+            chefredakteur_id = updated_profile["id"]
+
+            # Assert that BAW data is not in the non-profile search results
+            search_response = api_get(f"/user/{chefredakteur_id}")
+            search_data = search_response.json()
+
+            assert "operationModeChangeMailAddresses" not in search_data["attributes"]
+            assert "operationModeChangePhoneNumbers" not in search_data["attributes"]
+            assert "operationModeChangeSmsPhoneNumbers" not in search_data["attributes"]
+
+            # Login as exampleuser and verify BAW fields of chefredakteur are not visible
+            auth.switch_user_context("exampleuser")
+            chef_response = api_get(f"/user/{chefredakteur_id}")
+            chef_response.raise_for_status()
+            chef_data = chef_response.json()
+
+            assert "operationModeChangeMailAddresses" not in chef_data["attributes"]
+            assert "operationModeChangePhoneNumbers" not in chef_data["attributes"]
+            assert "operationModeChangeSmsPhoneNumbers" not in chef_data["attributes"]
+
+        finally:
+            # Clean up: Login as chefredakteur and remove BAW fields
+            auth.switch_user_context("chefredakteur")
+
+            profile_response = api_get("/user/profile")
+            profile_response.raise_for_status()
+
+            profile = profile_response.json()
+            profile["attributes"]["operationModeChangeMailAddresses"] = []
+            profile["attributes"]["operationModeChangePhoneNumbers"] = []
+            profile["attributes"]["operationModeChangeSmsPhoneNumbers"] = []
+            api_put("/user/profile", data=profile)
+
+            auth.clear_user_context()
