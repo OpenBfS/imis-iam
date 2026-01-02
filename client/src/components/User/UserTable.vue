@@ -100,6 +100,7 @@ onMounted(async () => {
           { name: "role", default: false },
           { name: "network", default: false },
           { name: "enabled", default: false },
+          { name: "retired", default: false },
           { name: "hiddenInAddressbook", default: false },
         ]
       : [];

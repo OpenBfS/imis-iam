@@ -112,6 +112,14 @@
               :type="props.type"
             ></Filter>
           </template>
+          <template v-else-if="header.key === 'retired'">
+            <Filter
+              :filterKey="header.key"
+              :items="booleanFilterItems"
+              :label="$t('user.retired')"
+              :type="props.type"
+            ></Filter>
+          </template>
           <template v-else-if="header.key === 'hiddenInAddressbook'">
             <Filter
               :filterKey="header.key"

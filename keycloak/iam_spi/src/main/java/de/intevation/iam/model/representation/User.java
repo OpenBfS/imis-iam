@@ -60,6 +60,8 @@ public class User {
 
     private boolean hiddenInAddressbook = false;
 
+    private boolean retired = false;
+
     /**
      * Empty constructor used by JSON de-/serialization.
      */
@@ -115,6 +117,7 @@ public class User {
 
             this.network = jpaModel.getNetwork();
             this.hiddenInAddressbook = jpaModel.getHiddenInAddressbook();
+            this.retired = jpaModel.getRetired();
         }
     }
 
@@ -130,6 +133,13 @@ public class User {
     }
     public void setHiddenInAddressbook(boolean hidden) {
         this.hiddenInAddressbook = hidden;
+    }
+
+    public boolean isRetired() {
+        return retired;
+    }
+    public void setRetired(boolean retired) {
+        this.retired = retired;
     }
 
     public String getId() {
@@ -193,6 +203,7 @@ public class User {
             jpaUser.setInstitutions(newInstitutions);
         }
         jpaUser.setHiddenInAddressbook(hiddenInAddressbook);
+        jpaUser.setRetired(retired);
         return jpaUser;
     }
 

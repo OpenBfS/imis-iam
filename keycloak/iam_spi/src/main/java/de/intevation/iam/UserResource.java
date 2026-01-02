@@ -383,6 +383,10 @@ public class UserResource {
                 ve);
         }
 
+        // Retired users must be disabled
+        if (rep.isRetired()) {
+            rep.setEnabled(false);
+        }
         newUserModel.setEnabled(rep.isEnabled());
         rep.setId(newUserModel.getId());
 
@@ -460,6 +464,10 @@ public class UserResource {
                     .entity(ve.getErrors())
                     .build(),
                 ve);
+        }
+        // Retired users must be disabled
+        if (rep.isRetired()) {
+            rep.setEnabled(false);
         }
         user.setEnabled(rep.isEnabled());
 

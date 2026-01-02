@@ -6,6 +6,7 @@ Authentication helper for Keycloak
 import os
 import requests
 
+from .db_helpers import enable_admin_direct_access_grants
 
 # Test users with their roles and permissions
 # chefredakteur: Can see and edit everything
@@ -118,23 +119,31 @@ class KeycloakAuth:
         """
         return self._current_token or self.get_access_token()
 
-    def delete_user_via_admin_api(self, user_id: str) -> bool:
+    def get_admin_headers(self) -> dict:
         """
-        Delete a user using Keycloak Admin account.
+        Get Keycloak Admin token and return the request headers
         """
+        enable_admin_direct_access_grants()
+
         # Get admin token
         admin_token = self.get_access_token("admin", "secret",
                                             realm="master",
                                             client_id="security-admin-console")
 
-        # Use Keycloak Admin API to delete user
-        admin_url = f"{self.keycloak_url}/admin/realms/{self.realm}/users/{user_id}"
-
-        headers = {
+        return {
             "Authorization": f"Bearer {admin_token}",
             "Content-Type": "application/json"
         }
 
+
+    def delete_user_via_admin_api(self, user_id: str) -> bool:
+        """
+        Delete a user using Keycloak Admin account.
+        """
+        headers = self.get_admin_headers()
+
+        # Use Keycloak Admin API to delete user
+        admin_url = f"{self.keycloak_url}/admin/realms/{self.realm}/users/{user_id}"
         response = requests.delete(admin_url, headers=headers)
         response.raise_for_status()
 

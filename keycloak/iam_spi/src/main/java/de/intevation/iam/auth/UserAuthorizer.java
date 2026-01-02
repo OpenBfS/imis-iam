@@ -29,6 +29,7 @@ public class UserAuthorizer extends Authorizer<User> {
 
     private static final String ENABLED_ATTRIBUTE_KEY = "enabled";
     private static final String HIDDEN_IN_ADDRESSBOOK_KEY = "hiddenInAddressbook";
+    private static final String RETIRED_ATTRIBUTE_KEY = "retired";
     private static final String ROLE_ATTRIBUTE_KEY = "role";
     private static final String NETWORK_ATTRIBUTE_KEY = "network";
     private static final String TAGS_ATTRIBUTE_KEY = "tags";
@@ -40,6 +41,7 @@ public class UserAuthorizer extends Authorizer<User> {
         List.of(
             ENABLED_ATTRIBUTE_KEY,
             HIDDEN_IN_ADDRESSBOOK_KEY,
+            RETIRED_ATTRIBUTE_KEY,
             ROLE_ATTRIBUTE_KEY,
             NETWORK_ATTRIBUTE_KEY,
             TAGS_ATTRIBUTE_KEY
@@ -83,6 +85,12 @@ public class UserAuthorizer extends Authorizer<User> {
     ) throws AuthorizationException {
         String userNetwork = user.getNetwork();
         String requestingUserNetwork = getRequestingUserNetwork(requestingUser);
+
+        // Retired users only visible to chief editors
+        if (user.isRetired() && !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+            throw new AuthorizationException("Retired user is not visible");
+        }
+
         if (
             (user.isEnabled() && !user.isHiddenInAddressbook())
             || IaMRole.EDITOR.isRoleOf(requestingUser, session)

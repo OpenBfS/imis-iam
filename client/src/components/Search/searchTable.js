@@ -20,7 +20,7 @@ const createHeaders = (columns, type) => {
   for (let i = 0; i < columns.length; i++) {
     const column = columns[i];
     const headerName = column.name;
-    if (headerName === "hiddenInAddressbook" && !profileStore.isChiefEditor) {
+    if ((headerName === "hiddenInAddressbook" || headerName === "retired") && !profileStore.isChiefEditor) {
       continue;
     } else if (type === "users") {
       // Don't show columns with private attributes because the user can only see their own private

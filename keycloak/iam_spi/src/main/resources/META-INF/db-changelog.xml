@@ -318,4 +318,12 @@
              SELECT id, email, email_constraint, email_verified, enabled, federation_link, first_name, last_name, realm_id, username, to_timestamp(created_timestamp/1000.0), service_account_client_link, not_before FROM keycloak.user_entity;
         </sql>
     </changeSet>
+    <changeSet author="swagner@intevation.de" id="v0.21">
+        <sql dbms="all"
+             splitStatements="true"
+             stripComments="true">
+           ALTER TABLE iam_user_attributes
+             ADD COLUMN retired boolean DEFAULT false;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
