@@ -525,3 +525,85 @@ class TestUserAPIRolePermissions:
         assert profile_data["attributes"]["operationModeChangeMailAddresses"] == []
         assert profile_data["attributes"]["operationModeChangePhoneNumbers"] == []
         assert profile_data["attributes"]["operationModeChangeSmsPhoneNumbers"] == []
+
+    def test_user_tag_search_exact(self):
+        """
+        Test that user search by tag is exact:
+        1. Create a user with tag "IBG"
+        2. Create a user with tag "IBG nachrichtlich"
+        3. Search for tag "IBG" - result must be only the first user
+        """
+        # Generate unique test data
+        test_username_1 = generate_test_username()
+        test_email_1 = f"{test_username_1}@example.com"
+        test_first_name_1 = "IBG"
+        test_last_name_1 = "User1"
+
+        test_username_2 = generate_test_username()
+        test_email_2 = f"{test_username_2}@example.com"
+        test_first_name_2 = "IBG"
+        test_last_name_2 = "User2"
+
+        user_1_id = None
+        user_2_id = None
+
+        try:
+            # Create user with tag "IBG"
+            user_1_data = {
+                "attributes": {
+                    "username": [test_username_1],
+                    "email": [test_email_1],
+                    "firstName": [test_first_name_1],
+                    "lastName": [test_last_name_1],
+                    "position": ["Mitarbeitende"],
+                    "tags": ["IBG"]
+                },
+                "institutions": ["Institution 1"],
+                "role": "user",
+                "network": "08",
+                "enabled": True,
+            }
+
+            create_response_1 = api_post("/user", data=user_1_data)
+            create_response_1.raise_for_status()
+            user_1_id = create_response_1.json().get("id")
+
+            # Create user with tag "IBG nachrichtlich"
+            user_2_data = {
+                "attributes": {
+                    "username": [test_username_2],
+                    "email": [test_email_2],
+                    "firstName": [test_first_name_2],
+                    "lastName": [test_last_name_2],
+                    "position": ["Mitarbeitende"],
+                    "tags": ["IBG nachrichtlich"]
+                },
+                "institutions": ["Institution 2"],
+                "role": "user",
+                "network": "08",
+                "enabled": True,
+            }
+
+            create_response_2 = api_post("/user", data=user_2_data)
+            create_response_2.raise_for_status()
+            user_2_id = create_response_2.json().get("id")
+
+            # Search for tag "IBG"
+            search_response = api_get("/user", params={
+                "search": create_search_query(tags="IBG"),
+                "maxResults": 100
+            })
+            search_response.raise_for_status()
+            search_data = search_response.json()["list"]
+
+            # Verify only the first user with tag "IBG" is returned
+            assert len(search_data) == 1
+            assert search_data[0]["id"] == user_1_id
+            assert search_data[0]["attributes"]["tags"] == ["IBG"]
+            assert search_data[0]["attributes"]["username"] == [test_username_1]
+
+        finally:
+            if user_1_id:
+                delete_user_from_db(user_1_id)
+            if user_2_id:
+                delete_user_from_db(user_2_id)

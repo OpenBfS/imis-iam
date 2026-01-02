@@ -26,7 +26,7 @@ SCREENSHOT_DIR = Path(__file__).parent / "screenshots"
 SCREENSHOT_DIR.mkdir(exist_ok=True)
 
 
-class TestFrontendLogin(SeleniumTestSuite):
+class TestFrontendInstitution(SeleniumTestSuite):
     """Test suite for frontend functionality and integration tests"""
 
     def test_institution_duplicate_address_warning(self, authenticated_driver_factory):
