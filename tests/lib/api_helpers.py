@@ -144,7 +144,7 @@ def create_search_query(**filters) -> str:
         >>> create_search_query(role="user", network="network1")
         'role:user network:network1'
     """
-    return " ".join([f"{key}:{value}" for key, value in filters.items()])
+    return " ".join([f'{key}:"{value}"' for key, value in filters.items()])
 
 
 def generate_test_username(prefix: str = "testuser") -> str:
