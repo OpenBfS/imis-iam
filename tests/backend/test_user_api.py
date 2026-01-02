@@ -828,3 +828,86 @@ class TestUserAPIRolePermissions:
         assert profile_data["attributes"]["operationModeChangeMailAddresses"] == []
         assert profile_data["attributes"]["operationModeChangePhoneNumbers"] == []
         assert profile_data["attributes"]["operationModeChangeSmsPhoneNumbers"] == []
+
+    def test_hidden_in_addressbook_visibility(self):
+        """
+        Test hiddenInAddressbook visibility rules:
+        1. Chief editor creates a user with hiddenInAddressbook=true
+        2. Verify exampleuser cannot query it directly (403)
+        3. Verify exampleuser cannot see it in the user list
+        4. Verify redakteur cannot query it directly (403)
+        5. Verify redakteur cannot see it in the user list
+        6. Verify chefredakteur CAN query it directly (200)
+        7. Verify chefredakteur CAN see it in the user list
+        """
+        # Generate unique test data
+        test_username = generate_test_username()
+        test_email = f"{test_username}@example.com"
+        created_user_id = None
+
+        try:
+            auth = get_auth()
+            auth.switch_user_context("chefredakteur")
+
+            # 1: Create user with hiddenInAddressbook=true
+            user_data = {
+                "attributes": {
+                    "username": [test_username],
+                    "email": [test_email],
+                    "firstName": ["Hidden"],
+                    "lastName": ["User"],
+                    "position": ["Mitarbeitende"],
+                },
+                "institutions": ["Institution 1"],
+                "role": "user",
+                "network": "08",
+                "enabled": True,
+                "hiddenInAddressbook": True,
+                "retired": False,
+            }
+
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user["id"]
+
+            assert created_user["hiddenInAddressbook"] is True
+            assert created_user["enabled"] is True
+
+            for username in ("exampleuser", "redakteur"):
+                auth.switch_user_context(username)
+
+                # 2+4: Try to query the hidden user
+                get_response = api_get(f"/user/{created_user_id}")
+                assert get_response.status_code == 403
+
+                # 3+5: Verify user not in list
+                list_response = api_get("/user", params={
+                    "search": create_search_query(username=test_username),
+                    "maxResults": 100
+                })
+                list_response.raise_for_status()
+                users = list_response.json()["list"]
+                assert not any(u["id"] == created_user_id for u in users)
+
+            # 6: chefredakteur can query the hidden user
+            auth.switch_user_context("chefredakteur")
+
+            get_response = api_get(f"/user/{created_user_id}")
+            get_response.raise_for_status()
+            retrieved_user = get_response.json()
+            assert retrieved_user["id"] == created_user_id
+            assert retrieved_user["hiddenInAddressbook"] is True
+
+            # 7: chefredakteur can see hidden user in list
+            list_response = api_get("/user", params={
+                "search": create_search_query(username=test_username),
+                "maxResults": 100
+            })
+            list_response.raise_for_status()
+            users = list_response.json()["list"]
+            assert any(u["id"] == created_user_id for u in users)
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)
