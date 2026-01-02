@@ -272,3 +272,100 @@ class TestInstitutionAPI:
                 delete_institution_from_db(institution_1_id)
             if institution_2_id:
                 delete_institution_from_db(institution_2_id)
+
+    def test_institution_search_tags(self):
+        """
+        Test search for institution tags:
+        1. Create a new institution with tag "Leitstelle"
+        2. Create another new institution with tags "Bundesministerium" and "Leitstelle"
+        3. Search for institutions with tag "Bundesministerium" - result size should be 2
+        4. Search for institutions with tag "Leitstelle" - result size should be 2
+        5. Search for both tags (like in multiple choice, but not available here) - should return only search for one tag
+        """
+        # Generate unique test data
+        suffix = generate_test_username(prefix='')[1:]
+        test_name_1 = f"Test Leitstelle {suffix}"
+        test_meas_facil_name_1 = f"test_lst_{suffix}"
+        test_meas_facil_id_1 = f"81{suffix[:5]}"
+
+        test_name_2 = f"Test Both Tags {suffix}"
+        test_meas_facil_name_2 = f"test_both_{suffix}"
+        test_meas_facil_id_2 = f"82{suffix[:5]}"
+
+        institution_1_id = None
+        institution_2_id = None
+
+        try:
+            # Create a new institution with tag "Leitstelle"
+            institution_1_data = {
+                "name": test_name_1,
+                "measFacilName": test_meas_facil_name_1,
+                "measFacilId": test_meas_facil_id_1,
+                "serviceBuildingStreet": "Test Street 1",
+                "serviceBuildingPostalCode": "11111",
+                "serviceBuildingLocation": "Test City 1",
+                "serviceBuildingState": "Test State 1",
+                "network": "08",
+                "active": True,
+                "tags": ["Leitstelle"]
+            }
+
+            create_response_1 = api_post("/institution", data=institution_1_data)
+            create_response_1.raise_for_status()
+            institution_1_id = create_response_1.json().get("id")
+
+            # Create another new institution with tags "Bundesministerium" and "Leitstelle"
+            institution_2_data = {
+                "name": test_name_2,
+                "measFacilName": test_meas_facil_name_2,
+                "measFacilId": test_meas_facil_id_2,
+                "serviceBuildingStreet": "Test Street 2",
+                "serviceBuildingPostalCode": "22222",
+                "serviceBuildingLocation": "Test City 2",
+                "serviceBuildingState": "Test State 2",
+                "network": "08",
+                "active": True,
+                "tags": ["Bundesministerium", "Leitstelle"]
+            }
+
+            create_response_2 = api_post("/institution", data=institution_2_data)
+            create_response_2.raise_for_status()
+            institution_2_id = create_response_2.json().get("id")
+
+            # 3. Search for institutions with tag "Bundesministerium"
+            search_response_1 = api_get("/institution", params={
+                "search": create_search_query(tags="Bundesministerium"),
+                "maxResults": 100
+            })
+            search_response_1.raise_for_status()
+            search_data_1 = search_response_1.json()
+
+            # 1 existing institution (Institution 1) + 1 new institution with both tags = 2
+            assert search_data_1["size"] == 2 == len(search_data_1["list"])
+
+            # 4. Search for institutions with tag "Leitstelle"
+            search_response_2 = api_get("/institution", params={
+                "search": create_search_query(tags="Leitstelle"),
+                "maxResults": 100
+            })
+            search_response_2.raise_for_status()
+            search_data_2 = search_response_2.json()
+
+            # 1 institution with only "Leitstelle" + 1 institution with both tags = 2
+            assert search_data_2["size"] == 2 == len(search_data_2["list"])
+
+            # 5: Search for both tags as in multiple-choice
+            # But this is not available, result should be only for one tag
+            search_response_3 = api_get("/institution", params={
+                "search": f'{create_search_query(tags="Bundesministerium")} {create_search_query(tags="Leitstelle")}',
+                "maxResults": 100
+            })
+            search_response_3.raise_for_status()
+            search_data_3 = search_response_3.json()
+
+            assert search_data_3["size"] != 3
+        finally:
+            if institution_1_id:
+                delete_institution_from_db(institution_1_id)
+            if institution_2_id:
+                delete_institution_from_db(institution_2_id)

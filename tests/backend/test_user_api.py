@@ -385,6 +385,76 @@ class TestUserAPI:
             if user_2_id:
                 delete_user_from_db(user_2_id)
 
+    def test_user_search_institution_multiple_choice(self):
+        """
+        Test multiple choice search in user search for institutions:
+        1. Create a new user with institution "Institution 2"
+        2. Search for users in institution "Institution 1" - result size should be 3 (all previous users)
+        3. Search for users in institution "Institution 2" - result size should be 1 (the new user)
+        4. Search for users in both institutions - result size should be 4 (all users)
+        """
+        # Generate unique test data
+        test_username = generate_test_username()
+        test_email = f"{test_username}@example.com"
+        test_first_name = "Institution"
+        test_last_name = "Two"
+
+        user_id = None
+
+        try:
+            # Create a new user with institution "Institution 2"
+            user_data = {
+                "attributes": {
+                    "username": [test_username],
+                    "email": [test_email],
+                    "firstName": [test_first_name],
+                    "lastName": [test_last_name],
+                    "position": ["Mitarbeitende"],
+                    "tags": ["AK UN"]
+                },
+                "institutions": ["Institution 2"],
+                "role": "user",
+                "network": "08",
+                "enabled": True,
+            }
+
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            user_id = create_response.json().get("id")
+
+            # Search for users in institution "Institution 1"
+            search_response_1 = api_get("/user", params={
+                "search": create_search_query(institutions="Institution 1"),
+                "maxResults": 100
+            })
+            search_response_1.raise_for_status()
+            search_data_1 = search_response_1.json()
+
+            assert search_data_1["size"] == 3 == len(search_data_1["list"])
+
+            # Search for users in institution "Institution 2"
+            search_response_2 = api_get("/user", params={
+                "search": create_search_query(institutions="Institution 2"),
+                "maxResults": 100
+            })
+            search_response_2.raise_for_status()
+            search_data_2 = search_response_2.json()
+
+            assert search_data_2["size"] == 1 == len(search_data_2["list"])
+
+            # Search for users in both institutions
+            search_response_3 = api_get("/user", params={
+                "search": f'{create_search_query(institutions="Institution 1")} {create_search_query(institutions="Institution 2")}',
+                "maxResults": 100
+            })
+            search_response_3.raise_for_status()
+            search_data_3 = search_response_3.json()
+
+            assert search_data_3["size"] == 4 == len(search_data_3["list"])
+        finally:
+            if user_id:
+                delete_user_from_db(user_id)
+
     def test_user_search_position_multiple_choice(self):
         """
         Test multiple choice search for field position:
