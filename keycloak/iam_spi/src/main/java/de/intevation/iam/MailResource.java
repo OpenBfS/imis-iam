@@ -159,14 +159,6 @@ public class MailResource {
         critQuery.orderBy(cb.desc(root.get(Mail_.sendDate)));
         Predicate filter;
 
-        //Filter by recipients
-        In<String> recipientFilter = cb.in(root.get("recipients"));
-        if (recipients != null && !recipients.isEmpty()) {
-            for (String recipient: recipients) {
-                recipientFilter.value(recipient);
-            }
-        }
-
         //Filter by mails according to "archived" value
         Predicate archiveFilter = cb.equal(root.get(Mail_.archived), archived);
 
@@ -178,8 +170,17 @@ public class MailResource {
         Predicate dateExpiredOrNoDateFilter = cb.or(
             expiredFilter, noDateFilter);
 
-        filter = cb.and(recipientFilter, archiveFilter);
-        filter = cb.and(filter, dateExpiredOrNoDateFilter);
+        filter = cb.and(archiveFilter, dateExpiredOrNoDateFilter);
+
+        //Filter by recipients (only if recipients are specified)
+        //otherwise it causes 'WHERE 1=0'
+        if (recipients != null && !recipients.isEmpty()) {
+            In<String> recipientFilter = cb.in(root.get("recipients"));
+            for (String recipient: recipients) {
+                recipientFilter.value(recipient);
+            }
+            filter = cb.and(filter, recipientFilter);
+        }
 
         //Filter mails by start and end date
         if (start != null) {
