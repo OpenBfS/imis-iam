@@ -324,7 +324,7 @@ class TestUserAPIRolePermissions:
                 auth.clear_user_context()
 
     def test_update_own_profile(self):
-        """Test that everyone can view and update their own profile"""
+        """Test that everyone can view and update their own profile, test by updating BAW fields"""
         auth = get_auth()
 
         for user in TEST_USERS.keys():
@@ -332,18 +332,46 @@ class TestUserAPIRolePermissions:
                 auth.switch_user_context(user)
 
                 # Get profile
-                response = api_get("/user/profile")
-                response.raise_for_status()
+                profile_response = api_get("/user/profile")
+                profile_response.raise_for_status()
 
-                profile = response.json()
+                profile = profile_response.json()
                 username = profile["attributes"]["username"][0]
                 assert username == user
 
-                # Try to update profile
+                # Update profile with BAW fields
+                baw_email = f"baw.{user}@example.com"
+                user_hash = abs(hash(user)) % 10000  # 4 digits
+                baw_phone = f"+491234{user_hash}"
+                baw_sms = f"+499876{user_hash}"
+                profile["attributes"]["operationModeChangeMailAddresses"] = [baw_email]
+                profile["attributes"]["operationModeChangePhoneNumbers"] = [baw_phone]
+                profile["attributes"]["operationModeChangeSmsPhoneNumbers"] = [baw_sms]
+
+                # Update profile
                 update_response = api_put("/user/profile", data=profile)
                 update_response.raise_for_status()
 
+                # Verify fields are saved
+                verify_response = api_get("/user/profile")
+                verify_response.raise_for_status()
+                updated_profile = verify_response.json()
+
+                assert updated_profile["attributes"]["operationModeChangeMailAddresses"] == [baw_email]
+                assert updated_profile["attributes"]["operationModeChangePhoneNumbers"] == [baw_phone]
+                assert updated_profile["attributes"]["operationModeChangeSmsPhoneNumbers"] == [baw_sms]
+
             finally:
+                # Clean up: Remove fields
+                profile_response = api_get("/user/profile")
+                profile_response.raise_for_status()
+                profile = profile_response.json()
+                profile["attributes"]["operationModeChangeMailAddresses"] = []
+                profile["attributes"]["operationModeChangePhoneNumbers"] = []
+                profile["attributes"]["operationModeChangeSmsPhoneNumbers"] = []
+                put_request = api_put("/user/profile", data=profile)
+                put_request.raise_for_status()
+
                 auth.clear_user_context()
 
     def test_exampleuser_cannot_create_user(self):
@@ -371,9 +399,9 @@ class TestUserAPIRolePermissions:
         finally:
             auth.clear_user_context()
 
-    def test_baw_fields_update_and_visibility(self):
+    def test_baw_fields_visibility(self):
         """
-        Test BAW (Operation Mode Change) fields update and visibility:
+        Test BAW (Operation Mode Change) fields visibility:
         1. Login as chefredakteur and update own profile with BAW fields
         2. Query own user data and verify BAW fields are present in profile
         3. But not in when querying user data
@@ -442,3 +470,58 @@ class TestUserAPIRolePermissions:
             api_put("/user/profile", data=profile)
 
             auth.clear_user_context()
+
+    def test_baw_fields_updateability(self):
+        """
+        Test that chefredakteur cannot set BAW fields for another user:
+        1. Login as chefredakteur
+        2. Set BAW fields for exampleuser
+        3. Verify the data is not saved
+        4. Login as exampleuser
+        5. Verify the data is in the profile information
+        """
+        baw_emails = ["baw.user@example.com"]
+        baw_phones = ["+49111222333"]
+        baw_sms = ["+49444555666"]
+        auth = get_auth()
+
+        # Login as chefredakteur and set BAW fields for exampleuser
+        auth.switch_user_context("chefredakteur")
+
+        # First, get current data
+        search_response = api_get("/user", params={
+            "search": create_search_query(username="exampleuser"),
+            "maxResults": 1
+        })
+        search_response.raise_for_status()
+        search_data = search_response.json()
+        assert search_data["size"] == 1
+
+        exampleuser_data = search_data["list"][0]
+        exampleuser_id = exampleuser_data["id"]
+
+        # Try to set BAW fields
+        exampleuser_data["attributes"]["operationModeChangeMailAddresses"] = baw_emails
+        exampleuser_data["attributes"]["operationModeChangePhoneNumbers"] = baw_phones
+        exampleuser_data["attributes"]["operationModeChangeSmsPhoneNumbers"] = baw_sms
+        update_response = api_put("/user/", data=exampleuser_data)
+        assert update_response.status_code == 400  # Bad Request
+
+        # Verify the data
+        verify_response = api_get(f"/user/{exampleuser_id}")
+        verify_response.raise_for_status()
+        verified_data = verify_response.json()
+
+        assert "operationModeChangeMailAddresses" not in verified_data["attributes"]
+        assert "operationModeChangePhoneNumbers" not in verified_data["attributes"]
+        assert "operationModeChangeSmsPhoneNumbers" not in verified_data["attributes"]
+
+        # Login as exampleuser and verify the data is also not in the profile
+        auth.switch_user_context("exampleuser")
+        profile_response = api_get("/user/profile")
+        profile_response.raise_for_status()
+        profile_data = profile_response.json()
+
+        assert profile_data["attributes"]["operationModeChangeMailAddresses"] == []
+        assert profile_data["attributes"]["operationModeChangePhoneNumbers"] == []
+        assert profile_data["attributes"]["operationModeChangeSmsPhoneNumbers"] == []
