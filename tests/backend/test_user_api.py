@@ -621,7 +621,7 @@ class TestUserAPIRolePermissions:
                 response.raise_for_status()
 
                 data = response.json()
-                assert data["size"] == 3
+                assert data["size"] == 3, f"{user} can see {data['size']} users, not 3: {[u['attributes']['username'][0] for u in data['list']]}"
 
             finally:
                 auth.clear_user_context()

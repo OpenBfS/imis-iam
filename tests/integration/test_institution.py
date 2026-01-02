@@ -14,7 +14,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from lib.selenium_helpers import (
     get_firefox_driver,
     get_application_url,
-    get_keycloak_url,
     get_realm,
     SeleniumTestSuite
 )

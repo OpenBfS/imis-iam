@@ -16,7 +16,6 @@ from selenium.webdriver.common.keys import Keys
 from lib.selenium_helpers import (
     get_firefox_driver,
     get_application_url,
-    get_keycloak_url,
     get_realm,
     SeleniumTestSuite
 )

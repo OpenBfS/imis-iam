@@ -63,6 +63,7 @@ pytest
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `CLIENT_URL` | Client base URL | `http://localhost:48081` |
 | `KEYCLOAK_URL` | Keycloak base URL | `http://localhost:48080` |
 | `REALM` | Keycloak realm name | `imis3` |
 | `CLIENT_ID` | OAuth2 client ID | `iam-client` |

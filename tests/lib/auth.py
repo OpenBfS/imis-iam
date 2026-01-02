@@ -21,6 +21,7 @@ TEST_USERS = {
 
 class KeycloakAuth:
     def __init__(self,
+                 client_url: str = None,
                  keycloak_url: str = None,
                  realm: str = None,
                  client_id: str = None,
@@ -31,6 +32,7 @@ class KeycloakAuth:
         Initialize Keycloak authentication.
 
         Args:
+            client_url: Client base URL (default from environment)
             keycloak_url: Keycloak base URL (default from environment)
             realm: Realm name (default from environment)
             client_id: OAuth2 client ID (default from environment)
@@ -38,6 +40,7 @@ class KeycloakAuth:
             username: Default username (default from environment)
             password: Default password (default from environment)
         """
+        self.client_url = client_url or os.getenv('CLIENT_URL', 'http://localhost:48081')
         self.keycloak_url = keycloak_url or os.getenv('KEYCLOAK_URL', 'http://localhost:48080')
         self.realm = realm or os.getenv('REALM', 'imis3')
         self.client_id = client_id or os.getenv('CLIENT_ID', 'iam-client')
@@ -64,7 +67,7 @@ class KeycloakAuth:
             return cached_token
 
         # Request new token
-        token_url = f"{self.keycloak_url}/realms/{realm}/protocol/openid-connect/token"
+        token_url = f"{self.client_url}/realms/{realm}/protocol/openid-connect/token"
 
         data = {
             'client_id': client_id,
@@ -128,7 +131,8 @@ class KeycloakAuth:
         # Get admin token
         admin_token = self.get_access_token("admin", "secret",
                                             realm="master",
-                                            client_id="security-admin-console")
+                                            client_id="security-admin-console",
+                                            )
 
         return {
             "Authorization": f"Bearer {admin_token}",

@@ -137,6 +137,10 @@ def delete_user_from_db(user_uuid: Optional[str] = None, username: Optional[str]
             (user_uuid,)
         )
         cursor.execute(
+            "DELETE FROM credential WHERE user_id = %s",
+            (user_uuid,)
+        )
+        cursor.execute(
             "DELETE FROM user_entity WHERE id = %s",
             (user_uuid,)
         )
@@ -161,7 +165,6 @@ def enable_admin_direct_access_grants():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Delete in correct order to respect foreign key constraints
         cursor.execute("""
             UPDATE client
             SET direct_access_grants_enabled = true
