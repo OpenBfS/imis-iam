@@ -323,7 +323,8 @@
              splitStatements="true"
              stripComments="true">
            ALTER TABLE iam_user_attributes
-             ADD COLUMN retired BOOLEAN NOT NULL DEFAULT false;
+             ADD COLUMN retired BOOLEAN NOT NULL DEFAULT false,
+             ALTER COLUMN hidden_in_addressbook SET NOT NULL;
         </sql>
     </changeSet>
 </databaseChangeLog>

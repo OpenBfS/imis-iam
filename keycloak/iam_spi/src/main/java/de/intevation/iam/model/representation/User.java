@@ -116,7 +116,7 @@ public class User {
             }
 
             this.network = jpaModel.getNetwork();
-            this.hiddenInAddressbook = jpaModel.getHiddenInAddressbook();
+            this.hiddenInAddressbook = jpaModel.isHiddenInAddressbook();
             this.retired = jpaModel.isRetired();
         }
     }
