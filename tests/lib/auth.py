@@ -52,6 +52,7 @@ class KeycloakAuth:
         self._current_user = None
         self._current_token = None
 
+
     def get_access_token(self, username: str = None, password: str = None, realm: str = None, client_id: str = None) -> str:
         """
         Get access token from Keycloak.
@@ -138,7 +139,6 @@ class KeycloakAuth:
             "Authorization": f"Bearer {admin_token}",
             "Content-Type": "application/json"
         }
-
 
     def delete_user_via_admin_api(self, user_id: str) -> bool:
         """

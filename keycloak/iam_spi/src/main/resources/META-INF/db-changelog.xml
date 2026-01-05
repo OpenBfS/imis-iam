@@ -323,7 +323,7 @@
              splitStatements="true"
              stripComments="true">
            ALTER TABLE iam_user_attributes
-             ADD COLUMN retired boolean DEFAULT false;
+             ADD COLUMN retired BOOLEAN NOT NULL DEFAULT false;
         </sql>
     </changeSet>
 </databaseChangeLog>

@@ -43,8 +43,8 @@ public class UserAttributes {
     @Column(name = "hidden_in_addressbook")
     private Boolean hiddenInAddressbook;
 
-    @Column(name = "retired")
-    private Boolean retired;
+    @Column(name = "retired", nullable = false)
+    private boolean retired;
 
     @Column(name = "expired_notification_sent")
     private Boolean expiredNotificationSent;
@@ -105,7 +105,7 @@ public class UserAttributes {
         this.hiddenInAddressbook = hiddenInAddressbook;
     }
 
-    public Boolean getRetired() {
+    public boolean isRetired() {
         return retired;
     }
 

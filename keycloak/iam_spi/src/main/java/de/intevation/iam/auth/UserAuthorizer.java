@@ -86,17 +86,16 @@ public class UserAuthorizer extends Authorizer<User> {
         String userNetwork = user.getNetwork();
         String requestingUserNetwork = getRequestingUserNetwork(requestingUser);
 
+        // Chief editors can see all users
         // Retired users only visible to chief editors
-        if (user.isRetired() && !IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
-            throw new AuthorizationException("Retired user is not visible");
-        }
-
-        if (
-            (user.isEnabled() && !user.isHiddenInAddressbook())
-            || IaMRole.EDITOR.isRoleOf(requestingUser, session)
-            && requestingUserNetwork != null
-            && requestingUserNetwork.equals(userNetwork)
-            || IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)) {
+        // Show disabled users to editors only when they are in the same network
+        // Regular users can only see enabled, non-hidden users
+        if (IaMRole.CHIEF_EDITOR.isRoleOf(requestingUser, session)
+            || !user.isRetired()
+            && (user.isEnabled() && !user.isHiddenInAddressbook()
+                || IaMRole.EDITOR.isRoleOf(requestingUser, session)
+                && requestingUserNetwork != null
+                && requestingUserNetwork.equals(userNetwork))) {
             return;
         }
         throw new AuthorizationException("User is not visible");

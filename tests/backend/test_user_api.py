@@ -1277,3 +1277,133 @@ class TestUserAPIRolePermissions:
         finally:
             if created_user_id:
                 delete_user_from_db(created_user_id)
+
+    def test_user_network_visibility_and_disabled_state(self):
+        """
+        Test user visibility based on network and disabled state:
+        1. Create a user with network "11"
+        2. Verify redakteur and exampleuser can query it
+        3. Disable the user
+        4. Verify redakteur (in a different network) and exampleuser cannot query it anymore
+        5. Change network to "07"
+        6. Verify redakteur can query
+        7. Verify exampleuser cannot query it
+        """
+        # Example user data
+        test_username = generate_test_username()
+        created_user_id = None
+        auth = get_auth()
+        user_data = {
+            "attributes": {
+                "username": [test_username],
+                "email": [f"{test_username}@example.com"],
+                "firstName": ["Network"],
+                "lastName": ["Test"],
+                "position": ["Mitarbeitende"],
+            },
+            "institutions": ["Institution 1"],
+            "role": "user",
+            "network": "11",
+            "enabled": True,
+        }
+
+        auth.switch_user_context("chefredakteur")
+
+        try:
+            # 1: Create user with network "11"
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user["id"]
+
+            assert created_user["network"] == "11"
+            assert created_user["enabled"] is True
+
+            # 2: Verify redakteur and exampleuser can query it
+            for username in ("redakteur", "exampleuser"):
+                auth.switch_user_context(username)
+
+                # Query by ID
+                get_response = api_get(f"/user/{created_user_id}")
+                get_response.raise_for_status()
+                retrieved_user = get_response.json()
+                assert retrieved_user["id"] == created_user_id
+
+                # Query via search
+                list_response = api_get("/user", params={
+                    "search": create_search_query(username=test_username),
+                    "maxResults": 100
+                })
+                list_response.raise_for_status()
+                users = list_response.json()["list"]
+                assert any(u["id"] == created_user_id for u in users)
+
+            # 3: Disable the user
+            auth.switch_user_context("chefredakteur")
+            user_data["id"] = created_user_id
+            user_data["enabled"] = False
+
+            update_response = api_put("/user", data=user_data)
+            update_response.raise_for_status()
+            updated_user = update_response.json()
+            assert updated_user["enabled"] is False
+
+            # 4: Verify redakteur and exampleuser cannot query it anymore
+            for username in ("redakteur", "exampleuser"):
+                auth.switch_user_context(username)
+
+                # Query by ID should still work but show disabled
+                get_response = api_get(f"/user/{created_user_id}")
+                assert get_response.status_code == 403, username
+
+                # Disabled user should not appear in the search
+                list_response = api_get("/user", params={
+                    "search": create_search_query(username=test_username),
+                    "maxResults": 100
+                })
+                list_response.raise_for_status()
+                users = list_response.json()["list"]
+                assert not any(u["id"] == created_user_id for u in users), username
+
+            # 5: Change network to "07"
+            auth.switch_user_context("chefredakteur")
+            user_data["network"] = "07"
+
+            update_response = api_put("/user", data=user_data)
+            update_response.raise_for_status()
+            updated_user = update_response.json()
+            assert updated_user["network"] == "07"
+            assert updated_user["enabled"] is False
+
+            # 6: Verify redakteur can query it
+            auth.switch_user_context("redakteur")
+            get_response = api_get(f"/user/{created_user_id}")
+            get_response.raise_for_status()
+            retrieved_user = get_response.json()
+            assert retrieved_user["id"] == created_user_id
+            assert retrieved_user["network"] == "07"
+
+            list_response = api_get("/user", params={
+                "search": create_search_query(username=test_username),
+                "maxResults": 100
+            })
+            list_response.raise_for_status()
+            users = list_response.json()["list"]
+            assert any(u["id"] == created_user_id for u in users)
+
+            # 7. Verify exampleuser cannot query it
+            auth.switch_user_context("exampleuser")
+            get_response = api_get(f"/user/{created_user_id}")
+            assert get_response.status_code == 403
+
+            list_response = api_get("/user", params={
+                "search": create_search_query(username=test_username),
+                "maxResults": 100
+            })
+            list_response.raise_for_status()
+            users = list_response.json()["list"]
+            assert not any(u["id"] == created_user_id for u in users)
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)

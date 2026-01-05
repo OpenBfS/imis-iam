@@ -117,7 +117,7 @@ public class User {
 
             this.network = jpaModel.getNetwork();
             this.hiddenInAddressbook = jpaModel.getHiddenInAddressbook();
-            this.retired = jpaModel.getRetired();
+            this.retired = jpaModel.isRetired();
         }
     }
 
