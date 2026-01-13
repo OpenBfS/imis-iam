@@ -224,6 +224,9 @@ Standard response format for list endpoints:
 }
 ```
 
+Please note:
+The field `size` denotes the total number of results without considering the pagination, not the number of elements in the transferred list.
+
 ## Authorization
 
 ### Role-Based Access Control
@@ -262,6 +265,67 @@ Supports:
 - Wildcards: `name:"red%eur"`
 - Conjungation of multiple searches: `field:"value" field2:"value"`
 - Logical OR for values: `institutions:"Institution 1" institutions:"Institution 2"`
+
+## REST API Examples
+
+This section contains usage examples for Bash scripting.
+For examples in Python, you can have a look at the test scripts, especially the authentication library in `tests/lib/auth.py`.
+It is also possible and advisable to use authentication libraries for Keycloak, like [python-keycloak](https://pypi.org/project/python-keycloak), [keycloak-js](https://www.npmjs.com/package/keycloak-js) or [keycloak-client (Java)](https://github.com/keycloak/keycloak-client).
+For authenticating web services, [`mod_auth_openidc` for Apache](https://github.com/OpenIDC/mod_auth_openidc) is a good choice.
+
+Documentation for Keycloak's own REST API can be found at [Keycloak Admin REST API](https://www.keycloak.org/docs-api/latest/rest-api/index.html)
+
+### Prerequisites
+
+For the examples below, you need `curl` and `jq`.
+
+Instead of `curl`, you can also use other tools, such as `wget`.
+`jq` is optional and only for formatting and processing the JSON responses.
+
+### Authentication
+
+First, we need to get an authentication token from Keycloak.
+
+Replace the client secret, username and password in the following example to retrieve a Bearer token:
+
+```shell
+$ curl --fail -d client_id=iam-client -d client_secret=exampleclientsecret \
+  -d grant_type=password -d username=exampleuser -d password=secret \
+  http://localhost:48081/realms/imis3/protocol/openid-connect/token
+{
+    "access_token": "...",
+    "expires_in": 300,
+    "refresh_expires_in": 1800,
+    "refresh_token": "...",
+    "token_type": "Bearer",
+    "not-before-policy": 0,
+    "session_state": "...",
+    "scope": "email profile"
+}
+```
+
+The element `access_token` in the response contains the crucial information.
+Save it in a variable to easier reuse:
+
+```bash
+access_token="..."
+```
+
+Query the access token and save it in one step:
+```bash
+access_token=$(curl --silent -d client_id=iam-client -d client_secret=exampleclientsecret \
+  -d grant_type=password -d username=exampleuser -d password=secret \
+  http://localhost:48081/realms/imis3/protocol/openid-connect/token | jq -r '.access_token')
+```
+
+The access tokens are by default very short lived (five minutes in this example).
+The token lifetime can be set in the Keycloak configuration.
+
+After the token expiration, any subsequent API calls will result in an HTTP error code 401 Unauthorized.
+
+### REST API Examples
+
+See [REST API Examples.md](./REST%20API%20Examples.md).
 
 ## Database Schema
 
