@@ -6,8 +6,15 @@ FROM debian:${DEBIAN_CODENAME} as builder
 #
 # Install required packages
 #
+ARG NODE_MAJOR=24
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y npm && \
+    apt-get remove -y nodejs npm && \
+    apt-get install -y ca-certificates curl gnupg && \
+    mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+    DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs libapache2-mod-auth-openidc curl && \
     apt-get -qq clean && rm -rf /var/lib/apt/lists/*
 
 RUN npm install --global yarn
@@ -16,7 +23,6 @@ ENV SRC=/usr/local/iamclient/
 ADD client/package.json client/yarn.lock $SRC
 WORKDIR $SRC
 RUN yarn install
-
 
 ADD client $SRC
 ARG CLIENT_PATH

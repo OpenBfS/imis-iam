@@ -149,10 +149,19 @@ export function useForm(i18n) {
     return false;
   };
 
-  const areArraysDifferent = (a, b) => {
+  const areArraysDifferent = (a, b, sameOrder = true) => {
+    let sameElementsCount = 0;
     if (a.length !== b.length) return true;
     for (var i = 0; i < a.length; ++i) {
-      if (a[i] !== b[i]) return true;
+      if (sameOrder && a[i] !== b[i]) {
+        return true;
+      } else if (!sameOrder) {
+        const index = b.findIndex((element) => element === a[i]);
+        if (index != -1) sameElementsCount++;
+      }
+    }
+    if (!sameOrder && a.length !== sameElementsCount) {
+      return true;
     }
     return false;
   };

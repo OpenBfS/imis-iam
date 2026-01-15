@@ -15,6 +15,7 @@ import global from "@/test/components/global";
 import { HTTP } from "@/lib/http";
 import i18n from "@/i18n";
 import { roles } from "@/test/sharedTests";
+import { createHeaders, initSelectedColumns } from "@/components/Search/searchTable";
 
 setActivePinia(createPinia());
 
@@ -74,20 +75,23 @@ const users = [
     },
   },
 ];
+userStore.foundUsers = users;
+const columns = [
+  { name: "username", default: true },
+  { name: "firstName", default: true },
+  { name: "lastName", default: true },
+  { name: "role", default: true },
+];
 
 // Init component
 const wrapper = mount(UserTable, {
   props: {
-    columns: [
-      { name: "username", default: true },
-      { name: "firstName", default: true },
-      { name: "lastName", default: true },
-      { name: "role", default: true },
-    ],
     users: users,
   },
   global: global,
 });
+userStore.tableHeaders = createHeaders(columns, "users");
+initSelectedColumns("users");
 
 test("Username is displayed in first column", async () => {
   wrapper.findAll("tbody tr").forEach((row, i) => {
@@ -103,3 +107,4 @@ test("Role is translated", async () => {
   expect(wrapper.text()).toContain(t("roleIamUser"));
   expect(wrapper.text()).toContain(t("roleIamEditor"));
 });
+

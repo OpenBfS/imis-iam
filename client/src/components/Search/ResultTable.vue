@@ -6,18 +6,11 @@
  and comes with ABSOLUTELY NO WARRANTY!
  -->
 <template>
-  <v-list
-    density="compact"
-    nav
-    lines=""
-    class="d-flex flex-column h-100 px-0 pb-0"
-  >
-    <InstitutionTable
-      v-if="props.type != 'users'"
-      v-bind:institutions="institutionStore.foundInstitutions"
-    />
-    <UserTable v-else v-bind:users="userStore.foundUsers" />
-  </v-list>
+  <InstitutionTable
+    v-if="props.type != 'users'"
+    v-bind:institutions="institutionStore.foundInstitutions"
+  />
+  <UserTable v-else v-bind:users="userStore.foundUsers" />
 </template>
 
 <script setup>

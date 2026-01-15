@@ -246,7 +246,7 @@
                   attribute="tags"
                   :no-data-text="$t('label.noDataText')"
                   :label="$t('institution.tags')"
-                  :items="categories"
+                  :items="institutionStore.institutionTags"
                   v-model="institution.tags"
                   :disabled="profileStore.userData.role !== 'chief_editor'"
                   item-title="name"
@@ -265,7 +265,6 @@
         v-if="hasLoadingError || hasRequestError"
         v-bind:message="applicationStore.httpErrorMessage"
       />
-      <UIAlert v-else-if="duplicateAddressFound" message="aaaah" />
     </v-container>
     <v-divider></v-divider>
     <v-card-actions>
@@ -405,16 +404,6 @@ const {
   handleValidationErrorFromServer,
   isServerValidationError,
 } = useForm();
-const categories = ref([]);
-const getCategories = () => {
-  HTTP.get("iam/institution/tag")
-    .then((response) => {
-      categories.value = response.data;
-    })
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
 
 const measIdAndNameOrNothing = () => {
   return [
@@ -486,7 +475,9 @@ onBeforeMount(() => {
 onMounted(() => {
   // TODO: Geocoding feature delayed to a subsequent date
   // coordinatesStore.coordinates.length = 0;
-  getCategories();
+  institutionStore.loadInstitutionTags().catch(() => {
+    hasLoadingError.value = true;
+  });
 
   if (hasPostalAddress()) {
     showPostalAddress.value = true;
@@ -587,6 +578,7 @@ const checkForDuplicateAddress = () => {
       const foundInstitutions = response.data.list;
       const instWithDuplAddress = foundInstitutions.find((i) => {
         return (
+          (!institution.value.id || institution.value.id !== i.id) &&
           i.serviceBuildingPostalCode ===
             institution.value.serviceBuildingPostalCode &&
           i.serviceBuildingStreet === institution.value.serviceBuildingStreet

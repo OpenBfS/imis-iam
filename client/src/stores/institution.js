@@ -29,6 +29,7 @@ export const useInstitutionStore = defineStore("institution", {
     // Object with keys "key" and "order"
     sortBy: null,
     totalNumberOfInstitutions: 0,
+    institutionTags: [],
   }),
   actions: {
     //Convert current institution attributes to string arrays
@@ -117,11 +118,23 @@ export const useInstitutionStore = defineStore("institution", {
       this.totalNumberOfInstitutions++;
     },
     updateFilter(key, term) {
-      if (term === null || term.length === 0) {
+      if (term == null || term.length === 0) {
         delete this.filterBy[key];
       } else if (!term.length || term.length > 0) {
         this.filterBy[key] = term;
       }
+    },
+    loadInstitutionTags() {
+      return new Promise((resolve, reject) => {
+        HTTP.get("iam/institution/tag")
+          .then((response) => {
+            this.institutionTags = response.data;
+            resolve(this.institutionTags);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
     },
   },
   getters: {

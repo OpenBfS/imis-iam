@@ -135,7 +135,7 @@
           >
             <Filter
               :filterKey="header.key"
-              :items="institutionTags"
+              :items="institutionStore.institutionTags"
               item-title="name"
               item-value="name"
               :label="$t('institution.tags')"
@@ -205,7 +205,6 @@ import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
 import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { HTTP } from "@/lib/http";
 import { useNotification } from "@/lib/use-notification";
 import { states } from "./Institution/institution";
 import Filter from "./Search/Filter.vue";
@@ -242,16 +241,6 @@ const roles = computed(() => {
   });
 });
 const selected = ref([]);
-const institutionTags = ref([]);
-const getInstitutionTags = () => {
-  HTTP.get("iam/institution/tag")
-    .then((response) => {
-      institutionTags.value = response.data;
-    })
-    .catch(() => {
-      hasLoadingError.value = true;
-    });
-};
 
 const props = defineProps([
   // Vuetify props
@@ -284,7 +273,9 @@ const updateTable = (event) => {
 };
 
 onMounted(() => {
-  getInstitutionTags();
+  institutionStore.loadInstitutionTags().catch(() => {
+    hasLoadingError.value = true;
+  });
 });
 
 const getNumberForEndOfRange = () => {

@@ -205,7 +205,7 @@ export const useApplicationStore = defineStore("application", {
       const profileStore = useProfileStore();
       const ownUsername = profileStore.getOwnUsername;
       const isOwnAccount = ownUsername === user.attributes.username[0]
-      const u = isOwnAccount ? profileStore.userData : user;
+      const u = structuredClone(isOwnAccount ? profileStore.userData : user);
       const keys = Object.keys(u.attributes);
       keys.forEach((key) => {
         if (

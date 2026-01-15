@@ -6,10 +6,10 @@ RUN echo \
     debconf-set-selections && \
     echo "locales locales/default_environment_locale select en_US.UTF-8" | \
     debconf-set-selections
-RUN apt-get update -y && apt-get install -y locales
+RUN apt-get update -y && DEBIAN_FRONTEND="noninteractive" apt-get install -y locales
 ENV LC_ALL=en_US.UTF-8
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y \
             openjdk-21-jre-headless maven
 
 ENV KEYCLOAK_HOME=/opt/keycloak
@@ -38,10 +38,10 @@ RUN echo \
     debconf-set-selections && \
     echo "locales locales/default_environment_locale select en_US.UTF-8" | \
     debconf-set-selections
-RUN apt-get update -y && apt-get install -y locales
+RUN apt-get update -y && DEBIAN_FRONTEND="noninteractive" apt-get install -y locales
 ENV LC_ALL=en_US.UTF-8
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y \
             libxml2-utils openjdk-21-jre-headless jq curl \
             postgresql-client
 

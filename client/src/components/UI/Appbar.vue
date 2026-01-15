@@ -62,9 +62,6 @@ import { useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { computed } from "vue";
 
-const cloneObject = (obj) => {
-  return JSON.parse(JSON.stringify(obj));
-};
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
 const savedUser = computed(() => {
@@ -91,6 +88,6 @@ const changePassword = () => {
 };
 
 const editProfile = () => {
-  applicationStore.openUserEditForm(cloneObject(savedUser.value));
+  applicationStore.openUserEditForm(structuredClone(savedUser.value));
 };
 </script>
