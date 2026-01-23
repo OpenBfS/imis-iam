@@ -1081,6 +1081,24 @@ class TestUserAPIRolePermissions:
             retired_user_in_list = any(u["id"] == created_user_id for u in users)
             assert retired_user_in_list
 
+            # Search for retired users: test user should be in data
+            retired_search_response = api_get("/user", params={
+                "search": f'{create_search_query(username=test_username, retired="true")}',
+                "maxResults": 100
+            })
+            retired_search_response.raise_for_status()
+            retired_users = retired_search_response.json()["list"]
+            assert any(u["id"] == created_user_id for u in retired_users), retired_users
+
+            # Search for non-retired users: test user should NOT be in data
+            non_retired_search_response = api_get("/user", params={
+                "search": f'{create_search_query(username=test_username, retired="false")}',
+                "maxResults": 100
+            })
+            non_retired_search_response.raise_for_status()
+            non_retired_users = non_retired_search_response.json()["list"]
+            assert not any(u["id"] == created_user_id for u in non_retired_users)
+
             # Switch to regular user
             auth.switch_user_context("exampleuser")
 
