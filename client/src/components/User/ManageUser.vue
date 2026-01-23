@@ -50,7 +50,7 @@
                   :disabled="profileStore.userData.role !== 'chief_editor'"
                 ></Checkbox>
               </v-col>
-              <v-col cols="2" v-if="profileStore.userData.role === 'chief_editor'">
+              <v-col cols="3" v-if="profileStore.userData.role === 'chief_editor'">
                 <Checkbox
                   attribute="retired"
                   :label="$t('user.retired')"
