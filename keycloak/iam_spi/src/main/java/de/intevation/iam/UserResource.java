@@ -233,7 +233,7 @@ public class UserResource {
                 Map<String, String> customAttributes = new HashMap<>();
                 for (String customAttribute : new String[]{
                         "institutions", "role", "network",
-                        "hiddenInAddressbook"}
+                        "hiddenInAddressbook", "retired"}
                 ) {
                     String value = attributes.get(customAttribute);
                     if (value != null) {
@@ -266,13 +266,19 @@ public class UserResource {
                         "hiddenInAddressbook");
                     Boolean isHidden = isHiddenString != null
                         ? Boolean.valueOf(isHiddenString) : null;
+                    String isRetiredString = customAttributes.get(
+                        "retired");
+                    Boolean isRetired = isRetiredString != null
+                        ? Boolean.valueOf(isRetiredString) : null;
                     customAttributesFilter = u -> (institution == null
                         || u.getInstitutions().contains(institution))
                         && (role == null || u.getRole().equals(role))
                         && (network == null
                             || u.getNetwork().contains(network))
                         && (isHidden == null
-                            || u.isHiddenInAddressbook() == isHidden);
+                            || u.isHiddenInAddressbook() == isHidden)
+                        && (isRetired == null
+                            || u.isRetired() == isRetired);
                 }
 
                 List<User> matching = userModels
@@ -383,6 +389,10 @@ public class UserResource {
                 ve);
         }
 
+        // Retired users must be disabled
+        if (rep.isRetired()) {
+            rep.setEnabled(false);
+        }
         newUserModel.setEnabled(rep.isEnabled());
         rep.setId(newUserModel.getId());
 
@@ -460,6 +470,10 @@ public class UserResource {
                     .entity(ve.getErrors())
                     .build(),
                 ve);
+        }
+        // Retired users must be disabled
+        if (rep.isRetired()) {
+            rep.setEnabled(false);
         }
         user.setEnabled(rep.isEnabled());
 

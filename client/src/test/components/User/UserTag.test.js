@@ -6,7 +6,6 @@
  */
 import { beforeAll, describe, expect, test, vi } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
-import { useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
 import { useUserStore } from "@/stores/user";
 import { HTTP } from "@/lib/http";

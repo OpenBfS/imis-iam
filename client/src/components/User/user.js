@@ -18,6 +18,7 @@ const expUser = {
   network: null,
   enabled: false,
   hiddenInAddressbook: false,
+  retired: false,
 };
 
 function getExpUser() {

@@ -112,11 +112,11 @@
               :type="props.type"
             ></Filter>
           </template>
-          <template v-else-if="header.key === 'hiddenInAddressbook'">
+          <template v-else-if="header.key === 'retired' || header.key === 'hiddenInAddressbook'">
             <Filter
               :filterKey="header.key"
               :items="booleanFilterItems"
-              :label="$t('user.hiddenInAddressbook')"
+              :label="$t(`user.${header.key}`)"
               :type="props.type"
             ></Filter>
           </template>
