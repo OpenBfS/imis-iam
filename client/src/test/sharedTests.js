@@ -8,7 +8,7 @@ import { expect } from "vitest";
 import i18n from "@/i18n";
 import ChipTextField from "@/components/Form/ChipTextField.vue";
 import { setActivePinia, createPinia } from "pinia";
-import { useApplicationStore } from "@/stores/application";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application";
 import { useProfileStore } from "@/stores/profile";
 
 const { t } = i18n.global;
@@ -23,7 +23,7 @@ const networks = ["01", "02"];
 const setupSharedTestEnvironment = async (item, roleOfLoggedInUser) => {
   setActivePinia(createPinia());
   const applicationStore = useApplicationStore();
-  applicationStore.processType = "edit";
+  applicationStore.processType = PROCESS_TYPE.EDIT;
   applicationStore.managedItem = structuredClone(item);
   applicationStore.savedItem = structuredClone(item);
   const profileStore = useProfileStore();

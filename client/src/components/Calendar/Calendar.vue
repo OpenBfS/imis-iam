@@ -22,7 +22,7 @@
             @click="
               resetNotification();
               applicationStore.setManagedItem({ ...exampleEvent });
-              applicationStore.setProcessType('add');
+              applicationStore.setProcessType(PROCESS_TYPE.ADD);
               applicationStore.setShowManageEventDialog(true);
             "
           >
@@ -53,7 +53,7 @@
                       applicationStore.setManagedItem({
                         ...eventsStore.getEvent(event.id),
                       });
-                      applicationStore.setProcessType('edit');
+                      applicationStore.setProcessType(PROCESS_TYPE.EDIT);
                       applicationStore.setShowManageEventDialog(true);
                     "
                   />
@@ -89,7 +89,7 @@
 import { expEvent } from "./event.js";
 import { computed, onMounted, ref } from "vue";
 import { useNotification } from "@/lib/use-notification.js";
-import { useApplicationStore } from "@/stores/application.js";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useEventsStore } from "@/stores/events.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { HTTP } from "@/lib/http.js";
@@ -137,7 +137,7 @@ const itemClicked = (id) => {
   applicationStore.setManagedItem({
     ...eventsStore.getEvent(id),
   });
-  applicationStore.setProcessType("show");
+  applicationStore.setProcessType(PROCESS_TYPE.SHOW);
   applicationStore.setShowManageEventDialog(true);
 };
 

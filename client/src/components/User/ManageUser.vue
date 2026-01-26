@@ -9,10 +9,10 @@
 <!-- eslint-disable vue/no-v-for-template-key -->
 <template>
   <v-card width="80vw">
-    <v-card-title v-if="['add', 'copy'].indexOf(processType) !== -1">
+    <v-card-title v-if="[PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1">
       <span class="text-h5">{{ $t("user.createTitle") }}</span>
     </v-card-title>
-    <v-card-title v-if="processType === 'edit'">
+    <v-card-title v-if="processType === PROCESS_TYPE.EDIT">
       <span class="text-h5">{{
         $t("user.editTitle", { name: user.attributes.username[0] })
       }}</span>
@@ -23,13 +23,13 @@
         <v-col cols="11">
           <v-form v-model="valid" ref="form" :readonly="isReadOnly">
             <v-row>
-              <v-col v-if="processType !== 'edit'">
+              <v-col v-if="processType !== PROCESS_TYPE.EDIT">
                 <TextField
                   attribute="username"
                   density="compact"
                   :ref="'username'"
                   :variant="
-                    ['add', 'copy'].indexOf(processType) !== -1
+                    [PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
                       ? 'underlined'
                       : 'plain'
                   "
@@ -170,19 +170,19 @@
         color="accent"
         :disabled="!valid || hasNoChange"
         @click="
-          ['add', 'copy'].indexOf(processType) !== -1
+          [PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
             ? createUser()
             : saveUser()
         "
       >
         {{
-          ["add", "copy"].indexOf(processType) !== -1
+          [PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
             ? $t("button.create")
             : $t("button.save")
         }}
       </v-btn>
       <v-btn
-        v-if="processType === 'edit' && !isReadOnly"
+        v-if="processType === PROCESS_TYPE.EDIT && !isReadOnly"
         color="accent"
         :disabled="hasNoChange"
         @click="resetForm(cloneObject(originalUser), user, resetNotification)"
@@ -247,7 +247,7 @@ import {
 import { useNotification } from "@/lib/use-notification.js";
 import { useI18n } from "vue-i18n";
 import { HTTP } from "@/lib/http.js";
-import { useApplicationStore } from "@/stores/application.js";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";

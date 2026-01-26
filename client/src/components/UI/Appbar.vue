@@ -88,6 +88,6 @@ const changePassword = () => {
 };
 
 const editProfile = () => {
-  applicationStore.openUserEditForm(structuredClone(savedUser.value));
+  applicationStore.openUserEditForm(structuredClone(savedUser.value), true);
 };
 </script>

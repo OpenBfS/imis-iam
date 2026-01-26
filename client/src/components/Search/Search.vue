@@ -29,7 +29,7 @@
         icon="mdi-account-plus"
         @click="
           applicationStore.setManagedItem(getExpUser());
-          applicationStore.setProcessType('add');
+          applicationStore.setProcessType(PROCESS_TYPE.ADD);
           applicationStore.setShowManageUserDialog(true);
         "
       >
@@ -45,7 +45,7 @@
         class="ms-4"
         @click="
           applicationStore.setManagedItem(getExpInstitution());
-          applicationStore.setProcessType('add');
+          applicationStore.setProcessType(PROCESS_TYPE.ADD);
           applicationStore.setShowManageInstitutionDialog(true);
         "
         icon="mdi-office-building-plus"
@@ -81,7 +81,7 @@
 <script setup>
 import { computed, ref, onMounted } from "vue";
 import { useNotification } from "@/lib/use-notification.js";
-import { useApplicationStore } from "@/stores/application.js";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
 import { useProfileStore } from "@/stores/profile.js";

@@ -9,12 +9,12 @@
   <v-card
     width="80vw"
     min-height="500pt"
-    v-if="['add', 'edit', 'show'].indexOf(processType) !== -1"
+    v-if="[PROCESS_TYPE.ADD, PROCESS_TYPE.EDIT, PROCESS_TYPE.SHOW].indexOf(processType) !== -1"
   >
-    <v-card-title v-if="processType === 'add'">
+    <v-card-title v-if="processType === PROCESS_TYPE.ADD">
       <span class="text-h5">{{ $t("calendar.createTitle") }}</span>
     </v-card-title>
-    <v-card-title v-if="processType === 'edit'">
+    <v-card-title v-if="processType === PROCESS_TYPE.EDIT">
       <span class="text-h5">
         {{ $t("calendar.editTitle", { title: event.title }) }}
       </span>
@@ -70,15 +70,15 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn
-        v-if="profileStore.isAllowedToManage && processType !== 'show'"
+        v-if="profileStore.isAllowedToManage && processType !== PROCESS_TYPE.SHOW"
         color="accent"
         :disabled="!valid || hasNoChange"
-        @click="processType == 'add' ? createEvent() : updateEvent()"
+        @click="processType == PROCESS_TYPE.ADD ? createEvent() : updateEvent()"
       >
-        {{ processType == "add" ? $t("button.create") : $t("button.save") }}
+        {{ processType == PROCESS_TYPE.ADD ? $t("button.create") : $t("button.save") }}
       </v-btn>
       <v-btn
-        v-if="processType === 'edit' && profileStore.isAllowedToManage"
+        v-if="processType === PROCESS_TYPE.EDIT && profileStore.isAllowedToManage"
         color="accent"
         :disabled="hasNoChange"
         @click="resetForm(originalEvent, event, resetNotification)"
@@ -106,7 +106,7 @@ import { HTTP } from "@/lib/http.js";
 import { onBeforeMount, ref } from "vue";
 import { useForm } from "@/lib/use-form.js";
 import { useNotification } from "@/lib/use-notification.js";
-import { useApplicationStore } from "@/stores/application.js";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useEventsStore } from "@/stores/events.js";
 import { useProfileStore } from "@/stores/profile.js";
 import Textarea from "@/components/Form/Textarea.vue";
@@ -124,7 +124,7 @@ const event = ref(applicationStore.managedItem);
 const originalEvent = { ...event.value };
 const processType = ref(applicationStore.processType);
 
-const readonly = event.value.readonly || processType.value === "show";
+const readonly = event.value.readonly || processType.value === PROCESS_TYPE.SHOW;
 
 const {
   form,

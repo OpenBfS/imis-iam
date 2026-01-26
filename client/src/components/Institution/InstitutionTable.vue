@@ -33,7 +33,7 @@
               applicationStore.setManagedItem({
                 ...item,
               });
-              applicationStore.setProcessType('edit');
+              applicationStore.setProcessType(PROCESS_TYPE.EDIT);
               applicationStore.setShowManageInstitutionDialog(true);
             "
           ></v-btn>
@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { useApplicationStore } from "@/stores/application.js";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import DataTableServer from "@/components/DataTableServer.vue";

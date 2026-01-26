@@ -7,10 +7,10 @@
  -->
 <template>
   <v-card width="80vw">
-    <v-card-title v-if="processType === 'add'">
+    <v-card-title v-if="processType === PROCESS_TYPE.ADD">
       <span class="text-h5">{{ $t("institution.createTitle") }}</span>
     </v-card-title>
-    <v-card-title v-if="processType === 'edit'">
+    <v-card-title v-if="processType === PROCESS_TYPE.EDIT">
       <span class="text-h5">
         {{ $t("institution.editTitle", { name: institution.name }) }}
       </span>
@@ -273,12 +273,12 @@
         v-if="profileStore.isAllowedToManage"
         color="accent"
         :disabled="!valid || (hasNoChange && !isPostalAddressToBeDeleted)"
-        @click="processType == 'add' ? createInstitution() : saveInstitution()"
+        @click="processType == PROCESS_TYPE.ADD ? createInstitution() : saveInstitution()"
       >
-        {{ processType == "add" ? $t("button.create") : $t("button.save") }}
+        {{ processType == PROCESS_TYPE.ADD ? $t("button.create") : $t("button.save") }}
       </v-btn>
       <v-btn
-        v-if="processType === 'edit' && profileStore.isAllowedToManage"
+        v-if="processType === PROCESS_TYPE.EDIT && profileStore.isAllowedToManage"
         color="accent"
         :disabled="
           hasNoChange && initialShowPostalAddress === showPostalAddress
@@ -345,7 +345,7 @@ import {
 import { createSearchQueryString, HTTP } from "@/lib/http.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { trimSpacesInObject, useForm } from "@/lib/use-form.js";
-import { useApplicationStore } from "@/stores/application.js";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 // TODO: Geocoding feature delayed to a subsequent date
 // import { useCoordinatesStore } from "@/stores/coordinates.js";
 // import { debounce } from "debounce";

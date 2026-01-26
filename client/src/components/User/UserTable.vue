@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { useApplicationStore } from "@/stores/application.js";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
 import { onMounted, ref, toRaw } from "vue";
@@ -129,7 +129,7 @@ const onCopyClicked = (id) => {
   delete user.value["id"];
   applicationStore.setManagedItem(user.value);
   applicationStore.setSavedItem(savedUser.value);
-  applicationStore.setProcessType("copy");
+  applicationStore.setProcessType(PROCESS_TYPE.COPY);
   applicationStore.setShowManageUserDialog(true);
 };
 const onEditClicked = (id) => {
