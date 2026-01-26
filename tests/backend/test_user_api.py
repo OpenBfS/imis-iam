@@ -944,9 +944,9 @@ class TestUserAPIRolePermissions:
         assert response.status_code == 400
 
         # Verify error response contains validation information
+        # error_data: [{'attribute': 'position', 'message': 'error-invalid-value', 'messageParameters': ['position'], 'statusCode': 'BAD_REQUEST'}]
         error_data = response.json()
-        assert "error" in error_data or "message" in error_data, \
-            "Response should contain error information"
+        assert any(item.get("attribute") == "position" for item in error_data)
 
 
     def test_retired_field_is_privileged(self):
