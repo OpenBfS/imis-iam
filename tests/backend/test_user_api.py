@@ -1462,3 +1462,72 @@ class TestUserAPIRolePermissions:
         finally:
             if created_user_id:
                 delete_user_from_db(created_user_id)
+
+    def test_editor_can_modify_user_tags_same_network(self):
+        """
+        Test that redakteur (editor) can modify tags for users in same network:
+        1. Create a temporary user in redakteur's network
+        2. Login as redakteur and update the user's tags
+        3. Verify tags are updated
+        4. Move user to a different network
+        5. Try to modify tags as redakteur (should fail)
+        """
+        test_username = generate_test_username()
+        created_user_id = None
+        auth = get_auth()
+        user_data = {
+            "attributes": {
+                "username": [test_username],
+                "email": [f"{test_username}@example.com"],
+                "firstName": ["Tag"],
+                "lastName": ["Test"],
+                "position": ["Mitarbeitende"],
+                "tags": ["IBG"],
+            },
+            "institutions": ["Institution 1"],
+            "role": "user",
+            "network": "07",  # Same network as redakteur
+            "enabled": True,
+        }
+
+        auth.switch_user_context("chefredakteur")
+
+        try:
+            # 1: Create user in redakteur's network
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user["id"]
+
+            assert created_user["network"] == user_data["network"]
+            assert created_user["attributes"]["tags"] == user_data["attributes"]["tags"]
+
+            # 2: Login as redakteur and update the user's tags
+            auth.switch_user_context("redakteur")
+            user_data["id"] = created_user_id
+            user_data["attributes"]["tags"] = ["AK UN", "Kleine Lagen"]
+            update_response = api_put("/user", data=user_data)
+            update_response.raise_for_status()
+
+            # 3: Verify tags were updated
+            updated_user = update_response.json()
+            assert updated_user["attributes"]["tags"] == ["AK UN", "Kleine Lagen"]
+
+            # 4: Move user to a different network
+            auth.switch_user_context("chefredakteur")
+            user_data["network"] = "20"
+            update_response = api_put("/user", data=user_data)
+            update_response.raise_for_status()
+            updated_user = update_response.json()
+            assert updated_user["network"] == "20"
+
+            # 5: Try to modify tags as redakteur (should fail with 403)
+            auth.switch_user_context("redakteur")
+            user_data["attributes"]["tags"] = ["IBG nachrichtlich"]
+
+            update_response = api_put("/user", data=user_data)
+            assert update_response.status_code == 403
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)
