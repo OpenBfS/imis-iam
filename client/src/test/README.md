@@ -7,8 +7,7 @@ Vue testing framework for the Vue client to the Keycloak iam_spi custom extensio
 This testing suite provides automated tests for UI elements and components:
 - Forms: the `ChipTextField` component
 - User management
-- Institution management
-- Mail/messaging
+- Basic Institution management
 
 Backend and integration tests are located in `tests/`.
 

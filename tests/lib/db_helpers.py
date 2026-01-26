@@ -137,6 +137,10 @@ def delete_user_from_db(user_uuid: Optional[str] = None, username: Optional[str]
             (user_uuid,)
         )
         cursor.execute(
+            "DELETE FROM credential WHERE user_id = %s",
+            (user_uuid,)
+        )
+        cursor.execute(
             "DELETE FROM user_entity WHERE id = %s",
             (user_uuid,)
         )
@@ -146,6 +150,35 @@ def delete_user_from_db(user_uuid: Optional[str] = None, username: Optional[str]
         conn.close()
     except Exception as e:
         print(f"Error deleting user {user_uuid} from database: {str(e)}")
+        conn and conn.rollback()
+        cursor and cursor.close()
+        conn and conn.close()
+        raise
+
+
+def enable_admin_direct_access_grants():
+    """
+    Enable direct access grants as Authentication Flow in the security-admin-console of realm master
+    """
+    conn = cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE client
+            SET direct_access_grants_enabled = true
+            WHERE
+                client_id = 'security-admin-console' AND
+                base_url = '/admin/master/console/'
+            """
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"Error enabling direct access grants in master realm")
         conn and conn.rollback()
         cursor and cursor.close()
         conn and conn.close()

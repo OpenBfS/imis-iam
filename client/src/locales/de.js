@@ -209,6 +209,7 @@ export default {
     name: "Name",
     username: "IMIS-Kennung",
     enabled: "Aktiviert",
+    retired: "Ausgeschieden",
     hiddenInAddressbook: "Versteckt",
     position: "Position",
     misc: "Weiteres",

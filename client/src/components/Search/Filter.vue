@@ -98,7 +98,7 @@ const autocompleteValue = ref(null);
 const multiple = computed(() => {
   return (
     props.type === "users" &&
-    !["enabled", "hiddenInAddressbook", "role"].includes(props.filterKey)
+    !["enabled", "hiddenInAddressbook", "role", "retired"].includes(props.filterKey)
   );
 });
 

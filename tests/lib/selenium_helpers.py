@@ -46,11 +46,11 @@ def get_firefox_driver(headless: bool = None):
     return driver
 
 
-def get_keycloak_url():
+def get_client_url():
     """
     Get Keycloak base URL from environment or use default.
     """
-    return os.getenv('KEYCLOAK_URL', 'http://localhost:48081')
+    return os.getenv('CLIENT_URL', 'http://localhost:48081')
 
 
 def get_realm():
@@ -62,11 +62,9 @@ def get_realm():
 
 def get_application_url():
     """
-    Get the Keycloak login URL for the realm.
+    Get the application URL for the realm.
     """
-    keycloak_url = get_keycloak_url()
-    realm = get_realm()
-    return f"{keycloak_url}/adressbuch/"
+    return f"{get_client_url()}/adressbuch/"
 
 
 class SeleniumTestSuite:

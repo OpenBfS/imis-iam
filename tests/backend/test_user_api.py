@@ -618,7 +618,7 @@ class TestUserAPIRolePermissions:
                 response.raise_for_status()
 
                 data = response.json()
-                assert data["size"] == 3
+                assert data["size"] == 3, f"{user} can see {data['size']} users, not 3: {[u['attributes']['username'][0] for u in data['list']]}"
 
             finally:
                 auth.clear_user_context()
@@ -947,3 +947,518 @@ class TestUserAPIRolePermissions:
         error_data = response.json()
         assert "error" in error_data or "message" in error_data, \
             "Response should contain error information"
+
+
+    def test_retired_field_is_privileged(self):
+        """
+        Test that only chefredakteur can set retired=true.
+        Editors cannot set retired status.
+        Regular users can't even create a new user -> irrelevant
+        """
+        test_username = generate_test_username()
+        test_email = f"{test_username}@example.com"
+        created_user_id = None
+
+        try:
+            # Login as redakteur and try to create user with retired=true
+            auth = get_auth()
+            auth.switch_user_context("redakteur")
+
+            user_data = {
+                "attributes": {
+                    "username": [test_username],
+                    "email": [test_email],
+                    "firstName": ["Test"],
+                    "lastName": ["Retired"],
+                    "position": ["Mitarbeitende"],
+                },
+                "institutions": ["Institution 1"],
+                "role": "user",
+                "network": "08",
+                "enabled": False,
+                "retired": True,
+            }
+
+            # Should fail with 403 Forbidden
+            create_response = api_post("/user", data=user_data)
+            assert create_response.status_code == 403
+
+            # Countercheck: Create user as chefredakteur should succeed
+            auth.switch_user_context("chefredakteur")
+
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user.get("id")
+
+            # Verify the user
+            assert created_user["retired"] is True
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)
+
+    def test_retired_users_automatically_disabled(self):
+        """
+        Test that when retired=true, enabled is automatically set to false.
+        Test both create and update operations
+        """
+        test_username = generate_test_username()
+        test_email = f"{test_username}@example.com"
+        created_user_id = None
+
+        try:
+            auth = get_auth()
+            auth.switch_user_context("chefredakteur")
+
+            # Create user with retired=true and enabled=true
+            user_data = {
+                "attributes": {
+                    "username": [test_username],
+                    "email": [test_email],
+                    "firstName": ["Test"],
+                    "lastName": ["Retired"],
+                    "position": ["Mitarbeitende"],
+                },
+                "institutions": ["Institution 1"],
+                "role": "user",
+                "network": "08",
+                "enabled": True,  # Try to enable
+                "retired": True,  # But also retire
+            }
+
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user.get("id")
+
+            # Enabled should be set to false
+            assert created_user["retired"] is True
+            assert created_user["enabled"] is False
+
+            # Update user to retired=true
+            update_data = created_user.copy()
+            update_data["enabled"] = True
+            update_data["retired"] = False
+
+            update_response = api_put("/user", data=update_data)
+            update_response.raise_for_status()
+            updated_user = update_response.json()
+
+            # Verify user is now enabled and not retired
+            assert updated_user["retired"] is False
+            assert updated_user["enabled"] is True
+
+            # Now retire the user again
+            update_data["retired"] = True
+            update_data["enabled"] = True  # Try to keep enabled
+
+            update_response = api_put("/user", data=update_data)
+            update_response.raise_for_status()
+            updated_user = update_response.json()
+
+            # Verify enabled was set to false
+            assert updated_user["retired"] is True
+            assert updated_user["enabled"] is False
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)
+
+    def test_retired_user_visibility(self):
+        """
+        Test retired user visibility:
+        - Chief editors can see retired users
+        - Regular editors/users cannot see retired users
+        """
+        test_username = generate_test_username()
+        test_email = f"{test_username}@example.com"
+        created_user_id = None
+
+        try:
+            auth = get_auth()
+            auth.switch_user_context("chefredakteur")
+
+            # Create retired user
+            user_data = {
+                "attributes": {
+                    "username": [test_username],
+                    "email": [test_email],
+                    "firstName": ["Retired"],
+                    "lastName": ["User"],
+                    "position": ["Mitarbeitende"],
+                },
+                "institutions": ["Institution 1"],
+                "role": "user",
+                "network": "08",
+                "enabled": False,
+                "retired": True,
+            }
+
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user.get("id")
+
+            # Chief editor should be able to see the retired user
+            get_response = api_get(f"/user/{created_user_id}")
+            get_response.raise_for_status()
+            retrieved_user = get_response.json()
+            assert retrieved_user["retired"] is True
+
+            # Chief editor should see retired user in list
+            list_response = api_get("/user", params={
+                "search": create_search_query(username=test_username),
+                "maxResults": 100
+            })
+            list_response.raise_for_status()
+            users = list_response.json()["list"]
+
+            # Chief editor should see retired user in list
+            retired_user_in_list = any(u["id"] == created_user_id for u in users)
+            assert retired_user_in_list
+
+            # Search for retired users: test user should be in data
+            retired_search_response = api_get("/user", params={
+                "search": f'{create_search_query(username=test_username, retired="true")}',
+                "maxResults": 100
+            })
+            retired_search_response.raise_for_status()
+            retired_users = retired_search_response.json()["list"]
+            assert any(u["id"] == created_user_id for u in retired_users), retired_users
+
+            # Search for non-retired users: test user should NOT be in data
+            non_retired_search_response = api_get("/user", params={
+                "search": f'{create_search_query(username=test_username, retired="false")}',
+                "maxResults": 100
+            })
+            non_retired_search_response.raise_for_status()
+            non_retired_users = non_retired_search_response.json()["list"]
+            assert not any(u["id"] == created_user_id for u in non_retired_users)
+
+            # Switch to regular user
+            auth.switch_user_context("exampleuser")
+
+            # Should get 403 Forbidden
+            get_response = api_get(f"/user/{created_user_id}")
+            assert get_response.status_code == 403
+
+            # Retired user should not appear in user list
+            list_response = api_get("/user", params={
+                "search": create_search_query(username=test_username),
+                "maxResults": 100
+            })
+            list_response.raise_for_status()
+            users = list_response.json()["list"]
+            assert not any(u["id"] == created_user_id for u in users)
+
+            # Switch to editor
+            auth.switch_user_context("redakteur")
+
+            # Should get 403 Forbidden
+            get_response = api_get(f"/user/{created_user_id}")
+            assert get_response.status_code == 403
+
+            # Retired user should not appear in user list
+            list_response = api_get("/user", params={
+                "search": create_search_query(username=test_username),
+                "maxResults": 100
+            })
+            list_response.raise_for_status()
+            users = list_response.json()["list"]
+            assert not any(u["id"] == created_user_id for u in users)
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)
+
+    def test_retired_user_uid_preservation(self):
+        """
+        Test that UIDs of preserved users cannot be reused
+        """
+        test_username = generate_test_username()
+        test_email = f"{test_username}@example.com"
+        created_user_id = None
+
+        try:
+            auth = get_auth()
+            auth.switch_user_context("chefredakteur")
+
+            # Create and retire a user
+            user_data = {
+                "attributes": {
+                    "username": [test_username],
+                    "email": [test_email],
+                    "firstName": ["Test"],
+                    "lastName": ["Retired"],
+                    "position": ["Mitarbeitende"],
+                },
+                "institutions": ["Institution 1"],
+                "role": "user",
+                "network": "08",
+                "enabled": True,
+                "retired": True,
+            }
+
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user.get("id")
+
+            # Verify user exists
+            get_response = api_get(f"/user/{created_user_id}")
+            get_response.raise_for_status()
+            retired_user = get_response.json()
+            assert retired_user["id"] == created_user_id
+            assert retired_user["retired"] is True
+
+            # Try to create new user with same username - should fail
+            new_user_data = {
+                "attributes": {
+                    "username": [test_username],
+                    "email": [f"new_{test_email}"],
+                    "firstName": ["New"],
+                    "lastName": ["User"],
+                    "position": ["Mitarbeitende"],
+                },
+                "institutions": ["Institution 1"],
+                "role": "user",
+                "network": "08",
+                "enabled": True,
+                "retired": False,
+            }
+
+            # This should fail because username already exists
+            create_response = api_post("/user", data=new_user_data)
+            # [{"statusCode":"CONFLICT","message":"usernameExistsMessage","attribute":"username","messageParameters":["username"]}]
+            assert create_response.status_code == 400
+            assert create_response.json()[0]['statusCode'] == 'CONFLICT'
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)
+
+    def test_retired_user_cannot_login(self):
+        """
+        Test complete retired user workflow:
+        1. Chief editor creates a user
+        2. Login as that user (should succeed)
+        3. Chief editor retires the user
+        4. Try to login as that user again (should fail)
+        """
+        test_username = generate_test_username()
+        test_password = "password"
+        test_email = f"{test_username}@example.com"
+        created_user_id = None
+
+        try:
+            auth = get_auth()
+            auth.switch_user_context("chefredakteur")
+
+            # Create active, non-retired user
+            user_data = {
+                "attributes": {
+                    "username": [test_username],
+                    "email": [test_email],
+                    "firstName": ["Test"],
+                    "lastName": ["LoginUser"],
+                    "position": ["Mitarbeitende"],
+                },
+                "institutions": ["Institution 1"],
+                "role": "user",
+                "network": "08",
+                "enabled": True,
+            }
+
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user.get("id")
+
+            # Set password for the new user via Keycloak Admin API
+            admin_headers = auth.get_admin_headers()
+            password_url = f"{auth.keycloak_url}/admin/realms/{auth.realm}/users/{created_user_id}/reset-password"
+            password_data = {
+                "type": "password",
+                "value": test_password,
+                "temporary": False
+            }
+
+            password_response = requests.put(password_url, json=password_data,
+                                             headers=admin_headers)
+            password_response.raise_for_status()
+
+            # Login as the new user (should succeed)
+            try:
+                user_token = auth.get_access_token(test_username, test_password)
+                assert user_token is not None
+                # Clear token cache for subsequent tests
+                if test_username in auth._token_cache:
+                    del auth._token_cache[test_username]
+            except Exception as e:
+                pytest.fail(f"Initial login failed for active user: {str(e)}")
+
+            # Retire the user
+            auth.switch_user_context("chefredakteur")
+            update_data = created_user.copy()
+            update_data["retired"] = True
+            update_response = api_put("/user", data=update_data)
+            update_response.raise_for_status()
+            updated_user = update_response.json()
+
+            # Verify user is retired and disabled
+            assert updated_user["retired"] is True
+            assert updated_user["enabled"] is False
+
+            # Try to login as retired user (should fail)
+            login_failed = False
+            try:
+                # Clear cache to force fresh login attempt
+                if test_username in auth._token_cache:
+                    del auth._token_cache[test_username]
+
+                retired_user_token = auth.get_access_token(test_username, test_password)
+                # If we got here, login succeeded when it shouldn't have
+                login_failed = False
+            except Exception as e:
+                # Login should fail for retired/disabled user
+                login_failed = True
+                # Verify it's an authentication error
+                assert "Failed to get access token" in str(e) or "401" in str(e)
+
+            # Verify that login actually failed
+            assert login_failed, "Retired user should not be able to login, but authentication succeeded"
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)
+
+    def test_user_network_visibility_and_disabled_state(self):
+        """
+        Test user visibility based on network and disabled state:
+        1. Create a user with network "11"
+        2. Verify redakteur and exampleuser can query it
+        3. Disable the user
+        4. Verify redakteur (in a different network) and exampleuser cannot query it anymore
+        5. Change network to "07"
+        6. Verify redakteur can query
+        7. Verify exampleuser cannot query it
+        """
+        # Example user data
+        test_username = generate_test_username()
+        created_user_id = None
+        auth = get_auth()
+        user_data = {
+            "attributes": {
+                "username": [test_username],
+                "email": [f"{test_username}@example.com"],
+                "firstName": ["Network"],
+                "lastName": ["Test"],
+                "position": ["Mitarbeitende"],
+            },
+            "institutions": ["Institution 1"],
+            "role": "user",
+            "network": "11",
+            "enabled": True,
+        }
+
+        auth.switch_user_context("chefredakteur")
+
+        try:
+            # 1: Create user with network "11"
+            create_response = api_post("/user", data=user_data)
+            create_response.raise_for_status()
+            created_user = create_response.json()
+            created_user_id = created_user["id"]
+
+            assert created_user["network"] == "11"
+            assert created_user["enabled"] is True
+
+            # 2: Verify redakteur and exampleuser can query it
+            for username in ("redakteur", "exampleuser"):
+                auth.switch_user_context(username)
+
+                # Query by ID
+                get_response = api_get(f"/user/{created_user_id}")
+                get_response.raise_for_status()
+                retrieved_user = get_response.json()
+                assert retrieved_user["id"] == created_user_id
+
+                # Query via search
+                list_response = api_get("/user", params={
+                    "search": create_search_query(username=test_username),
+                    "maxResults": 100
+                })
+                list_response.raise_for_status()
+                users = list_response.json()["list"]
+                assert any(u["id"] == created_user_id for u in users)
+
+            # 3: Disable the user
+            auth.switch_user_context("chefredakteur")
+            user_data["id"] = created_user_id
+            user_data["enabled"] = False
+
+            update_response = api_put("/user", data=user_data)
+            update_response.raise_for_status()
+            updated_user = update_response.json()
+            assert updated_user["enabled"] is False
+
+            # 4: Verify redakteur and exampleuser cannot query it anymore
+            for username in ("redakteur", "exampleuser"):
+                auth.switch_user_context(username)
+
+                # Query by ID should still work but show disabled
+                get_response = api_get(f"/user/{created_user_id}")
+                assert get_response.status_code == 403, username
+
+                # Disabled user should not appear in the search
+                list_response = api_get("/user", params={
+                    "search": create_search_query(username=test_username),
+                    "maxResults": 100
+                })
+                list_response.raise_for_status()
+                users = list_response.json()["list"]
+                assert not any(u["id"] == created_user_id for u in users), username
+
+            # 5: Change network to "07"
+            auth.switch_user_context("chefredakteur")
+            user_data["network"] = "07"
+
+            update_response = api_put("/user", data=user_data)
+            update_response.raise_for_status()
+            updated_user = update_response.json()
+            assert updated_user["network"] == "07"
+            assert updated_user["enabled"] is False
+
+            # 6: Verify redakteur can query it
+            auth.switch_user_context("redakteur")
+            get_response = api_get(f"/user/{created_user_id}")
+            get_response.raise_for_status()
+            retrieved_user = get_response.json()
+            assert retrieved_user["id"] == created_user_id
+            assert retrieved_user["network"] == "07"
+
+            list_response = api_get("/user", params={
+                "search": create_search_query(username=test_username),
+                "maxResults": 100
+            })
+            list_response.raise_for_status()
+            users = list_response.json()["list"]
+            assert any(u["id"] == created_user_id for u in users)
+
+            # 7. Verify exampleuser cannot query it
+            auth.switch_user_context("exampleuser")
+            get_response = api_get(f"/user/{created_user_id}")
+            assert get_response.status_code == 403
+
+            list_response = api_get("/user", params={
+                "search": create_search_query(username=test_username),
+                "maxResults": 100
+            })
+            list_response.raise_for_status()
+            users = list_response.json()["list"]
+            assert not any(u["id"] == created_user_id for u in users)
+
+        finally:
+            if created_user_id:
+                delete_user_from_db(created_user_id)

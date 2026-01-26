@@ -12,13 +12,13 @@ from .auth import get_auth
 class APIClient:
     """Client for iam_spi API requests"""
 
-    def __init__(self, keycloak_url: str = None, realm: str = None):
+    def __init__(self, client_url: str = None, realm: str = None):
         """
         Initialize API client.
         """
-        self.keycloak_url = keycloak_url or os.getenv('KEYCLOAK_URL', 'http://localhost:48080')
+        self.client_url = client_url or os.getenv('CLIENT_URL', 'http://localhost:48081')
         self.realm = realm or os.getenv('REALM', 'imis3')
-        self.base_url = f"{self.keycloak_url}/realms/{self.realm}/iam"
+        self.base_url = f"{self.client_url}/realms/{self.realm}/iam"
         self.timeout = int(os.getenv('REQUEST_TIMEOUT', '30'))
 
     def _get_headers(self, token: str = None) -> Dict[str, str]:
