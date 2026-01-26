@@ -192,6 +192,7 @@ export default {
     userTitle: "@:userTerm",
     createTitle: "Neuen @:userTerm erstellen",
     editTitle: "@:userTerm {name}",
+    editProfileTitle: "Eigenes Profil bearbeiten",
     institutions: "@:institutions",
     addUser: "@:userTerm hinzufügen",
     contact: "Kontakt",

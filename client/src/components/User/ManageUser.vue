@@ -17,6 +17,9 @@
         $t("user.editTitle", { name: user.attributes.username[0] })
       }}</span>
     </v-card-title>
+    <v-card-title v-if="processType === PROCESS_TYPE.EDIT_PROFILE">
+      <span class="text-h5">{{ $t("user.editProfileTitle") }}</span>
+    </v-card-title>
     <v-divider></v-divider>
     <v-container class="pa-1 mt-4">
       <v-row justify="center">

@@ -91,14 +91,13 @@ class TestFrontendUser(SeleniumTestSuite):
             EC.element_to_be_clickable((By.XPATH, "//div[@class='v-list-item__content'][contains(., 'Profil')]"))
         )
         profile_menu_item.click()
-        print("Clicked Profil menu item")
+        print("Clicked profile menu item")
 
         # Verify profile dialog
         profile_card_title = wait.until(
             EC.presence_of_element_located((By.CSS_SELECTOR, ".v-card-title .text-h5"))
         )
-        expected_title = f"IMIS-Nutzer {username}"
-        assert expected_title == profile_card_title.text
+        assert profile_card_title.text == "Eigenes Profil bearbeiten"
         print(f"Profile dialog opened with title: {profile_card_title.text}")
         cancel_button = wait.until(
             EC.presence_of_element_located((By.XPATH, "//span[@class='v-btn__content'][contains(., 'Abbrechen')]"))
