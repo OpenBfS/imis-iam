@@ -368,13 +368,13 @@ class TestInstitutionAPI:
             if institution_2_id:
                 delete_institution_from_db(institution_2_id)
 
-    def test_create_institution_with_invalid_tags(self):
+    def test_create_institution_with_new_tags(self):
         """
-        Creating institutions with invalid tag values should fail with a validation error
+        Creating institutions with a new tag creates it
         """
         suffix = generate_test_username(prefix='')[1:]
         institution_data = {
-            "name": f"Invalid Tags Institution {suffix}",
+            "name": f"New Tags Institution {suffix}",
             "measFacilName": f"test_{suffix[:5]}",
             "measFacilId": f"{suffix[:5]}",
             "serviceBuildingStreet": "Test Street 123",
@@ -383,22 +383,24 @@ class TestInstitutionAPI:
             "serviceBuildingState": "Test State",
             "network": "08",
             "active": True,
-            "tags": ["Invalid Tag", "Another Invalid Tag"],
+            "tags": ["New Tag", "Another new Tag"],
         }
         print(institution_data)
 
-        # Attempt to create institution with invalid tags
-        response = api_post("/institution", data=institution_data)
         try:
-            # Should receive a validation error (400 Bad Request)
-            assert response.status_code == 400
+            # Attempt to create institution with new tags
+            response = api_post("/institution", data=institution_data)
+            response.raise_for_status()
+
+
+            tag_response = api_get("/institution/tag")
+            tag_response.raise_for_status()
+            tags = tag_response.json()
+            print('tags:', tags)
+            tag_names = [tag['name'] for tag in tags]
+            assert 'New Tag' in tag_names
+            assert 'Another new Tag' in tag_names
         finally:
             # delete instition
             if response.ok:
                 delete_institution_from_db(response.json()['id'])
-
-        if response.status_code == 400:
-            # Verify error response contains validation information
-            error_data = response.json()
-            assert "error" in error_data or "message" in error_data
-
