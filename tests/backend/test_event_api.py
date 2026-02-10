@@ -8,18 +8,23 @@ Missing tests:
 
 import pytest
 from datetime import datetime, timedelta, timezone
-from lib import api_get, api_post, api_put, api_delete
+from lib import api_get, api_post, api_put, api_delete, get_auth
 
 
 class TestEventAPI:
     """Test suite for /iam/event endpoints"""
 
-    def test_list_events(self):
-        """Test GET /iam/event - List events"""
-        response = api_get("/event")
-        response.raise_for_status()
-        events = response.json()
-        assert isinstance(events, list)
+    def test_list_events_as_exampleuser(self):
+        """Test GET /iam/event as exampleuser"""
+        auth = get_auth()
+        try:
+            auth.switch_user_context("exampleuser")
+            response = api_get("/event")
+            response.raise_for_status()
+            events = response.json()
+            assert isinstance(events, list)
+        finally:
+            auth.clear_user_context()
 
     def test_event_lifecycle_create_update_query_delete(self):
         """

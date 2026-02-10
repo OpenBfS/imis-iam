@@ -4,7 +4,7 @@ Tests for '/iam/mail'
 """
 
 import pytest
-from lib import api_get, api_post
+from lib import api_get, api_post, get_auth
 
 
 class TestMailAPI:
@@ -12,11 +12,16 @@ class TestMailAPI:
 
     def test_list_mails(self):
         """Test GET /iam/mail - List mails"""
-        response = api_get("/mail", params={"count": 10})
-        response.raise_for_status()
+        auth = get_auth()
+        try:
+            auth.switch_user_context("exampleuser")
+            response = api_get("/mail", params={"count": 10})
+            response.raise_for_status()
 
-        mails = response.json()
-        assert mails == []
+            mails = response.json()
+            assert mails == []
+        finally:
+            auth.clear_user_context()
 
     def test_get_mail_types(self):
         """Test GET /iam/mail/type - List mail types"""
