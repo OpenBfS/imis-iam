@@ -48,6 +48,8 @@ pytest
 
 ### Run Specific Test Suites
 
+Some examples:
+
 ```bash
 ./run_tests.py user              # Run user API tests only
 ./run_tests.py backend           # Run all backend API tests
@@ -55,6 +57,11 @@ pytest
 ./run_tests.py institution       # Run institution tests
 ./run_tests.py mail event        # Run mail and event tests
 ./run_tests.py --verbose         # Run with verbose output
+```
+
+For a full list of available tests selectors, see the output of the built-in help:
+```bash
+./run_tests.py --help
 ```
 
 ## Configuration Options
@@ -76,7 +83,36 @@ pytest
 | `DB_NAME` | Database name | `keycloak` |
 | `SELENIUM_HEADLESS` | Run Selenium Headless | `true` |
 
-## Manually use helper function to delete a user/institution from the database
+For example, these options allow running the tests on a different machine than the one hosting the application.
+This is particularly useful when the development instance is a remote VM, reachable via SSH, with its interfaces accessible through SSH SOCKS Proxies and Local Forwards.
+Running the tests locally allows executing integration tests in the foreground with immediate visibility into test execution.
+
+SSH Config:
+```ini
+Host imis.example.com
+    LocalForward localhost:48080 localhost:48080 # BfS IMIS
+    LocalForward localhost:48081 localhost:48081 # BfS IMIS
+    LocalForward localhost:2345 localhost:2345 # BfS IMIS Postgres
+```
+
+And `/etc/hosts`:
+```
+127.0.0.1	imis.example.com
+```
+
+```bash
+SELENIUM_HEADLESS=false KEYCLOAK_URL=http://imis.example.com:48080 CLIENT_URL=http://imis.example.com:48081 ./tests/run_tests.py
+```
+
+As an alternative to the hosts and SSH configuration, `proxychains` could be used for a transparent proxy approach.
+
+## Manually use helper functions to delete a user/institution from the database
+
+During development or testing, extraneous data may accumulate in the database.
+Rather than recreating all containers from scratch, deleting the specific records is often easier and faster.
+As deleting users and institutions is intentionally not possible via the user interfaces of IMIS and Keycloak, these helper functions provide a convenient alternative.
+
+**Warning:** While these functions can technically be used in production environments, doing so is strongly discouraged as it circumvents the intended delete constraints.
 
 ```bash
 python3 -i lib/db_helpers.py
