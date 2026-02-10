@@ -123,18 +123,7 @@ delete_institution_from_db(institution_facil_name='test_5owza6aa')
 
 ## CI/CD Integration
 
-### GitLab CI Example
-
-```yaml
-test:
-  stage: test
-  image: python:3.11
-  before_script:
-    - cd tests
-    - pip install -r requirements.txt
-  script:
-    - ./run_tests.py
-```
+Note: These examples are not validated and are intended as a starting point. Adjustments may be required to match a specific CI/CD environment.
 
 ### GitHub Actions Example
 
@@ -148,6 +137,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Start application containers
+        run: |
+          cd docker
+          docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml up -d --wait
       - uses: actions/setup-python@v2
         with:
           python-version: '3.11'
@@ -159,4 +152,51 @@ jobs:
         run: |
           cd tests
           ./run_tests.py
+      - name: Stop application containers
+        if: always()
+        run: |
+          cd docker
+          docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml down --volumes
+```
+
+### Jenkins Pipeline Example
+
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Start Application') {
+            steps {
+                sh '''
+                    cd docker
+                    docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml up -d --wait
+                '''
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    cd tests
+                    pip install -r requirements.txt
+                '''
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                sh '''
+                    cd tests
+                    ./run_tests.py
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            sh '''
+                cd docker
+                docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml down --volumes
+            '''
+        }
+    }
+}
 ```
