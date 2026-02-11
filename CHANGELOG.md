@@ -1,12 +1,25 @@
 # Changelog
 
+## 1.0.6 - 16.02.2026
+
+### Changed
+
+- Allow editors to edit tags [#6139] (tgottfried, cklassen)
+
+### Added
+- Add documentation on architecture and details on components [#6278] (swagner)
+- Add REST API documentation including examples [#6278] (swagner)
+- Add filtering documentation [#6278] (swagner)
+- Add documentation on adding user attributes [#6278] (swagner)
+- Add python-based tests for iam_spi [#5611] (swagner, cklassen)
+- Add retired flag for users [#6240] (tgottfried, cklassen, swagner)
+
 ## 1.0.5 - 15.12.2025
 
 ### Changed
 
 - Hide 'BAW-Kontaktdaten', only owner can see his contact-details [#6146] (cklassen, tgottfried)
 - Update to KC version 26.4.6 [#6277] (swagner)
-
 
 ### Added
 
