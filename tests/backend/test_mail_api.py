@@ -85,7 +85,7 @@ class TestMailAPI:
         assert set(sent_mail["recipients"]) == set(recipient_ids)
 
         # Archive the mail
-        archive_response = api_get(f"/mail/archive/{sent_mail["id"]}")
+        archive_response = api_get(f"/mail/archive/{sent_mail['id']}")
         archive_response.raise_for_status()
         assert archive_response.status_code == 200
 
