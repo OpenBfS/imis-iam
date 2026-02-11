@@ -382,8 +382,7 @@
             "Kleine Lagen",
             "Landesadministration IMIS-DokPool",
             "Messanleitung",
-            "REI-Nutzer",
-            "REI/REA informell",
+            "REI-Information",
             "Schulungsangebote"
           ]
         }
@@ -397,7 +396,8 @@
           "user"
         ],
         "edit": [
-          "admin"
+          "admin",
+	  "user"
         ]
       },
       "multivalued": true
@@ -419,7 +419,8 @@
     {
       "name": "operationModeChangeContact",
       "displayHeader": "",
-      "displayDescription": ""
+      "displayDescription": "",
+      "annotations": {}
     }
   ]
 }
