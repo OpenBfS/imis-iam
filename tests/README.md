@@ -127,15 +127,24 @@ Note: These examples are not validated and are intended as a starting point. Adj
 
 ### GitLab CI Example
 
+This uses "Docker In Docker" (dind).
+
 ```yaml
 test:
   stage: test
-  image: python:3.11
+  image: python:3.13
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
   before_script:
-    - cd tests
-    - pip install -r requirements.txt
+    - apt-get update && apt-get install -y docker.io docker-compose-v2
+    - docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --env-file docker/dev.env up -d --wait
+    - pip install -r tests/requirements.txt
   script:
-    - ./run_tests.py
+    - ./tests/run_tests.py
+  after_script:
+    - docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --env-file docker/dev.env down --volumes
 ```
 
 ### GitHub Actions Example
@@ -151,28 +160,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Start application containers
-        run: |
-          cd docker
-          docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml up -d --wait
+        run: docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --env-file docker/dev.env up -d --wait
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          python-version: '3.13'
       - name: Install dependencies
-        run: |
-          cd tests
-          pip install -r requirements.txt
+        run: pip install -r tests/requirements.txt
       - name: Run tests
-        run: |
-          cd tests
-          ./run_tests.py
+        run: tests/run_tests.py
       - name: Stop application containers
         if: always()
-        run: |
-          cd docker
-          docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml down --volumes
+        run: docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --env-file docker/dev.env down --volumes
 ```
 
 ### Jenkins Pipeline Example
+
+Docker Compose needs to be available on the Agent.
 
 ```groovy
 pipeline {
@@ -180,35 +183,23 @@ pipeline {
     stages {
         stage('Start Application') {
             steps {
-                sh '''
-                    cd docker
-                    docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml up -d --wait
-                '''
+                sh 'docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --env-file docker/dev.env up -d --wait'
             }
         }
         stage('Install Dependencies') {
             steps {
-                sh '''
-                    cd tests
-                    pip install -r requirements.txt
-                '''
+                sh 'pip install -r tests/requirements.txt'
             }
         }
         stage('Run Tests') {
             steps {
-                sh '''
-                    cd tests
-                    ./run_tests.py
-                '''
+                sh 'tests/run_tests.py'
             }
         }
     }
     post {
         always {
-            sh '''
-                cd docker
-                docker compose --env-file dev.env -f docker-compose.yml -f docker-compose.dev.yml down --volumes
-            '''
+            sh 'docker compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --env-file docker/dev.env down --volumes'
         }
     }
 }
