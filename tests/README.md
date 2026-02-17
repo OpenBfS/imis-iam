@@ -125,6 +125,19 @@ delete_institution_from_db(institution_facil_name='test_5owza6aa')
 
 Note: These examples are not validated and are intended as a starting point. Adjustments may be required to match a specific CI/CD environment.
 
+### GitLab CI Example
+
+```yaml
+test:
+  stage: test
+  image: python:3.11
+  before_script:
+    - cd tests
+    - pip install -r requirements.txt
+  script:
+    - ./run_tests.py
+```
+
 ### GitHub Actions Example
 
 ```yaml
