@@ -11,13 +11,11 @@ import ChipTextField from "@/components/Form/ChipTextField.vue";
 import global from "@/test/components/global";
 import { test, expect } from "vitest";
 import i18n from "@/i18n";
-import { useApplicationStore } from "@/stores/application";
+import { useForm } from "@/lib/use-form";
 
 const { t } = i18n.global;
 
 setActivePinia(createPinia());
-
-const applicationStore = useApplicationStore();
 
 const errorMessage = "Does not match";
 const rulesToSpyOn = {
@@ -26,14 +24,20 @@ const rulesToSpyOn = {
 };
 const propRuleSpy = vi.spyOn(rulesToSpyOn, "propRule");
 const clientRuleSpy = vi.spyOn(rulesToSpyOn, "clientRule");
-applicationStore.clientAndServerRules = {
-  test: [rulesToSpyOn.clientRule],
-};
 const wrapper = mount(ChipTextField, {
   global: global,
   props: {
     attribute: "test",
     rules: [rulesToSpyOn.propRule],
+  },
+  setup() {
+    const { initClientRules } = useForm();
+    initClientRules({
+      test: [rulesToSpyOn.clientRule],
+    });
+    return {
+      initClientRules,
+    };
   },
 });
 const inputField = wrapper.find("input");

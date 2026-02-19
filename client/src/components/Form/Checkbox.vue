@@ -12,16 +12,16 @@
     :hint="props.hint"
     :label="props.label"
     :model-value="
-      props.attribute && !props.modelValue
-        ? applicationStore.managedItem[props.attribute]
+      managedItemIndex !== undefined && props.attribute && !props.modelValue
+        ? applicationStore.managedItems[managedItemIndex].item[props.attribute]
         : props.modelValue
     "
     :name="props.name || props.attribute"
     :persistent-hint="props.persistentHint"
-    :readonly="applicationStore.form?.readonly || props.readonly"
+    :readonly="form?.readonly || props.readonly"
     :rules="
-      applicationStore.clientAndServerRules[props.attribute]
-        ? applicationStore.clientAndServerRules[props.attribute]
+      clientAndServerRules[props.attribute]
+        ? clientAndServerRules[props.attribute]
         : props.rules
     "
     @change="(e) => { emit('change', e) }"
@@ -33,9 +33,10 @@
 
 <script setup>
 import { useApplicationStore } from "@/stores/application.js";
-import { useForm } from "@/lib/use-form.js";
+import { inject } from "vue";
 
-const { onUpdateModelValue } = useForm();
+const { onUpdateModelValue, clientAndServerRules } = inject("useForm");
+const managedItemIndex = inject("managedItemIndex");
 
 const applicationStore = useApplicationStore();
 
@@ -55,4 +56,6 @@ const props = defineProps([
   "attribute",
 ]);
 const emit = defineEmits(["change", "update:modelValue"]);
+
+const { form } = inject("useForm");
 </script>

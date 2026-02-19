@@ -22,12 +22,6 @@
           <v-dialog v-model="applicationStore.showExportDialog">
             <ExportDialog />
           </v-dialog>
-          <v-dialog v-model="applicationStore.showManageUserDialog">
-            <ManageUser />
-          </v-dialog>
-          <v-dialog v-model="applicationStore.showManageInstitutionDialog">
-            <ManageInstitution />
-          </v-dialog>
           <v-dialog v-model="applicationStore.showManageEventDialog">
             <ManageEvent />
           </v-dialog>
@@ -41,6 +35,14 @@
       </div>
       <Appfooter />
     </div>
+    <template
+      v-for="(item, index) in applicationStore.managedItems"
+      v-bind:key="index"
+    >
+      <ManageUser v-if="item?.type === 'user'" :index="index" />
+      <ManageInstitution v-if="item?.type === 'institution'" :index="index" />
+      <WindowPlaceholder v-if="applicationStore.touchedEdge" />
+    </template>
   </v-app>
 </template>
 

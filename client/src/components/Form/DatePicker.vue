@@ -11,11 +11,11 @@
       <v-text-field
         ref="dateTextfield"
         v-model="dateString"
-        :clearable="!applicationStore.form?.readonly && !props.readonly"
+        :clearable="!form?.readonly && !props.readonly"
         prepend-inner-icon="mdi-calendar-blank"
         :hint="!props.readonly ? $t('hints.dateFormat') : ''"
         :label="label"
-        :readonly="applicationStore.form?.readonly || props.readonly"
+        :readonly="form?.readonly || props.readonly"
         :rules="rules"
         @click="
           if (!props.readonly) {
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, inject, onMounted, ref, watch } from "vue";
 import { useForm } from "@/lib/use-form.js";
 import { useI18n } from "vue-i18n";
 
@@ -69,6 +69,8 @@ const props = defineProps([
   "readonly",
   "required",
 ]);
+
+const { form } = inject("useForm");
 
 const {
   dateStringToDate,

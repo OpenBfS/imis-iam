@@ -21,8 +21,8 @@
     :item-value="props.itemValue"
     :label="`${props.label}${props.required ? ' *' : ''}`"
     :model-value="
-      props.attribute && !props.modelValue
-        ? applicationStore.managedItem[props.attribute]
+      managedItemIndex !== undefined && props.attribute && !props.modelValue
+        ? applicationStore.managedItems[managedItemIndex].item[props.attribute]
         : props.modelValue
     "
     :multiple="props.multiple"
@@ -30,12 +30,12 @@
     :no-data-text="props.noDataText"
     :persistent-hint="props.persistentHint"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="applicationStore.form?.readonly || props.readonly"
+    :readonly="form?.readonly || props.readonly"
     :return-object="props.returnObject"
     :rules="[
       ...rules,
-      ...(applicationStore.clientAndServerRules[props.attribute]
-        ? applicationStore.clientAndServerRules[props.attribute]
+      ...(clientAndServerRules[props.attribute]
+        ? clientAndServerRules[props.attribute]
         : (props.rules ?? [])),
     ]"
     :variant="props.variant"
@@ -50,7 +50,9 @@ import { useApplicationStore } from "@/stores/application.js";
 import { useForm } from "@/lib/use-form.js";
 import { computed, inject, ref } from "vue";
 
-const { createRequiredRule, onUpdateModelValue } = useForm();
+const { createRequiredRule } = useForm();
+const { onUpdateModelValue, clientAndServerRules } = inject("useForm");
+const managedItemIndex = inject("managedItemIndex");
 
 const applicationStore = useApplicationStore();
 
@@ -87,11 +89,12 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 const translationCategory = inject("translationCategory");
+const { form } = inject("useForm");
 const rules = ref(
-  createRequiredRule(props.required, props.attribute, translationCategory),
+  createRequiredRule(props.required, props.attribute, translationCategory)
 );
 
 const editable = computed(() => {
-  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
+  return !props.disabled && !props.readonly && !form?.readonly;
 });
 </script>

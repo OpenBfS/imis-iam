@@ -15,6 +15,7 @@
   "dependencies": {
     "@fontsource/roboto": "^5.2.9",
     "@mdi/font": "7.4.47",
+    "@vueuse/core": "^14.1.0",
     "axios": "^1.13.5",
     "core-js": "^3.48.0",
     "debounce": "^2.2.0",

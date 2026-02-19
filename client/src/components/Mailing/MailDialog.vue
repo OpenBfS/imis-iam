@@ -315,7 +315,6 @@ const sendMail = () => {
     });
 };
 onBeforeMount(() => {
-  applicationStore.setForm(form);
   initClientRules({
     expiryDate: validGermanDate(),
     recipient: reqField(t("emails.requiredRecipient")),

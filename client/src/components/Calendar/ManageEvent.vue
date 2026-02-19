@@ -141,7 +141,6 @@ const {
   isServerValidationError,
 } = useForm();
 onBeforeMount(() => {
-  applicationStore.setForm(form);
   initClientRules({
     description: reqField(t("calendar.requiredDescription")),
     site: reqField(t("calendar.requiredSite")),

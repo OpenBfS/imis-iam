@@ -5,13 +5,14 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { nextTick, ref, watch } from "vue";
+import { computed, nextTick, provide, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application.js";
+import { areArraysDifferent } from "@/lib/form-helper";
 
 export function useForm(i18n) {
   const { t } = i18n?.global ?? useI18n();
-  const form = ref(null);
+  const form = useTemplateRef("form");
   const valid = ref(false);
   const hasNoChange = ref(true);
   const showConfirmCancelDialog = ref(false);
@@ -20,6 +21,17 @@ export function useForm(i18n) {
   const regExprPostalCode = /^\d{5}$/;
   const noLeadingTrailingSpaces = /\S.*\S/;
   const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
+  const changedAttributes = ref([]);
+  const resetEventListeners = ref([]);
+  const clientAndServerRules = ref({});
+  const clientRules = ref({});
+  // Object with fake rules. It contains maximal one rule per input field.
+  // These rules always return a message so they always lead to an
+  // error message for the attribute. This way we can use Vuetify's internal
+  // mechanism to show error messages. We use it to show validation errors
+  // coming from keycloak.
+  const serverValidationRules = ref({});
+  const dialogWidth = ref(600);
   // Validation rules
   const validMail = (validMsg) => {
     return [
@@ -93,9 +105,8 @@ export function useForm(i18n) {
   const resetForm = async (
     originalObject,
     changedObject,
-    resetNotificationCallback,
+    resetNotificationCallback
   ) => {
-    const applicationStore = useApplicationStore();
     if (resetNotificationCallback) resetNotificationCallback();
     const changedKeys = Object.keys(changedObject);
     changedKeys.forEach((key) => {
@@ -105,12 +116,33 @@ export function useForm(i18n) {
     });
     Object.assign(changedObject, originalObject);
     await nextTick();
-    applicationStore.attributesOfFieldsThatChanged = [];
-    applicationStore.serverValidationRules = {};
+    changedAttributes.value = [];
     aggregateRules();
     form.value?.validate();
-    applicationStore.callResetEventListener();
+    callResetEventListener();
     hasNoChange.value = true;
+  };
+
+  const addResetEventListener = (listener) => {
+    resetEventListeners.value = [...resetEventListeners.value, listener];
+  };
+  const removeAllResetEventListeners = () => {
+    resetEventListeners.value = [];
+  };
+  const callResetEventListener = () => {
+    resetEventListeners.value.forEach((listener) => {
+      listener();
+    });
+  };
+
+  const submitChange = (attribute) => {
+    changedAttributes.value = [...changedAttributes.value, attribute];
+  };
+  const removeChange = (attribute) => {
+    const index = changedAttributes.value.findIndex((a) => a === attribute);
+    if (index !== -1) {
+      changedAttributes.value = changedAttributes.value.toSpliced(index, 1);
+    }
   };
 
   const areObjectsDifferent = (a, b) => {
@@ -149,30 +181,13 @@ export function useForm(i18n) {
     return false;
   };
 
-  const areArraysDifferent = (a, b, sameOrder = true) => {
-    let sameElementsCount = 0;
-    if (a.length !== b.length) return true;
-    for (var i = 0; i < a.length; ++i) {
-      if (sameOrder && a[i] !== b[i]) {
-        return true;
-      } else if (!sameOrder) {
-        const index = b.findIndex((element) => element === a[i]);
-        if (index != -1) sameElementsCount++;
-      }
-    }
-    if (!sameOrder && a.length !== sameElementsCount) {
-      return true;
-    }
-    return false;
-  };
-
   const watchChange = (originalObject, changedObject) => {
-    const applicationStore = useApplicationStore();
     watch(
-      () => applicationStore.attributesOfFieldsThatChanged,
+      () => changedAttributes,
       () => {
         updateHasNoChange(originalObject, changedObject);
       },
+      { deep: true }
     );
     watch(changedObject, () => {
       updateHasNoChange(originalObject, changedObject);
@@ -180,10 +195,9 @@ export function useForm(i18n) {
   };
 
   const updateHasNoChange = (originalObject, changedObject) => {
-    const applicationStore = useApplicationStore();
     hasNoChange.value =
       !areObjectsDifferent(originalObject, changedObject) &&
-      applicationStore.attributesOfFieldsThatChanged.length === 0;
+      changedAttributes.value.length === 0;
   };
 
   const onCancel = (cancelCallback) => {
@@ -195,12 +209,8 @@ export function useForm(i18n) {
   };
 
   const initClientRules = (rules) => {
-    const applicationStore = useApplicationStore();
-    applicationStore.clientRules = rules;
-    Object.keys(applicationStore.clientRules).forEach((key) => {
-      applicationStore.clientAndServerRules[key] =
-        applicationStore.clientRules[key];
-    });
+    clientRules.value = rules;
+    clientAndServerRules.value = Object.assign({}, rules);
   };
 
   /**
@@ -226,7 +236,7 @@ export function useForm(i18n) {
           const charAfterDash = translationKey.charAt(index + 1);
           translationKey = translationKey.replace(
             `-${charAfterDash}`,
-            charAfterDash.toUpperCase(),
+            charAfterDash.toUpperCase()
           );
         }
         index = translationKey.indexOf("-");
@@ -249,7 +259,6 @@ export function useForm(i18n) {
    * }
    */
   const handleValidationErrorFromServer = async (error) => {
-    const applicationStore = useApplicationStore();
     for (let i = 0; i < error.length; i++) {
       const errorObject = error[i];
       // If error is a list element, ignore element position.
@@ -257,10 +266,10 @@ export function useForm(i18n) {
       const message = errorObject.message;
       const translatedMessage = translateError(
         message,
-        errorObject.messageParameters,
+        errorObject.messageParameters
       );
       // Create rules that can be used by the validation mechanism of Vuetify.
-      applicationStore.serverValidationRules[attribute] = () => {
+      serverValidationRules.value[attribute] = () => {
         return translatedMessage;
       };
       aggregateRules();
@@ -271,52 +280,45 @@ export function useForm(i18n) {
   };
 
   const aggregateRules = () => {
-    const applicationStore = useApplicationStore();
-    Object.keys(applicationStore.clientAndServerRules).forEach((key) => {
-      delete applicationStore.clientAndServerRules[key];
-      applicationStore.clientAndServerRules[key] = [];
+    Object.keys(clientAndServerRules.value).forEach((key) => {
+      delete clientAndServerRules.value[key];
+      clientAndServerRules.value[key] = [];
     });
     // First add the server rules and then the client rules because Vuetify shows only one
     // error message at a time and if the user saved an item already they obviously passed
     // the client rules and the server rules are more important so we decide to show them.
-    Object.keys(applicationStore.serverValidationRules).forEach((key) => {
-      if (!applicationStore.clientAndServerRules[key]) {
+    Object.keys(serverValidationRules.value).forEach((key) => {
+      if (!clientAndServerRules.value[key]) {
         // Necessary because it could be that the backend returns errors
         // for text fields which have no rules on the client side.
         // Therefore, rules and their keys of client and server might differ.
-        applicationStore.clientAndServerRules[key] = [];
+        clientAndServerRules.value[key] = [];
       }
-      applicationStore.clientAndServerRules[key].push(
-        applicationStore.serverValidationRules[key],
-      );
+      clientAndServerRules.value[key].push(serverValidationRules.value[key]);
     });
-    Object.keys(applicationStore.clientRules).forEach((key) => {
-      applicationStore.clientAndServerRules[key].push(
-        ...applicationStore.clientRules[key],
-      );
+    Object.keys(clientRules.value).forEach((key) => {
+      clientAndServerRules.value[key].push(...clientRules.value[key]);
     });
   };
 
   const aggregateRulesForSingleAttribute = (attribute) => {
-    const applicationStore = useApplicationStore();
-    delete applicationStore.clientAndServerRules[attribute];
-    applicationStore.clientAndServerRules[attribute] = [];
-    if (applicationStore.clientRules[attribute]) {
-      applicationStore.clientAndServerRules[attribute].push(
-        ...applicationStore.clientRules[attribute],
+    delete clientAndServerRules.value[attribute];
+    clientAndServerRules.value[attribute] = [];
+    if (clientRules.value[attribute]) {
+      clientAndServerRules.value[attribute].push(
+        ...clientRules.value[attribute]
       );
     }
-    if (applicationStore.serverValidationRules[attribute]) {
-      applicationStore.clientAndServerRules[attribute].push(
-        applicationStore.serverValidationRules[attribute],
+    if (serverValidationRules.value[attribute]) {
+      clientAndServerRules.value[attribute].push(
+        serverValidationRules.value[attribute]
       );
     }
   };
 
   const clearValidationError = async (attribute) => {
-    const applicationStore = useApplicationStore();
-    if (applicationStore.serverValidationRules[attribute]) {
-      delete applicationStore.serverValidationRules[attribute];
+    if (serverValidationRules.value[attribute]) {
+      delete serverValidationRules.value[attribute];
       aggregateRulesForSingleAttribute(attribute);
       await nextTick();
       form.value.validate();
@@ -328,9 +330,8 @@ export function useForm(i18n) {
   };
 
   const onUpdateModelValue = (event, emit, attribute) => {
-    const applicationStore = useApplicationStore();
-    if (applicationStore.clientAndServerRules) {
-      applicationStore.clearValidationError(attribute);
+    if (clientAndServerRules.value) {
+      clearValidationError(attribute);
     }
     emit("update:modelValue", event);
   };
@@ -368,6 +369,26 @@ export function useForm(i18n) {
     return newRules;
   };
 
+  const setDialogWidth = (width) => {
+    dialogWidth.value = width;
+  };
+
+  const cols = computed(() => {
+    return dialogWidth.value > 1200 ? 4 : dialogWidth.value > 600 ? 6 : 12;
+  });
+
+  provide("useForm", {
+    changedAttributes,
+    submitChange,
+    removeChange,
+    addResetEventListener,
+    removeAllResetEventListeners,
+    onUpdateModelValue,
+    clientAndServerRules,
+    setDialogWidth,
+    form,
+  });
+
   return {
     form,
     valid,
@@ -398,24 +419,10 @@ export function useForm(i18n) {
     showFormError,
     createRequiredRule,
     noLeadingTrailingSpaces,
+    removeAllResetEventListeners,
+    clientAndServerRules,
+    clientRules,
+    cols,
   };
 }
 
-export const trimSpacesInObject = (obj) => {
-  const keys = Object.keys(obj);
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const value = obj[key];
-    if (value === undefined || value === null) continue;
-    if (typeof value === "string") {
-      obj[key] = value.trim();
-    } else if (typeof value === "object") {
-      if (value.length) {
-        obj[key] = value.map((v) => v.trim());
-      } else {
-        trimSpacesInObject(obj[key]);
-      }
-    }
-  }
-  return obj;
-};

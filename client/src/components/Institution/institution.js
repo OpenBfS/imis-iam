@@ -61,6 +61,7 @@ function updateInstitution(
   isServerValidationError,
   handleValidationErrorFromServer,
   hasRequestError,
+  managedItemIndex
 ) {
   const institutionStore = useInstitutionStore();
   if (!showPostalAddress) {
@@ -72,7 +73,7 @@ function updateInstitution(
     institutionStore
       .updateInstitution(institution)
       .then(() => {
-        finishInstitutionDialog(institution);
+        finishInstitutionDialog(institution, managedItemIndex);
         resolve({ status: 200 });
       })
       .catch((error) => {
@@ -84,11 +85,12 @@ function updateInstitution(
   });
 }
 
-function finishInstitutionDialog(newInstitution) {
+function finishInstitutionDialog(newInstitution, managedItemIndex) {
   const applicationStore = useApplicationStore();
   applicationStore.searchRequest(["institutions"]);
-  applicationStore.setShowManageInstitutionDialog(false);
   applicationStore.loadNetworksIfNotContains(newInstitution.network);
+  if (managedItemIndex !== undefined)
+    applicationStore.removeManagedItem(managedItemIndex);
 }
 
 const states = [

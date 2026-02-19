@@ -34,11 +34,14 @@ const institution = {
 
 describe("Test ManageInstitution", () => {
   test("Reset button is en- and disabled correctly", async () => {
-    setupSharedTestEnvironment(institution, "chief_editor");
+    setupSharedTestEnvironment(institution, "institution", "chief_editor");
     const applicationStore = useApplicationStore();
     applicationStore.setNetworks(networks);
     const wrapper = mount(ManageInstitution, {
       global: global,
+      props: {
+        index: 0,
+      },
     });
     await flushPromises();
     runSharedTests(wrapper);

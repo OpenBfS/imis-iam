@@ -5,7 +5,7 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import i18n from "@/i18n";
-import { trimSpacesInObject } from "@/lib/use-form";
+import { trimSpacesInObject } from "@/lib/form-helper.js";
 import { useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
@@ -27,7 +27,7 @@ function getExpUser() {
   const user = structuredClone(expUser);
   user.network = toRaw(profileStore.userData.network);
   user.role = toRaw(userStore.roles)?.find(
-    (role) => role.name === "user",
+    (role) => role.name === "user"
   )?.name;
   return user;
 }
@@ -39,7 +39,7 @@ function handleDisplayName(displayName) {
     displayName.endsWith("}")
   ) {
     return t(
-      `user.${displayName.replace("${profile.attributes.", "").slice(0, -1)}`,
+      `user.${displayName.replace("${profile.attributes.", "").slice(0, -1)}`
     );
   }
   return displayName;
@@ -51,8 +51,8 @@ function updateUser(
   isServerValidationError,
   handleValidationErrorFromServer,
   hasRequestError,
+  managedItemIndex
 ) {
-  const applicationStore = useApplicationStore();
   const profileStore = useProfileStore();
   const userStore = useUserStore();
   if (resetNotification) resetNotification();
@@ -64,8 +64,7 @@ function updateUser(
         if (profileStore.userData.id === user.id) {
           profileStore.loadProfile();
         }
-        applicationStore.setOwnAccount(false);
-        finishUserDialog(user);
+        finishUserDialog(user, managedItemIndex);
         resolve({ status: 200 });
       })
       .catch((error) => {
@@ -77,11 +76,12 @@ function updateUser(
   });
 }
 
-function finishUserDialog(newUser) {
+function finishUserDialog(newUser, managedItemIndex) {
   const applicationStore = useApplicationStore();
   applicationStore.searchRequest(["users"]);
-  applicationStore.setShowManageUserDialog(false);
   applicationStore.loadNetworksIfNotContains(newUser.network);
+  if (managedItemIndex !== undefined)
+    applicationStore.removeManagedItem(managedItemIndex);
 }
 
 export { finishUserDialog, getExpUser, handleDisplayName, updateUser };

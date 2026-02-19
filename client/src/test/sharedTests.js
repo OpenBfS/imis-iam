@@ -20,12 +20,15 @@ const roles = [
 ];
 const networks = ["01", "02"];
 
-const setupSharedTestEnvironment = async (item, roleOfLoggedInUser) => {
+const setupSharedTestEnvironment = async (item, itemType, roleOfLoggedInUser) => {
   setActivePinia(createPinia());
   const applicationStore = useApplicationStore();
-  applicationStore.processType = PROCESS_TYPE.EDIT;
-  applicationStore.managedItem = structuredClone(item);
-  applicationStore.savedItem = structuredClone(item);
+  applicationStore.addManagedItem({
+    item: structuredClone(item),
+    originalItem: structuredClone(item),
+    processType: PROCESS_TYPE.EDIT,
+    type: itemType,
+  });
   const profileStore = useProfileStore();
   profileStore.setUserData({ role: roleOfLoggedInUser });
 };

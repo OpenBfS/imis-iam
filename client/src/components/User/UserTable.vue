@@ -66,7 +66,10 @@ import { useUserStore } from "@/stores/user.js";
 import { onMounted, ref, toRaw } from "vue";
 import { getExpUser } from "@/components/User/user.js";
 import DataTableServer from "@/components/DataTableServer.vue";
-import { createHeaders, initSelectedColumns } from "@/components/Search/searchTable.js";
+import {
+  createHeaders,
+  initSelectedColumns,
+} from "@/components/Search/searchTable.js";
 
 const props = defineProps({
   users: Array,
@@ -75,7 +78,6 @@ const props = defineProps({
 const applicationStore = useApplicationStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
-const savedUser = ref();
 
 onMounted(async () => {
   if (!profileStore.attributes) {
@@ -120,7 +122,6 @@ const onCopyClicked = (id) => {
   // Keep network of example user because other roles than chief redakteur are not allowed
   // to set other network values.
   user.value.network = network;
-  savedUser.value = cloneObject(user.value);
   user.value.attributes.title = undefined;
   user.value.attributes.username = undefined;
   user.value.attributes.firstName = undefined;
@@ -128,10 +129,7 @@ const onCopyClicked = (id) => {
   user.value.attributes.email = undefined;
   user.value.enabled = false;
   delete user.value["id"];
-  applicationStore.setManagedItem(user.value);
-  applicationStore.setSavedItem(savedUser.value);
-  applicationStore.setProcessType(PROCESS_TYPE.COPY);
-  applicationStore.setShowManageUserDialog(true);
+  applicationStore.openUserEditForm(user.value, PROCESS_TYPE.COPY);
 };
 const onEditClicked = (id) => {
   user.value = cloneObject(getUserById(id));

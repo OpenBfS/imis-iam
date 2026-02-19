@@ -132,13 +132,12 @@ const csvOptions = ref({
   encoding: encoding[0],
   quoteType: quoteTypes[0].value,
 });
-const { form, valid, validLength } = useForm();
+const { form, valid, validLength, removeAllResetEventListeners, initClientRules } = useForm();
 
 provide("translationCategory", "export");
 
 onBeforeMount(() => {
-  applicationStore.setForm(form);
-  applicationStore.initClientRules({
+  initClientRules({
     fieldSeparator: [
       ...validLength(
         undefined,
@@ -186,7 +185,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  applicationStore.removeAllResetEventListeners();
+  removeAllResetEventListeners();
 });
 
 const exportRequest = (itemsName) => {

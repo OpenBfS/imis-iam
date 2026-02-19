@@ -74,7 +74,7 @@ import { useApplicationStore } from "@/stores/application";
 import { useInstitutionStore } from "@/stores/institution";
 import { useUserStore } from "@/stores/user";
 import debounce from "debounce";
-import { useForm } from "@/lib/use-form";
+import { areArraysDifferent } from "@/lib/form-helper";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -89,8 +89,6 @@ const props = defineProps([
   "placeholder",
   "type",
 ]);
-
-const { areArraysDifferent } = useForm();
 
 const textFieldValue = ref("");
 const autocompleteValue = ref(null);

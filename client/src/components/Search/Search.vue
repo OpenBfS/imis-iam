@@ -27,11 +27,7 @@
         color="accent"
         class="ms-4"
         icon="mdi-account-plus"
-        @click="
-          applicationStore.setManagedItem(getExpUser());
-          applicationStore.setProcessType(PROCESS_TYPE.ADD);
-          applicationStore.setShowManageUserDialog(true);
-        "
+        @click="applicationStore.openUserEditForm(getExpUser(), PROCESS_TYPE.ADD)"
       >
       </v-btn>
     </UITooltip>
@@ -44,9 +40,10 @@
         v-if="isAllowedToAdd"
         class="ms-4"
         @click="
-          applicationStore.setManagedItem(getExpInstitution());
-          applicationStore.setProcessType(PROCESS_TYPE.ADD);
-          applicationStore.setShowManageInstitutionDialog(true);
+          applicationStore.openInstitutionEditForm(
+            getExpInstitution(),
+            PROCESS_TYPE.ADD
+          )
         "
         icon="mdi-office-building-plus"
       >

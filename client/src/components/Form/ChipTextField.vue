@@ -22,7 +22,7 @@
     :persistent-hint="true"
     :persistent-placeholder="entries.length > 0"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="applicationStore.form?.readonly || props.readonly"
+    :readonly="form?.readonly || props.readonly"
     :rules="allRules"
     :variant="props.variant ?? 'underlined'"
   >
@@ -60,13 +60,31 @@
 </style>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, unref, watch } from "vue";
+import {
+  computed,
+  inject,
+  onMounted,
+  onUnmounted,
+  ref,
+  unref,
+  watch,
+} from "vue";
 import { useApplicationStore } from "@/stores/application.js";
-import { useForm } from "@/lib/use-form.js";
 import { useI18n } from "vue-i18n";
+import { areArraysDifferent } from "@/lib/form-helper";
 
 const { t } = useI18n();
-const { areArraysDifferent, onUpdateModelValue } = useForm();
+
+const {
+  changedAttributes,
+  submitChange,
+  removeChange,
+  addResetEventListener,
+  onUpdateModelValue,
+  clientAndServerRules,
+  form,
+} = inject("useForm");
+const managedItemIndex = inject("managedItemIndex");
 
 const applicationStore = useApplicationStore();
 
@@ -112,9 +130,9 @@ const internalRules = ref([
 ]);
 
 const allRules = computed(() => {
-  return applicationStore.clientAndServerRules[props.attribute]
+  return clientAndServerRules[props.attribute]
     ? [
-        ...applicationStore.clientAndServerRules[props.attribute],
+        ...clientAndServerRules[props.attribute],
         ...(props.rules ?? []),
         ...internalRules.value,
       ]
@@ -123,7 +141,7 @@ const allRules = computed(() => {
 
 let isAdding = false;
 const editable = computed(() => {
-  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
+  return !props.disabled && !props.readonly && !form?.readonly;
 });
 const resetInput = () => {
   input.value = "";
@@ -135,17 +153,21 @@ onMounted(() => {
   // Users can have attributes nested in the property "attributes"
   else if (
     props.attribute &&
-    (applicationStore.managedItem[props.attribute] ||
-      applicationStore.managedItem.attributes?.[props.attribute])
+    (applicationStore.managedItems[managedItemIndex].item[props.attribute] ||
+      applicationStore.managedItems[managedItemIndex].item.attributes?.[
+        props.attribute
+      ])
   ) {
     entries.value =
-      applicationStore.managedItem[props.attribute] ||
-      applicationStore.managedItem.attributes?.[props.attribute];
+      applicationStore.managedItems[managedItemIndex].item[props.attribute] ||
+      applicationStore.managedItems[managedItemIndex].item.attributes?.[
+        props.attribute
+      ];
   }
-  applicationStore.addResetEventListener(resetInput);
+  addResetEventListener(resetInput);
 });
 onUnmounted(() => {
-  applicationStore.removeChangeInField(props.attribute);
+  removeChange(props.attribute);
 });
 
 watch(entries, (newEntries) => {
@@ -156,16 +178,14 @@ watch(entries, (newEntries) => {
  * Since the text input that is no chip yet isn't saved in managedItem in the applicationStore
  * we cannot say if the content of the form changed just by a look at managedItem. To be able
  * to track this intermediate state of ChipTextFields we save the attribute of them in
- * attributesOfFieldsThatChanged when there is some input.
+ * changedAttributes when there is some input.
  */
 watch(input, (newInput) => {
-  const isContained = applicationStore.attributesOfFieldsThatChanged.includes(
-    props.attribute,
-  );
+  const isContained = changedAttributes.value.includes(props.attribute);
   if (newInput.length > 0 && !isContained) {
-    applicationStore.submitChangeInField(props.attribute);
+    submitChange(props.attribute);
   } else if (newInput.length === 0 && isContained) {
-    applicationStore.removeChangeInField(props.attribute);
+    removeChange(props.attribute);
   }
 });
 
@@ -173,7 +193,7 @@ watch(input, (newInput) => {
 // there are several at the same time.
 watch(
   // Without structuredClone changes are not detected correctly.
-  () => structuredClone(applicationStore.managedItem),
+  () => structuredClone(applicationStore.managedItems[managedItemIndex].item),
   (newValue, oldValue) => {
     // Users can have attributes nested in the property "attributes"
     const oldEntries =
@@ -191,7 +211,7 @@ watch(
       entries.value = newEntries || [];
       input.value = "";
     }
-  },
+  }
 );
 
 const addEntry = () => {

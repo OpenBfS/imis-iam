@@ -5,18 +5,32 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 import { setActivePinia, createPinia } from "pinia";
-import { useApplicationStore } from "@/stores/application";
 import { test, expect, expectTypeOf } from "vitest";
-import { trimSpacesInObject, useForm } from "@/lib/use-form";
+import { trimSpacesInObject } from "@/lib/form-helper.js";
+import { useForm } from "@/lib/use-form";
 import i18n from "@/i18n";
 import { getExpInstitution } from "@/components/Institution/institution";
+import { defineComponent } from "vue";
+import { mount } from "@vue/test-utils";
+import global from "@/test/components/global";
+import { areArraysDifferent } from "@/lib/form-helper.js";
 
-const { areArraysDifferent, handleValidationErrorFromServer } = useForm(i18n);
 setActivePinia(createPinia());
-const applicationStore = useApplicationStore();
 const { t } = i18n.global;
 
 test("Test handleValidationErrorFromServer", async () => {
+  const TestComponent = defineComponent({
+    setup() {
+      return {
+        ...useForm(),
+      };
+    },
+  });
+
+  const wrapper = mount(TestComponent, {
+    global: global,
+  });
+
   const errors = [
     {
       message: "must not be blank",
@@ -33,21 +47,19 @@ test("Test handleValidationErrorFromServer", async () => {
       messageParameters: ["email", "\\S+@\\S+\\.\\S+"],
     },
   ];
-  await handleValidationErrorFromServer(errors);
-  expect(Object.keys(applicationStore.clientAndServerRules)[0]).toBe("role");
-  expectTypeOf(applicationStore.clientAndServerRules["role"]).toBeFunction();
-  expect(applicationStore.clientAndServerRules["role"][0]()).toBe(
-    errors[0].message,
+  await wrapper.vm.handleValidationErrorFromServer(errors);
+  expect(Object.keys(wrapper.vm.clientAndServerRules)[0]).toBe("role");
+  expectTypeOf(wrapper.vm.clientAndServerRules["role"]).toBeFunction();
+  expect(wrapper.vm.clientAndServerRules["role"][0]()).toBe(errors[0].message);
+
+  expect(Object.keys(wrapper.vm.clientAndServerRules)[1]).toBe("email");
+  expectTypeOf(wrapper.vm.clientAndServerRules["email"]).toBeFunction();
+  expect(wrapper.vm.clientAndServerRules["email"][0]()).toBe(
+    t("error.validEmail")
   );
 
-  expect(Object.keys(applicationStore.clientAndServerRules)[1]).toBe("email");
-  expectTypeOf(applicationStore.clientAndServerRules["email"]).toBeFunction();
-  expect(applicationStore.clientAndServerRules["email"][0]()).toBe(
-    t("error.validEmail"),
-  );
-
-  expect(applicationStore.clientAndServerRules["email"][0]()).toBe(
-    t("error.validEmail"),
+  expect(wrapper.vm.clientAndServerRules["email"][0]()).toBe(
+    t("error.validEmail")
   );
 });
 

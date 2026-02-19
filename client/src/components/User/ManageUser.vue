@@ -8,258 +8,152 @@
 
 <!-- eslint-disable vue/no-v-for-template-key -->
 <template>
-  <v-card width="80vw">
-    <v-card-title v-if="[PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1">
-      <span class="text-h5">{{ $t("user.createTitle") }}</span>
-    </v-card-title>
-    <v-card-title v-if="processType === PROCESS_TYPE.EDIT">
-      <span class="text-h5">{{
-        $t("user.editTitle", { name: user.attributes.username[0] })
-      }}</span>
-    </v-card-title>
-    <v-card-title v-if="processType === PROCESS_TYPE.EDIT_PROFILE">
-      <span class="text-h5">{{ $t("user.editProfileTitle") }}</span>
-    </v-card-title>
-    <v-divider></v-divider>
-    <v-container class="pa-1 mt-4">
-      <v-row justify="center">
-        <v-col cols="11">
-          <v-form v-model="valid" ref="form" :readonly="isReadOnly">
-            <v-row>
-              <v-col v-if="processType !== PROCESS_TYPE.EDIT">
-                <TextField
-                  attribute="username"
-                  density="compact"
-                  :ref="'username'"
-                  :variant="
-                    [PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
-                      ? 'underlined'
-                      : 'plain'
-                  "
-                  :label="$t('user.username')"
-                  :model-value="user.attributes.username"
-                  required
-                  @update:model-value="
-                    clearValidationError('username');
-                    setUserAttribute('username', $event);
-                  "
-                ></TextField>
+  <FloatingDialog :z-index="managedItem.zIndex" @raise="applicationStore.raiseManagedItem(props.index)">
+    <template v-slot:header>
+      <span v-if="[PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1" class="text-h5">{{
+        $t("user.createTitle") }}</span>
+      <span class="text-h5" v-else-if="processType === PROCESS_TYPE.EDIT">{{ $t("user.editTitle", {
+        name:
+          user?.attributes.username[0] }) }}
+      </span>
+      <span v-else-if="processType === PROCESS_TYPE.EDIT_PROFILE" class="text-h5">{{ $t("user.editProfileTitle")
+        }}</span>
+    </template>
+    <v-form v-model="valid" ref="form" :readonly="isReadOnly">
+      <v-container class="pa-3">
+        <v-row>
+          <v-col v-if="processType !== PROCESS_TYPE.EDIT" cols="12">
+            <TextField attribute="username" density="compact" :ref="'username'" :variant="[PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
+                ? 'underlined'
+                : 'plain'
+              " :label="$t('user.username')" :model-value="user.attributes.username" required @update:model-value="
+                clearValidationError('username');
+              setUserAttribute('username', $event);
+              "></TextField>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col style="max-width: fit-content">
+            <Checkbox
+              @change="(event) => {
+                if (event.target.checked) {
+                  user.retired = false;
+                }
+              }"
+              attribute="enabled"
+              :label="$t('user.enabled')"
+              v-model="user.enabled"
+              :disabled="profileStore.userData.role !== 'chief_editor'"></Checkbox>
+          </v-col>
+          <v-col v-if="profileStore.userData.role === 'chief_editor'" style="max-width: fit-content">
+            <Checkbox
+              @change="(event) => {
+                if (event.target.checked) {
+                  user.enabled = false;
+                }
+              }"
+              attribute="retired"
+              :label="$t('user.retired')"
+              v-model="user.retired"
+            ></Checkbox>
+          </v-col>
+          <v-col style="max-width: fit-content">
+            <Checkbox attribute="hiddenInAddressbook" :label="$t('user.hiddenInAddressbook')"
+              v-model="user.hiddenInAddressbook"></Checkbox>
+          </v-col>
+        </v-row>
+        <template v-for="group in filteredAttributeGroups" :key="group.name">
+          <v-row>
+            <v-col>
+              <v-label>{{ $t(`user.${group.name}`) }}</v-label>
+            </v-col>
+          </v-row>
+          <v-row>
+            <template v-for="attribute in profileStore.filteredAttributesOfGroup(
+              group.name,
+              toRaw(user)
+            )" :key="attribute.name">
+              <v-col :cols="cols">
+                <GenericUserFormField :attribute="attribute" :clearValidationError="clearValidationError"
+                  :setUserAttribute="setUserAttribute" :user="user" :disabled="isDisabled(attribute)" />
               </v-col>
-              <v-col cols="2">
-                <Checkbox
-                @change="(event) => {
-                    if (event.target.checked) {
-                      user.retired = false;
-                    }
-                  }"
-                  attribute="enabled"
-                  :label="$t('user.enabled')"
-                  v-model="user.enabled"
-                  :disabled="profileStore.userData.role !== 'chief_editor'"
-                ></Checkbox>
-              </v-col>
-              <v-col cols="3" v-if="profileStore.userData.role === 'chief_editor'">
-                <Checkbox
-                  @change="(event) => {
-                    if (event.target.checked) {
-                      user.enabled = false;
-                    }
-                  }"
-                  attribute="retired"
-                  :label="$t('user.retired')"
-                  v-model="user.retired"
-                ></Checkbox>
-              </v-col>
-              <v-col v-if="profileStore.userData.role === 'chief_editor'">
-                <Checkbox
-                  attribute="hiddenInAddressbook"
-                  :label="$t('user.hiddenInAddressbook')"
-                  v-model="user.hiddenInAddressbook"
-                ></Checkbox>
-              </v-col>
-            </v-row>
-            <template
-              v-for="group in filteredAttributeGroups"
-              :key="group.name"
-            >
-              <v-row>
-                <v-label>{{ $t(`user.${group.name}`) }}</v-label>
-              </v-row>
-              <v-row>
-                <template
-                  v-for="attribute in profileStore.filteredAttributesOfGroup(
-                    group.name,
-                    toRaw(user)
-                  )"
-                  :key="attribute.name"
-                >
-                  <v-col cols="6">
-                    <GenericUserFormField
-                      :attribute="attribute"
-                      :clearValidationError="clearValidationError"
-                      :setUserAttribute="setUserAttribute"
-                      :user="user"
-                      :disabled="isDisabled(attribute)"
-                    />
-                  </v-col>
-                </template>
-              </v-row>
             </template>
+          </v-row>
+        </template>
 
-            <v-row>
-              <v-label>{{ $t("user.misc") }}</v-label>
-            </v-row>
-            <v-row>
-              <template
-                v-for="attribute in profileStore.attributesWithoutGroup"
-                :key="attribute.name"
-              >
-                <v-col v-if="attribute.name !== 'username'" cols="6">
-                  <GenericUserFormField
-                    :attribute="attribute"
-                    :clearValidationError="clearValidationError"
-                    :setUserAttribute="setUserAttribute"
-                    :user="user"
-                    :disabled="isDisabled(attribute)"
-                  />
-                  <p
-                    :id="`${attribute.name}-validation-error`"
-                    class="validation-error"
-                  ></p>
-                </v-col>
-              </template>
-            </v-row>
+        <v-row>
+          <v-label>{{ $t("user.misc") }}</v-label>
+        </v-row>
+        <v-row>
+          <template v-for="attribute in profileStore.attributesWithoutGroup" :key="attribute.name">
+            <v-col v-if="attribute.name !== 'username'" cols="6">
+              <GenericUserFormField :attribute="attribute" :clearValidationError="clearValidationError"
+                :setUserAttribute="setUserAttribute" :user="user" :disabled="isDisabled(attribute)" />
+              <p :id="`${attribute.name}-validation-error`" class="validation-error"></p>
+            </v-col>
+          </template>
+        </v-row>
 
-            <v-row>
-              <v-col>
-                <Select
-                  attribute="institutions"
-                  :clearable="profileStore.isAllowedToManage"
-                  :no-data-text="$t('label.noDataText')"
-                  :label="$t('user.institutions')"
-                  :items="institutionStore.sortedInstitutions"
-                  v-model="user.institutions"
-                  item-title="name"
-                  item-value="name"
-                  persistent-hint
-                  multiple
-                  required
-                ></Select>
-              </v-col>
-              <v-col>
-                <Combobox
-                  :items="applicationStore.networks"
-                  item-title="name"
-                  item-value="name"
-                  :label="$t('user.network')"
-                  :attribute="'network'"
-                  :disabled="profileStore.userData.role !== 'chief_editor'"
-                  :model-value="user.network"
-                  @update:model-value="user.network = $event"
-                  required
-                ></Combobox>
-              </v-col>
-            </v-row>
-            <v-row>
-              <Select
-                attribute="role"
-                :disabled="profileStore.userData.role !== 'chief_editor'"
-                :label="$t('user.role')"
-                :items="userRoles"
-                item-value="name"
-                name="role"
-                required
-                v-model="user.role"
-                persistent-hint
-              ></Select>
-            </v-row>
-          </v-form>
-          <v-label>* {{ $t("hints.requiredFields") }}</v-label>
-          <UIAlert
-            v-if="hasLoadingError || hasRequestError"
-            v-bind:message="applicationStore.httpErrorMessage"
-          />
-        </v-col>
-      </v-row>
-    </v-container>
-    <v-divider></v-divider>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn
-        v-if="!isReadOnly"
-        color="accent"
-        :disabled="!valid || hasNoChange"
-        @click="
-          [PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
-            ? createUser()
-            : saveUser()
-        "
-      >
+        <v-row>
+          <v-col>
+            <Select attribute="institutions" :clearable="profileStore.isAllowedToManage"
+              :no-data-text="$t('label.noDataText')" :label="$t('user.institutions')"
+              :items="institutionStore.sortedInstitutions" v-model="user.institutions" item-title="name"
+              item-value="name" persistent-hint multiple required></Select>
+          </v-col>
+          <v-col>
+            <Combobox :items="applicationStore.networks" item-title="name" item-value="name" :label="$t('user.network')"
+              :attribute="'network'" :disabled="profileStore.userData.role !== 'chief_editor'"
+              :model-value="user.network" @update:model-value="user.network = $event" required></Combobox>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <Select attribute="role" :disabled="profileStore.userData.role !== 'chief_editor'" :label="$t('user.role')"
+              :items="userRoles" item-value="name" name="role" required v-model="user.role" persistent-hint></Select>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-label>* {{ $t("hints.requiredFields") }}</v-label>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-form>
+    <UIAlert v-if="hasLoadingError || hasRequestError" v-bind:message="applicationStore.httpErrorMessage" />
+    <template v-slot:actions>
+      <v-btn v-if="!isReadOnly" color="accent" :disabled="!valid || hasNoChange" @click="
+        [PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
+          ? createUser()
+          : saveUser()
+        ">
         {{
           [PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
             ? $t("button.create")
             : $t("button.save")
         }}
       </v-btn>
-      <v-btn
-        v-if="[PROCESS_TYPE.EDIT, PROCESS_TYPE.EDIT_PROFILE].includes(processType) && !isReadOnly"
-        color="accent"
-        :disabled="hasNoChange"
-        @click="resetForm(cloneObject(originalUser), user, resetNotification)"
-      >
+      <v-btn v-if="[PROCESS_TYPE.EDIT, PROCESS_TYPE.EDIT_PROFILE].includes(processType) && !isReadOnly" color="accent" :disabled="hasNoChange"
+        @click="resetForm(cloneObject(originalUser), user, resetNotification)">
         {{ $t("button.reset") }}
       </v-btn>
-      <v-btn
-        color="accent"
-        @click="
-          onCancel(() => {
-            applicationStore.setOwnAccount(false);
-            applicationStore.setShowManageUserDialog(false);
-          })
-        "
-      >
+      <v-btn color="accent" @click="
+        onCancel(() => {
+          close();
+        })
+        ">
         {{ $t("button.cancel") }}
       </v-btn>
-    </v-card-actions>
-  </v-card>
-  <ConfirmCancelDialog
-    :isActive="showConfirmCancelDialog"
-    :onConfirm="
-      () => {
-        applicationStore.setOwnAccount(false);
-        applicationStore.setShowManageUserDialog(false);
-      }
-    "
-    :onCancel="() => closeConfirmCancelDialog()"
-  ></ConfirmCancelDialog>
+    </template>
+  </FloatingDialog>
+  <ConfirmCancelDialog :isActive="showConfirmCancelDialog" :onConfirm="close"
+    :onCancel="() => closeConfirmCancelDialog()"></ConfirmCancelDialog>
 </template>
-<style lang="scss" scoped>
-form > div {
-  display: flex;
-  padding-top: 8px;
-}
-.three_group_class > div {
-  max-width: 33.3333333333%;
-  width: 100%;
-}
-.two_group_class > div {
-  max-width: 50%;
-  width: 100%;
-}
-.one_group_class > div {
-  max-width: 100%;
-  width: 100%;
-}
-.three_group_class > div:nth-child(2),
-.two_group_class > div:nth-child(2) {
-  padding: 0 10px;
-}
-</style>
+
 <script setup>
 import {
   computed,
   provide,
-  onBeforeMount,
   onMounted,
   onUnmounted,
   toRaw,
@@ -271,7 +165,8 @@ import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
-import { trimSpacesInObject, useForm } from "@/lib/use-form.js";
+import { trimSpacesInObject } from "@/lib/form-helper.js";
+import { useForm } from "@/lib/use-form.js";
 import {
   finishUserDialog,
   handleDisplayName,
@@ -292,7 +187,10 @@ const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
 
+const props = defineProps(["index"]);
+
 provide("translationCategory", "user");
+provide("managedItemIndex", props.index);
 
 function setUserAttribute(name, value) {
   const attrs = user.value.attributes;
@@ -309,6 +207,10 @@ function setUserAttribute(name, value) {
     delete attrs[name];
   }
 }
+
+const close = () => {
+  applicationStore.removeManagedItem(props.index);
+};
 
 // Creating rules for the validation of form components.
 const getUserAttributeRules = (userAttribute) => {
@@ -355,31 +257,27 @@ const isDisabled = (attribute) => {
   );
 };
 
-onBeforeMount(() => {
-  applicationStore.setForm(form);
-});
-
 onMounted(() => {
+  const rules = {};
   profileStore.attributes.forEach((userAttribute) => {
-    applicationStore.clientRules[userAttribute.name] =
-      getUserAttributeRules(userAttribute);
+    rules[userAttribute.name] = getUserAttributeRules(userAttribute);
   });
-  Object.keys(applicationStore.clientRules).forEach((key) => {
-    applicationStore.clientAndServerRules[key] =
-      applicationStore.clientRules[key];
-  });
+  initClientRules(rules);
 });
 onUnmounted(() => {
-  applicationStore.removeAllResetEventListeners();
+  removeAllResetEventListeners();
+});
+const managedItem = computed(() => {
+  return applicationStore.managedItems[props.index];
 });
 const user = computed(() => {
-  return applicationStore.managedItem;
+  return managedItem.value.item;
 });
 const originalUser = computed(() => {
-  return applicationStore.savedItem;
+  return managedItem.value.originalItem;
 });
 const processType = computed(() => {
-  return applicationStore.processType;
+  return managedItem.value.processType;
 });
 const userRoles = computed(() => {
   return (
@@ -417,7 +315,7 @@ const createUser = () => {
     .then((response) => {
       const newUser = response.data;
       userStore.addUser(newUser);
-      finishUserDialog(newUser);
+      finishUserDialog(newUser, props.index);
       applicationStore.searchRequest(["users"]);
     })
     .catch((error) => {
@@ -436,6 +334,7 @@ const saveUser = () => {
     isServerValidationError,
     handleValidationErrorFromServer,
     hasRequestError,
+    props.index
   );
 };
 
@@ -454,11 +353,18 @@ const {
   handleValidationErrorFromServer,
   clearValidationError,
   isServerValidationError,
+  removeAllResetEventListeners,
+  initClientRules,
+  cols,
 } = useForm();
 watchChange(originalUser.value, user.value);
 
 const isReadOnly = computed(() => {
-  if (applicationStore.ownAccount) {
+  if (
+    user.value.attributes?.username &&
+    user.value.attributes.username[0] ===
+    profileStore.userData.attributes.username[0]
+  ) {
     return false;
   }
   return (

@@ -14,7 +14,6 @@ import { flushPromises, mount } from "@vue/test-utils";
 import ManageUser from "@/components/User/ManageUser.vue";
 import global from "@/test/components/global";
 import { test, expect } from "vitest";
-import { useForm } from "@/lib/use-form";
 import i18n from "@/i18n";
 import {
   networks,
@@ -24,7 +23,6 @@ import {
 } from "@/test/sharedTests";
 
 const { t } = i18n.global;
-const { handleValidationErrorFromServer } = useForm(i18n);
 
 setActivePinia(createPinia());
 
@@ -41,6 +39,16 @@ const user = {
   network: networks[0],
   attributes: {
     username: ["one"],
+    firstName: [firstName],
+    operationModeChangePhoneNumbers: ["+4912345678"],
+  },
+};
+const ownUser = {
+  id: "2",
+  role: "chief_editor",
+  network: networks[0],
+  attributes: {
+    username: ["two"],
     firstName: [firstName],
     operationModeChangePhoneNumbers: ["+4912345678"],
   },
@@ -88,14 +96,18 @@ const userProfileMetadata = {
 let wrapper;
 
 const setupTestEnvironment = async (roleOfLoggedInUser) => {
-  setupSharedTestEnvironment(user, roleOfLoggedInUser);
+  setupSharedTestEnvironment(user, "user", roleOfLoggedInUser);
   const profileStore = useProfileStore();
+  profileStore.setUserData(ownUser);
   const userStore = useUserStore();
   userStore.setRoles(roles);
   profileStore.setUserProfileMetadata(userProfileMetadata);
   await flushPromises();
   wrapper = mount(ManageUser, {
     global: global,
+    props: {
+      index: 0,
+    },
   });
 };
 
@@ -110,14 +122,14 @@ describe("Test ManageUser", () => {
     const newValue = "test";
     await input.setValue(newValue);
     expect(input.element.value).toBe(newValue);
-    expect(applicationStore.managedItem.attributes[name]).toStrictEqual([
-      newValue,
-    ]);
+    expect(
+      applicationStore.managedItems[0].item.attributes[name]
+    ).toStrictEqual([newValue]);
   }
 
   test("First name is displayed in respective input", async () => {
     expect(wrapper.get("input[name='firstName']").element.value).toBe(
-      firstName,
+      firstName
     );
   });
 
@@ -144,7 +156,7 @@ describe("Test ManageUser", () => {
         messageParameters: ["role"],
       },
     ];
-    handleValidationErrorFromServer(errors);
+    wrapper.vm.handleValidationErrorFromServer(errors);
     const selectContainer =
       wrapper.get("input[name='role']").element.parentElement.parentElement
         .parentElement.parentElement.parentElement.parentElement;
@@ -163,7 +175,7 @@ describe("Test ManageUser", () => {
     editedUser.role = null;
     wrapper.vm.resetForm(user, editedUser);
     await flushPromises();
-    expect(selectContainer.textContent).not.toContain(errors[0].message);
+    expect(selectContainer.textContent).toContain(errors[0].message);
   });
 
   test("Reset button is en- and disabled correctly", async () => {

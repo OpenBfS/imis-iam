@@ -29,13 +29,7 @@
             }`"
             size="small"
             v-bind="props"
-            @click="
-              applicationStore.setManagedItem({
-                ...item,
-              });
-              applicationStore.setProcessType(PROCESS_TYPE.EDIT);
-              applicationStore.setShowManageInstitutionDialog(true);
-            "
+            @click="editInstitution(item)"
           ></v-btn>
         </template>
         <span>{{
@@ -57,7 +51,10 @@ import { useProfileStore } from "@/stores/profile.js";
 import DataTableServer from "@/components/DataTableServer.vue";
 import { getExpInstitution } from "@/components/Institution/institution.js";
 import { onMounted } from "vue";
-import { createHeaders, initSelectedColumns } from "@/components/Search/searchTable.js";
+import {
+  createHeaders,
+  initSelectedColumns,
+} from "@/components/Search/searchTable.js";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -74,6 +71,13 @@ const defaultHeaders = [
 const props = defineProps({
   institutions: Array,
 });
+
+const editInstitution = (institution) => {
+  applicationStore.openInstitutionEditForm(
+    structuredClone(institution),
+    PROCESS_TYPE.EDIT
+  );
+};
 
 onMounted(() => {
   const columns = Object.keys(getExpInstitution()).map((key) => {

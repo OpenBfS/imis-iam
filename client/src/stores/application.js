@@ -7,7 +7,6 @@
 import { defineStore } from "pinia";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useUserStore } from "@/stores/user.js";
-import { nextTick } from "vue";
 import { HTTP } from "@/lib/http";
 import { useProfileStore } from "./profile";
 
@@ -27,23 +26,13 @@ export const useApplicationStore = defineStore("application", {
     showExportDialog: false,
     listToExport: "",
     isAllowedToManageUser: false,
+    // managedItems: [{item, originalItem}]
+    managedItems: [],
     managedItem: {},
-    clientAndServerRules: {},
-    clientRules: {},
-    // Object with fake rules. It contains maximal one rule per input field.
-    // These rules always return a message so they always lead to an
-    // error message for the attribute. This way we can use Vuetify's internal
-    // mechanism to show error messages. We use it to show validation errors
-    // coming from keycloak.
-    serverValidationRules: {},
-    attributesOfFieldsThatChanged: [],
-    resetEventListeners: [],
-    form: undefined,
     // Original unedited item so we can reset it when necessary
     savedItem: {},
     showManageEventDialog: false,
     showManageUserDialog: false,
-    showManageInstitutionDialog: false,
     showSessionExpiredDialog: false,
     showInfoDialog: false,
     processType: "",
@@ -58,13 +47,11 @@ export const useApplicationStore = defineStore("application", {
     isLoading: false,
     networks: [],
     abortControllers: {},
+    touchedEdge: undefined,
   }),
   actions: {
     setOwnAccount(data) {
       this.ownAccount = data;
-    },
-    setShowManageUserDialog(data) {
-      this.showManageUserDialog = data;
     },
     setShowManageEventDialog(data) {
       this.showManageEventDialog = data;
@@ -78,8 +65,43 @@ export const useApplicationStore = defineStore("application", {
     setProcessType(data) {
       this.processType = data;
     },
-    setShowManageInstitutionDialog(data) {
-      this.showManageInstitutionDialog = data;
+    addManagedItem(item) {
+      const index = this.managedItems.findIndex(
+        (i) => i.item.id === item.item.id
+      );
+      if (item.item.id && index !== -1) {
+        // Do not open the same managed item in multiple dialogs
+        this.raiseManagedItem(index);
+      } else {
+        // Leave one zIndex out so we can show a window placeholder at this index
+        item.zIndex = this.managedItems.length + 1;
+        this.managedItems.push(item);
+      }
+    },
+    removeManagedItem(index) {
+      this.managedItems[index] = undefined;
+      if (this.managedItems.slice(index).every((i) => i === undefined)) {
+        this.managedItems.splice(index, 1);
+      }
+
+      // Clean up all undefined items at the end of the array. Keep undefined items that
+      // are placed before the last defined one to prevent interferences of the dialogs.
+      let i = this.managedItems.length - 1;
+      while (i >= 0) {
+        if (this.managedItems[i] === undefined) {
+          this.managedItems.pop();
+        } else {
+          break;
+        }
+        i--;
+      }
+    },
+    raiseManagedItem(index) {
+      const oldIndex = structuredClone(this.managedItems[index]).zIndex;
+      this.managedItems.forEach((item) => {
+        if (item && item.zIndex > oldIndex) item.zIndex--;
+      });
+      this.managedItems[index].zIndex = this.managedItems.length;
     },
     setManagedItem(item) {
       this.managedItem = item;
@@ -92,21 +114,6 @@ export const useApplicationStore = defineStore("application", {
     },
     setlistToExport(message) {
       this.listToExport = message;
-    },
-    submitChangeInField(attribute) {
-      this.attributesOfFieldsThatChanged = [
-        ...this.attributesOfFieldsThatChanged,
-        attribute,
-      ];
-    },
-    removeChangeInField(attribute) {
-      const index = this.attributesOfFieldsThatChanged.findIndex(
-        (a) => a === attribute,
-      );
-      if (index !== -1) {
-        this.attributesOfFieldsThatChanged =
-          this.attributesOfFieldsThatChanged.toSpliced(index, 1);
-      }
     },
 
     /**
@@ -148,49 +155,6 @@ export const useApplicationStore = defineStore("application", {
           .finally(() => (this.isLoading = false));
       });
     },
-    setForm(newForm) {
-      this.form = newForm;
-    },
-    async clearValidationError(attribute) {
-      if (this.serverValidationRules[attribute]) {
-        delete this.serverValidationRules[attribute];
-        this.aggregateRulesForSingleAttribute(attribute);
-        await nextTick();
-        this.form.validate();
-      }
-    },
-    initClientRules(rules) {
-      this.clientRules = {};
-      this.serverValidationRules = {};
-      this.clientAndServerRules = {};
-      this.clientRules = rules;
-      this.clientAndServerRules = Object.assign({}, rules);
-    },
-    aggregateRulesForSingleAttribute(attribute) {
-      delete this.clientAndServerRules[attribute];
-      this.clientAndServerRules[attribute] = [];
-      if (this.clientRules[attribute]) {
-        this.clientAndServerRules[attribute].push(
-          ...this.clientRules[attribute],
-        );
-      }
-      if (this.serverValidationRules[attribute]) {
-        this.clientAndServerRules[attribute].push(
-          this.serverValidationRules[attribute],
-        );
-      }
-    },
-    addResetEventListener(listener) {
-      this.resetEventListeners.push(listener);
-    },
-    removeAllResetEventListeners() {
-      this.resetEventListeners = [];
-    },
-    callResetEventListener() {
-      this.resetEventListeners.forEach((listener) => {
-        listener();
-      });
-    },
     setNetworks(newNetworks) {
       this.networks = newNetworks;
     },
@@ -214,7 +178,9 @@ export const useApplicationStore = defineStore("application", {
     openUserEditForm(user, processType = PROCESS_TYPE.EDIT) {
       const profileStore = useProfileStore();
       const ownUsername = profileStore.getOwnUsername;
-      const isOwnAccount = ownUsername === user.attributes.username[0]
+      const isOwnAccount =
+        user.attributes?.username &&
+        ownUsername === user.attributes.username[0];
       const u = structuredClone(isOwnAccount ? profileStore.userData : user);
       const keys = Object.keys(u.attributes);
       keys.forEach((key) => {
@@ -226,10 +192,20 @@ export const useApplicationStore = defineStore("application", {
         }
       });
       this.setOwnAccount(isOwnAccount);
-      this.setManagedItem(u);
-      this.setSavedItem(structuredClone(u));
-      this.setProcessType(processType);
-      this.setShowManageUserDialog(true);
+      this.addManagedItem({
+        item: u,
+        originalItem: structuredClone(u),
+        type: "user",
+        processType,
+      });
+    },
+    openInstitutionEditForm(institution, processType = PROCESS_TYPE.EDIT) {
+      this.addManagedItem({
+        item: institution,
+        originalItem: structuredClone(institution),
+        type: "institution",
+        processType,
+      });
     },
   },
 });

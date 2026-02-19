@@ -17,7 +17,7 @@
       "
     >
       <v-card-text>
-        <v-form v-model="valid" ref="form" class="v-col v-col-10">
+        <v-form v-model="valid" class="v-col v-col-10">
           <Select
             :no-data-text="$t('label.noDataText')"
             :label="$t('institution.tags')"
@@ -60,12 +60,11 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onUpdated, ref, watch } from "vue";
+import { onUpdated, ref, watch } from "vue";
 import { useForm } from "@/lib/use-form.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { updateInstitution } from "@/components/Institution/institution.js";
 import { updateUser } from "@/components/User/user.js";
-import { useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
@@ -74,7 +73,6 @@ import { useI18n } from "vue-i18n";
 
 const props = defineProps(["close", "isActive", "type"]);
 
-const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
 const userStore = useUserStore();
@@ -83,7 +81,6 @@ const { t } = useI18n();
 const { hasLoadingError, hasRequestError, resetNotification } =
   useNotification();
 const {
-  form,
   translateError,
   valid,
   handleValidationErrorFromServer,
@@ -107,7 +104,7 @@ watch(
   () => {
     resetMessages();
     resetSelection();
-  },
+  }
 );
 
 const loadUserTags = async () => {
@@ -115,14 +112,10 @@ const loadUserTags = async () => {
     await profileStore.loadUserProfileMetadata();
   }
   userTagsAttribute.value = profileStore.attributes.find(
-    (attribute) => attribute.name === "tags",
+    (attribute) => attribute.name === "tags"
   );
   userTags.value = userTagsAttribute.value.validations.options.options;
 };
-
-onBeforeMount(() => {
-  applicationStore.setForm(form);
-});
 
 onUpdated(() => {
   resetMessages();
@@ -160,7 +153,7 @@ const editTags = async (remove) => {
   for (let i = 0; i < selectedItems.length; i++) {
     const id = selectedItems[i];
     const itemToEdit = structuredClone(
-      foundItems.find((item) => item.id === id),
+      foundItems.find((item) => item.id === id)
     );
     let newTags = [];
     const oldTags =
@@ -210,7 +203,7 @@ const editTags = async (remove) => {
         true,
         isServerValidationError,
         handleValidationErrorFromServer,
-        hasRequestError,
+        hasRequestError
       );
     } else if (isUserType()) {
       result = updateUser(
@@ -218,7 +211,7 @@ const editTags = async (remove) => {
         resetNotification,
         isServerValidationError,
         handleValidationErrorFromServer,
-        hasRequestError,
+        hasRequestError
       );
     }
     if (result.response !== 200) {
@@ -228,7 +221,7 @@ const editTags = async (remove) => {
         const attribute = errorObject.messageParameters[0];
         const translatedMessage = translateError(
           errorObject.message,
-          attribute,
+          attribute
         );
         newErrorMessages.push({
           key: itemToEdit.name,

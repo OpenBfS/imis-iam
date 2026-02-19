@@ -21,20 +21,20 @@
     :item-value="props.itemValue"
     :label="`${props.label}${props.required ? ' *' : ''}`"
     :model-value="
-      props.attribute && !props.modelValue
-        ? applicationStore.managedItem[props.attribute]
+      managedItemIndex !== undefined && props.attribute && !props.modelValue
+        ? applicationStore.managedItems[managedItemIndex].item[props.attribute]
         : props.modelValue
     "
     :name="props.name || props.attribute"
     :no-data-text="props.noDataText ?? $t('label.noDataText')"
     :prepend-inner-icon="props.prependInnerIcon"
-    :readonly="applicationStore.form?.readonly || props.readonly"
+    :readonly="form?.readonly || props.readonly"
     :return-object="props.returnObject"
     ref="combobox"
     :rules="[
       ...rules,
-      ...(applicationStore.clientAndServerRules[props.attribute]
-        ? applicationStore.clientAndServerRules[props.attribute]
+      ...(clientAndServerRules[props.attribute]
+        ? clientAndServerRules[props.attribute]
         : (props.rules ?? [])),
     ]"
     :type="props.type ?? 'text'"
@@ -50,7 +50,7 @@ import { computed, inject, ref } from "vue";
 import { useApplicationStore } from "@/stores/application.js";
 import { useForm } from "@/lib/use-form.js";
 
-const { createRequiredRule, onUpdateModelValue } = useForm();
+const { createRequiredRule } = useForm();
 
 const applicationStore = useApplicationStore();
 
@@ -93,10 +93,13 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue"]);
+const { form } = inject("useForm");
+const managedItemIndex = inject("managedItemIndex");
 const combobox = ref(null);
 const translationCategory = inject("translationCategory");
+const { onUpdateModelValue, clientAndServerRules } = inject("useForm");
 const rules = ref(
-  createRequiredRule(props.required, props.attribute, translationCategory),
+  createRequiredRule(props.required, props.attribute, translationCategory)
 );
 
 const validate = () => {
@@ -108,6 +111,6 @@ defineExpose({
 });
 
 const editable = computed(() => {
-  return !props.disabled && !props.readonly && !applicationStore.form?.readonly;
+  return !props.disabled && !props.readonly && !form?.readonly;
 });
 </script>
