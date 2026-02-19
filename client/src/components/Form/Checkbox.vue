@@ -24,6 +24,7 @@
         ? applicationStore.clientAndServerRules[props.attribute]
         : props.rules
     "
+    @change="(e) => { emit('change', e) }"
     @update:model-value="
       (event) => onUpdateModelValue(event, emit, props.attribute)
     "
@@ -53,5 +54,5 @@ const props = defineProps([
   // Custom props
   "attribute",
 ]);
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["change", "update:modelValue"]);
 </script>

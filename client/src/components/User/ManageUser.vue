@@ -47,6 +47,11 @@
               </v-col>
               <v-col cols="2">
                 <Checkbox
+                @change="(event) => {
+                    if (event.target.checked) {
+                      user.retired = false;
+                    }
+                  }"
                   attribute="enabled"
                   :label="$t('user.enabled')"
                   v-model="user.enabled"
@@ -55,6 +60,11 @@
               </v-col>
               <v-col cols="3" v-if="profileStore.userData.role === 'chief_editor'">
                 <Checkbox
+                  @change="(event) => {
+                    if (event.target.checked) {
+                      user.enabled = false;
+                    }
+                  }"
                   attribute="retired"
                   :label="$t('user.retired')"
                   v-model="user.retired"
@@ -253,7 +263,6 @@ import {
   onMounted,
   onUnmounted,
   toRaw,
-  watch,
 } from "vue";
 import { useNotification } from "@/lib/use-notification.js";
 import { useI18n } from "vue-i18n";
@@ -447,20 +456,6 @@ const {
   isServerValidationError,
 } = useForm();
 watchChange(originalUser.value, user.value);
-
-// Automatically disable user when marked as retired
-watch(() => user.value.retired, (newRetired) => {
-  if (newRetired) {
-    user.value.enabled = false;
-  }
-});
-
-// Automatically un-retire user when re-activated
-watch(() => user.value.enabled, (newEnabled) => {
-  if (newEnabled) {
-    user.value.retired = false;
-  }
-});
 
 const isReadOnly = computed(() => {
   if (applicationStore.ownAccount) {
