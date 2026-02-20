@@ -5,16 +5,22 @@
  * and comes with ABSOLUTELY NO WARRANTY!
  */
 
-import { computed, nextTick, provide, ref, useTemplateRef, watch } from "vue";
+import { computed, nextTick, provide, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application.js";
-import { areArraysDifferent } from "@/lib/form-helper";
+import { areArraysDifferent, areObjectsDifferent } from "@/lib/form-helper";
 
-export function useForm(i18n) {
+export function useForm(originalObject, changedObject, i18n) {
   const { t } = i18n?.global ?? useI18n();
   const form = useTemplateRef("form");
   const valid = ref(false);
-  const hasNoChange = ref(true);
+  const hasNoChange = computed(() => {
+    if (!originalObject && !changedObject) return true;
+    return (
+      !areObjectsDifferent(originalObject.value, changedObject.value) &&
+      changedAttributes.value.length === 0
+    );
+  });
   const showConfirmCancelDialog = ref(false);
   const regExprPhone = /^\+[1-9][0-9]{7,16}$/;
   const regExprEmail = /^\S+@\S+\.\S+$/;
@@ -102,25 +108,20 @@ export function useForm(i18n) {
       },
     ];
   };
-  const resetForm = async (
-    originalObject,
-    changedObject,
-    resetNotificationCallback
-  ) => {
+  const resetForm = async (resetNotificationCallback) => {
     if (resetNotificationCallback) resetNotificationCallback();
-    const changedKeys = Object.keys(changedObject);
-    changedKeys.forEach((key) => {
-      if (!originalObject[key]) {
-        delete changedObject[key];
+    const keysOfChangedItem = Object.keys(changedObject.value);
+    keysOfChangedItem.forEach((key) => {
+      if (!originalObject.value[key]) {
+        delete changedObject.value[key];
       }
     });
-    Object.assign(changedObject, originalObject);
+    Object.assign(changedObject.value, structuredClone(originalObject.value));
     await nextTick();
     changedAttributes.value = [];
     aggregateRules();
     form.value?.validate();
     callResetEventListener();
-    hasNoChange.value = true;
   };
 
   const addResetEventListener = (listener) => {
@@ -143,61 +144,6 @@ export function useForm(i18n) {
     if (index !== -1) {
       changedAttributes.value = changedAttributes.value.toSpliced(index, 1);
     }
-  };
-
-  const areObjectsDifferent = (a, b) => {
-    const allKeys = [...Object.keys(a), ...Object.keys(b)];
-    for (let i = 0; i < allKeys.length; i++) {
-      const key = allKeys[i];
-      if (
-        (a[key] === undefined && b[key]?.length === 0) ||
-        (a[key]?.length === 0 && b[key] === undefined)
-      ) {
-        // Treat empty array as if it was undefined because in the end both mean that there is no value for an attribute.
-        continue;
-      }
-      if (a[key] === null && b[key] === null) {
-        continue;
-      } else if (
-        (a[key] === null || b[key] === null) &&
-        ((a[key] === null && b[key] !== null) ||
-          (a[key] !== null && b[key] === null))
-      ) {
-        return true;
-      } else if (typeof a[key] === "object" && typeof b[key] === "object") {
-        // Compare arrays
-        if (a[key].length && b[key].length && areArraysDifferent(a, b)) {
-          return true;
-        } else {
-          // Compare nested objects
-          if (areObjectsDifferent(a[key], b[key])) {
-            return true;
-          }
-        }
-      } else if (a[key] !== b[key]) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const watchChange = (originalObject, changedObject) => {
-    watch(
-      () => changedAttributes,
-      () => {
-        updateHasNoChange(originalObject, changedObject);
-      },
-      { deep: true }
-    );
-    watch(changedObject, () => {
-      updateHasNoChange(originalObject, changedObject);
-    });
-  };
-
-  const updateHasNoChange = (originalObject, changedObject) => {
-    hasNoChange.value =
-      !areObjectsDifferent(originalObject, changedObject) &&
-      changedAttributes.value.length === 0;
   };
 
   const onCancel = (cancelCallback) => {
@@ -236,7 +182,7 @@ export function useForm(i18n) {
           const charAfterDash = translationKey.charAt(index + 1);
           translationKey = translationKey.replace(
             `-${charAfterDash}`,
-            charAfterDash.toUpperCase()
+            charAfterDash.toUpperCase(),
           );
         }
         index = translationKey.indexOf("-");
@@ -266,7 +212,7 @@ export function useForm(i18n) {
       const message = errorObject.message;
       const translatedMessage = translateError(
         message,
-        errorObject.messageParameters
+        errorObject.messageParameters,
       );
       // Create rules that can be used by the validation mechanism of Vuetify.
       serverValidationRules.value[attribute] = () => {
@@ -306,12 +252,12 @@ export function useForm(i18n) {
     clientAndServerRules.value[attribute] = [];
     if (clientRules.value[attribute]) {
       clientAndServerRules.value[attribute].push(
-        ...clientRules.value[attribute]
+        ...clientRules.value[attribute],
       );
     }
     if (serverValidationRules.value[attribute]) {
       clientAndServerRules.value[attribute].push(
-        serverValidationRules.value[attribute]
+        serverValidationRules.value[attribute],
       );
     }
   };
@@ -405,7 +351,6 @@ export function useForm(i18n) {
     validRegex,
     validLength,
     resetForm,
-    watchChange,
     onCancel,
     showConfirmCancelDialog,
     closeConfirmCancelDialog,
@@ -425,4 +370,3 @@ export function useForm(i18n) {
     cols,
   };
 }
-

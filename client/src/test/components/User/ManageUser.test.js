@@ -173,7 +173,7 @@ describe("Test ManageUser", () => {
     expect(selectContainer.textContent).toContain(errors[0].message);
     const editedUser = structuredClone(user);
     editedUser.role = null;
-    wrapper.vm.resetForm(user, editedUser);
+    wrapper.vm.resetForm(() => {});
     await flushPromises();
     expect(selectContainer.textContent).toContain(errors[0].message);
   });

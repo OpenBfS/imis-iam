@@ -219,14 +219,13 @@ const {
   validGermanDate,
   doesRegexMatchWholeString,
   germanDateRegex,
-  watchChange,
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
   initClientRules,
   handleValidationErrorFromServer,
   isServerValidationError,
-} = useForm();
+} = useForm(emptyMail, mail);
 const expiryDateString = ref("");
 const isExpiryDatePickerOpen = ref(false);
 const userData = profileStore.userData;
@@ -260,7 +259,7 @@ const mail = ref({
   selectedSender: senderList.value[0] || "",
 });
 const emptyMail = structuredClone(mail.value);
-watchChange(emptyMail, mail.value);
+
 const toggleExpiryDatePicker = () => {
   isExpiryDatePickerOpen.value = !isExpiryDatePickerOpen.value;
 };

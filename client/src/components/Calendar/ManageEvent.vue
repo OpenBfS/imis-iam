@@ -116,12 +116,16 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
+const props = defineProps(["index"]);
+
 const { hasRequestError, resetNotification } = useNotification();
 const applicationStore = useApplicationStore();
 const eventsStore = useEventsStore();
 const profileStore = useProfileStore();
-const event = ref(applicationStore.managedItem);
-const originalEvent = { ...event.value };
+
+const managedItem = applicationStore.managedItems[props.index];
+const event = ref(managedItem.item);
+const originalEvent = ref(managedItem.originalItem);
 const processType = ref(applicationStore.processType);
 
 const readonly = event.value.readonly || processType.value === PROCESS_TYPE.SHOW;
@@ -132,14 +136,13 @@ const {
   hasNoChange,
   reqField,
   resetForm,
-  watchChange,
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
   initClientRules,
   handleValidationErrorFromServer,
   isServerValidationError,
-} = useForm();
+} = useForm(originalEvent, event);
 onBeforeMount(() => {
   initClientRules({
     description: reqField(t("calendar.requiredDescription")),
@@ -177,8 +180,6 @@ const updateEvent = () => {
         : (hasRequestError.value = true);
     });
 };
-
-watchChange(originalEvent, event.value);
 
 const startDateUpdatedCallback = (newDate) => {
   event.value.startDate = newDate;

@@ -6,14 +6,13 @@
  */
 import { setActivePinia, createPinia } from "pinia";
 import { test, expect, expectTypeOf } from "vitest";
-import { trimSpacesInObject } from "@/lib/form-helper.js";
+import { areArraysDifferent, trimSpacesInObject } from "@/lib/form-helper.js";
 import { useForm } from "@/lib/use-form";
 import i18n from "@/i18n";
 import { getExpInstitution } from "@/components/Institution/institution";
 import { defineComponent } from "vue";
 import { mount } from "@vue/test-utils";
 import global from "@/test/components/global";
-import { areArraysDifferent } from "@/lib/form-helper.js";
 
 setActivePinia(createPinia());
 const { t } = i18n.global;

@@ -306,7 +306,7 @@
           hasNoChange && initialShowPostalAddress === showPostalAddress
         "
         @click="
-          resetForm(originalInstitution, institution, resetNotification);
+          resetForm(resetNotification);
           showPostalAddress = initialShowPostalAddress;
         "
       >
@@ -409,7 +409,6 @@ const {
   resetForm,
   validRegex,
   noLeadingTrailingSpaces,
-  watchChange,
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
@@ -418,7 +417,7 @@ const {
   removeAllResetEventListeners,
   initClientRules,
   cols,
-} = useForm();
+} = useForm(originalInstitution, institution);
 
 const measIdAndNameOrNothing = () => {
   return [
@@ -558,8 +557,6 @@ const saveInstitution = () => {
     props.index
   );
 };
-
-watchChange(originalInstitution, institution.value);
 
 const close = () => {
   applicationStore.removeManagedItem(props.index);

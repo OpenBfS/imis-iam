@@ -134,7 +134,7 @@
         }}
       </v-btn>
       <v-btn v-if="[PROCESS_TYPE.EDIT, PROCESS_TYPE.EDIT_PROFILE].includes(processType) && !isReadOnly" color="accent" :disabled="hasNoChange"
-        @click="resetForm(cloneObject(originalUser), user, resetNotification)">
+        @click="resetForm(resetNotification)">
         {{ $t("button.reset") }}
       </v-btn>
       <v-btn color="accent" @click="
@@ -157,6 +157,7 @@ import {
   onMounted,
   onUnmounted,
   toRaw,
+  ref,
 } from "vue";
 import { useNotification } from "@/lib/use-notification.js";
 import { useI18n } from "vue-i18n";
@@ -267,18 +268,11 @@ onMounted(() => {
 onUnmounted(() => {
   removeAllResetEventListeners();
 });
-const managedItem = computed(() => {
-  return applicationStore.managedItems[props.index];
-});
-const user = computed(() => {
-  return managedItem.value.item;
-});
-const originalUser = computed(() => {
-  return managedItem.value.originalItem;
-});
-const processType = computed(() => {
-  return managedItem.value.processType;
-});
+const managedItem = applicationStore.managedItems[props.index];
+const user = ref(managedItem.item);
+const originalUser = ref(managedItem.originalItem);
+const processType = managedItem.processType;
+
 const userRoles = computed(() => {
   return (
     userStore.roles?.map((item) => {
@@ -300,16 +294,13 @@ const filteredAttributeGroups = computed(() => {
       return (
         (user.value.attributes?.username &&
           profileStore.getOwnUsername === user.value.attributes.username[0]) ||
-        profileStore.filteredAttributesOfGroup(group.name, toRaw(user))
+        profileStore.filteredAttributesOfGroup(group.name, toRaw(user.value))
           ?.length > 0
       );
     }) ?? []
   );
 });
-// Deep Copy for objects
-const cloneObject = (obj) => {
-  return JSON.parse(JSON.stringify(obj));
-};
+
 const createUser = () => {
   HTTP.post("/iam/user", trimSpacesInObject(user.value))
     .then((response) => {
@@ -346,7 +337,6 @@ const {
   validRegex,
   validLength,
   resetForm,
-  watchChange,
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
@@ -356,8 +346,7 @@ const {
   removeAllResetEventListeners,
   initClientRules,
   cols,
-} = useForm();
-watchChange(originalUser.value, user.value);
+} = useForm(originalUser, user);
 
 const isReadOnly = computed(() => {
   if (

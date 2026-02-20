@@ -11,11 +11,27 @@ import ChipTextField from "@/components/Form/ChipTextField.vue";
 import global from "@/test/components/global";
 import { test, expect } from "vitest";
 import i18n from "@/i18n";
-import { useForm } from "@/lib/use-form";
+import { useApplicationStore } from "@/stores/application";
+import { networks, setupSharedTestEnvironment } from "@/test/sharedTests";
+import { ref } from "vue";
 
 const { t } = i18n.global;
 
 setActivePinia(createPinia());
+const applicationStore = useApplicationStore();
+
+const firstName = "One";
+const user = {
+  id: "1",
+  role: "chief_editor",
+  network: networks[0],
+  attributes: {
+    username: ["one"],
+    firstName: [firstName],
+    operationModeChangePhoneNumbers: ["+4912345678"],
+  },
+};
+setupSharedTestEnvironment(user, "user", "chief_editor");
 
 const errorMessage = "Does not match";
 const rulesToSpyOn = {
@@ -24,20 +40,37 @@ const rulesToSpyOn = {
 };
 const propRuleSpy = vi.spyOn(rulesToSpyOn, "propRule");
 const clientRuleSpy = vi.spyOn(rulesToSpyOn, "clientRule");
+
+applicationStore.managedItems;
+
+let changedAttributes = ref([]),
+  submitChange = () => {},
+  removeChange = () => {},
+  addResetEventListener = () => {},
+  onUpdateModelValue = () => {},
+  clientAndServerRules = { test: [rulesToSpyOn.clientRule] },
+  form;
+
 const wrapper = mount(ChipTextField, {
-  global: global,
+  global: {
+    provide: {
+      managedItemIndex: 0,
+      useForm: {
+        changedAttributes,
+        submitChange,
+        removeChange,
+        addResetEventListener,
+        onUpdateModelValue,
+        clientAndServerRules,
+        form,
+      },
+    },
+    ...global,
+  },
   props: {
     attribute: "test",
+    clearable: true,
     rules: [rulesToSpyOn.propRule],
-  },
-  setup() {
-    const { initClientRules } = useForm();
-    initClientRules({
-      test: [rulesToSpyOn.clientRule],
-    });
-    return {
-      initClientRules,
-    };
   },
 });
 const inputField = wrapper.find("input");
