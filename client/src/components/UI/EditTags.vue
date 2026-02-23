@@ -85,7 +85,7 @@ const {
   valid,
   handleValidationErrorFromServer,
   isServerValidationError,
-} = useForm();
+} = useForm({});
 const selectedTags = ref([]);
 const userTagsAttribute = ref(null);
 const userTags = ref([]);

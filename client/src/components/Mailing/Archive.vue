@@ -182,20 +182,14 @@ tr {
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import { HTTP } from "@/lib/http.js";
-import { useForm } from "@/lib/use-form.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { useApplicationStore } from "@/stores/application.js";
 import { useMailStore } from "@/stores/mail.js";
 import { useRoute } from "vue-router";
 import debounce from "debounce";
 import { useI18n } from "vue-i18n";
+import { validGermanDate, germanDateRegex, doesRegexMatchWholeString, dateStringToDate } from "@/lib/form-helper";
 
-const {
-  dateStringToDate,
-  validGermanDate,
-  doesRegexMatchWholeString,
-  germanDateRegex,
-} = useForm();
 const { d } = useI18n();
 const startDate = ref(new Date());
 const startDateString = ref("");

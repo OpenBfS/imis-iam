@@ -10,7 +10,7 @@ import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application.js";
 import { areArraysDifferent, areObjectsDifferent } from "@/lib/form-helper";
 
-export function useForm(originalObject, changedObject, i18n) {
+export function useForm({ originalObject, changedObject, rules, i18n }) {
   const { t } = i18n?.global ?? useI18n();
   const form = useTemplateRef("form");
   const valid = ref(false);
@@ -22,92 +22,37 @@ export function useForm(originalObject, changedObject, i18n) {
     );
   });
   const showConfirmCancelDialog = ref(false);
-  const regExprPhone = /^\+[1-9][0-9]{7,16}$/;
-  const regExprEmail = /^\S+@\S+\.\S+$/;
-  const regExprPostalCode = /^\d{5}$/;
-  const noLeadingTrailingSpaces = /\S.*\S/;
-  const germanDateRegex = /[\d]{1,2}\.[\d]{1,2}\.[\d]{4}/;
   const changedAttributes = ref([]);
   const resetEventListeners = ref([]);
-  const clientAndServerRules = ref({});
-  const clientRules = ref({});
+  const clientRules = ref(rules);
   // Object with fake rules. It contains maximal one rule per input field.
   // These rules always return a message so they always lead to an
   // error message for the attribute. This way we can use Vuetify's internal
   // mechanism to show error messages. We use it to show validation errors
   // coming from keycloak.
   const serverValidationRules = ref({});
+  const clientAndServerRules = computed(() => {
+    const tmpRules = {};
+    // First add the server rules and then the client rules because Vuetify shows only one
+    // error message at a time and if the user saved an item already they obviously passed
+    // the client rules and the server rules are more important so we decide to show them.
+    Object.keys(serverValidationRules.value).forEach((key) => {
+      if (!tmpRules[key]) {
+        tmpRules[key] = [];
+      }
+      tmpRules[key].push(serverValidationRules.value[key]);
+    });
+    if (clientRules.value) {
+      Object.keys(clientRules.value).forEach((key) => {
+        if (!tmpRules[key]) {
+          tmpRules[key] = [];
+        }
+        tmpRules[key].push(...clientRules.value[key]);
+      });
+    }
+    return tmpRules;
+  });
   const dialogWidth = ref(600);
-  // Validation rules
-  const validMail = (validMsg) => {
-    return [
-      (v) => !v || doesRegexMatchWholeString(regExprEmail, v) || validMsg,
-    ];
-  };
-  const validPhone = (validMsg) => {
-    return [
-      (v) => !v || doesRegexMatchWholeString(regExprPhone, v) || validMsg,
-    ];
-  };
-  const validPostalcode = (validMsg) => {
-    return [(v) => regExprPostalCode.test(v) || v == "" || validMsg];
-  };
-  const dateStringToDate = (dateString) => {
-    const parts = dateString.split(".");
-    const year = parts[2];
-    const month = parts[1].length === 1 ? "0" + parts[1] : parts[1];
-    const day = parts[0].length === 1 ? "0" + parts[0] : parts[0];
-    const date = new Date(`${year}-${month}-${day}T23:59:59`);
-    date.setMilliseconds(999);
-    return date.toDateString() !== "Invalid Date" ? date : undefined;
-  };
-  const doesRegexMatchWholeString = (regex, text) => {
-    const matches = regex.exec(text);
-    return matches && matches[0] === text;
-  };
-  const validGermanDate = () => {
-    return [
-      (v) =>
-        !v ||
-        v.length === 0 ||
-        (doesRegexMatchWholeString(germanDateRegex, v) &&
-          dateStringToDate(v) !== undefined) ||
-        t("error.validDate"),
-    ];
-  };
-  const reqField = (reqMsg) => {
-    return [(v) => (v && Boolean(v.toString())) || reqMsg];
-  };
-  const reqMultipleSelect = (reqMsg) => {
-    return [(v) => !!(v && v.length) || reqMsg];
-  };
-
-  const validRegex = (regex, validMsg) => {
-    return [
-      (v) =>
-        // Make sure that the whole string has to be a match and that this
-        // match is the only one.
-        // Otherwise a string could be valid even if it had two or more
-        // matches.
-        !v ||
-        (v.toString().match(regex)?.[0] === v.toString() &&
-          v.toString().match(regex)?.[0].length === v.toString().length) ||
-        validMsg,
-    ];
-  };
-  const validLength = (minLength, maxLength, validMsg) => {
-    return [
-      (v) => {
-        return (
-          !v ||
-          (v &&
-            (!minLength || (minLength && v.toString().length >= minLength)) &&
-            (!maxLength || (maxLength && v.toString().length <= maxLength))) ||
-          validMsg
-        );
-      },
-    ];
-  };
   const resetForm = async (resetNotificationCallback) => {
     if (resetNotificationCallback) resetNotificationCallback();
     const keysOfChangedItem = Object.keys(changedObject.value);
@@ -119,7 +64,6 @@ export function useForm(originalObject, changedObject, i18n) {
     Object.assign(changedObject.value, structuredClone(originalObject.value));
     await nextTick();
     changedAttributes.value = [];
-    aggregateRules();
     form.value?.validate();
     callResetEventListener();
   };
@@ -154,9 +98,8 @@ export function useForm(originalObject, changedObject, i18n) {
     showConfirmCancelDialog.value = false;
   };
 
-  const initClientRules = (rules) => {
+  const setClientRules = (rules) => {
     clientRules.value = rules;
-    clientAndServerRules.value = Object.assign({}, rules);
   };
 
   /**
@@ -218,54 +161,15 @@ export function useForm(originalObject, changedObject, i18n) {
       serverValidationRules.value[attribute] = () => {
         return translatedMessage;
       };
-      aggregateRules();
       // Need to wait for the DOM. Otherwise the error messages are not automatically shown.
       await nextTick();
       form.value?.validate();
     }
   };
 
-  const aggregateRules = () => {
-    Object.keys(clientAndServerRules.value).forEach((key) => {
-      delete clientAndServerRules.value[key];
-      clientAndServerRules.value[key] = [];
-    });
-    // First add the server rules and then the client rules because Vuetify shows only one
-    // error message at a time and if the user saved an item already they obviously passed
-    // the client rules and the server rules are more important so we decide to show them.
-    Object.keys(serverValidationRules.value).forEach((key) => {
-      if (!clientAndServerRules.value[key]) {
-        // Necessary because it could be that the backend returns errors
-        // for text fields which have no rules on the client side.
-        // Therefore, rules and their keys of client and server might differ.
-        clientAndServerRules.value[key] = [];
-      }
-      clientAndServerRules.value[key].push(serverValidationRules.value[key]);
-    });
-    Object.keys(clientRules.value).forEach((key) => {
-      clientAndServerRules.value[key].push(...clientRules.value[key]);
-    });
-  };
-
-  const aggregateRulesForSingleAttribute = (attribute) => {
-    delete clientAndServerRules.value[attribute];
-    clientAndServerRules.value[attribute] = [];
-    if (clientRules.value[attribute]) {
-      clientAndServerRules.value[attribute].push(
-        ...clientRules.value[attribute],
-      );
-    }
-    if (serverValidationRules.value[attribute]) {
-      clientAndServerRules.value[attribute].push(
-        serverValidationRules.value[attribute],
-      );
-    }
-  };
-
   const clearValidationError = async (attribute) => {
     if (serverValidationRules.value[attribute]) {
       delete serverValidationRules.value[attribute];
-      aggregateRulesForSingleAttribute(attribute);
       await nextTick();
       form.value.validate();
     }
@@ -276,9 +180,7 @@ export function useForm(originalObject, changedObject, i18n) {
   };
 
   const onUpdateModelValue = (event, emit, attribute) => {
-    if (clientAndServerRules.value) {
-      clearValidationError(attribute);
-    }
+    clearValidationError(attribute);
     emit("update:modelValue", event);
   };
 
@@ -289,30 +191,6 @@ export function useForm(originalObject, changedObject, i18n) {
       ? `: ${error.response.statusText}`
       : "";
     applicationStore.setHttpErrorMessage(`${error.message}${statusText}`);
-  };
-
-  // Creates a rule for required fields with a specific message if possible.
-  // "translationCategory" is the top-level property in the locale file, e.g. "institution".
-  const createRequiredRule = (required, attribute, translationCategory) => {
-    const newRules = [];
-    if (required === true) {
-      if (attribute && translationCategory) {
-        const translatedAttribute = t(`${translationCategory}.${attribute}`);
-        const fullTranslation = t("error.requiredField", [translatedAttribute]);
-        if (
-          translationCategory !== undefined &&
-          translatedAttribute?.length > 0 &&
-          fullTranslation?.length > 0
-        ) {
-          newRules.push(...reqField(fullTranslation));
-        } else {
-          newRules.push(...reqField(t("error.requiredFieldGeneric")));
-        }
-      } else {
-        newRules.push(...reqField(t("error.requiredFieldGeneric")));
-      }
-    }
-    return newRules;
   };
 
   const setDialogWidth = (width) => {
@@ -339,22 +217,10 @@ export function useForm(originalObject, changedObject, i18n) {
     form,
     valid,
     hasNoChange,
-    validMail,
-    reqField,
-    validPhone,
-    validPostalcode,
-    validGermanDate,
-    reqMultipleSelect,
-    dateStringToDate,
-    doesRegexMatchWholeString,
-    germanDateRegex,
-    validRegex,
-    validLength,
     resetForm,
     onCancel,
     showConfirmCancelDialog,
     closeConfirmCancelDialog,
-    initClientRules,
     handleValidationErrorFromServer,
     clearValidationError,
     isServerValidationError,
@@ -362,11 +228,10 @@ export function useForm(originalObject, changedObject, i18n) {
     translateError,
     areArraysDifferent,
     showFormError,
-    createRequiredRule,
-    noLeadingTrailingSpaces,
     removeAllResetEventListeners,
     clientAndServerRules,
     clientRules,
+    setClientRules,
     cols,
   };
 }

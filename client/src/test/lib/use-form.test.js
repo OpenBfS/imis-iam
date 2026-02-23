@@ -21,7 +21,7 @@ test("Test handleValidationErrorFromServer", async () => {
   const TestComponent = defineComponent({
     setup() {
       return {
-        ...useForm(),
+        ...useForm({}),
       };
     },
   });

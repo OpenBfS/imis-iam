@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onMounted, onUnmounted, provide, ref } from "vue";
+import { onMounted, onUnmounted, provide, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useApplicationStore } from "@/stores/application.js";
 import { useUserStore } from "@/stores/user.js";
@@ -80,6 +80,7 @@ import { useNotification } from "@/lib/use-notification.js";
 import { useForm } from "@/lib/use-form.js";
 import { createSearchQueryString, HTTP, paramsSerializer } from "@/lib/http.js";
 import Combobox from "../Form/Combobox.vue";
+import { validLength } from "@/lib/form-helper";
 
 const applicationStore = useApplicationStore();
 const institutionStore = useInstitutionStore();
@@ -132,12 +133,8 @@ const csvOptions = ref({
   encoding: encoding[0],
   quoteType: quoteTypes[0].value,
 });
-const { form, valid, validLength, removeAllResetEventListeners, initClientRules } = useForm();
-
-provide("translationCategory", "export");
-
-onBeforeMount(() => {
-  initClientRules({
+const { valid, removeAllResetEventListeners } = useForm({
+  rules: {
     fieldSeparator: [
       ...validLength(
         undefined,
@@ -158,8 +155,10 @@ onBeforeMount(() => {
         }),
       ),
     ],
-  });
+  }
 });
+
+provide("translationCategory", "export");
 
 onMounted(() => {
   if (

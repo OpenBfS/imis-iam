@@ -183,7 +183,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { HTTP } from "@/lib/http.js";
 import { useApplicationStore } from "@/stores/application.js";
 import { useMailStore } from "@/stores/mail.js";
@@ -196,6 +196,7 @@ import Textarea from "@/components/Form/Textarea.vue";
 import TextField from "@/components/Form/TextField.vue";
 import Select from "@/components/Form/Select.vue";
 import ConfirmCancelDialog from "@/components/ConfirmCancelDialog.vue";
+import { reqField, validGermanDate, germanDateRegex, doesRegexMatchWholeString, dateStringToDate } from "@/lib/form-helper";
 
 const props = defineProps({
   mailingLists: Array,
@@ -212,20 +213,21 @@ const { hasRequestError, hasLoadingError, resetNotification } =
   useNotification();
 // Mail
 const {
-  form,
   valid,
-  reqField,
-  dateStringToDate,
-  validGermanDate,
-  doesRegexMatchWholeString,
-  germanDateRegex,
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
-  initClientRules,
   handleValidationErrorFromServer,
   isServerValidationError,
-} = useForm(emptyMail, mail);
+} = useForm({
+  originalObject: emptyMail, changedObject: mail, rules: {
+    expiryDate: validGermanDate(),
+    recipient: reqField(t("emails.requiredRecipient")),
+    subject: reqField(t("emails.requiredSubject")),
+    text: reqField(t("emails.requiredContent")),
+    type: reqField(t("emails.requiredType")),
+  }
+});
 const expiryDateString = ref("");
 const isExpiryDatePickerOpen = ref(false);
 const userData = profileStore.userData;
@@ -313,15 +315,6 @@ const sendMail = () => {
         : (hasRequestError.value = true);
     });
 };
-onBeforeMount(() => {
-  initClientRules({
-    expiryDate: validGermanDate(),
-    recipient: reqField(t("emails.requiredRecipient")),
-    subject: reqField(t("emails.requiredSubject")),
-    text: reqField(t("emails.requiredContent")),
-    type: reqField(t("emails.requiredType")),
-  });
-});
 onMounted(() => {
   getTypes();
 });

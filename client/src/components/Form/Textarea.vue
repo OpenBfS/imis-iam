@@ -39,11 +39,10 @@
 </template>
 
 <script setup>
+import { createRequiredRule } from "@/lib/form-helper";
 import { useApplicationStore } from "@/stores/application.js";
-import { useForm } from "@/lib/use-form.js";
 import { computed, inject, ref } from "vue";
 
-const { createRequiredRule } = useForm();
 const { onUpdateModelValue, clientAndServerRules } = inject("useForm");
 const managedItemIndex = inject("managedItemIndex");
 

@@ -48,9 +48,7 @@
 <script setup>
 import { computed, inject, ref } from "vue";
 import { useApplicationStore } from "@/stores/application.js";
-import { useForm } from "@/lib/use-form.js";
-
-const { createRequiredRule } = useForm();
+import { createRequiredRule } from "@/lib/form-helper";
 
 const applicationStore = useApplicationStore();
 

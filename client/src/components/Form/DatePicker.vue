@@ -19,8 +19,8 @@
         :rules="rules"
         @click="
           if (!props.readonly) {
-            isDatePickerOpen = true;
-          }
+          isDatePickerOpen = true;
+        }
         "
         @click:clear="handleClearDateTextfield"
         @input="handleInputForDate"
@@ -29,9 +29,9 @@
     <v-expand-transition>
       <v-date-picker
         v-click-outside="{
-          handler: toggleDatePicker,
-          closeConditional: dateCloseConditional,
-          include: includedElements,
+        handler: toggleDatePicker,
+        closeConditional: dateCloseConditional,
+        include: includedElements,
         }"
         :hide-header="true"
         :model-value="internalDate"
@@ -58,8 +58,8 @@
 
 <script setup>
 import { computed, inject, onMounted, ref, watch } from "vue";
-import { useForm } from "@/lib/use-form.js";
 import { useI18n } from "vue-i18n";
+import { reqField, validGermanDate, germanDateRegex, doesRegexMatchWholeString, dateStringToDate } from "@/lib/form-helper";
 
 const props = defineProps([
   "dateUpdatedCallback",
@@ -72,13 +72,6 @@ const props = defineProps([
 
 const { form } = inject("useForm");
 
-const {
-  dateStringToDate,
-  validGermanDate,
-  doesRegexMatchWholeString,
-  reqField,
-  germanDateRegex,
-} = useForm();
 const { d, t } = useI18n();
 const id = ref();
 const internalDate = ref(new Date());

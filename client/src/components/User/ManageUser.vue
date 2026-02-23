@@ -17,15 +17,15 @@
           user?.attributes.username[0] }) }}
       </span>
       <span v-else-if="processType === PROCESS_TYPE.EDIT_PROFILE" class="text-h5">{{ $t("user.editProfileTitle")
-        }}</span>
+      }}</span>
     </template>
     <v-form v-model="valid" ref="form" :readonly="isReadOnly">
       <v-container class="pa-3">
         <v-row>
           <v-col v-if="processType !== PROCESS_TYPE.EDIT" cols="12">
             <TextField attribute="username" density="compact" :ref="'username'" :variant="[PROCESS_TYPE.ADD, PROCESS_TYPE.COPY].indexOf(processType) !== -1
-                ? 'underlined'
-                : 'plain'
+              ? 'underlined'
+              : 'plain'
               " :label="$t('user.username')" :model-value="user.attributes.username" required @update:model-value="
                 clearValidationError('username');
               setUserAttribute('username', $event);
@@ -36,9 +36,9 @@
           <v-col style="max-width: fit-content">
             <Checkbox
               @change="(event) => {
-                if (event.target.checked) {
-                  user.retired = false;
-                }
+              if (event.target.checked) {
+                user.retired = false;
+              }
               }"
               attribute="enabled"
               :label="$t('user.enabled')"
@@ -48,9 +48,9 @@
           <v-col v-if="profileStore.userData.role === 'chief_editor'" style="max-width: fit-content">
             <Checkbox
               @change="(event) => {
-                if (event.target.checked) {
-                  user.enabled = false;
-                }
+              if (event.target.checked) {
+                user.enabled = false;
+              }
               }"
               attribute="retired"
               :label="$t('user.retired')"
@@ -166,7 +166,7 @@ import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useInstitutionStore } from "@/stores/institution.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { useUserStore } from "@/stores/user.js";
-import { trimSpacesInObject } from "@/lib/form-helper.js";
+import { trimSpacesInObject, validLength, validRegex } from "@/lib/form-helper.js";
 import { useForm } from "@/lib/use-form.js";
 import {
   finishUserDialog,
@@ -263,7 +263,7 @@ onMounted(() => {
   profileStore.attributes.forEach((userAttribute) => {
     rules[userAttribute.name] = getUserAttributeRules(userAttribute);
   });
-  initClientRules(rules);
+  setClientRules(rules);
 });
 onUnmounted(() => {
   removeAllResetEventListeners();
@@ -334,8 +334,6 @@ const {
   form,
   valid,
   hasNoChange,
-  validRegex,
-  validLength,
   resetForm,
   onCancel,
   showConfirmCancelDialog,
@@ -344,9 +342,12 @@ const {
   clearValidationError,
   isServerValidationError,
   removeAllResetEventListeners,
-  initClientRules,
+  setClientRules,
   cols,
-} = useForm(originalUser, user);
+} = useForm({
+  originalObject: originalUser,
+  changedObject: user
+});
 
 const isReadOnly = computed(() => {
   if (

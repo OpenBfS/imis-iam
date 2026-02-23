@@ -23,8 +23,8 @@
       ref="form"
       :readonly="
         !profileStore.isAllowedToManage ||
-        (profileStore.userData.role !== 'chief_editor' &&
-          institution.network !== profileStore.userData.network)
+      (profileStore.userData.role !== 'chief_editor' &&
+        institution.network !== profileStore.userData.network)
       "
     >
       <v-container class="pa-3">
@@ -55,7 +55,7 @@
               :attribute="'measFacilId'"
               @update:modelValue="
                 institution.measFacilId = $event;
-                measFacilNameField.validate();
+              measFacilNameField.validate();
               "
             ></TextField>
           </v-col>
@@ -66,7 +66,7 @@
               :attribute="'measFacilName'"
               @update:modelValue="
                 institution.measFacilName = $event;
-                measFacilIdField.validate();
+              measFacilIdField.validate();
               "
             ></TextField>
           </v-col>
@@ -307,7 +307,7 @@
         "
         @click="
           resetForm(resetNotification);
-          showPostalAddress = initialShowPostalAddress;
+        showPostalAddress = initialShowPostalAddress;
         "
       >
         {{ $t("button.reset") }}
@@ -328,9 +328,9 @@
     :cancelButtonText="$t('button.noCancelEntry')"
     :onConfirm="
       () => {
-        dismissedDuplicateAddressDialog = true;
-        isDuplicateAddressDialogOpen = false;
-      }
+      dismissedDuplicateAddressDialog = true;
+      isDuplicateAddressDialogOpen = false;
+    }
     "
     :onCancel="() => close()"
   ></ConfirmCancelDialog>
@@ -344,7 +344,6 @@
 <script setup>
 import {
   computed,
-  onBeforeMount,
   onMounted,
   onUnmounted,
   provide,
@@ -353,7 +352,7 @@ import {
 import { createSearchQueryString, HTTP } from "@/lib/http.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { useForm } from "@/lib/use-form.js";
-import { trimSpacesInObject } from "@/lib/form-helper.js";
+import { noLeadingTrailingSpaces, trimSpacesInObject, validMail, validPhone, validPostalcode, validRegex } from "@/lib/form-helper.js";
 import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 // TODO: Geocoding feature delayed to a subsequent date
 // import { useCoordinatesStore } from "@/stores/coordinates.js";
@@ -400,24 +399,6 @@ const originalInstitution = ref(managedItem.originalItem);
 // const selectedCoordinates = ref(null);
 const showPostalAddress = ref(false);
 const initialShowPostalAddress = ref(false);
-const {
-  valid,
-  hasNoChange,
-  validMail,
-  validPhone,
-  validPostalcode,
-  resetForm,
-  validRegex,
-  noLeadingTrailingSpaces,
-  onCancel,
-  showConfirmCancelDialog,
-  closeConfirmCancelDialog,
-  handleValidationErrorFromServer,
-  isServerValidationError,
-  removeAllResetEventListeners,
-  initClientRules,
-  cols,
-} = useForm(originalInstitution, institution);
 
 const measIdAndNameOrNothing = () => {
   return [
@@ -436,8 +417,22 @@ const measIdAndNameOrNothing = () => {
     },
   ];
 };
-onBeforeMount(() => {
-  initClientRules({
+
+const {
+  valid,
+  hasNoChange,
+  resetForm,
+  onCancel,
+  showConfirmCancelDialog,
+  closeConfirmCancelDialog,
+  handleValidationErrorFromServer,
+  isServerValidationError,
+  removeAllResetEventListeners,
+  cols,
+} = useForm({
+  originalObject: originalInstitution,
+  changedObject: institution,
+  rules: {
     name: [
       ...validRegex(
         noLeadingTrailingSpaces,
@@ -483,8 +478,9 @@ onBeforeMount(() => {
         t("error.noLeadingTrailingSpaces")
       ),
     ],
-  });
+  }
 });
+
 onMounted(() => {
   // TODO: Geocoding feature delayed to a subsequent date
   // coordinatesStore.coordinates.length = 0;
@@ -596,7 +592,7 @@ const checkForDuplicateAddress = () => {
         return (
           (!institution.value.id || institution.value.id !== i.id) &&
           i.serviceBuildingPostalCode ===
-            institution.value.serviceBuildingPostalCode &&
+          institution.value.serviceBuildingPostalCode &&
           i.serviceBuildingStreet === institution.value.serviceBuildingStreet
         );
       });

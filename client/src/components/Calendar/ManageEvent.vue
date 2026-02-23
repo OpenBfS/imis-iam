@@ -88,7 +88,7 @@
       <v-btn
         color="accent"
         @click="
-          onCancel(() => applicationStore.setShowManageEventDialog(false))
+        onCancel(() => applicationStore.setShowManageEventDialog(false))
         "
       >
         {{ $t("button.cancel") }}
@@ -103,7 +103,7 @@
 </template>
 <script setup>
 import { HTTP } from "@/lib/http.js";
-import { onBeforeMount, ref } from "vue";
+import { ref } from "vue";
 import { useForm } from "@/lib/use-form.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
@@ -131,7 +131,6 @@ const processType = ref(applicationStore.processType);
 const readonly = event.value.readonly || processType.value === PROCESS_TYPE.SHOW;
 
 const {
-  form,
   valid,
   hasNoChange,
   reqField,
@@ -139,16 +138,16 @@ const {
   onCancel,
   showConfirmCancelDialog,
   closeConfirmCancelDialog,
-  initClientRules,
   handleValidationErrorFromServer,
   isServerValidationError,
-} = useForm(originalEvent, event);
-onBeforeMount(() => {
-  initClientRules({
+} = useForm({
+  originalObject: originalEvent,
+  changedObject: event,
+  rules: {
     description: reqField(t("calendar.requiredDescription")),
     site: reqField(t("calendar.requiredSite")),
     title: reqField(t("calendar.requiredTitle")),
-  });
+  }
 });
 
 const createEvent = () => {
