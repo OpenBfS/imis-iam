@@ -130,9 +130,9 @@ const internalRules = ref([
 ]);
 
 const allRules = computed(() => {
-  return clientAndServerRules[props.attribute]
+  return clientAndServerRules.value[props.attribute]
     ? [
-        ...clientAndServerRules[props.attribute],
+        ...clientAndServerRules.value[props.attribute],
         ...(props.rules ?? []),
         ...internalRules.value,
       ]
