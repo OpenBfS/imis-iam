@@ -67,7 +67,7 @@ export const useApplicationStore = defineStore("application", {
     },
     addManagedItem(item) {
       const index = this.managedItems.findIndex(
-        (i) => i.item.id === item.item.id
+        (i) => i?.item.id === item.item.id
       );
       if (item.item.id && index !== -1) {
         // Do not open the same managed item in multiple dialogs
