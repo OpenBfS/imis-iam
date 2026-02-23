@@ -84,7 +84,7 @@ const {
   clientAndServerRules,
   form,
 } = inject("useForm");
-const managedItemIndex = inject("managedItemIndex");
+const managedItemIndex = inject("managedItemIndex", undefined);
 
 const applicationStore = useApplicationStore();
 

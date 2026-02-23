@@ -92,7 +92,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 const { form } = inject("useForm");
-const managedItemIndex = inject("managedItemIndex");
+const managedItemIndex = inject("managedItemIndex", undefined);
 const combobox = ref(null);
 const translationCategory = inject("translationCategory");
 const { onUpdateModelValue, clientAndServerRules } = inject("useForm");

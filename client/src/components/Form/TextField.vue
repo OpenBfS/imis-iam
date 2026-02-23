@@ -42,7 +42,7 @@ import { useApplicationStore } from "@/stores/application.js";
 import { createRequiredRule } from "@/lib/form-helper";
 
 const { onUpdateModelValue, clientAndServerRules } = inject("useForm");
-const managedItemIndex = inject("managedItemIndex");
+const managedItemIndex = inject("managedItemIndex", undefined);
 
 const applicationStore = useApplicationStore();
 

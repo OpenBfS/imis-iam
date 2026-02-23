@@ -36,7 +36,7 @@ import { useApplicationStore } from "@/stores/application.js";
 import { inject } from "vue";
 
 const { onUpdateModelValue, clientAndServerRules } = inject("useForm");
-const managedItemIndex = inject("managedItemIndex");
+const managedItemIndex = inject("managedItemIndex", undefined);
 
 const applicationStore = useApplicationStore();
 
