@@ -48,7 +48,7 @@ let changedAttributes = ref([]),
   removeChange = () => {},
   addResetEventListener = () => {},
   onUpdateModelValue = () => {},
-  clientAndServerRules = { test: [rulesToSpyOn.clientRule] },
+  clientAndServerRules = ref({ test: [rulesToSpyOn.clientRule] }),
   form;
 
 const wrapper = mount(ChipTextField, {
@@ -95,7 +95,7 @@ test("Test ChipTextField", async () => {
   expect(button.attributes().disabled).toBeUndefined();
 
   const callCountPropRule = propRuleSpy.mock.calls.length;
-  const callCountClientRule = propRuleSpy.mock.calls.length;
+  const callCountClientRule = clientRuleSpy.mock.calls.length;
   await button.trigger("click");
   // A chip with content "b" should be added
   chip = wrapper.findComponent("[data-test='chip']");
