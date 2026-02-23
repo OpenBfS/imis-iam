@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { onUpdated, ref, watch } from "vue";
+import { onUpdated, provide, ref, watch } from "vue";
 import { useForm } from "@/lib/use-form.js";
 import { useNotification } from "@/lib/use-notification.js";
 import { updateInstitution } from "@/components/Institution/institution.js";
@@ -72,6 +72,16 @@ import Select from "@/components/Form/Select.vue";
 import { useI18n } from "vue-i18n";
 
 const props = defineProps(["close", "isActive", "type"]);
+
+const isInstitutionType = () => {
+  return props.type === "institutions";
+};
+
+const isUserType = () => {
+  return props.type === "users";
+};
+
+provide("translationCategory", isInstitutionType() ? "institution" : "user");
 
 const institutionStore = useInstitutionStore();
 const profileStore = useProfileStore();
@@ -90,14 +100,6 @@ const selectedTags = ref([]);
 const userTagsAttribute = ref(null);
 const userTags = ref([]);
 const errorMessages = ref([]);
-
-const isInstitutionType = () => {
-  return props.type === "institutions";
-};
-
-const isUserType = () => {
-  return props.type === "users";
-};
 
 watch(
   () => props.isActive,
