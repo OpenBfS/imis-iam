@@ -202,7 +202,7 @@
         }}
       </v-btn>
       <v-btn
-        v-if="processType === PROCESS_TYPE.EDIT && !isReadOnly"
+        v-if="[PROCESS_TYPE.EDIT, PROCESS_TYPE.EDIT_PROFILE].includes(processType) && !isReadOnly"
         color="accent"
         :disabled="hasNoChange"
         @click="resetForm(cloneObject(originalUser), user, resetNotification)"
