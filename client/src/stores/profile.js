@@ -81,7 +81,10 @@ export const useProfileStore = defineStore("profile", {
     },
     getOwnUsername: (state) => {
       return state.userData.attributes.username[0]
-    }
+    },
+    getOwnID: (state) => {
+      return state.userData.id;
+    },
   },
   actions: {
     setUserData(data) {

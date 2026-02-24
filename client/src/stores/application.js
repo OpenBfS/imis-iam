@@ -211,11 +211,7 @@ export const useApplicationStore = defineStore("application", {
         this.loadNetworks();
       }
     },
-    /**
-     * @param {object} user
-     * @param {boolean} viaProfileButton If the profile button in the app bar at the top was pressed.
-     */
-    openUserEditForm(user, viaProfileButton = false) {
+    openUserEditForm(user, processType = PROCESS_TYPE.EDIT) {
       const profileStore = useProfileStore();
       const ownUsername = profileStore.getOwnUsername;
       const isOwnAccount = ownUsername === user.attributes.username[0]
@@ -232,9 +228,7 @@ export const useApplicationStore = defineStore("application", {
       this.setOwnAccount(isOwnAccount);
       this.setManagedItem(u);
       this.setSavedItem(structuredClone(u));
-      this.setProcessType(
-        viaProfileButton ? PROCESS_TYPE.EDIT_PROFILE : PROCESS_TYPE.EDIT,
-      );
+      this.setProcessType(processType);
       this.setShowManageUserDialog(true);
     },
   },

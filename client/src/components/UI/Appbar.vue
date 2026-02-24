@@ -58,7 +58,7 @@
 </template>
 <style scoped></style>
 <script setup>
-import { useApplicationStore } from "@/stores/application.js";
+import { PROCESS_TYPE, useApplicationStore } from "@/stores/application.js";
 import { useProfileStore } from "@/stores/profile.js";
 import { computed } from "vue";
 
@@ -88,6 +88,6 @@ const changePassword = () => {
 };
 
 const editProfile = () => {
-  applicationStore.openUserEditForm(structuredClone(savedUser.value), true);
+  applicationStore.openUserEditForm(structuredClone(savedUser.value), PROCESS_TYPE.EDIT_PROFILE);
 };
 </script>

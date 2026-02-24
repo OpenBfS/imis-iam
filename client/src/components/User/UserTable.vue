@@ -135,6 +135,8 @@ const onCopyClicked = (id) => {
 };
 const onEditClicked = (id) => {
   user.value = cloneObject(getUserById(id));
-  applicationStore.openUserEditForm(user.value);
+  const ID = profileStore.getOwnID
+  const processType = user.value.id === ID ? PROCESS_TYPE.EDIT_PROFILE : PROCESS_TYPE.EDIT
+  applicationStore.openUserEditForm(user.value, processType);
 };
 </script>
