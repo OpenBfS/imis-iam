@@ -428,3 +428,86 @@ class TestFrontendUser(SeleniumTestSuite):
         # only compare entry types 'resource' (network requests)
         # other entry types are 'measure' and 'paint'
         assert requests_before == requests_after
+
+
+class TestParallelDialog(SeleniumTestSuite):
+    """Test suite for the parallel dialog (window manager) feature"""
+
+    def _open_user_entry(self, driver, wait, username):
+        """Click the edit/view button for a user row matching the given username."""
+        button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, f"//tr[contains(., '{username}')]//button[.//i[contains(@class, 'mdi-pencil') or contains(@class, 'mdi-information-outline')]]"))
+        )
+        button.click()
+        time.sleep(0.5)
+
+    def _drag_dialog(self, driver, wait, x=0, y=0):
+        """Drag the topmost (highest z-index) dialog header"""
+        wait.until(EC.presence_of_element_located((By.CLASS_NAME, "draggable-dialog-header")))
+        headers = driver.find_elements(By.CLASS_NAME, "draggable-dialog-header")
+        topmost = max(
+            headers,
+            key=lambda h: int(h.find_element(By.XPATH, "ancestor::div[contains(@class,'v-card')]").value_of_css_property("z-index") or 0)
+        )
+        ActionChains(driver).click_and_hold(topmost).move_by_offset(x, y).release().perform()
+        time.sleep(0.5)
+
+    def test_parallel_dialog(self, authenticated_driver_factory):
+        """
+        Test the parallel dialog feature / window manager feature:
+        1. Login as chefredakteur
+        2. Open own entry in the user list, drag dialog to the left edge
+        3. Open exampleuser's entry, move the dialog down
+        4. Switch to Institutionen tab
+        5. Open Institution 1, drag its dialog to the left edge
+        """
+        driver = authenticated_driver_factory("chefredakteur")
+        wait = WebDriverWait(driver, 10)
+
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_parallel_dialog_1_logged_in.png")
+
+        # 2: Open own entry (chefredakteur) and drag to left
+        self._open_user_entry(driver, wait, "Chefredakteur")
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_parallel_dialog_2_own_entry_opened.png")
+
+        self._drag_dialog(driver, wait, x=-600)
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_parallel_dialog_3_own_entry_dragged_left.png")
+
+        # Verify the dialog is still visible after dragging
+        dialog_cards = driver.find_elements(By.CSS_SELECTOR, ".draggable-dialog-header")
+        assert len(dialog_cards) >= 1, "parallel dialog should still be visible after dragging"
+
+        # 3: Open exampleuser's entry and move it down
+        self._open_user_entry(driver, wait, "User")
+        time.sleep(0.5)
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_parallel_dialog_4_exampleuser_opened.png")
+
+        self._drag_dialog(driver, wait, y=200)
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_parallel_dialog_5_exampleuser_moved_down.png")
+
+        # Verify two dialogs are open
+        dialog_headers = driver.find_elements(By.CSS_SELECTOR, ".draggable-dialog-header")
+        assert len(dialog_headers) == 2, f"Expected 2 open dialogs, found {len(dialog_headers)}"
+
+        # 4: Switch to Institutionen tab
+        institutions_tab = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@role='tab' and contains(., 'Institutionen')]"))
+        )
+        institutions_tab.click()
+        time.sleep(1)
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_parallel_dialog_6_institutions_tab.png")
+
+        # 5: Open Institution 1 (measFacilName: inst_1) and drag to right
+        institution_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//tr[contains(., 'inst_1')]//button[.//i[contains(@class, 'mdi-pencil')]]"))
+        )
+        institution_button.click()
+        time.sleep(0.5)
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_parallel_dialog_7_institution_opened.png")
+
+        self._drag_dialog(driver, wait, x=600)
+        driver.save_screenshot(f"{SCREENSHOT_DIR}/test_parallel_dialog_8_institution_dragged_left.png")
+
+        # Verify three dialogs are open
+        dialog_headers = driver.find_elements(By.CSS_SELECTOR, ".draggable-dialog-header")
+        assert len(dialog_headers) == 3, f"Expected 3 open dialogs, found {len(dialog_headers)}"
