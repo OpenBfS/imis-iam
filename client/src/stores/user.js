@@ -6,7 +6,7 @@
  */
 import { defineStore } from "pinia";
 import { createSearchQueryString, HTTP } from "../lib/http.js";
-import { PROCESS_TYPE, useApplicationStore } from "./application.js";
+import { PROCESS_TYPE } from "./application.js";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
@@ -85,11 +85,10 @@ export const useUserStore = defineStore("user", {
           .catch((error) => reject(error));
       });
     },
-    updateUser(user) {
-      const applicationStore = useApplicationStore();
+    updateUser(user, processType) {
       return new Promise((resolve, reject) => {
         const endpoint =
-          applicationStore.processType === PROCESS_TYPE.EDIT_PROFILE
+          processType === PROCESS_TYPE.EDIT_PROFILE
             ? "/iam/user/profile"
             : "iam/user";
         HTTP.put(endpoint, user)

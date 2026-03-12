@@ -53,12 +53,16 @@ function updateUser(
   hasRequestError,
   managedItemIndex
 ) {
+  const applicationStore = useApplicationStore();
   const profileStore = useProfileStore();
   const userStore = useUserStore();
   if (resetNotification) resetNotification();
   return new Promise((resolve) => {
     userStore
-      .updateUser(trimSpacesInObject(user))
+      .updateUser(
+        trimSpacesInObject(user),
+        applicationStore.managedItems[managedItemIndex].processType,
+      )
       .then(() => {
         // Update current user Profile and thus the data in App bar.
         if (profileStore.userData.id === user.id) {
