@@ -57,7 +57,7 @@
               v-model="user.retired"
             ></Checkbox>
           </v-col>
-          <v-col style="max-width: fit-content">
+          <v-col v-if="profileStore.userData.role === 'chief_editor'" style="max-width: fit-content">
             <Checkbox attribute="hiddenInAddressbook" :label="$t('user.hiddenInAddressbook')"
               v-model="user.hiddenInAddressbook"></Checkbox>
           </v-col>
