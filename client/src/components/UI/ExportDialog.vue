@@ -16,14 +16,14 @@
             <Combobox
               :label="$t('export.fieldSeparator')"
               :items="fieldSeparators"
-              attribute="fieldSeparator"
+              :model-value="csvOptions.fieldSeparator"
               required
               @update:modelValue="csvOptions.fieldSeparator = $event"
             ></Combobox>
             <Combobox
               :label="$t('export.rowDelimiter')"
               :items="rowDelimiters"
-              attribute="rowDelimiter"
+              :model-value="csvOptions.rowDelimiter"
               persistent-hint
               required
               @update:modelValue="csvOptions.rowDelimiter = $event"
@@ -31,16 +31,17 @@
             <Combobox
               :label="$t('export.encoding')"
               :items="encoding"
+              :model-value="csvOptions.encoding"
               attribute="encoding"
               persistent-hint
               required
               @update:modelValue="csvOptions.encoding = $event"
             ></Combobox>
             <Combobox
-              attribute="quoteType"
               :no-data-text="$t('label.noDataText')"
               :label="$t('export.quoteType')"
               :items="quoteTypes"
+              :model-value="csvOptions.quoteType"
               persistent-hint
               required
               @update:modelValue="csvOptions.quoteType = $event"

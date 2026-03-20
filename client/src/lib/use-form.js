@@ -171,8 +171,8 @@ export function useForm({ originalObject, changedObject, rules, i18n }) {
     if (serverValidationRules.value[attribute]) {
       delete serverValidationRules.value[attribute];
       await nextTick();
-      form.value.validate();
     }
+    form.value.validate();
   };
 
   const isServerValidationError = (error) => {
