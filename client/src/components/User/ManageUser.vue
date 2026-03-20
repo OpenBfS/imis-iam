@@ -82,7 +82,9 @@
         </template>
 
         <v-row>
-          <v-label>{{ $t("user.misc") }}</v-label>
+          <v-col>
+            <v-label>{{ $t("user.misc") }}</v-label>
+          </v-col>
         </v-row>
         <v-row>
           <template v-for="attribute in profileStore.attributesWithoutGroup" :key="attribute.name">
